@@ -10,11 +10,12 @@ def iiifparse(manifest):
     mnf = json.loads(manifest)
     metadata=mnf["metadata"]
     m=parseMeta(metadata)
-    if "seeAlso" in mnf:
-        x=mnf["seeAlso"]
-        for xx in x:
-            if (xx["label"] == "MARCXML"): 
-                m.markxml=xx["@id"]
+#    if "seeAlso" in mnf:
+#        x=mnf["seeAlso"]
+#        print(x)
+#        for xx in x:
+#            if (xx["label"] == "MARCXML"): 
+#                m.markxml=xx["@id"]
     canvases=mnf["sequences"][0]["canvases"]    
     i=parseImages(canvases)
     m.numberOfImages=len(i)

@@ -6,9 +6,30 @@ from iiifparse import *
 from dbactions import *
 from classes import *
 from nanoid import generate
-   
-   
+from pydantic_settings import BaseSettings
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
+
+#class Settings(BaseSettings):
+#    class Config:
+#        env_file = '.env'
+#        env_file_encoding = 'utf-8'
+
+
+#settings = Settings()
+#for name, value in os.environ.items():
+#    print("{0}: {1}".format(name, value))
+#print("MONGODB")
+#print( os.getenv('MONGODB_HOST', ''))
+#print( os.getenv('MONGODB_PORT', ''))
+#print("Settings")
+#print(settings.dict())
+#print(settings.MONGODB_PORT)
+
+print(get_database())
+#getAllRessourcesFromDb()
 
 app = FastAPI()
 
@@ -31,7 +52,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World port"+os.getenv('MONGODB_PORT', '')+" end port"}
     
 @app.get("/getMetadata")
 async def getMetadata(iiifUrl):
