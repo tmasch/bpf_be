@@ -1,0 +1,30 @@
+version: "3"
+services:
+  bpf_be:
+    container_name: be7
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      WAIT_HOSTS: mongodb:27017
+      MONGODB_HOST: localhost
+      MONGODB_PORT: 27017
+    networks:
+      - bpfnet
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    volumes:
+      - /Users/trm/Projekte/bpf_db:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - bpfnet
+networks:
+  bpfnet:
+    driver: bridge
