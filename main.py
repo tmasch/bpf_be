@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import urllib.request
 import json 
-from iiifparse import *
+import iiifparse
 from dbactions import *
 from classes import *
 from nanoid import generate
@@ -55,8 +55,9 @@ async def root():
     return {"message": "Hello World port"+os.getenv('MONGODB_PORT', '')+" end port"}
     
 @app.get("/getMetadata")
-async def getMetadata(iiifUrl):
-    m = iiifparse(iiifUrl)
+async def getMetadata(iiifUrl, material):
+    m = iiifparse.iiifparse(iiifUrl)
+    m.material = material
 #    print(iiifUrl)
 #    url = urllib.request.urlopen(iiifUrl)
 #    manifest = url.read()
@@ -68,6 +69,15 @@ async def getMetadata(iiifUrl):
     print(m)
 
     return (m) 
+
+@app.get("/callAdditionalBibliographicInformation")
+async def supply_biblio_information(additional_bid):
+    bi = iiifparse.supply_bibliographic_information(additional_bid)    
+    print(Bibliographic_id)
+    print(bi)
+    return (bi)
+
+    
 
 @app.post("/createNewRessource")
 async def createNewRessource(metadata: Metadata):

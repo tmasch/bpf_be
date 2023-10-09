@@ -33,7 +33,9 @@ def VD17_parsing(url_bibliography):
                     for step2 in field:                                            
                         match(step2.get("code")):                        
                             case "a":                                
-                                bid.id = step2.text                        
+                                bid.id = step2.text
+                                if bid.id[0:4] == "VD18":
+                                    bid.id = bid.id[5:]                        
                             case "2":
                                 bid.name = step2.text                                
                 case "100": #for the author
@@ -44,7 +46,8 @@ def VD17_parsing(url_bibliography):
                                 pe.name = step2.text
                             case "0":
                                 if "(DE-588)" in step2.text:                                
-                                    pe.id = (step2.text)[8:] # here and elsewhere: to suppress the "(DE-588)"                                
+                                    pe.id = (step2.text)[8:] # here and elsewhere: to suppress the "(DE-588)"   
+                                    pe.id_name = "GND"                             
                     pe.role = "aut"                        
                     bi.persons.append(pe)
                 case "245": # for title and volume number
@@ -68,6 +71,7 @@ def VD17_parsing(url_bibliography):
                             printing_information_divided = re.match(printing_information_pattern, step2.text)
                             bi.printing_information = printing_information_divided[3]
                 case "700"|"710": #for printers and publishers #the 710 is for the case, a printing firm (e.g., heirs of printer XY) have been catalogued as institution
+                    # On the long term, one should probably separate here persons and organisations, storing them as different entities
 #                    person_role = ""
 #                    person_id = ""
                     pe = Person()
@@ -78,11 +82,14 @@ def VD17_parsing(url_bibliography):
                             case "0":
                                 if "(DE-588)" in step2.text:
                                     pe.id = (step2.text)[8:]
+                                    pe.id_name = "GND"
                                     #person_id_divided = re.match(gnd_pattern, field[step2].text)
                                     #person_id = person_id_divided[2]
                             case "4":
                                 if step2.text == "prt":
                                     pe.role = "prt"
+                                if step2.text == "pbl":
+                                    pe.role = "pbl"
                     if pe.role != "":
 #                        single_person = (person_name, person_id, person_role)                
                         bi.persons.append(pe)
@@ -96,7 +103,8 @@ def VD17_parsing(url_bibliography):
                                     pl.name = step2.text                                
                                 case "0":
                                     if "(DE-588)" in step2.text:
-                                        pl.id = (step2.text)[8:]                                    
+                                        pl.id = (step2.text)[8:]  
+                                        pl.id_name = "GND"                                  
                                 case "4":
                                     if step2.text == "pup":
                                         pl.role = "pup"

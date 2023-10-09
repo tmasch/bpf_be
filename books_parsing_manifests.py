@@ -129,7 +129,7 @@ def Halle_parsing(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     location = ""
     bibliographic_id = []
     bibliographic_id_number = ""
@@ -216,7 +216,7 @@ def Berlin_parsing(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     bibliographic_id = []
     for step1 in metadata:
         label = step1["label"]
@@ -305,7 +305,7 @@ def Cambridge_Trinity_parsing(URI_entered):
     #Step 2: Transforming the extracted fields into database format (here done together with step 1 because it is very little to do)
     metadata=manifest["metadata"]
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     repository = ""
     shelfmark = ""
 
@@ -377,7 +377,7 @@ def ThULB_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and bringing them to database format
     # The manifest contains hardly any data. Each individual canvas, however, has its own URN that is part of the label field
     # One can extract this URN, remove the two last groups of digits, send it to the URN-resolver of the DNB, and receive
@@ -465,7 +465,7 @@ def SLUB_parsing(URI_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     metadata=manifest["metadata"]
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
 
@@ -537,7 +537,7 @@ def Cambridge_Corpus_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
     #Step 1: Extracting relevant fields from the general section of the Manifest
     
 
@@ -590,7 +590,7 @@ def Leipzig_parsing(URI_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     metadata=manifest["metadata"]
     m = Metadata()
-    m.manifest = manifest
+    m.manifest = url.read()
 
     for step1 in metadata:
         label = step1["label"]

@@ -24,6 +24,7 @@ class Person(BaseModel):
 # id is the id of the person in authority files (currently, the GND), name the name given in the source
 # and role the person's role in making the book, according to standard bibliographical abbreviations, e.g. "prt" for printer.
     id : Optional[str] = ""
+    id_name : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
 
@@ -33,6 +34,7 @@ class Place(BaseModel):
 # and role either "mfp" for the place of printing, or "pup" for the place of publishing. 
 # If a place is both, there will be two different record for it. 
     id : Optional[str] = ""
+    id_name : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
 
@@ -69,6 +71,7 @@ class Metadata(BaseModel):
 #        t=t+"Manifest"+self.manifest
 #        return(t)
     id : Optional[str] = ""
+    material : Optional[str] = ""
     repository : Optional[str] = ""
     shelfmark : Optional[str] = ""
     license : Optional[str] = ""
