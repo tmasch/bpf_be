@@ -37,7 +37,14 @@ def VD17_parsing(url_bibliography):
                                 if bid.id[0:4] == "VD18":
                                     bid.id = bid.id[5:]                        
                             case "2":
-                                bid.name = step2.text                                
+                                bid.name = step2.text
+                    bi.bibliographic_id.append(bid) # in the VD17, there is only one ID, this list is only introduced for the sake of consistence with incunables
+#                        single_place = (place_name, place_id, place_role)
+                    print("vorher: ")
+                    print(bid.id)
+                    print("gesamt: ")
+                    print(bid)
+                    
                 case "100": #for the author
                     pe = Person()
                     for step2 in field:                     
@@ -50,6 +57,8 @@ def VD17_parsing(url_bibliography):
                                     pe.id_name = "GND"                             
                     pe.role = "aut"                        
                     bi.persons.append(pe)
+#                    print("vorher:" + pe.name)
+#                    print("nachher: " + bi.persons)
                 case "245": # for title and volume number
                     for step2 in field:                                    
                         match(step2.get("code")):
@@ -111,10 +120,10 @@ def VD17_parsing(url_bibliography):
                                     if step2.text == "mfp":
                                         pl.role = "mfp"
                         #bibliographic_id_single = (bibliographic_id_name, bibliographic_id_number)
-                        bi.bibliographic_id.append(bid) # in the VD17, there is only one ID, this list is only introduced for the sake of consistence with incunables
-#                        single_place = (place_name, place_id, place_role)
                         bi.places.append(pl)
  #       return bibliographic_id_list, person_list, place_list, title, volume_number, part_title, printing_date, printing_information
+        print("bibliographic information from VD17:")
+        print(bi)
         return bi
 
 def VD16_parsing(url_bibliography):    

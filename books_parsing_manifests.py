@@ -525,7 +525,7 @@ def SLUB_parsing(URI_entered):
         #but has as last character "r" or "v", it is probably a folio number. 
         if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (canvas_label[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
 
