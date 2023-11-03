@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings
 import os
 from dotenv import load_dotenv
 load_dotenv()
+import gndparse
 
 
 #class Settings(BaseSettings):
@@ -65,8 +66,18 @@ async def getMetadata(iiifUrl, material):
 #    m=iiifparse(manifest)
 #    m.iiifUrl=iiifUrl
 #    m.manifest=manifest
+    person_counter = -1
+    for person in m.bibliographic_information[0].persons:
+        person_counter = person_counter + 1
+        person = gndparse.person_identification(person)
+        print("Person found: ")
+        print(person_counter)
+        print(person)
+      #  m.bibliographic_information[0].persons[person_counter] = person
+
+
     m.id=generate()
-    print(m)
+#    print(m)
 
     return (m) 
 
@@ -78,6 +89,12 @@ async def supply_biblio_information(additional_bid):
     return (bi)
 
     
+@app.get("/loadNewAuthorityRecord")
+async def load_new_authority_record(new_authority_id):
+    print(new_authority_id)
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+    potential_person = gndparse.gnd_parsing_person(authority_url)
+    return(potential_person)
 
 @app.post("/createNewRessource")
 async def createNewRessource(metadata: Metadata):

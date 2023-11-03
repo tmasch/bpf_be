@@ -58,8 +58,6 @@ def iiifparse(URI_entered):
     #else:
     #    print("This book comes from a library that is not yet supported by the system.")
     #    break
-
-    
     m.iiifUrl = URI_entered
 
 
@@ -88,3 +86,5 @@ def supply_bibliographic_information(additional_bid):
     bid_id = bid_divided[3]
     bibliographic_information_single = bibliography_select(bid_name, bid_id)    
     return bibliographic_information_single
+
+

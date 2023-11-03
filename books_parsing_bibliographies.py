@@ -81,6 +81,7 @@ def VD17_parsing(url_bibliography):
                             bi.printing_information = printing_information_divided[3]
                 case "700"|"710": #for printers and publishers #the 710 is for the case, a printing firm (e.g., heirs of printer XY) have been catalogued as institution
                     # On the long term, one should probably separate here persons and organisations, storing them as different entities
+                    # This needs to be changed since gndparse searches now only for persons. 
 #                    person_role = ""
 #                    person_id = ""
                     pe = Person()
@@ -249,7 +250,7 @@ def ISTC_parsing(URL_bibliography):
     bi = Bibliographic_information()
     istc_record_raw = requests.get(URL_bibliography)    
     istc_record_full = (istc_record_raw).json()
-   
+       
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")
         return

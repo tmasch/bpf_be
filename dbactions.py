@@ -12,6 +12,7 @@ def get_database():
         return client['bpf']
     host = os.getenv('MONGODB_HOST', '')
     print("host",host)
+    print(os.getenv('MONGODB_PORT', ''))
     port = int(os.getenv('MONGODB_PORT', ''))
     print("port",port)
     endpoint = 'mongodb://{0}'.format(host)
