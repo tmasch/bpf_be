@@ -36,10 +36,9 @@ def BSB_parsing(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
     m = Metadata()
+    repository = Organisation()
     m.manifest =  url.read()
     location = ""
-    #repository = ""
-    #shelfmark = ""
     bibliographic_id = []
     bibliographic_id_url = ""
     bibliographic_id_name = ""
@@ -67,9 +66,10 @@ def BSB_parsing(URI_entered):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
     if location:
         location_divided = re.match(location_pattern, location)
-        m.repository = location_divided.groups()[0]
+        repository.name = location_divided.groups()[0]
+        m.repository.append(repository)
         m.shelfmark = location_divided.groups()[2].lstrip()
-        print(m.repository)
+        print(m.repository[0].name)
         print(m.shelfmark)
     if bibliographic_id:
         
@@ -91,7 +91,7 @@ def BSB_parsing(URI_entered):
             if bibliographic_id_number[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
                 m.bibliographic_id.append(bid)
     print(m.license)
-    print(m.repository)
+    print(m.repository[0].name)
     print(m.shelfmark)
     
     
@@ -130,6 +130,7 @@ def Halle_parsing(URI_entered):
     metadata=manifest["metadata"]
     m = Metadata()
     m.manifest = url.read()
+    repository = Organisation()
     location = ""
     bibliographic_id = []
     bibliographic_id_number = ""
@@ -161,7 +162,8 @@ def Halle_parsing(URI_entered):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
     if location:
         location_divided = re.match(location_pattern, location)
-        m.repository = location_divided.groups()[0]
+        repository.name = location_divided.groups()[0]
+        m.repository.append(repository)
         m.shelfmark = location_divided.groups()[2]
     
     if bibliographic_id:    
@@ -216,14 +218,16 @@ def Berlin_parsing(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
     m = Metadata()
+    repository = Organisation()
     m.manifest = url.read()
     bibliographic_id = []
     for step1 in metadata:
         label = step1["label"]
         if label == "PhysicalLocation":         
-            m.repository = step1["value"]
-            if m.repository == "DE-1":
-                m.repository = "Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Berlin, Germany"
+            repository.name = step1["value"]
+            if repository.name == "DE-1":
+                repository.name = "Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Berlin, Germany"
+            m.repository.append(repository)
             
         if label == "Signatur" :
             m.shelfmark = step1["value"]
@@ -306,7 +310,7 @@ def Cambridge_Trinity_parsing(URI_entered):
     metadata=manifest["metadata"]
     m = Metadata()
     m.manifest = url.read()
-    repository = ""
+    repository = Organisation()
     shelfmark = ""
 
     bibliographic_id_transformed = []
@@ -340,7 +344,8 @@ def Cambridge_Trinity_parsing(URI_entered):
                     bid.id = bibliographic_id_divided[3]
                    
                     m.bibliographic_id.append(bid)               
-    m.repository = manifest["attribution"]
+    repository.name = manifest["attribution"]
+    m.repository.append(repository)
     m.shelfmark = manifest["label"]
     m.license = manifest["license"]
     #book_properties = (repository, shelfmark, bibliographic_id_transformed, license)
@@ -377,6 +382,7 @@ def ThULB_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     m = Metadata()
+    repository = Organisation()
     m.manifest = url.read()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and bringing them to database format
     # The manifest contains hardly any data. Each individual canvas, however, has its own URN that is part of the label field
@@ -399,7 +405,8 @@ def ThULB_parsing(URI_entered):
     catalogue_page = requests.get(urn_full)  
     catalogue_text = catalogue_page.text
     repository_divided = re.findall(repository_pattern, catalogue_text, re.MULTILINE)[0]
-    repository = repository_divided[1]
+    repository.name = repository_divided[1]
+    m.repository.append(repository)
 
 
     if "Zitierform" in catalogue_text: #Sometimes, two versions of the shelf mark are given, then the one marked 'Zitierform' is to be used. 
@@ -465,6 +472,7 @@ def SLUB_parsing(URI_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     metadata=manifest["metadata"]
     m = Metadata()
+    repository = Organisation()
     m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
@@ -500,7 +508,8 @@ def SLUB_parsing(URI_entered):
         
     
     attribution = manifest["attribution"]
-    m.repository = re.match(repository_pattern, attribution)[2]
+    repository.name = re.match(repository_pattern, attribution)[2]
+    m.repository.append(repository)
 
     
  
@@ -537,11 +546,11 @@ def Cambridge_Corpus_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     m = Metadata()
+    repository = Organisation()
     m.manifest = url.read()
     #Step 1: Extracting relevant fields from the general section of the Manifest
     
 
-    repository = ""
     shelfmark = ""
     canvas_prefix = ""
     canvas_label = ""
@@ -555,7 +564,8 @@ def Cambridge_Corpus_parsing(URI_entered):
     
 
     #Step 2: Transforming the extracted fields into database format
-    m.repository = "Corpus Christi College Cambridge, Parker Library"
+    repository.name = "Corpus Christi College Cambridge, Parker Library"
+    m.repository.append(repository)
     label_pattern = r'(.*)(:)(.*)'
     label_divided = re.match(label_pattern, label)
     m.shelfmark = "MS " + (label_divided[1]).lstrip("0")
@@ -590,6 +600,7 @@ def Leipzig_parsing(URI_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     metadata=manifest["metadata"]
     m = Metadata()
+    repository = Organisation()
     m.manifest = url.read()
 
     for step1 in metadata:
@@ -600,7 +611,8 @@ def Leipzig_parsing(URI_entered):
         if label == "Signatur":
             m.shelfmark = step1["value"]
         if label == "Owner":
-            m.repository = step1["value"]
+            repository.name = step1["value"]
+            m.repository.append(repository)
         # Bei den wenigen digitalisierten Inkunabeln fehlen anscheinend die GW-Nummern. 
         if label == "VD16":
             bid.name = "VD16"
@@ -624,8 +636,9 @@ def Leipzig_parsing(URI_entered):
         # The field 'owner' is not used for manuscripts. Since apparently all digitised manuscripts in the system are from Leipzig,
         # one can simply doublecheck that the name of the library appears in the 'label' and then use it. 
         # Should at some point manuscripts from other collections be described here, one would have to change that. 
-        if m.repository == "" and manifest["label"][0:40] == "Leipzig, Universitätsbibliothek Leipzig,":
-            m.repository = "Universitätsbibliothek Leipzig"
+        if repository.name == "" and manifest["label"][0:40] == "Leipzig, Universitätsbibliothek Leipzig,":
+            repository.name = "Universitätsbibliothek Leipzig"
+            m.repository.append(repository)
 
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format

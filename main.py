@@ -57,6 +57,8 @@ async def root():
     
 @app.get("/getMetadata")
 async def getMetadata(iiifUrl, material):
+    print("iiifURL: ")
+    print(iiifUrl)
     m = iiifparse.iiifparse(iiifUrl)
     m.material = material
 #    print(iiifUrl)
@@ -66,19 +68,22 @@ async def getMetadata(iiifUrl, material):
 #    m=iiifparse(manifest)
 #    m.iiifUrl=iiifUrl
 #    m.manifest=manifest
-    person_counter = -1
-    for person in m.bibliographic_information[0].persons:
-        person_counter = person_counter + 1
-        person = gndparse.person_identification(person)
-        print("Person found: ")
-        print(person_counter)
-        print(person)
-      #  m.bibliographic_information[0].persons[person_counter] = person
-
-
+    if m.bibliographic_information:
+        person_counter = -1
+        for person in m.bibliographic_information[0].persons:
+            person_counter = person_counter + 1
+            person = gndparse.person_identification(person)
+        #  m.bibliographic_information[0].persons[person_counter] = person
+        organisation_counter = -1
+        for organisation in m.bibliographic_information[0].organisations:
+            organisation_counter = organisation_counter + 1
+            organisation = gndparse.organisation_identification(organisation)
+    repository_counter = -1
+    for repository in m.repository:
+        repository = gndparse.organisation_identification(repository) # I had to define 'repository' as a list because Pydantic forced me to do so, but it only has one member. 
+        repository_counter = repository_counter + 1
     m.id=generate()
 #    print(m)
-
     return (m) 
 
 @app.get("/callAdditionalBibliographicInformation")
@@ -89,12 +94,30 @@ async def supply_biblio_information(additional_bid):
     return (bi)
 
     
-@app.get("/loadNewAuthorityRecord")
-async def load_new_authority_record(new_authority_id):
+@app.get("/loadNewPersonAuthorityRecord")
+async def load_new_person_authority_record(new_authority_id):
     print(new_authority_id)
     authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
     potential_person = gndparse.gnd_parsing_person(authority_url)
     return(potential_person)
+
+@app.get("/loadNewOrganisationAuthorityRecord")
+async def load_new_organisation_authority_record(new_authority_id_org):
+    print(new_authority_id_org)
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_org + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+    potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
+    print(potential_organisation)
+    return(potential_organisation)
+
+@app.get("/loadNewRepositoryAuthorityRecord")
+async def load_new_repository_authority_record(new_authority_id_rep):
+    print(new_authority_id_rep)
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_rep + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+    potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
+    print(potential_organisation)
+    return(potential_organisation)
+
+
 
 @app.post("/createNewRessource")
 async def createNewRessource(metadata: Metadata):

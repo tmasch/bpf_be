@@ -79,11 +79,7 @@ def VD17_parsing(url_bibliography):
                         if "Vorlageform des Erscheinungsvermerks" in step2.text:
                             printing_information_divided = re.match(printing_information_pattern, step2.text)
                             bi.printing_information = printing_information_divided[3]
-                case "700"|"710": #for printers and publishers #the 710 is for the case, a printing firm (e.g., heirs of printer XY) have been catalogued as institution
-                    # On the long term, one should probably separate here persons and organisations, storing them as different entities
-                    # This needs to be changed since gndparse searches now only for persons. 
-#                    person_role = ""
-#                    person_id = ""
+                case "700": #for printers and publishers 
                     pe = Person()
                     for step2 in field:
                         match(step2.get("code")):
@@ -100,9 +96,35 @@ def VD17_parsing(url_bibliography):
                                     pe.role = "prt"
                                 if step2.text == "pbl":
                                     pe.role = "pbl"
+                                if step2.text == "rsp":
+                                    pe.role = "rsp"
+                                if step2.text == "aut":
+                                    pe.role = "aut"
                     if pe.role != "":
 #                        single_person = (person_name, person_id, person_role)                
                         bi.persons.append(pe)
+                case "710":
+                    org = Organisation()
+                    for step2 in field:
+                        match(step2.get("code")):
+                            case "a":
+                                org.name = step2.text
+                            case "0":
+                                if "(DE-588)" in step2.text:
+                                    org.id = (step2.text)[8:]
+                                    org.id_name = "GND"
+                                    #person_id_divided = re.match(gnd_pattern, field[step2].text)
+                                    #person_id = person_id_divided[2]
+                            case "4":
+                                if step2.text == "prt":
+                                    org.role = "prt"
+                                if step2.text == "pbl":
+                                    org.role = "pbl"
+                    if org.role != "":
+#                        single_person = (person_name, person_id, person_role)                
+                        bi.organisations.append(org)
+
+
                 case "751": #for the places of printing and publishing
 #                        place_id = ""
 #                        place_role = ""

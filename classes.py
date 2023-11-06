@@ -88,6 +88,39 @@ class Place(BaseModel):
     role : Optional[str] = ""
 
 
+
+class Organisation_import(BaseModel):
+# This class is used for importing data on organisations from authority records such as the GND
+    external_id : Optional[list[External_id]] = []
+    internal_id : Optional[str] = ""
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    dates_from_source : Optional[list[Date_import]] = []
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+    preview : Optional[str] = ""
+
+class Organisation(BaseModel):
+# This class is used for references to organisations (publishing houses) in book records. 
+# id is the id of the place in authority files (currently, the GND), name the name given the source
+# and role either "pub" for the publisher, or "prt" for the printer
+# If an organisation is both, there will be two different record for it. 
+    id : Optional[str] = ""
+    id_name : Optional[str] = ""
+    internal_id : Optional[str] = ""
+    internal_id_preview : Optional[str] = ""
+    name : Optional[str] = ""
+    role : Optional[str] = ""
+    name : Optional[str] = ""
+    role : Optional[str] = ""
+    chosen_candidate : Optional[int] = ""
+    potential_candidates : Optional[list[Organisation_import]] = []
+
+
+
+
 class Bibliographic_id(BaseModel):
 # Here, the name is the name of the repertory (e.g., VD16), the id the id of a book in the repertory
 # and the uri the uri of the record of the book in the repertory.
@@ -103,6 +136,7 @@ class Bibliographic_information(BaseModel):
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
     bibliographic_id : Optional[list[External_id]] = []
     persons : Optional[list [Person]] = []
+    organisations : Optional[list [Organisation]] = []
     places : Optional[list [Place]] = []
     title: Optional[str] = ""
     volume_number : Optional[str] = ""
@@ -127,7 +161,7 @@ class Metadata(BaseModel):
 #        return(t)
     id : Optional[str] = ""
     material : Optional[str] = ""
-    repository : Optional[str] = ""
+    repository : Optional[list[Organisation]] = []
     shelfmark : Optional[str] = ""
     license : Optional[str] = ""
     bibliographic_id : Optional[list[External_id]] = []
