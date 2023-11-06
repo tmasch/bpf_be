@@ -77,17 +77,6 @@ class Person(BaseModel):
     
 
 
-class Place(BaseModel):
-# This class is used for references to places (virtually alwys towns) in book records.
-# id is the id of the place in authority files (currently, the GND), name the name given the source
-# and role either "mfp" for the place of printing, or "pup" for the place of publishing. 
-# If a place is both, there will be two different record for it. 
-    id : Optional[str] = ""
-    id_name : Optional[str] = ""
-    name : Optional[str] = ""
-    role : Optional[str] = ""
-
-
 
 class Organisation_import(BaseModel):
 # This class is used for importing data on organisations from authority records such as the GND
@@ -113,11 +102,43 @@ class Organisation(BaseModel):
     internal_id_preview : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
-    name : Optional[str] = ""
-    role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
     potential_candidates : Optional[list[Organisation_import]] = []
 
+class Coordinates(BaseModel):
+    # this class is used for importing coordinates from the GND, it may be usable more generally for handling this date
+    west : Optional[str] = ""
+    east : Optional[str] = ""
+    north : Optional[str] = ""
+    south : Optional[str] = ""
+
+class Place_import(BaseModel):
+# This class is used for importing data on places from authority records such as the GND
+    external_id : Optional[list[External_id]] = []
+    internal_id : Optional[str] = ""
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    coordinates : Optional[list[Coordinates]] = []
+    dates_from_source : Optional[list[Date_import]] = []
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+    preview : Optional[str] = ""
+
+class Place(BaseModel):
+# This class is used for references to places (virtually alwys towns) in book records.
+# id is the id of the place in authority files (currently, the GND), name the name given the source
+# and role either "mfp" for the place of printing, or "pup" for the place of publishing. 
+# If a place is both, there will be two different record for it. 
+    id : Optional[str] = ""
+    id_name : Optional[str] = ""
+    internal_id : Optional[str] = ""
+    internal_id_preview : Optional[str] = ""
+    name : Optional[str] = ""
+    role : Optional[str] = ""
+    chosen_candidate : Optional[int] = ""
+    potential_candidates : Optional[list[Place_import]] = []
 
 
 

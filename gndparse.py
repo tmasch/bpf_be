@@ -33,25 +33,26 @@ def person_identification(person):
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
     candidates = []
     if person.id:
-        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"_id": 1, "name_preferred": 1})
+        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "name_preferred": 1})
         if person_found:
-            person.internal_id = str(person_found["_id"])
+            person.internal_id = person_found["id"]
             person.internal_id_preview = person_found["name_preferred"] # The date should be added, but I first have to write how it is to be parsed
         else:
             if person.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + person.id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
                 person.potential_candidates = gnd_parsing_person(authority_url)
     else:
+        person.name = person.name.strip()
         candidates_result = coll.find({"name_preferred" : person.name}, {"_id": 1, "name_preferred" : 1})
         for candidate_result in candidates_result:
             candidate = Person_import()   
-            candidate.internal_id = str(candidate_result["_id"])
+            candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
 
             person.potential_candidates.append(candidate)
         candidates_result = coll.find({"name_variant" : person.name}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
-            candidate.internal_id = str(candidate_result["_id"])
+            candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             if candidate.id not in person.potential_candidates:
                 person.potential_candidates.append(candidate)
@@ -62,7 +63,6 @@ def person_identification(person):
                 person_name_search = person_name_search.replace(old, new)
             print(person_name_search)
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-            print(authority_url)
             person.potential_candidates = gnd_parsing_person(authority_url)
         if not person.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
             name_divided = person_name_search.split("%20")
@@ -72,8 +72,8 @@ def person_identification(person):
                     search_phrase = r"Per=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
                     name_query = name_query + search_phrase
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
-            print(authority_url)
-            person.potential_candidates = gnd_parsing_person(authority_url)
+            new_potential_candidates = gnd_parsing_person(authority_url)
+            person.potential_candidates = person.potential_candidates + new_potential_candidates
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
 
@@ -81,29 +81,16 @@ def person_identification(person):
     return person         
                 
 
-    
-    # This is currently unconnected
-#    if not person.id:
-#        for old, new in url_replacement.items():
-#            person.name = person.name.replace(old, new)
-#        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person.name + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-#    print(authority_url)
-
-    # End of the unconnected section
-
-
-
 def organisation_identification(organisation):
 # This function is used for every organisation named in the bibliographic record (printer etc.), and in addition for the repository of a book or manuscript
 # It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
     candidates = []
-#    print("Arrived in organisation_identification")
- #   print
+
     if organisation.id:
         organisation_found = coll.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1})
         if organisation_found:
-            organisation.internal_id = str(organisation_found["id"])
+            organisation.internal_id = organisation_found["id"]
             organisation.internal_id_preview = organisation_found["name_preferred"]
         else:
             if organisation.id_name == "GND": # I will have to create similar things for other authority files
@@ -114,42 +101,25 @@ def organisation_identification(organisation):
         organisation.name = organisation.name.strip()
         print("Search term: x"+ organisation.name + "x")
         candidates_result = (coll.find({"name_preferred" : organisation.name}, {"id": 1, "name_preferred" : 1}))
-#        if candidates_result:
-#            print("found in Mongo as preferred")
-#            print(candidates_result)
-#            print(list(candidates_result))
-
         for candidate_result in candidates_result:
-            print("single result:")
-            #print(candidate_result)
-            #print(candidate_result["name_preferred"])
+
             candidate = Organisation_import()   
-            candidate.internal_id = str(candidate_result["_id"])
+            candidate.internal_id = candidate_result["id"]
             candidate.preview = candidate_result["name_preferred"]
-            print("Preferred candidate in Mongo: " + candidate.name_preferred)
+
             organisation.potential_candidates.append(candidate)
         candidates_result = coll.find({"name_variant" : organisation.name}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
-#        if candidates_result:
-#            print("found in Mongo as variant")
-#            print(candidates_result[0])
         for candidate_result in candidates_result:
             candidate = Organisation_import()   
-            print('single record variant: ')
-            print(candidate_result)
-            candidate.internal_id = str(candidate_result["id"])
+            candidate.internal_id = candidate_result["id"]
             candidate.preview = candidate_result["name_preferred"]
-            print("Variant cndidate in Mongo: " + candidate.name_preferred)
             if candidate.internal_id not in organisation.potential_candidates:
                 organisation.potential_candidates.append(candidate)
-#                print(person.potential_candidates)
-
         if not organisation.potential_candidates: #if nothing has been found
             organisation_name_search = organisation.name
             for old, new in url_replacement.items():
                 organisation_name_search = organisation_name_search.replace(old, new)
-#            print(organisation_name_search)
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Koe%3D' + organisation_name_search + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
-#            print(authority_url)
             organisation.potential_candidates = gnd_parsing_organisation(authority_url)
         
 #        if not organisation.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
@@ -162,17 +132,77 @@ def organisation_identification(organisation):
                     name_query = name_query + search_phrase
 #                    print ("name query:" + name_query)
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'    
-        
- #           print(authority_url)
-            organisation.potential_candidates = gnd_parsing_organisation(authority_url)
+      
+            new_potential_candidates = gnd_parsing_organisation(authority_url)
+            organisation.potential_candidates = organisation.potential_candidates + new_potential_candidates 
     if len(organisation.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         organisation.chosen_candidate = 0
-#    print(organisation)
 
     
     return organisation
                 
 
+def place_identification(place):
+# This function is used for every place named in the bibliographic record (place of publishing / manufacture)
+# It will first search if a record for this place is already in the MongoDB database, and then search in the GND
+# If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
+# Note that the GND parser combined with it suppresses all records to regions - if this mechanism is later also used for identifying regions, this might need to be changed
+# Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
+    candidates = []
+    if place.id:
+        place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1})
+        if place_found:
+            place.internal_id = place_found["id"]
+            place.internal_id_preview = place_found["name_preferred"]
+        else:
+            if place.id_name == "GND": # I will have to create similar things for other authority files
+                authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + place.id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
+
+                place.potential_candidates = gnd_parsing_place(authority_url)
+    else:
+        place.name = place.name.strip()
+        candidates_result = (coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1}))
+        for candidate_result in candidates_result:
+            candidate = Place_import()   
+            candidate.internal_id = candidate_result["id"]
+            candidate.preview = candidate_result["name_preferred"]
+            place.potential_candidates.append(candidate)
+        candidates_result = coll.find({"name_variant" : place.name}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        for candidate_result in candidates_result:
+            candidate = Place_import()   
+            candidate.internal_id = candidate_result["id"]
+            candidate.preview = candidate_result["name_preferred"]
+
+            if candidate.internal_id not in place.potential_candidates:
+                place.potential_candidates.append(candidate)
+
+
+        if not place.potential_candidates: #if nothing has been found
+            place_name_search = place.name
+            for old, new in url_replacement.items():
+                place_name_search = place_name_search.replace(old, new)
+            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=400'
+            place.potential_candidates = gnd_parsing_place(authority_url)
+        
+#        if not organisation.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
+# I experiment leaving that one out. 
+            name_divided = place_name_search.split("%20")
+            name_query = ""           
+            for word in name_divided:
+                if word != "":    
+                    search_phrase = r"Geo=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
+                    name_query = name_query + search_phrase
+#                    print ("name query:" + name_query)
+            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=400'    
+            additional_potential_candidates = gnd_parsing_place(authority_url)
+            for additional_candidate in additional_potential_candidates:
+                if additional_candidate not in place.potential_candidates:
+                    place.potential_candidates.append(candidate)
+#            place.potential_candidates = place.potential_candidates + additional_potential_candidates
+            place.potential_candidates = sorted(place.potential_candidates, key = lambda candidate : candidate.preview)
+    if len(place.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
+        place.chosen_candidate = 0
+    return place
 
 
 
@@ -201,9 +231,10 @@ def gnd_parsing_person(authority_url):
                             case "a":
                                 pe_id = External_id()
                                 pe_id.name = "GND"
-                                pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
-                                if not pe.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
-                                    pe.external_id.append(pe_id)
+                                if step2.text[0:8] == "(DE-588)":
+                                    pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+                                    if not pe.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                        pe.external_id.append(pe_id)
                                 # Quite often, there are several GND records for one person, and if discovered, they are merged, and all GND IDs but become obsolete.
                                 # However, they are still stored in the record (035z) and are found by the search. 
                                 # Hence, this ID may be different from the person.id I used for the search in the first place.
@@ -442,9 +473,10 @@ def gnd_parsing_organisation(authority_url):
                             case "a":
                                 org_id = External_id()
                                 org_id.name = "GND"
-                                org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
-                                if not org.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
-                                    org.external_id.append(org_id)
+                                if step2.text[0:8] == "(DE-588)":
+                                    org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+                                    if not org.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                        org.external_id.append(org_id)
                                 # Quite often, there are several GND records for one organisation, and if discovered, they are merged, and all GND IDs but become obsolete.
                                 # However, they are still stored in the record (035z) and are found by the search. 
                                 # Hence, this ID may be different from the organisation.id I used for the search in the first place.
@@ -612,6 +644,219 @@ def gnd_parsing_organisation(authority_url):
     return(potential_organisations_list)
 
 
+def gnd_parsing_place(authority_url):
+    potential_places_list = []
+    url = urllib.request.urlopen(authority_url)
+    tree = xml.etree.ElementTree.parse(url)
+    root = tree.getroot()
+    #print(root)
+    
+    for record in root[2]:
+        pl = Place_import()
+        comment = ""
+        obpa_preview = ""
+        adue_preview = ""
+        vorg_preview = ""
+        nach_preview = ""
+        name_variant_preview = ""
+        comments_preview = ""
+        entity_list = []
+        town = False
+        for step1 in record[2][0]:
+            match step1.get('tag'):
+                case "024":
+                    pl_id = External_id()
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                pl_id.id = step2.text
+                            case "2":
+                                pl_id.name = step2.text
+                        if pl_id.name == "geonames":
+                            pl_id.uri = "https://sws.geonames.org/" + pl_id.id
+                            pl.external_id.append(pl_id)                            
+                case "034":
+                    coordinates = Coordinates()
+                    pl_id = External_id()
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "d": 
+                                coordinates.west = step2.text
+                            case "e": 
+                                coordinates.east = step2.text
+                            case "f":
+                                coordinates.north = step2.text
+                            case "g": 
+                                coordinates.south = step2.text
+                    pl.coordinates.append(coordinates)
+                case "035":
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                pl_id = External_id()
+                                pl_id.name = "GND"
+                                if step2.text[0:8] == "(DE-588)":
+                                    pl_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.                             
+                                    pl.external_id.append(pl_id)
+                                # Quite often, there are several GND records for one place, and if discovered, they are merged, and all GND IDs but become obsolete.
+                                # However, they are still stored in the record (035z) and are found by the search. 
+                                # Hence, this ID may be different from the person.id I used for the search in the first place.
+                                # Annoyingly, the search also finds IDs from the old database . If it is possible that a PND ID is the same as the GND ID of a 
+                                # different record, I have to include a function to delete this record from the results (I am enquiring if this is the case)
+                case "075":
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "b":
+                                entity_list.append(step2.text)
+                case "151":
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                pl.name_preferred = step2.text                               
+                            case "x" | "z": # some kind of subdivision, I don't know how often it will appear
+                                pl.name_preferred = pl.name_preferred + " (" + step2.text + ") "
+                case "451":
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                name_variant = step2.text
+                            case "i" | "x" | "z": # different comment fields
+                                name_number =  " (" + step2.text + ") "
+                    for variant in pl.name_variant:
+                        if name_variant in variant:
+                            name_variant = ""
+                    if name_variant:
+                        pl.name_variant.append(name_variant)
+                case "500":
+                    conn_pe = Connected_entity()
+                    conn_pe.external_id = []
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "0":
+                                if step2.text[0:8] == "(DE-588)":
+                                    conn_id = External_id()
+                                    conn_id.name = "GND"
+                                    conn_id.id = step2.text[8:]
+                                    conn_pe.external_id.append(conn_id)
+
+                            case "a":
+                                conn_pe.name = step2.text
+                            case "b": 
+                                conn_pe.name = conn_pe.name + " " + step2.text
+                            case "c": 
+                                conn_pe.name = conn_pe.name + "(" + step2.text + ")" #in this case I add this to the name
+                            # since it may make clear who the person is. 
+                            case "4":
+                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+                                    conn_pe.connection_type = step2.text
+                            case "9": 
+                                if step2.text[0:2] == "v:":
+                                    conn_pe.connection_comment = step2.text[2:]
+                                if step2.text[0:2] == "Z:":
+                                    conn_pe.connection_time = step2.text
+                    if "VD-16 Mitverf." not in conn_pe.connection_comment: 
+                            # someone connected all persons who appear together as authors in the VD16,
+                            # I want them removed. 
+                        pl.connected_persons.append(conn_pe)
+                case "510":
+                    conn_org = Connected_entity()
+                    conn_org.external_id = []
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "0":
+                                if step2.text[0:8] == "(DE-588)":
+                                    conn_id = External_id()
+                                    conn_id.name = "GND"
+                                    conn_id.id = step2.text[8:]
+                                    conn_org.external_id.append(conn_id)
+                            case "a": 
+                                conn_org.name = step2.text
+                            case "b": #for sub-units of organisations - no clue if this will ever happen in my circumstances
+                                conn_org.name = conn_org.name + " (" + step2.text + ")"
+                            case "4":
+                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+                                    conn_org.connection_type = step2.text
+                            case "9": 
+                                if step2.text[0:2] == "v:":
+                                    conn_org.connection_comment = step2.text[2:]
+                                if step2.text[0:2] == "Z:":
+                                    conn_org.connection_time = step2.text
+                    pl.connected_organisations.append(conn_org)
+                case "548": #I wonder if this is ever used for places
+                    date = Date_import()
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                date.datestring = step2.text
+                            case "4":
+                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+                                    date.datetype = step2.text
+                    if date.datetype == "datb":
+                        date_preview = " (extant" + date.datestring + ")"
+                case "550": #This is used for general headings. This information is simply displayed in the "comment" field
+                    # so that it can be used to manually create the links I will need. 
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "a":
+                                if pl.comments:
+                                    pl.comments = step2.text + "; " + pl.comments
+                                else:
+                                    pl.comments = step2.text
+                case "551":
+                    conn_pl = Connected_entity()
+                    conn_id = External_id()
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "0":
+                                if step2.text[0:8] == "(DE-588)":
+                                    conn_id.name = "GND"
+                                    conn_id.id = step2.text[8:]
+                                    conn_pl.external_id.append(conn_id)
+                            case "a": 
+                                conn_pl.name = step2.text
+                            case "g": 
+                                conn_pl.name = conn_pl.name + " (" + step2.text + ")"
+                            case "4":
+                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+                                    conn_pl.connection_type = step2.text
+                            case "9": 
+                                if step2.text[0:2] == "v:":
+                                    conn_pl.connection_comment = step2.text[2:]
+                                if step2.text[0:2] == "Z:":
+                                    conn_pl.connection_time = step2.text
+                    if conn_pl.connection_type == "obpa":
+                        obpa_preview = ", part of " + conn_pl.name
+                    if conn_pl.connection_type == "adue":
+                        adue_preview = ", part of " + conn_pl.name
+                  
+                    if conn_pl.connection_type == "vorg":
+                        vorg_preview = ", earlier called " + conn_pl.name
+                    if conn_pl.connection_type == "nach":
+                        nach_preview = ", later called " + conn_pl.name
+                    pl.connected_locations.append(conn_pl)
+                case "678":
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "b":
+                                if pl.comments:
+                                    pl.comments = step2.text + "; " + pl.comments
+                                else:
+                                    pl.comments = step2.text
+        if pl.comments:                
+            comments_preview = " (" + pl.comments + ")"
+        if pl.name_variant:
+            name_variant_preview = ", also called: "
+            for variant in pl.name_variant:
+                name_variant_preview = name_variant_preview + variant + "; "
+            name_variant_preview = name_variant_preview[:-2]
+
+        pl.preview = pl.name_preferred + obpa_preview + adue_preview + vorg_preview + nach_preview + name_variant_preview + comments_preview
+        if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list and "gif" not in entity_list):
+        #Thus, only administrative units or not-further determined locations or fictive locations, provided they are neither states nor larger administrative regions
+            potential_places_list.append(pl)
+    return(potential_places_list)
+
+
 
 
 person = Person()
@@ -636,3 +881,11 @@ organisation.id_name = "GND"
 #record = gnd_parsing_organisation(authority_url)
 #record = organisation_identification(organisation)
 #print(record)
+#authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D4086808-4%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
+place = Place()
+place.id_name = "GND"
+#place.id = "4086808-4"
+#place.name = "Frankfurt, Main"
+#x = place_identification(place)
+
+#print(x)
