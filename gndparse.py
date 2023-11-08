@@ -197,7 +197,7 @@ def place_identification(place):
             additional_potential_candidates = gnd_parsing_place(authority_url)
             for additional_candidate in additional_potential_candidates:
                 if additional_candidate not in place.potential_candidates:
-                    place.potential_candidates.append(candidate)
+                    place.potential_candidates.append(additional_candidate)
 #            place.potential_candidates = place.potential_candidates + additional_potential_candidates
             place.potential_candidates = sorted(place.potential_candidates, key = lambda candidate : candidate.preview)
     if len(place.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)

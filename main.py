@@ -80,12 +80,12 @@ async def getMetadata(iiifUrl, material):
             organisation = gndparse.organisation_identification(organisation)
         places_counter = -1
         for place in m.bibliographic_information[0].places:
-            print("Place raw: " )
-            print(place)
+#            print("Place raw: " )
+#            print(place)
             places_counter = places_counter + 1
             place = gndparse.place_identification(place)
-        print("Place to be inserted:")
-        print(place)
+#        print("Place to be inserted:")
+#        print(place)
     repository_counter = -1
     for repository in m.repository:
         repository = gndparse.organisation_identification(repository) # I had to define 'repository' as a list because Pydantic forced me to do so, but it only has one member. 
@@ -142,7 +142,7 @@ async def createNewRessource(metadata: Metadata):
     print(m)
     insertMetadata(m)
     print(m)
-    return("Hello World")
+    return(m)
     
 @app.get("/allRessources", response_model=List[Metadata]) 
 async def getAllRessources():
