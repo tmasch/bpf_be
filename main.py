@@ -5,6 +5,7 @@ import json
 import iiifparse
 from dbactions import *
 from classes import *
+from imageActions import *
 from nanoid import generate
 from pydantic_settings import BaseSettings
 import os
@@ -154,3 +155,9 @@ async def getRessource(id: str):
     print(id)
     r=getRessourceFromDb(id)
     return(r)
+    
+@app.get("/findImages")    
+async def findImages(id: str):
+    print(id)
+    r=findImages(id)
+    
