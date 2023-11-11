@@ -67,6 +67,7 @@ def BSB_parsing(URI_entered):
     if location:
         location_divided = re.match(location_pattern, location)
         repository.name = location_divided.groups()[0]
+        repository.role = "col"
         m.repository.append(repository)
         m.shelfmark = location_divided.groups()[2].lstrip()
         print(m.repository[0].name)
@@ -163,6 +164,7 @@ def Halle_parsing(URI_entered):
     if location:
         location_divided = re.match(location_pattern, location)
         repository.name = location_divided.groups()[0]
+        repository.role = "col"
         m.repository.append(repository)
         m.shelfmark = location_divided.groups()[2]
     
@@ -227,6 +229,7 @@ def Berlin_parsing(URI_entered):
             repository.name = step1["value"]
             if repository.name == "DE-1":
                 repository.name = "Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Berlin, Germany"
+            repository.role = "col"
             m.repository.append(repository)
             
         if label == "Signatur" :
@@ -345,6 +348,7 @@ def Cambridge_Trinity_parsing(URI_entered):
                    
                     m.bibliographic_id.append(bid)               
     repository.name = manifest["attribution"]
+    repository.role = "col"
     m.repository.append(repository)
     m.shelfmark = manifest["label"]
     m.license = manifest["license"]
@@ -406,6 +410,7 @@ def ThULB_parsing(URI_entered):
     catalogue_text = catalogue_page.text
     repository_divided = re.findall(repository_pattern, catalogue_text, re.MULTILINE)[0]
     repository.name = repository_divided[1]
+    repository.role = "col"
     m.repository.append(repository)
 
 
@@ -509,6 +514,7 @@ def SLUB_parsing(URI_entered):
     
     attribution = manifest["attribution"]
     repository.name = re.match(repository_pattern, attribution)[2]
+    repository.role = "col"
     m.repository.append(repository)
 
     
@@ -565,6 +571,7 @@ def Cambridge_Corpus_parsing(URI_entered):
 
     #Step 2: Transforming the extracted fields into database format
     repository.name = "Corpus Christi College Cambridge, Parker Library"
+    repository.role = "col"
     m.repository.append(repository)
     label_pattern = r'(.*)(:)(.*)'
     label_divided = re.match(label_pattern, label)
@@ -612,6 +619,7 @@ def Leipzig_parsing(URI_entered):
             m.shelfmark = step1["value"]
         if label == "Owner":
             repository.name = step1["value"]
+            repository.role = "col"
             m.repository.append(repository)
         # Bei den wenigen digitalisierten Inkunabeln fehlen anscheinend die GW-Nummern. 
         if label == "VD16":
@@ -638,6 +646,7 @@ def Leipzig_parsing(URI_entered):
         # Should at some point manuscripts from other collections be described here, one would have to change that. 
         if repository.name == "" and manifest["label"][0:40] == "Leipzig, Universitätsbibliothek Leipzig,":
             repository.name = "Universitätsbibliothek Leipzig"
+            repository.role = "col"
             m.repository.append(repository)
 
  

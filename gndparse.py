@@ -6,14 +6,20 @@ import re
 import dbactions
 #from dbactions import *
 url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "ß" : r"%C3%9F", "(" : "%28", ")" : "%29", "," : ""} #perhaps more signs will have to be added here later
+role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pub" : "Printer"}
+role_organisation_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pub" : "Printer", "col" : "Collection"}
+role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical"}
 from pymongo import MongoClient
 
 
 
 #This is only for stand-alone execution of functions in this module, in other cases, a connection to the database has already been made. 
-client = MongoClient("localhost", 27017)
-db = client.bpf
-coll = db.bpf
+#client = MongoClient("localhost", 27017)
+#db = client.bpf
+#coll = db.bpf
+
+dbname = dbactions.get_database()
+coll=dbname['bpf']
 
 
 
@@ -32,32 +38,65 @@ def person_identification(person):
 # It will first search if a record for this person is already in the MongoDB database, and then search in the GND
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
     candidates = []
+    person.internal_id_person_type1_needed =  role_person_type_correspondence[person.role] 
+    person.chosen_candidate = 999 # For some reason, I cannot return the form when 'chosen candidate' is empty. Hence, I put this in as a default setting. 
     if person.id:
-        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "name_preferred": 1})
-        if person_found:
+        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+        if person_found:            
+            print(person_found)
             person.internal_id = person_found["id"]
-            person.internal_id_preview = person_found["name_preferred"] # The date should be added, but I first have to write how it is to be parsed
+            person.internal_id_person_type1 = person_found["person_type1"]
+            person.internal_id_preview = person_found["name_preferred"] 
+            # The date should be added, but I first have to write how it is to be parsed
+            
+            #The following is a warning that a matching person has the wrong type. 
+            if person.internal_id_person_type1_needed not in person.internal_id_person_type1:
+                person_type1_present = ""
+                for type in person.internal_id_person_type1:
+                    person_type1_present = person_type1_present + "' and '" + type + "'"
+                    person_type1_present = person_type1_present[5:]
+                person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
         else:
             if person.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + person.id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
                 person.potential_candidates = gnd_parsing_person(authority_url)
     else:
+
         person.name = person.name.strip()
-        candidates_result = coll.find({"name_preferred" : person.name}, {"_id": 1, "name_preferred" : 1})
+        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
         for candidate_result in candidates_result:
             candidate = Person_import()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
-
+            candidate.preview = candidate.name_preferred # The years should be added once I have them
+            print("Found as preferred name")
+            print(candidate.name_preferred)
             person.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : person.name}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
+        #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
+            candidate = Person_import()
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
-            if candidate.id not in person.potential_candidates:
+            candidate.internal_id_person_type1 = candidate_result["person_type1"]
+            candidate.preview = candidate.name_preferred # Also here, the years should be added
+            print("Found as variant: ")
+            print(candidate.internal_id)
+            print(candidate.name_preferred)
+            print(candidate.internal_id_person_type1)
+            if candidate not in person.potential_candidates: # Das scheint hier nicht zu funktionieren
                 person.potential_candidates.append(candidate)
-#                print(person.potential_candidates)
-        if not person.potential_candidates: #if nothing has been found
+                print(person.potential_candidates)
+            for candidate in person.potential_candidates:
+                if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
+                    person_type1_present = ""
+                    for type in candidate.internal_id_person_type1:
+                        person_type1_present = person_type1_present + "' and '" + type + "'"
+                        person_type1_present = person_type1_present[5:]
+                    candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
+       
+        if not person.potential_candidates: #if nothing has been found in the database
+            print("No person found")
             person_name_search = person.name
             for old, new in url_replacement.items():
                 person_name_search = person_name_search.replace(old, new)
@@ -81,6 +120,37 @@ def person_identification(person):
     return person         
                 
 
+def additional_person_identification(new_authority_id, role):
+    # This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
+    # Normally, they are parsed with gnd_parsing_person - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
+    # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    potential_persons_list = []
+    potential_person = Person_import()
+    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+    if person_found:            
+        print(person_found)
+        potential_person.internal_id = person_found["id"]
+        potential_person.internal_id_person_type1 = person_found["person_type1"]
+        potential_person.preview = person_found["name_preferred"] # The date should be added, but I first have to write how it is to be parsed
+        internal_id_person_type1_needed =  role_person_type_correspondence[role]
+        if internal_id_person_type1_needed not in potential_person.internal_id_person_type1: 
+            person_type1_present = ""
+            for type in potential_person.internal_id_person_type1:
+                person_type1_present = person_type1_present + "' and '" + type + "'"
+            person_type1_present = person_type1_present[5:]
+            potential_person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" \
+                + internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
+        potential_persons_list.append(potential_person)
+    else: 
+        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+        potential_persons_list = gnd_parsing_person(authority_url)
+
+    return(potential_persons_list)
+
+
+
+
+
 def organisation_identification(organisation):
 # This function is used for every organisation named in the bibliographic record (printer etc.), and in addition for the repository of a book or manuscript
 # It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
@@ -92,6 +162,18 @@ def organisation_identification(organisation):
         if organisation_found:
             organisation.internal_id = organisation_found["id"]
             organisation.internal_id_preview = organisation_found["name_preferred"]
+#            organisation.internal_id_organisation_type1 = organisation_found["organisation_type1"]
+            ### The last line caused error messages - however, I assume that this was rather due to problems I had with manual input into MongoDB.
+            # Hence, I leave it as it is and only comment it out. 
+            organisation_type1_needed =  role_organisation_type_correspondence[organisation.role] #The following is a warning that a matching person has the wrong type. It should also be 
+            # included for all searches for names in Iconobase, but I don't build this yet since there aren't any records in it that allow my to try it out. 
+            if organisation_type1_needed not in organisation.internal_id_organisation_type1:
+                organisation_type1_present = ""
+                for type in organisation.internal_id_organisation_type1:
+                    organisation_type1_present = organisation_type1_present + "' and '" + type
+                    organisation_type1_present = organisation_type1_present[5:] + "'"
+                organisation.internal_id_organisation_type1_comment = "This organisation is currently catalogued as " + organisation_type1_present + ", but not as '" + organisation_type1_needed + "'. The latter will be added if this record has been saved. " 
+
         else:
             if organisation.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + organisation.id + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
@@ -154,10 +236,22 @@ def place_identification(place):
         if place_found:
             place.internal_id = place_found["id"]
             place.internal_id_preview = place_found["name_preferred"]
+            place.internal_id_place_type1 = place_found["place_type1"] 
+            print('Place data:')
+            print(place.internal_id_place_type1)           
+            place_type1_needed =  role_place_type_correspondence[place.role] #The following is a warning that a matching place has the wrong type. It should also be 
+            # included for all searches for names in Iconobase, but I don't build this yet since there aren't any records in it that allow my to try it out. 
+            # This option has not been tried out properly since places rarely come with GND numbers
+            if place_type1_needed not in place.internal_id_perso_type1:
+                place_type1_present = ""
+                for type in place.internal_id_place_type1:
+                    place_type1_present = place_type1_present + "' and '" + type
+                    place_type1_present = place_type1_present[5:]
+                place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" + place_type1_needed + "'. The latter will be added if this record has been saved. " 
+                # This text makes no real sense with places, I will have to alter it later. 
         else:
             if place.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + place.id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
-
                 place.potential_candidates = gnd_parsing_place(authority_url)
     else:
         place.name = place.name.strip()
@@ -859,17 +953,18 @@ def gnd_parsing_place(authority_url):
 
 
 
-person = Person()
-person.id_name = "GND"
+#person = Person()
+#person.id_name = "GND"
 #person.id = "11900108X" #Lautensack
+#person.role = "prt"
 #person.id = "118650130" # Aristotle
 #person.id = "118780743" #Louis XVIII
 #person.name = "Lautensack, Paul"
 #person.name = "Rubens, Peter Paul"
 #person.name = "Andreas Asula"
 #record = person_identification(person)
-organisation = Organisation()
-organisation.id_name = "GND"
+#organisation = Organisation()
+#organisation.id_name = "GND"
 #organisation.id = "2133444-4"
 #record = organisation_identification(organisation)
 #authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + organisation.id + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
@@ -882,8 +977,8 @@ organisation.id_name = "GND"
 #record = organisation_identification(organisation)
 #print(record)
 #authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D4086808-4%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
-place = Place()
-place.id_name = "GND"
+#place = Place()
+#place.id_name = "GND"
 #place.id = "4086808-4"
 #place.name = "Frankfurt, Main"
 #x = place_identification(place)

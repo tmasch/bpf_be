@@ -44,6 +44,8 @@ class Date_import(BaseModel):
 class Person_import(BaseModel):
     external_id : Optional[list[External_id]] = []
     internal_id : Optional[str] = ""
+    internal_id_person_type1 : Optional[list[str]] = []
+    internal_id_person_type1_comment : Optional[str] = "" # I will need that field later, when I extend the search for matching types also do name searches in Iconobase
     name_preferred : Optional[str] = ""
     name_variant : Optional[list[str]] = []
     sex : Optional[str] = ""
@@ -69,6 +71,9 @@ class Person(BaseModel):
     id : Optional[str] = ""
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
+    internal_id_person_type1 : Optional[list[str]] = []
+    internal_id_person_type1_needed : Optional[str] = ""    
+    internal_id_person_type1_comment : Optional[str] = ""    
     internal_id_preview : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
@@ -82,6 +87,8 @@ class Organisation_import(BaseModel):
 # This class is used for importing data on organisations from authority records such as the GND
     external_id : Optional[list[External_id]] = []
     internal_id : Optional[str] = ""
+    internal_id_organisation_type1 : Optional[list[str]] = []
+    internal_id_organisation_type1_comment : Optional[str] = "" # I will need that field later, when I extend the search for matching types also do name searches in Iconobase
     name_preferred : Optional[str] = ""
     name_variant : Optional[list[str]] = []
     dates_from_source : Optional[list[Date_import]] = []
@@ -100,6 +107,8 @@ class Organisation(BaseModel):
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
     internal_id_preview : Optional[str] = ""
+    internal_id_organisation_type1 : Optional[list[str]] = []
+    internal_id_organisation_type1_comment : Optional[str] = "" # I will need that field later, when I extend the search for matching types also do name searches in Iconobase
     name : Optional[str] = ""
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
@@ -116,6 +125,8 @@ class Place_import(BaseModel):
 # This class is used for importing data on places from authority records such as the GND
     external_id : Optional[list[External_id]] = []
     internal_id : Optional[str] = ""
+    internal_id_place_type1 : Optional[list[str]] = []
+    internal_id_place_type1_comment : Optional[str] = "" # I will need that field later, when I extend the search for matching types also do name searches in Iconobase
     name_preferred : Optional[str] = ""
     name_variant : Optional[list[str]] = []
     coordinates : Optional[list[Coordinates]] = []
@@ -135,6 +146,8 @@ class Place(BaseModel):
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
     internal_id_preview : Optional[str] = ""
+    internal_id_place_type1 : Optional[list[str]] = []
+    internal_id_place_type1_comment : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
@@ -197,6 +210,32 @@ class Metadata(BaseModel):
 
 
 
+class Person_db(BaseModel):
+# This class is for entering Person authority records into the database. 
+# It contains all needed fields (or better, will do so), so many will remain empty. 
+# I hope it will be possible to delete empty fields when turning it into a dict object. 
+# If not, one should probably have different classes for different 
+    id : Optional[str] = ""
+    type : Optional[str] = ""
+    person_type1 : Optional[list[str]] = []
+    person_type2 : Optional[list[str]] = [] # Type 2 is a subtype only needed if type1 is "depicted Person"
+    person_type3 : Optional[list[str]] = [] # Type 3 is a subtype only needed if typ2 is "Saint"
+    external_id : Optional[list[External_id]] = []
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    sex : Optional[str] = ""
+    dates_from_source : Optional[list[Date_import]] = [] # This is only provisional - there will be some functions to turn the dates from import into standardised dates
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+    # At least two fields are still missing, they are not needed at this step but will be needed for records of the type1 "depicted Person":
+    # 'Office' and 'Profession' (one would preferably give an office (in the widest sense) together with a term, and, if the person held no office, a profession)
 
 
+
+class Organisation_db(BaseModel):
+# This class is for entering Organisation authority records into the database. 
+# Organisation records play only a limited role here,     
+    pass
 
