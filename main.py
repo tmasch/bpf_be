@@ -80,6 +80,7 @@ async def getMetadata(iiifUrl, material):
             place = gndparse.place_identification(place)
     for repository in m.repository:
         repository = gndparse.organisation_identification(repository) # I had to define 'repository' as a list because Pydantic forced me to do so, but it only has one member. 
+        repository.role = "col" # Normally, this role depends on the bibliographical data - in this case, it has to be set here. 
     m.id=generate()
 #    print(m)
     return (m) 
@@ -110,10 +111,11 @@ async def load_new_person_authority_record(new_authority_id, new_person_role):
     return(potential_person)
 
 @app.get("/loadNewOrganisationAuthorityRecord")
-async def load_new_organisation_authority_record(new_authority_id_org):
+async def load_new_organisation_authority_record(new_authority_id_org, new_organisation_role):
 #    print(new_authority_id_org)
-    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_org + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
-    potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
+#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_org + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+#    potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
+    potential_organisation = gndparse.additional_organisation_identification(new_authority_id_org, new_organisation_role)
 #    print(potential_organisation)
     return(potential_organisation)
 

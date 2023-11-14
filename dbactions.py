@@ -73,3 +73,17 @@ def add_person_type(person_id, person_type1):
     collection=dbname['bpf']
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
 
+def insertRecordOrganisation(organisation: Organisation_db):
+    # This function insserts a newly created record for a person into the database
+    # It was made for persons connected to books but probably can be used for any person
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    collection.insert_one(organisation.dict())
+    return("Hello World")
+
+def add_organisation_type(organisation_id, organisation_type1):
+    # This function is used to add another person type (e.g., Author, Artist etc.) to a person record
+    dbname = get_database()
+    collection=dbname['bpf']
+    result = collection.update_one({"id" : organisation_id}, {'$addToSet' : {"org_type1" : organisation_type1}})
