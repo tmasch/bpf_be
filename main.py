@@ -120,10 +120,13 @@ async def load_new_organisation_authority_record(new_authority_id_org, new_organ
     return(potential_organisation)
 
 @app.get("/loadNewPlaceAuthorityRecord")
-async def load_new_place_authority_record(new_authority_id_place):
+async def load_new_place_authority_record(new_authority_id_place, new_place_role):
 #    print(new_authority_id_place)
-    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_place + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'    
-    potential_place = gndparse.gnd_parsing_place(authority_url)
+#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_place + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'    
+#    potential_place = gndparse.gnd_parsing_place(authority_url)
+    potential_place = gndparse.additional_place_identification(new_authority_id_place, new_place_role)
+    print("potential place to be sent to FE")
+    print(potential_place)
     return(potential_place)
 
 

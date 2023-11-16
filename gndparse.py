@@ -7,7 +7,7 @@ import dbactions
 #from dbactions import *
 url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "ß" : r"%C3%9F", "(" : "%28", ")" : "%29", "," : ""} #perhaps more signs will have to be added here later
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
-role_organisation_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
+role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
 role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical"}
 from pymongo import MongoClient
 
@@ -95,10 +95,8 @@ def person_identification(person):
                     person_type1_present = ""
                     for type in candidate.internal_id_person_type1:
                         person_type1_present = person_type1_present + "' and '" + type + "'"
-                        person_type1_present = person_type1_present[5:]
+                    person_type1_present = person_type1_present[5:]
                     candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
-                else:
-                    person.internal_id_person_type1_needed = ""
        
         if not person.potential_candidates: #if nothing has been found in the database
             print("No person found")
@@ -145,8 +143,6 @@ def additional_person_identification(new_authority_id, role):
             person_type1_present = person_type1_present[5:]
             potential_person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" \
                 + internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
-        else:
-            internal_id_person_type1_needed = ""
         potential_persons_list.append(potential_person)
 
     else: 
@@ -164,23 +160,23 @@ def organisation_identification(organisation):
 # It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
     candidates = []
-    organisation.internal_id_org_type1_needed = role_organisation_type_correspondence[organisation.role]
+    organisation.internal_id_org_type1_needed = role_org_type_correspondence[organisation.role]
     organisation.chosen_candidate = 999 # For some reason, this must not be empty
     if organisation.id:
         organisation_found = coll.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
         if organisation_found:
             organisation.internal_id = organisation_found["id"]
             organisation.internal_id_preview = organisation_found["name_preferred"] + " (in Database)"
-            organisation.internal_id_organisation_type1 = organisation_found["org_type1"]
-            organisation_type1_needed =  role_organisation_type_correspondence[organisation.role] 
+            organisation.internal_id_org_type1 = organisation_found["org_type1"]
+            org_type1_needed =  role_org_type_correspondence[organisation.role] 
             
             #The following is a warning that a matching person has the wrong type. 
-            if organisation_type1_needed not in organisation.internal_id_organisation_type1:
-                organisation_type1_present = ""
-                for type in organisation.internal_id_organisation_type1:
-                    organisation_type1_present = organisation_type1_present + "' and '" + type
-                    organisation_type1_present = organisation_type1_present[5:] + "'"
-                organisation.internal_id_organisation_type1_comment = "This organisation is currently catalogued as " + organisation_type1_present + ", but not as '" + organisation_type1_needed + "'. The latter will be added if this record has been saved. " 
+            if org_type1_needed not in organisation.internal_id_org_type1:
+                org_type1_present = ""
+                for type in organisation.internal_id_org_type1:
+                    org_type1_present = org_type1_present + "' and '" + type
+                    org_type1_present = org_type1_present[5:] + "'"
+                organisation.internal_id_org_type1_comment = "This organisation is currently catalogued as " + org_type1_present + ", but not as '" + org_type1_needed + "'. The latter will be added if this record has been saved. " 
 
         else:
             if organisation.id_name == "GND": # I will have to create similar things for other authority files
@@ -193,8 +189,11 @@ def organisation_identification(organisation):
         for candidate_result in candidates_result:
             candidate = Organisation_import()   
             candidate.internal_id = candidate_result["id"]
-            candidate.preview = candidate_result["name_preferred"]
+            candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
+            print("orgtype1 in search for name_preferred: ")
+            print(candidate.preview)
+            print(candidate.internal_id_org_type1)
             organisation.potential_candidates.append(candidate)
         candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
@@ -202,7 +201,9 @@ def organisation_identification(organisation):
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
-            candidate.preview = candidate.name_preferred # Maybe I add other information to it later. 
+            candidate.preview = candidate.name_preferred + " (in Database)" # Maybe I add other information to it later. 
+            print("orgtype1 in search for name_variant: ")
+            print(candidate.internal_id_org_type1)
 
             if candidate not in organisation.potential_candidates:
                 organisation.potential_candidates.append(candidate)
@@ -220,8 +221,6 @@ def organisation_identification(organisation):
                     org_type1_present = org_type1_present[5:]
                     candidate.internal_id_org_type1_comment = "This organisation is currently catalogued as "\
                           + org_type1_present + ", but not as '" + organisation.internal_id_org_type1_needed + "'. The latter will be added if this record has been saved. " 
-                else:
-                    organisation.internal_id_org_type1_needed = ""
 
         if not organisation.potential_candidates: #if nothing has been found in the database
             organisation_name_search = organisation.name
@@ -230,8 +229,6 @@ def organisation_identification(organisation):
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Koe%3D' + organisation_name_search + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
             organisation.potential_candidates = gnd_parsing_organisation(authority_url)
         
-#        if not organisation.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
-# I experiment leaving that one out. 
             name_divided = organisation_name_search.split("%20")
             name_query = ""           
             for word in name_divided:
@@ -242,7 +239,9 @@ def organisation_identification(organisation):
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'    
       
             new_potential_candidates = gnd_parsing_organisation(authority_url)
-            organisation.potential_candidates = organisation.potential_candidates + new_potential_candidates 
+            for candidate in new_potential_candidates:
+                if candidate not in organisation.potential_candidates: #I need this distinction because I perform both a string and a keyword search, and both may yield the same results
+                    organisation.potential_candidates.append(candidate)
     if len(organisation.potential_candidates) == 1: # If there is only one entry for this organisation, it is by default selected (although the user can also run a new search, once this is established)
         organisation.chosen_candidate = 0
         
@@ -260,7 +259,7 @@ def additional_organisation_identification(new_authority_id, role):
         potential_org.internal_id = org_found["id"]
         potential_org.internal_id_org_type1 = org_found["org_type1"]
         potential_org.preview = org_found["name_preferred"] # The date should be added, but I first have to write how it is to be parsed
-        internal_id_org_type1_needed =  role_organisation_type_correspondence[role]
+        internal_id_org_type1_needed =  role_org_type_correspondence[role]
         if internal_id_org_type1_needed not in potential_org.internal_id_org_type1: 
             org_type1_present = ""
             for type in potential_org.internal_id_org_type1:
@@ -287,12 +286,13 @@ def place_identification(place):
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
 # Note that the GND parser combined with it suppresses all records to regions - if this mechanism is later also used for identifying regions, this might need to be changed
 # Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
-    candidates = []
+    place.internal_id_place_type1_needed =  role_place_type_correspondence[place.role] 
+    place.chosen_candidate = 999
     if place.id:
-        place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1})
+        place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
         if place_found:
             place.internal_id = place_found["id"]
-            place.internal_id_preview = place_found["name_preferred"]
+            place.internal_id_preview = place_found["name_preferred"] + " (in Database)"
             place.internal_id_place_type1 = place_found["place_type1"] 
             print('Place data:')
             print(place.internal_id_place_type1)           
@@ -301,59 +301,108 @@ def place_identification(place):
             # This option has not been tried out properly since places rarely come with GND numbers
             if place_type1_needed not in place.internal_id_perso_type1:
                 place_type1_present = ""
-                for type in place.internal_id_place_type1:
+                for type in place.internal_id_org_type1:
                     place_type1_present = place_type1_present + "' and '" + type
-                    place_type1_present = place_type1_present[5:]
-                place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" + place_type1_needed + "'. The latter will be added if this record has been saved. " 
-                # This text makes no real sense with places, I will have to alter it later. 
+                place_type1_present = place_type1_present[5:] + "'"
+
+                place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" + place_type1_needed + "'. \
+                    An additional record for " + place_type1_needed + " will be produced if this record is saved. " 
         else:
             if place.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + place.id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
                 place.potential_candidates = gnd_parsing_place(authority_url)
     else:
         place.name = place.name.strip()
-        candidates_result = (coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1}))
+        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
         for candidate_result in candidates_result:
             candidate = Place_import()   
             candidate.internal_id = candidate_result["id"]
-            candidate.preview = candidate_result["name_preferred"]
+            candidate.preview = candidate_result["name_preferred"] + " (in Database)"
+            candidate.internal_id_place_type1 = candidate_result["place_type1"]
             place.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : place.name}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
             candidate = Place_import()   
             candidate.internal_id = candidate_result["id"]
-            candidate.preview = candidate_result["name_preferred"]
+            candidate.preview = candidate_result["name_preferred"] + " (in Database)"
+            candidate.internal_id_place_type1 = candidate_result["place_type1"]
 
-            if candidate.internal_id not in place.potential_candidates:
+            if candidate not in place.potential_candidates:
                 place.potential_candidates.append(candidate)
+                # Warning if the place has not the right type:
+            for candidate in place.potential_candidates:
+                print(candidate.preview)
+                print(candidate.internal_id_place_type1)
+                print(place.internal_id_place_type1_needed)
+                if place.internal_id_place_type1_needed not in candidate.internal_id_place_type1:
+                    place_type1_present = ""
+                    for type in candidate.internal_id_place_type1:
+                        place_type1_present = place_type1_present + "' and '" + type + "'"
+                    place_type1_present = place_type1_present[5:]
 
+
+                    candidate.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" + place.internal_id_place_type1_needed + "'. \
+                    An additional record for " + place.internal_id_place_type1_needed + " will be produced if this place is selected and the record is saved. " 
 
         if not place.potential_candidates: #if nothing has been found
-            place_name_search = place.name
+            place_name_search = place.name.strip()
             for old, new in url_replacement.items():
                 place_name_search = place_name_search.replace(old, new)
-            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=400'
+                print("Search term for place :x" + place_name_search + "x")
+            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
             place.potential_candidates = gnd_parsing_place(authority_url)
-        
-#        if not organisation.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
-# I experiment leaving that one out. 
+            print("Number of 'portential candidates': ")
+            print(len(place.potential_candidates))
+#       I actually do not believe that one needs a words search for paces              
             name_divided = place_name_search.split("%20")
             name_query = ""           
             for word in name_divided:
                 if word != "":    
-                    search_phrase = r"Geo=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
+                    search_phrase = r"Geo%3D" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
                     name_query = name_query + search_phrase
-#                    print ("name query:" + name_query)
-            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=400'    
+                    print ("name query:" + name_query)
+            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'    
             additional_potential_candidates = gnd_parsing_place(authority_url)
+            print("Number or additional potential candidates: ")
+            print(len(additional_potential_candidates))
             for additional_candidate in additional_potential_candidates:
                 if additional_candidate not in place.potential_candidates:
                     place.potential_candidates.append(additional_candidate)
-#            place.potential_candidates = place.potential_candidates + additional_potential_candidates
-            place.potential_candidates = sorted(place.potential_candidates, key = lambda candidate : candidate.preview)
+    place.potential_candidates = sorted(place.potential_candidates, key = lambda candidate : candidate.preview)
     if len(place.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         place.chosen_candidate = 0
     return place
+
+
+def additional_place_identification(new_authority_id, role):
+    # This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
+    # Normally, they are parsed with gnd_parsing_place - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
+    # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    potential_places_list = []
+    potential_place = Place_import()
+    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+    if place_found:            
+        print(place_found)
+        potential_place.internal_id = place_found["id"]
+        potential_place.internal_id_place_type1 = place_found["place_type1"]
+        potential_place.preview = place_found["name_preferred"] + " (in Database)" 
+        internal_id_place_type1_needed =  role_place_type_correspondence[role]
+        if internal_id_place_type1_needed not in potential_place.internal_id_place_type1: 
+            place_type1_present = ""
+            for type in potential_place.internal_id_place_type1:
+                place_type1_present = place_type1_present + "' and '" + type + "'"
+            place_type1_present = place_type1_present[5:]
+            potential_place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" \
+                + internal_id_place_type1_needed + "'. An additional record for " + internal_id_place_type1_needed + " will be produced if this place is selected and the record is saved. "
+        potential_places_list.append(potential_place)
+    else: 
+        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
+        print("authority URL in additional_place_identification")
+        print(authority_url)
+        potential_places_list = gnd_parsing_place(authority_url)
+        print("Potential places list in additional_place_identification: ")
+        print(potential_places_list)
+    return(potential_places_list)
 
 
 
@@ -795,13 +844,12 @@ def gnd_parsing_organisation(authority_url):
     return(potential_organisations_list)
 
 
-def gnd_parsing_place(authority_url):
+def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places often yields several hundred results. Since the normal search function only downloads 100 results
+    # per bathc, I may need to run it several times, and hence I have to call the search several times. 
+    # In order to do so, I had to divide the function gnd_parsing_place. The function with this name now only launches one or more search options to bring back all results
+    # and later filters out many irrelevant results that I annoyingly cannot exclude from the search. 
+    # The longest part of the function the actual parsing of the XMl results, is moved to this function gnd_parsing_place_part_of_list. 
     potential_places_list = []
-    url = urllib.request.urlopen(authority_url)
-    tree = xml.etree.ElementTree.parse(url)
-    root = tree.getroot()
-    #print(root)
-    
     for record in root[2]:
         pl = Place_import()
         comment = ""
@@ -812,7 +860,6 @@ def gnd_parsing_place(authority_url):
         name_variant_preview = ""
         comments_preview = ""
         entity_list = []
-        town = False
         for step1 in record[2][0]:
             match step1.get('tag'):
                 case "024":
@@ -979,7 +1026,7 @@ def gnd_parsing_place(authority_url):
                         obpa_preview = ", part of " + conn_pl.name
                     if conn_pl.connection_type == "adue":
                         adue_preview = ", part of " + conn_pl.name
-                  
+                    
                     if conn_pl.connection_type == "vorg":
                         vorg_preview = ", earlier called " + conn_pl.name
                     if conn_pl.connection_type == "nach":
@@ -1005,7 +1052,45 @@ def gnd_parsing_place(authority_url):
         if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list and "gif" not in entity_list):
         #Thus, only administrative units or not-further determined locations or fictive locations, provided they are neither states nor larger administrative regions
             potential_places_list.append(pl)
+            print("potential places list at the end of gnd_parsing_place_part_of_list: ")
+            print(potential_places_list)
     return(potential_places_list)
+
+def gnd_parsing_place(authority_url):
+    potential_places_list = []
+    potential_places_list_complete = []
+    search_term = authority_url[89:-61]
+    if "%" in search_term: # If there was a word search, I only search for the first word
+        search_term = search_term.split("%")[0]
+    url = urllib.request.urlopen(authority_url)
+    tree = xml.etree.ElementTree.parse(url)
+    root = tree.getroot()
+    record_count = int(root[1].text)
+
+    
+    potential_places_list = gnd_parsing_place_part_of_list(root)
+
+    if record_count > 100:
+        record_count = record_count-100
+        start_record = 101
+        authority_url_basis = authority_url + "&startRecord="
+
+#         authority_url_basis = authority_url[:-18] + "startRecord="
+        while record_count > 0:
+            authority_url = authority_url_basis + str(start_record)
+            url = urllib.request.urlopen(authority_url)
+            tree = xml.etree.ElementTree.parse(url)
+            root = tree.getroot()
+            additional_potential_places_list = gnd_parsing_place_part_of_list(root)
+            potential_places_list = potential_places_list + additional_potential_places_list
+            record_count = record_count - 100
+            start_record = start_record + 100
+    if potential_places_list:
+        for place in potential_places_list:
+            if search_term in place.name_preferred or len(potential_places_list) == 1:
+                print(place.name_preferred)
+                potential_places_list_complete.append(place)   
+    return(potential_places_list_complete)
 
 
 

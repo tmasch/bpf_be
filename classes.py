@@ -56,8 +56,6 @@ class Person_import(BaseModel):
     comments : Optional[str] = ""
     preview : Optional[str] = ""
 
-class ObjectID(BaseModel):
-    pass
 
 class Person(BaseModel):
 # This class is used for references to persons in book records. 
@@ -108,9 +106,9 @@ class Organisation(BaseModel):
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
     internal_id_preview : Optional[str] = ""
-    internal_id_organisation_type1 : Optional[list[str]] = []
+    internal_id_org_type1 : Optional[list[str]] = []
     internal_id_org_type1_needed : Optional[str] = ""    
-    internal_id_organisation_type1_comment : Optional[str] = "" # I will need that field later, when I extend the search for matching types also do name searches in Iconobase
+    internal_id_org_type1_comment : Optional[str] = "" 
     name : Optional[str] = ""
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
@@ -149,6 +147,7 @@ class Place(BaseModel):
     internal_id : Optional[str] = ""
     internal_id_preview : Optional[str] = ""
     internal_id_place_type1 : Optional[list[str]] = []
+    internal_id_place_type1_needed : Optional[str] = ""    
     internal_id_place_type1_comment : Optional[str] = ""
     name : Optional[str] = ""
     role : Optional[str] = ""
@@ -238,7 +237,6 @@ class Person_db(BaseModel):
 
 class Organisation_db(BaseModel):
 # This class is for entering Organisation authority records into the database. 
-# Organisation records play only a limited role here,     
     id : Optional[str] = "" 
     type : Optional[str] = ""  # Is always "Organisation"
     org_type1: Optional[list[str]] = [] # Types 1 are: "Printer", "Collection", "Group of Persons"
@@ -253,5 +251,71 @@ class Organisation_db(BaseModel):
     comments : Optional[str] = ""
 
 
+class Place_db(BaseModel):
+# This class is for entering Place authority records into the database
+    id : Optional[str] = ""
+    type : Optional[str] = "" # Is always "Place"
+    place_type1 : Optional[list[str]] = "" # Types 1 are: "Region - historical", "Region - modern", "Town - historical", "Town - modern", "Building", "Building-part"
+    # There should be only one place_type1 per record, but I keep it as list for the sake of consistency
+    external_id : Optional[list[External_id]] = []
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    coordinates : Optional[list[Coordinates]] = []
+    dates_from_source : Optional[list[Date_import]] = [] # This is only provisional - there will be some functions to turn the dates from import into standardised dates
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+    
+
+class Link_to_repository(BaseModel):
+    # This class is used for entering the link between manuscripts and repositories into the database. 
+    # It can probably be later also used for the link between artworks and repositories
+    number : Optional[int] = 0 #This is only needed if several former locations are added later so that they can show in a sensible order (probably back in time)
+    place_id : Optional[str] = ""
+    current : Optional[bool] = True
+    collection : Optional[bool] = True # This field will be set to 'true' if the place has the type "Organisation" and the type_org1 "Collection", it will be set to 'false' if the place has the type 'Place'
+    # The purpose of this field is to simplify searches. 
+    id_preferred : Optional[str] = "" # Inventory number of shelf mark
+    id_variant : Optional[list[str]] = []
 
 
+
+class Manuscript_db(BaseModel):
+# This class is for entering Manuscript records into the database
+    id : Optional[str] = ""
+    type : Optional[str] = "Manuscript" # is always "Manuscript"
+    repository : Optional[list[Link_to_repository]] = []
+
+
+class Book_connected_entities_db(BaseModel):
+# This class is for the links of persons, organisations and places to book records
+    id : Optional[str] = ""
+    role : Optional[str] = ""
+    name : Optional[str] = "" # This field is only a stopgap measure, if 
+
+class Book_db(BaseModel):
+# This class is for entering Book records into the database
+    id : Optional[str] = ""
+    type : Optional[str] = "Book"
+    bibliographic_id : Optional[list[External_id]] = []
+    persons : Optional[list [Book_connected_entities_db]] = []
+    organisations : Optional[list [Book_connected_entities_db]] = []
+    places : Optional[list [Book_connected_entities_db]] = []
+    title: Optional[str] = ""
+    volume_number : Optional[str] = ""
+    part_title : Optional[str] = ""
+    printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    
+class Pages_db(BaseModel):
+# This class is for entering a record that contains information that will be later needed for the individual
+# Artwork and Photograph records
+    id: Optional[str] = ""
+    book_record_id : Optional[str] = ""
+    type : Optional[str] = "Pages"
+    repository : Optional[str] = ""
+    shelfmark : Optional[str] = ""
+    license : Optional[str] = ""
+    numberOfImages : Optional[int] = 0
+    images : Optional[list[Image]] = []
+    preview : Optional[str] = ""

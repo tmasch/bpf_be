@@ -3,6 +3,7 @@ from classes import *
 import json
 import os
 from typing import List
+from nanoid import generate
 
 client=None
 
@@ -74,8 +75,8 @@ def add_person_type(person_id, person_type1):
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
 
 def insertRecordOrganisation(organisation: Organisation_db):
-    # This function insserts a newly created record for a person into the database
-    # It was made for persons connected to books but probably can be used for any person
+    # This function inserts a newly created record for an organisation into the database
+    # It was made for organisations connected to books but probably can be used for any organisation
     print("Inserting metadata in database")
     dbname = get_database()
     collection=dbname['bpf']
@@ -87,3 +88,53 @@ def add_organisation_type(organisation_id, organisation_type1):
     dbname = get_database()
     collection=dbname['bpf']
     result = collection.update_one({"id" : organisation_id}, {'$addToSet' : {"org_type1" : organisation_type1}})
+
+def insertRecordPlace(place: Place_db):
+    # This function inserts a newly created record for a place into the database
+    # It was made for places connected to books but probably can be used for any place
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    collection.insert_one(place.dict())
+    return("Hello World")
+
+def copy_place_record(place_id, place_type):
+    # Different from person and organisation records, places only have one 'type', e.g. a person can be "author" and "depicted person"
+    # but a place cannot be 'building' and 'town'. Town and region records exist in two versions, as 'historical' and as 'modern'
+    # (e.g., a building is in the modern town of Istanbul in Province Istanbul, Turkey, 
+    # a Scriptorium worked in the historical town of Constantinople in Thrace in the Byzantine Empire)
+    # Hence, if a town is only catalogued as 'Town - modern' but has to be connected to a book record, the record has to be copied into a 'Town - historical'
+    # One will manually have to change the affiliation of this record from modern provinces to historical regions, but this is something that can only be done
+    # once I have an 'edit' view for authority records.
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    place = collection.find_one({"id" : place_id})
+    del place["_id"] # I have to remove the automatic id so that it can create a new one
+    place["id"] = generate()
+    place["place_type1"] = ["Place - historical"]
+    collection.insert_one(place)
+    return(place_id)
+
+
+def insertRecordManuscript(manuscript : Manuscript_db):
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    collection.insert_one(manuscript.dict())
+    return("Hello World")
+
+def insertRecordBook(book : Book_db):
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    collection.insert_one(book.dict())
+    return("Hello World")
+
+def insertRecordPages(pages : Pages_db):
+    print("Inserting metadata in database")
+    dbname = get_database()
+    collection=dbname['bpf']
+    collection.insert_one(pages.dict())
+    return("Hello World")
+
