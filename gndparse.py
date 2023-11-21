@@ -148,7 +148,8 @@ def additional_person_identification(new_authority_id, role):
     else: 
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
         potential_persons_list = gnd_parsing_person(authority_url)
-
+    print("added person")
+    print(potential_persons_list)
     return(potential_persons_list)
 
 
@@ -288,6 +289,7 @@ def place_identification(place):
 # Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
     place.internal_id_place_type1_needed =  role_place_type_correspondence[place.role] 
     place.chosen_candidate = 999
+    print("Arrived in place_identification")
     if place.id:
         place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
         if place_found:
@@ -299,9 +301,9 @@ def place_identification(place):
             place_type1_needed =  role_place_type_correspondence[place.role] #The following is a warning that a matching place has the wrong type. It should also be 
             # included for all searches for names in Iconobase, but I don't build this yet since there aren't any records in it that allow my to try it out. 
             # This option has not been tried out properly since places rarely come with GND numbers
-            if place_type1_needed not in place.internal_id_perso_type1:
+            if place_type1_needed not in place.internal_id_place_type1:
                 place_type1_present = ""
-                for type in place.internal_id_org_type1:
+                for type in place.internal_id_place_type1:
                     place_type1_present = place_type1_present + "' and '" + type
                 place_type1_present = place_type1_present[5:] + "'"
 
@@ -310,13 +312,16 @@ def place_identification(place):
         else:
             if place.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + place.id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
-                place.potential_candidates = gnd_parsing_place(authority_url)
+                print("authority_url with Gnd number: " + authority_url)
+                place.potential_candidates = gnd_parsing_place(authority_url)              
     else:
+        print("place name has no ID")
         place.name = place.name.strip()
         candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
-        for candidate_result in candidates_result:
+        for candidate_result in candidates_result:           
             candidate = Place_import()   
             candidate.internal_id = candidate_result["id"]
+            print("candidate found through name search in database (preferred name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_place_type1 = candidate_result["place_type1"]
             place.potential_candidates.append(candidate)
@@ -324,6 +329,7 @@ def place_identification(place):
         for candidate_result in candidates_result:
             candidate = Place_import()   
             candidate.internal_id = candidate_result["id"]
+            print("candidate found through name search in database (variant name name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_place_type1 = candidate_result["place_type1"]
 
@@ -345,11 +351,13 @@ def place_identification(place):
                     An additional record for " + place.internal_id_place_type1_needed + " will be produced if this place is selected and the record is saved. " 
 
         if not place.potential_candidates: #if nothing has been found
+            print("Candidate not found in database")
             place_name_search = place.name.strip()
             for old, new in url_replacement.items():
                 place_name_search = place_name_search.replace(old, new)
                 print("Search term for place :x" + place_name_search + "x")
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
+            print('URL for place name search : '+ authority_url)
             place.potential_candidates = gnd_parsing_place(authority_url)
             print("Number of 'portential candidates': ")
             print(len(place.potential_candidates))
@@ -513,7 +521,7 @@ def gnd_parsing_person(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_pe.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pe.connection_time = step2.text
+                                    conn_pe.connection_time = step2.text[2:]
                     if "VD-16 Mitverf." not in conn_pe.connection_comment: 
                             # someone connected all persons who appear together as authors in the VD16,
                             # I want them removed. 
@@ -589,7 +597,7 @@ def gnd_parsing_person(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_pl.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pl.connection_time = step2.text
+                                    conn_pl.connection_time = step2.text[2:]
                     if conn_pl.connection_type == "ortg":
                         ortg_preview = ", born in " + conn_pl.name
                     if conn_pl.connection_type == "orts":
@@ -851,6 +859,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
     # The longest part of the function the actual parsing of the XMl results, is moved to this function gnd_parsing_place_part_of_list. 
     potential_places_list = []
     for record in root[2]:
+        print("arrived in parsing record")
         pl = Place_import()
         comment = ""
         obpa_preview = ""
@@ -1049,7 +1058,9 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
             name_variant_preview = name_variant_preview[:-2]
 
         pl.preview = pl.name_preferred + obpa_preview + adue_preview + vorg_preview + nach_preview + name_variant_preview + comments_preview
-        if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list and "gif" not in entity_list):
+        print(pl)
+        print(entity_list)
+        if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list):
         #Thus, only administrative units or not-further determined locations or fictive locations, provided they are neither states nor larger administrative regions
             potential_places_list.append(pl)
             print("potential places list at the end of gnd_parsing_place_part_of_list: ")
@@ -1066,6 +1077,8 @@ def gnd_parsing_place(authority_url):
     tree = xml.etree.ElementTree.parse(url)
     root = tree.getroot()
     record_count = int(root[1].text)
+    print('Number of records found')
+    print(record_count)
 
     
     potential_places_list = gnd_parsing_place_part_of_list(root)
@@ -1086,6 +1099,8 @@ def gnd_parsing_place(authority_url):
             record_count = record_count - 100
             start_record = start_record + 100
     if potential_places_list:
+        print("List of potential places: ")
+        print(potential_places_list)
         for place in potential_places_list:
             if search_term in place.name_preferred or len(potential_places_list) == 1:
                 print(place.name_preferred)

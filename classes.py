@@ -194,6 +194,7 @@ class Metadata(BaseModel):
 #        t=t+"IIIF url"+self.iiifUrl
 #        t=t+"Manifest"+self.manifest
 #        return(t)
+    type : Optional[str] = "Manifest"
     id : Optional[str] = ""
     material : Optional[str] = ""
     repository : Optional[list[Organisation]] = []
@@ -286,26 +287,28 @@ class Manuscript_db(BaseModel):
     id : Optional[str] = ""
     type : Optional[str] = "Manuscript" # is always "Manuscript"
     repository : Optional[list[Link_to_repository]] = []
+    preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
 
-
-class Book_connected_entities_db(BaseModel):
+class Book_connected_entity_db(BaseModel):
 # This class is for the links of persons, organisations and places to book records
     id : Optional[str] = ""
     role : Optional[str] = ""
     name : Optional[str] = "" # This field is only a stopgap measure, if 
+    
 
 class Book_db(BaseModel):
 # This class is for entering Book records into the database
     id : Optional[str] = ""
     type : Optional[str] = "Book"
     bibliographic_id : Optional[list[External_id]] = []
-    persons : Optional[list [Book_connected_entities_db]] = []
-    organisations : Optional[list [Book_connected_entities_db]] = []
-    places : Optional[list [Book_connected_entities_db]] = []
+    persons : Optional[list [Book_connected_entity_db]] = []
+    organisations : Optional[list [Book_connected_entity_db]] = []
+    places : Optional[list [Book_connected_entity_db]] = []
     title: Optional[str] = ""
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
     
 class Pages_db(BaseModel):
 # This class is for entering a record that contains information that will be later needed for the individual
@@ -319,3 +322,102 @@ class Pages_db(BaseModel):
     numberOfImages : Optional[int] = 0
     images : Optional[list[Image]] = []
     preview : Optional[str] = ""
+
+class Preview_list_db(BaseModel):
+# This class is for displaying preview and id of all manuscripts and books in Iconobase.
+# It is made only as a provisional measure for display purposes, but a similar function could be used to access all manuscripts and books still in the ingest process
+    id : Optional[str] = ""
+    type : Optional[str] = ""
+    preview : Optional[str] = ""
+
+
+
+class Connected_entity_db_display(BaseModel):
+# This class is for the links of persons, organisations and places to book records
+    id : Optional[str] = ""
+    role : Optional[str] = ""
+    preview : Optional[str] = ""
+    
+
+class Book_db_display(BaseModel):
+# This class is for displaying (and perhaps later also for editing) book records from the database
+    id : Optional[str] = ""
+    type : Optional[str] = "Book"
+    bibliographic_id : Optional[list[External_id]] = []
+    persons : Optional[list [Connected_entity_db_display]] = []
+    organisations : Optional[list [Connected_entity_db_display]] = []
+    places : Optional[list [Connected_entity_db_display]] = []
+    title: Optional[str] = ""
+    volume_number : Optional[str] = ""
+    part_title : Optional[str] = ""
+    printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
+
+class Link_to_repository_display(BaseModel):
+    # This class is used for displaying (and later also editing) the link between manuscripts and repositories into the database. 
+    # It can probably be later also used for the link between artworks and repositories
+    number : Optional[int] = 0 #This is only needed if several former locations are added later so that they can show in a sensible order (probably back in time)
+    place_id : Optional[str] = ""
+    current : Optional[bool] = True
+    collection : Optional[bool] = True # This field will be set to 'true' if the place has the type "Organisation" and the type_org1 "Collection", it will be set to 'false' if the place has the type 'Place'
+    # The purpose of this field is to simplify searches. 
+    id_preferred : Optional[str] = "" # Inventory number of shelf mark
+    id_variant : Optional[list[str]] = []
+    preview : Optional[str]
+
+
+class Manuscript_db_display(BaseModel):
+# This class is for displaying (and perhaps later also for editing) manuscript records from the database
+    id : Optional[str] = ""
+    type : Optional[str] = "Manuscript" # is always "Manuscript"
+    repository : Optional[list[Link_to_repository_display]] = []
+    preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
+
+
+class Person_db_display(BaseModel):
+# This class is for displaying (and perhaps later also for editing) person records from the database
+    id : Optional[str] = ""
+    type : Optional[str] = "" # Is always 'Person'
+    person_type1 : Optional[list[str]] = [] # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
+    person_type2 : Optional[list[str]] = [] # Type 2 is a subtype only needed if type1 is "depicted Person"
+    person_type3 : Optional[list[str]] = [] # Type 3 is a subtype only needed if typ2 is "Saint"
+    external_id : Optional[list[External_id]] = []
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    sex : Optional[str] = ""
+    dates_from_source : Optional[list[Date_import]] = [] # This is only provisional - there will be some functions to turn the dates from import into standardised dates
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+
+class Org_db_display(BaseModel):
+# This class is for displaying (and perhaps later also for editing) Organisation authority records from the database. 
+    id : Optional[str] = "" 
+    type : Optional[str] = ""  # Is always "Organisation"
+    org_type1: Optional[list[str]] = [] # Types 1 are: "Printer", "Collection", "Group of Persons"
+    org_type2: Optional[list[str]] = [] # Type 21 is a subtype only needed if type1 is "Group of Persons", it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
+    external_id : Optional[list[External_id]] = []
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    dates_from_source : Optional[list[Date_import]] = [] # This is only provisional - there will be some functions to turn the dates from import into standardised dates
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""
+
+class Place_db_display(BaseModel):
+# This class is for displaying (and perhaps later also editing) Place authority records from the database
+    id : Optional[str] = ""
+    type : Optional[str] = "" # Is always "Place"
+    place_type1 : Optional[list[str]] = "" # Types 1 are: "Region - historical", "Region - modern", "Town - historical", "Town - modern", "Building", "Building-part"
+    # There should be only one place_type1 per record, but I keep it as list for the sake of consistency
+    external_id : Optional[list[External_id]] = []
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    coordinates : Optional[list[Coordinates]] = []
+    dates_from_source : Optional[list[Date_import]] = [] # This is only provisional - there will be some functions to turn the dates from import into standardised dates
+    connected_persons : Optional[list[Connected_entity]] = []
+    connected_organisations : Optional[list[Connected_entity]] = []
+    connected_locations : Optional[list[Connected_entity]] = []
+    comments : Optional[str] = ""

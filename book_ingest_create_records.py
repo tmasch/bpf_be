@@ -269,9 +269,10 @@ def metadata_dissection(metadata):
         new_manuscript = Manuscript_db()
         new_manuscript.id = generate()
         new_repository = Link_to_repository()
-        new_repository.place_id = metadata.repository[0].internal_id
+        new_repository.place_id = metadata.repository[0].potential_candidates[metadata.repository[0].chosen_candidate].internal_id
         new_repository.id_preferred = metadata.shelfmark
         new_manuscript.repository.append(new_repository)
+        new_manuscript.preview = metadata.repository[0].name + ", " + metadata.shelfmark
         book_record_id = new_manuscript.id # I need that one later
         dbactions.insertRecordManuscript(new_manuscript)
 
@@ -291,7 +292,7 @@ def metadata_dissection(metadata):
                 new_book.bibliographic_id.append(new_bibliographic_id)
         if metadata.bibliographic_information[0].persons:
             for person in metadata.bibliographic_information[0].persons:
-                new_person = Book_connected_entities_db()
+                new_person = Book_connected_entity_db()
                 new_person.role = person.role
                 if person.internal_id:
                     new_person.id = person.internal_id
@@ -300,7 +301,7 @@ def metadata_dissection(metadata):
                 new_book.persons.append(new_person)
         if metadata.bibliographic_information[0].organisations:
             for org in metadata.bibliographic_information[0].organisations:
-                new_org = Book_connected_entities_db()
+                new_org = Book_connected_entity_db()
                 new_org.role = org.role
                 if org.internal_id:
                     new_org.id = org.internal_id
@@ -309,13 +310,14 @@ def metadata_dissection(metadata):
                 new_book.organisations.append(new_org)
         if metadata.bibliographic_information[0].places:
             for place in metadata.bibliographic_information[0].places:
-                new_place = Book_connected_entities_db()
+                new_place = Book_connected_entity_db()
                 new_place.role = place.role
                 if place.internal_id:
                     new_place.id = place.internal_id
                 else: 
                     new_place.name = place.name # This is a stopgap measure if a place could not be identified
                 new_book.places.append(new_place)
+        new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
         book_record_id = new_book.id # I'll need that later
         print("New book record: ")
         print(new_book)

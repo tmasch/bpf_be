@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import gndparse
 import book_ingest_create_records
+import displayRecords
 
 
 #class Settings(BaseSettings):
@@ -159,9 +160,9 @@ async def saveConnectedRecords(metadata: Metadata):
     return(m)
 
 
-@app.get("/allRessources", response_model=List[Metadata]) 
+@app.get("/allRessources", response_model=List[Preview_list_db]) 
 async def getAllRessources():
-    r=getAllRessourcesFromDb()
+    r=getAllRessourcesFromDb()  
     return(r)
     
 @app.get("/ressource", response_model=Metadata)
@@ -175,3 +176,42 @@ async def findImages(id: str):
     print(id)
     r=findImages(id)
     
+
+@app.get("/getBookRecord", response_model = Book_db_display)
+async def getBookRecord(id: str):
+    bookRecord = displayRecords.getBookRecord(id)
+    print("bookrecord before returning from main.py: ")
+    print(bookRecord)
+    return(bookRecord)
+
+@app.get("/getManuscriptRecord", response_model = Manuscript_db_display)
+async def getBookRecord(id: str):
+    manuscriptRecord = displayRecords.getManuscriptRecord(id)
+    print("manuscriptkrecord before returning from main.py: ")
+    print(manuscriptRecord)
+    return(manuscriptRecord)
+
+
+@app.get("/getPersonRecord", response_model = Person_db_display)
+async def getPersonRecord(id: str):
+    print("Person record request arrived in BFF")
+    personrecord = displayRecords.getRecord(id)
+    print("Person record sent off from BFF")
+    return(personrecord)
+
+@app.get("/getOrgRecord", response_model = Org_db_display)
+async def getOrgRecord(id: str):
+    print("Person record request arrived in BFF")
+    orgRecord = displayRecords.getRecord(id)
+    print("Person record sent off from BFF")
+    return(orgRecord)
+
+@app.get("/getPlaceRecord", response_model = Place_db_display)
+async def getPlaceRecord(id: str):
+    print("Person record request arrived in BFF")
+    placeRecord = displayRecords.getRecord(id)
+    print("Person record sent off from BFF")
+    return(placeRecord)
+
+
+

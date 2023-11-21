@@ -42,8 +42,8 @@ def getAllRessourcesFromDb():
     print("Database name:",dbname)
 #    print(".")
     collection = dbname['bpf']
-    r=list(collection.find())
-#    print(r)
+    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book"]}}, {"id": 1, "type" : 1, "preview" : 1}))
+    print(r)
     return(r)        
     
 def getRessourceFromDb(id):

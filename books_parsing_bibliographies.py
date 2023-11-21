@@ -38,6 +38,10 @@ def VD17_parsing(url_bibliography):
                                     bid.id = bid.id[5:]                        
                             case "2":
                                 bid.name = step2.text
+                    if bid.name == "vd17":
+                        bid.uri = r'https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%27' + bid.id + '%27'
+                    if bid.name == "vd18": 
+                        bid.uri = r'https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=8080&SRT=YOP&TRM=VD18' + bid.id + '&ADI_MAT=B'
                     bi.bibliographic_id.append(bid) # in the VD17, there is only one ID, this list is only introduced for the sake of consistence with incunables
 #                        single_place = (place_name, place_id, place_role)
                     print("vorher: ")
@@ -281,6 +285,7 @@ def ISTC_parsing(URL_bibliography):
     bid = Bibliographic_id()
     bid.id = istc_record_short["id"]
     bid.name = "ISTC"
+    bid.uri = r"https://data.cerl.org/istc/"+bid.id
     bi.bibliographic_id.append(bid)
     #bibliographic_id_single_1 = ("ISTC", bibliographic_id_number_1)
     #bibliographic_id_list.append(bibliographic_id_single_1)
@@ -289,6 +294,7 @@ def ISTC_parsing(URL_bibliography):
             bid = Bibliographic_id()
             bid.id = step1[3:]
             bid.name = "GW"
+#            bid.uri = This will need more work!
             bi.bibliographic_id.append(bid)
             #bibliographic_id_single_2 = ("GW", bibliographic_id_number_2)
             #bibliographic_id_list.append(bibliographic_id_single_2)
