@@ -5,10 +5,12 @@ from classes import *
 import re
 import dbactions
 #from dbactions import *
-url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "ß" : r"%C3%9F", "(" : "%28", ")" : "%29", "," : ""} #perhaps more signs will have to be added here later
+url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "Ä" : "%C3%84", "Ö" : "%C3%96", "Ü": "%C3%9C", "ß" : r"%C3%9F", "(" : "", ")" : "", "," : "", "é" : "%C3%A9", "è" : "%C3%A8", "." : ""}  
+#perhaps more signs will have to be added here later
+# I also exclude "." - this is permissted in an URL, but the search dislikes it
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
 role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
-role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical"}
+role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical", "uvp" : "Town - historical"}
 from pymongo import MongoClient
 
 
@@ -43,7 +45,7 @@ def person_identification(person):
     if person.id:
         person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
         if person_found:            
-            print(person_found)
+            #print(person_found)
             person.internal_id = person_found["id"]
             person.internal_id_person_type1 = person_found["person_type1"]
             person.internal_id_preview = person_found["name_preferred"] + " (in Database)"
@@ -59,6 +61,8 @@ def person_identification(person):
         else:
             if person.id_name == "GND": # I will have to create similar things for other authority files
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + person.id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+                print("url for person search: ")
+                print(authority_url)
                 person.potential_candidates = gnd_parsing_person(authority_url)
     else:
 
@@ -87,9 +91,13 @@ def person_identification(person):
             print(candidate.internal_id)
             print(candidate.name_preferred)
             print(candidate.internal_id_person_type1)
-            if candidate not in person.potential_candidates: # Das scheint hier nicht zu funktionieren
+            candidate_duplicate = False
+            for extant_candidate in person.potential_candidates:
+                if extant_candidate.name_preferred == candidate.name_preferred:
+                    candidate_duplicate = True
+            if candidate_duplicate == False:             
                 person.potential_candidates.append(candidate)
-                print(person.potential_candidates)
+                #print(person.potential_candidates)
             for candidate in person.potential_candidates:
                 if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
                     person_type1_present = ""
@@ -103,8 +111,8 @@ def person_identification(person):
             person_name_search = person.name
             for old, new in url_replacement.items():
                 person_name_search = person_name_search.replace(old, new)
-            print(person_name_search)
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+            print(authority_url)
             person.potential_candidates = gnd_parsing_person(authority_url)
         if not person.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
             name_divided = person_name_search.split("%20")
@@ -131,7 +139,7 @@ def additional_person_identification(new_authority_id, role):
     potential_person = Person_import()
     person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
     if person_found:            
-        print(person_found)
+        #print(person_found)
         potential_person.internal_id = person_found["id"]
         potential_person.internal_id_person_type1 = person_found["person_type1"]
         potential_person.preview = person_found["name_preferred"] # The date should be added, but I first have to write how it is to be parsed
@@ -148,8 +156,8 @@ def additional_person_identification(new_authority_id, role):
     else: 
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
         potential_persons_list = gnd_parsing_person(authority_url)
-    print("added person")
-    print(potential_persons_list)
+    #print("added person")
+    #print(potential_persons_list)
     return(potential_persons_list)
 
 
@@ -161,6 +169,7 @@ def organisation_identification(organisation):
 # It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
     candidates = []
+    print("Starting organisatin_identification for repository")
     organisation.internal_id_org_type1_needed = role_org_type_correspondence[organisation.role]
     organisation.chosen_candidate = 999 # For some reason, this must not be empty
     if organisation.id:
@@ -185,11 +194,14 @@ def organisation_identification(organisation):
                 print(authority_url)
                 organisation.potential_candidates = gnd_parsing_organisation(authority_url)
     else:
+        print("No repository ID")
         organisation.name = organisation.name.strip()
         candidates_result = (coll.find({"name_preferred" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}))
+        print("Search for repository candidate completed")
         for candidate_result in candidates_result:
             candidate = Organisation_import()   
             candidate.internal_id = candidate_result["id"]
+            candidate.name_preferred = candidate_result["name_preferred"]
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
             print("orgtype1 in search for name_preferred: ")
@@ -205,8 +217,14 @@ def organisation_identification(organisation):
             candidate.preview = candidate.name_preferred + " (in Database)" # Maybe I add other information to it later. 
             print("orgtype1 in search for name_variant: ")
             print(candidate.internal_id_org_type1)
-
-            if candidate not in organisation.potential_candidates:
+            candidate_duplicate = False # This is needed to avoid having a candidate listed twice, it is rather longwided since I cannot use a simple if ... in thing in class instances. 
+            for extant_candidate in organisation.potential_candidates:
+                if extant_candidate.name_preferred == candidate.name_preferred:
+                    candidate_duplicate = True
+            if candidate_duplicate == False:
+                    
+#            if candidate not in organisation.potential_candidates:
+#                print("Candidate not yet in list")
                 organisation.potential_candidates.append(candidate)
             # The following is about a warning if the found organisations have the wrong type. I could not try it out, since the VD17 always gives IDs of organisations, 
             # and the ISTC does not have them. 
@@ -227,9 +245,8 @@ def organisation_identification(organisation):
             organisation_name_search = organisation.name
             for old, new in url_replacement.items():
                 organisation_name_search = organisation_name_search.replace(old, new)
-            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Koe%3D' + organisation_name_search + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
-            organisation.potential_candidates = gnd_parsing_organisation(authority_url)
-        
+            authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Koe%3D' + organisation_name_search + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'          
+            organisation.potential_candidates = gnd_parsing_organisation(authority_url)        
             name_divided = organisation_name_search.split("%20")
             name_query = ""           
             for word in name_divided:
@@ -287,6 +304,10 @@ def place_identification(place):
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
 # Note that the GND parser combined with it suppresses all records to regions - if this mechanism is later also used for identifying regions, this might need to be changed
 # Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
+    if place.role:
+        print(place.role)
+    else:
+        print("No place.role")
     place.internal_id_place_type1_needed =  role_place_type_correspondence[place.role] 
     place.chosen_candidate = 999
     print("Arrived in place_identification")
@@ -296,8 +317,8 @@ def place_identification(place):
             place.internal_id = place_found["id"]
             place.internal_id_preview = place_found["name_preferred"] + " (in Database)"
             place.internal_id_place_type1 = place_found["place_type1"] 
-            print('Place data:')
-            print(place.internal_id_place_type1)           
+#            print('Place data:')
+#            print(place.internal_id_place_type1)           
             place_type1_needed =  role_place_type_correspondence[place.role] #The following is a warning that a matching place has the wrong type. It should also be 
             # included for all searches for names in Iconobase, but I don't build this yet since there aren't any records in it that allow my to try it out. 
             # This option has not been tried out properly since places rarely come with GND numbers
@@ -361,7 +382,7 @@ def place_identification(place):
             place.potential_candidates = gnd_parsing_place(authority_url)
             print("Number of 'portential candidates': ")
             print(len(place.potential_candidates))
-#       I actually do not believe that one needs a words search for paces              
+#       I actually do not believe that one needs a words search for places              
             name_divided = place_name_search.split("%20")
             name_query = ""           
             for word in name_divided:
@@ -390,7 +411,7 @@ def additional_place_identification(new_authority_id, role):
     potential_place = Place_import()
     place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
     if place_found:            
-        print(place_found)
+#        print(place_found)
         potential_place.internal_id = place_found["id"]
         potential_place.internal_id_place_type1 = place_found["place_type1"]
         potential_place.preview = place_found["name_preferred"] + " (in Database)" 
@@ -405,11 +426,11 @@ def additional_place_identification(new_authority_id, role):
         potential_places_list.append(potential_place)
     else: 
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
-        print("authority URL in additional_place_identification")
-        print(authority_url)
+#        print("authority URL in additional_place_identification")
+#        print(authority_url)
         potential_places_list = gnd_parsing_place(authority_url)
-        print("Potential places list in additional_place_identification: ")
-        print(potential_places_list)
+#        print("Potential places list in additional_place_identification: ")
+#        print(potential_places_list)
     return(potential_places_list)
 
 
@@ -623,7 +644,7 @@ def gnd_parsing_person(authority_url):
 
         pe.preview = pe.name_preferred + date_preview + ortg_preview + ortw_preview + orts_preview + name_variant_preview + comments_preview
         potential_persons_list.append(pe)
-        print(potential_persons_list)
+        #print(potential_persons_list)
 #        print(pe.preview)
                     
 
@@ -671,7 +692,6 @@ def gnd_parsing_organisation(authority_url):
 #        print("Number of record:")
 #        print(record_number)
         record_number = record_number + 1
-
         for step1 in record[2][0]:
 
             match step1.get('tag'):
@@ -751,7 +771,7 @@ def gnd_parsing_organisation(authority_url):
                                     conn_pe.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
                                     conn_pe.connection_time = step2.text
-                        org.connected_persons.append(conn_pe)
+                    org.connected_persons.append(conn_pe)
                 case "510":
                     conn_org = Connected_entity()
                     conn_org.external_id = []
@@ -859,7 +879,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
     # The longest part of the function the actual parsing of the XMl results, is moved to this function gnd_parsing_place_part_of_list. 
     potential_places_list = []
     for record in root[2]:
-        print("arrived in parsing record")
+#        print("arrived in parsing record")
         pl = Place_import()
         comment = ""
         obpa_preview = ""
@@ -1058,13 +1078,13 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
             name_variant_preview = name_variant_preview[:-2]
 
         pl.preview = pl.name_preferred + obpa_preview + adue_preview + vorg_preview + nach_preview + name_variant_preview + comments_preview
-        print(pl)
-        print(entity_list)
+#        print(pl)
+#        print(entity_list)
         if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list):
         #Thus, only administrative units or not-further determined locations or fictive locations, provided they are neither states nor larger administrative regions
             potential_places_list.append(pl)
-            print("potential places list at the end of gnd_parsing_place_part_of_list: ")
-            print(potential_places_list)
+#            print("potential places list at the end of gnd_parsing_place_part_of_list: ")
+#            print(potential_places_list)
     return(potential_places_list)
 
 def gnd_parsing_place(authority_url):
@@ -1076,12 +1096,15 @@ def gnd_parsing_place(authority_url):
     url = urllib.request.urlopen(authority_url)
     tree = xml.etree.ElementTree.parse(url)
     root = tree.getroot()
-    record_count = int(root[1].text)
+    if root[1].text:      
+        record_count = int(root[1].text)
+    else:
+        record_count = 0
     print('Number of records found')
     print(record_count)
 
-    
-    potential_places_list = gnd_parsing_place_part_of_list(root)
+    if record_count > 0:
+        potential_places_list = gnd_parsing_place_part_of_list(root)
 
     if record_count > 100:
         record_count = record_count-100
@@ -1099,11 +1122,11 @@ def gnd_parsing_place(authority_url):
             record_count = record_count - 100
             start_record = start_record + 100
     if potential_places_list:
-        print("List of potential places: ")
-        print(potential_places_list)
+#        print("List of potential places: ")
+#        print(potential_places_list)
         for place in potential_places_list:
             if search_term in place.name_preferred or len(potential_places_list) == 1:
-                print(place.name_preferred)
+#                print(place.name_preferred)
                 potential_places_list_complete.append(place)   
     return(potential_places_list_complete)
 

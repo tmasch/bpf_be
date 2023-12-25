@@ -80,7 +80,7 @@ def VD17_parsing(url_bibliography):
                                 bi.printing_date = step2.text
                 case "500":  #for the original statement of publication (in order to manually indicate who is printer and who is publisher)                
                     for step2 in field:
-                        if "Vorlageform des Erscheinungsvermerks" in step2.text:
+                        if "Vorlageform" in step2.text:
                             printing_information_divided = re.match(printing_information_pattern, step2.text)
                             bi.printing_information = printing_information_divided[3]
                 case "700": #for printers and publishers 
@@ -146,6 +146,8 @@ def VD17_parsing(url_bibliography):
                                         pl.role = "pup"
                                     if step2.text == "mfp":
                                         pl.role = "mfp"
+                                    if step2.text == "uvp":
+                                        pl.role = "uvp"
                         #bibliographic_id_single = (bibliographic_id_name, bibliographic_id_number)
                         bi.places.append(pl)
  #       return bibliographic_id_list, person_list, place_list, title, volume_number, part_title, printing_date, printing_information

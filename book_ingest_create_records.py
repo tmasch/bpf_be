@@ -167,37 +167,6 @@ def metadata_dissection(metadata):
     #                        print("record against duplication: ")
                             print(org_against_duplication)
 
-    # Section on Repositories
-        # Repositories are also organisations, however, there is only one repository per book. Furthermore, mit is not part of the bibliographical
-        # information as all other links to authority records are. 
-        # There is no safeguard against creating two authority records if the same organisation appears as repertory and in the bibliographical information,
-        # however, this constellation is neigh impossible. 
-        if metadata.repository:
-            no_new_org_chosen_from_list = False
-            org = metadata.repository[0] # I had to define this as a list, but it always has one element only
-            if org.chosen_candidate != 999: # I make this awkward construction to avoid 'out of range' exceptions
-                if org.potential_candidates[org.chosen_candidate].internal_id:
-    #                print("Chosen candidate has internal id")
-                    no_new_org_chosen_from_list = True
-
-            if org.internal_id: #Scenario (a) above - in this case, no record has to be added
-                if org.internal_id_org_type1_comment: 
-    #                print("Type needed:")
-    #                print(org.internal_id_org_type1_needed)
-                    #If the organisation is alredy in Iconobase but has an additional org_type1 in the new entry, it has to be added to the organisation record. 
-                    dbactions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
-            elif no_new_org_chosen_from_list: # Scenario (b) above
-                org.internal_id = org.potential_candidates[org.chosen_candidate].internal_id
-                if org.potential_candidates[org.chosen_candidate].internal_id_org_type1_comment:
-    #                print("Type1 to be added:")
-    #                print(org.potential_candidates[org.chosen_candidate].internal_id) 
-    #                print(org.internal_id_org_type1_needed)
-                    dbactions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
-            else: 
-    #            print("new repository")
-                org.internal_id = org_ingest(org)
-
-
     # Section on Places
         # There are three constellations
         # (a): A place that is already in Iconobase was identified via an ID. In this case, there is no list of potential candidates. 
@@ -253,6 +222,7 @@ def metadata_dissection(metadata):
 
                             print("New Place is a duplicate")
                             break
+                
                     else: 
                             print("New Place is not a duplicate")
                             place.internal_id = place_ingest(place)
@@ -262,6 +232,39 @@ def metadata_dissection(metadata):
                             places_list.append(place_against_duplication)
                             print("record against duplication: ")
                             print(place_against_duplication)
+
+
+    # Section on Repositories
+        # Repositories are also organisations, however, there is only one repository per book. Furthermore, it is not part of the bibliographical
+        # information as all other links to authority records are. 
+        # There is no safeguard against creating two authority records if the same organisation appears as repertory and in the bibliographical information,
+        # however, this constellation is neigh impossible. 
+    if metadata.repository:
+        no_new_org_chosen_from_list = False
+        org = metadata.repository[0] # I had to define this as a list, but it always has one element only
+        if org.chosen_candidate != 999: # I make this awkward construction to avoid 'out of range' exceptions
+            if org.potential_candidates[org.chosen_candidate].internal_id:
+                print("Chosen candidate for repository has internal id")
+                no_new_org_chosen_from_list = True
+
+        if org.internal_id: #Scenario (a) above - in this case, no record has to be added
+            if org.internal_id_org_type1_comment: 
+                print("Type for repository needed:")
+                print(org.internal_id_org_type1_needed)
+                #If the organisation is alredy in Iconobase but has an additional org_type1 in the new entry, it has to be added to the organisation record. 
+                dbactions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
+        elif no_new_org_chosen_from_list: # Scenario (b) above
+            org.internal_id = org.potential_candidates[org.chosen_candidate].internal_id
+            if org.potential_candidates[org.chosen_candidate].internal_id_org_type1_comment:
+                print("Repository chosen from list - Type1 to be added:")
+                print(org.potential_candidates[org.chosen_candidate].internal_id) 
+                print(org.internal_id_org_type1_needed)
+                dbactions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
+        else: 
+            print("new repository")
+            org.potential_candidates[org.chosen_candidate].internal_id = org_ingest(org)
+
+
 
 
 # Section on Manuscripts
@@ -319,8 +322,8 @@ def metadata_dissection(metadata):
                 new_book.places.append(new_place)
         new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
         book_record_id = new_book.id # I'll need that later
-        print("New book record: ")
-        print(new_book)
+#        print("New book record: ")
+#        print(new_book)
         dbactions.insertRecordBook(new_book)
 
                 
@@ -332,7 +335,10 @@ def metadata_dissection(metadata):
     new_pages = Pages_db()
     new_pages.id = generate()
     new_pages.book_record_id = book_record_id
-    new_pages.repository = metadata.repository[0].internal_id
+    if metadata.repository[0].internal_id:
+        new_pages.repository = metadata.repository[0].internal_id
+    else:
+        new_pages.repository = metadata.repository[0].potential_candidates[org.chosen_candidate].internal_id
     new_pages.shelfmark = metadata.shelfmark
     new_pages.license = metadata.license
     new_pages.numberOfImages = metadata.numberOfImages
@@ -505,6 +511,8 @@ def org_ingest(org):
                             connected_person.connection_type = "connected (" + connected_person.connection_comment + ")"  
                         else: 
                             connected_person.connection_type = "connected"
+                case "saml":
+                    connected_person.connection_type = "Collector"
                 case _:            
                     if connected_person.connection_comment:
                         connected_person.connection_type = "connected (" + connected_person.connection_type + "; " + connected_person.connection_comment + ")"

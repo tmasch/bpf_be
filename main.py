@@ -72,18 +72,22 @@ async def getMetadata(iiifUrl, material):
 #    m.iiifUrl=iiifUrl
 #    m.manifest=manifest
     if m.bibliographic_information:
-        for person in m.bibliographic_information[0].persons:
-            person = gndparse.person_identification(person)
-        #  m.bibliographic_information[0].persons[person_counter] = person
-        for organisation in m.bibliographic_information[0].organisations:
-            organisation = gndparse.organisation_identification(organisation)
-        for place in m.bibliographic_information[0].places:
-            place = gndparse.place_identification(place)
+        if m.bibliographic_information[0]:
+            #print("m.bibliographic_information: ")
+            #print(m.bibliographic_information)
+            for person in m.bibliographic_information[0].persons:
+                person = gndparse.person_identification(person)
+            #  m.bibliographic_information[0].persons[person_counter] = person
+            for organisation in m.bibliographic_information[0].organisations:
+                organisation = gndparse.organisation_identification(organisation)
+            for place in m.bibliographic_information[0].places:
+                place = gndparse.place_identification(place)
     for repository in m.repository:
         repository = gndparse.organisation_identification(repository) # I had to define 'repository' as a list because Pydantic forced me to do so, but it only has one member. 
         repository.role = "col" # Normally, this role depends on the bibliographical data - in this case, it has to be set here. 
     m.id=generate()
-#    print(m)
+#    print("List of places to be sent to FE")
+#    print(m.bibliographic_information[0].places)
     return (m) 
 
 @app.get("/callAdditionalBibliographicInformation")
@@ -154,7 +158,8 @@ async def createNewRessource(metadata: Metadata):
 async def saveConnectedRecords(metadata: Metadata):
     print("hello world")
     m = metadata
-    print(m)
+    print("Repository in main.py: ")
+    print(m.repository)
     book_ingest_create_records.metadata_dissection(m)
     #print(m)
     return(m)

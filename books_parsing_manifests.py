@@ -8,6 +8,7 @@ import re
 import requests
 from lxml import etree
 from classes import *
+import xml.etree.ElementTree
 
 def Canvas_parsing(canvas_list):
     # Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all. 
@@ -26,6 +27,25 @@ def Canvas_parsing(canvas_list):
         images.append(im)
     return images
     
+def Canvas_parsing_Yale(canvas_list):
+    # Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all. 
+    # Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later. 
+
+    # This variant is used for books from Yale, where the label is not "label' but ["label"]["none"][0]. I keep it here, 
+    # in case any other library uses a similar strange system
+    images = []
+    i = 0
+    for canvas in canvas_list:
+        
+        i = i+1
+        im = Image()
+        im.index = i
+        im.label_raw = canvas["label"]["none"][0]
+        im.baseurl = canvas["items"][0]["items"][0]["body"]["service"][0]["@id"]
+        im.width = canvas["items"][0]["items"][0]["body"]["width"]
+        im.height = canvas["items"][0]["items"][0]["body"]["height"]
+        images.append(im)
+    return images
         
 
 
@@ -673,3 +693,1141 @@ def Leipzig_parsing(URI_entered):
             im.label_prefix = "fol. "
     m.images = images
     return m
+
+
+def Gallica_parsing(URI_entered):
+    # This function works only on the manifests from Gallica proper, not on external manifests shown here (hence it works on the BnF, Arsenal, and very few other libraries)
+    # Unfortunately, references to bibliographical reportories are not really standardised in Gallica, they can appear in at least four different places. 
+    # Hence, this section is messy,a nd it probably needs a number of additions. 
+    #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1: Extracting relevant fields from the general section of the Manifest
+    metadata=manifest["metadata"]
+    m = Metadata()
+    repository = Organisation()
+    m.manifest = url.read()
+    licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
+    shelfmark_pattern = r'([^,.]*)?[,.]?([^,.]*)?[,.]?(.*)'
+    catalogue_reference = ""
+    bibliographical_references = []
+    format = ""
+    m.license = manifest["license"]
+    for step1 in metadata:
+        bid = Bibliographic_id()
+        label = step1["label"]
+        if label == "Shelfmark":
+            shelfmark_long = step1["value"]
+        if label == "Repository":
+            if step1["value"]: # Oddly, this field seems to be sometimes empty, but it still has a label. 
+                repository.name = step1["value"]
+                repository.role = "col"
+                m.repository.append(repository)
+        if label == "Relation":
+            print(step1["value"][0:46])
+            if step1["value"][0:46] == r"Notice du catalogue : http://catalogue.bnf.fr/":
+                catalogue_reference = step1["value"][46:] #only the identificator, not the start of the URN
+        if label == "Format" and len(step1["value"]) == 2: # Sometimes, a bibliographical reference is added to the indication of the format - no idea, why
+            # In these cases, there are 2 records linked to format. 
+            format = step1["value"][0]["@value"]
+
+# Step 2: Parsing the shelf mark and format sections
+    shelfmark_divided = re.match(shelfmark_pattern, shelfmark_long)
+    if shelfmark_divided[3]: # most shelfmark lines consist of three elements, but some only have two. The last first is (again) the repository, the last the shelfmark,#
+        #the middle one a department of the BnF that I can ignore here. 
+        m.shelfmark = shelfmark_divided[3].strip()
+        if shelfmark_divided[2][0:7].strip() == "Biblio": # this is the for the Bibliothèque de l'Arsenal, which is treated as department of the BnF
+            repository.name = shelfmark_divided[2].strip()
+        else: 
+            repository.name = shelfmark_divided[1].strip()
+    elif shelfmark_divided[2]:
+        m.shelfmark = shelfmark_divided[2].strip()
+        repository.name = shelfmark_divided[1].strip()
+    repository.role = "col"
+    if len(m.repository) == 0: #This is only added if the field repository is empty
+        m.repository.append(repository)
+
+    if "(" in format:
+        format_bibliography = re.search(r'\(.*\)', format).group(0)[1:-2]
+        format_bibliography = format_bibliography.replace(",", "", 1) # In this case, there is a comma after the title of the reference work, in other cases not
+        if "; " in format_bibliography:
+            #print("format_bibliography split")
+            bibliographical_references =  format_bibliography.split("; ")
+        else: 
+            bibliographical_references.append(format_bibliography)
+
+
+    if catalogue_reference:
+        record_url = r"http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=(bib.persistentid%20any%20%22" + catalogue_reference + r"%22)"
+        print(record_url)
+        good_record = False
+        url = urllib.request.urlopen(record_url)
+        tree = xml.etree.ElementTree.parse(url)
+        root = tree.getroot()
+        record = root[3][0][2][0]
+        for step1 in record:
+            match step1.get('tag'):
+                case "210":# In some cases, this field seems to be used for bibliographical records
+                    for step2 in step1:
+                        record_210 = step2.text
+                        if "Hain-Copinger" in record_210:
+                            bid = Bibliographic_id()
+                            hc_found = re.search(r'Hain-Copinger, \w*', record_210)
+                            if hc_found:
+                                bid.name = "HC"
+                                bid.id = hc_found.group(0)[14:].strip()
+                                m.bibliographic_id.append(bid)
+                        if "Pellechet" in record_210:
+                            bid = Bibliographic_id()
+                            hc_found = re.search(r'Pellechet, \w*', record_210)
+                            if hc_found:
+                                bid.name = "Pell Ms"
+                                bid.id = hc_found.group(0)[10:].strip()
+                                m.bibliographic_id.append(bid)
+                            
+
+                case "300": # This field seems to be not so commonly used for bibliographical records
+                    for step2 in step1:
+                        match step2.get("code"):
+                            case "a":
+                                record_300 = step2.text
+                                if "ISTC" in record_300 or "istc" in record_300 or "GW" in record_300 or "gesamtkatalogderwiegendrucke" in record_300:                                   
+                                    print("field 300: " + record_300)
+                                    record_300 = record_300.replace("n°", "")
+                                    record_300 = record_300.replace("  ", " ")                                    
+                                    bid = Bibliographic_id()
+                                    istc_long_found = re.search(r'https\://data\.cerl\.org/istc/i\w\d{8}', record_300)
+                                    if istc_long_found:
+                                        print("ISTC URL found in 300")
+                                        bid.name = "ISTC"
+                                        bid.id = istc_long_found.group(0)[27:37]
+                                        print("ISTC found in 300: "+ bid.id)
+                                        good_record = True
+                                        m.bibliographic_id.append(bid)
+                                    gw_long_found = re.search(r'https\://www\.gesamtkatalogderwiegendrucke\.de/docs/\w*', record_300)
+                                    if gw_long_found:
+                                        print("GW URL found in 300")
+                                        bid.name = "GW"
+                                        print(gw_long_found.group(0))
+                                        bid.id = gw_long_found.group(0)[49:]
+                                        good_record = True
+                                        m.bibliographic_id.append(bid)
+                                    istc_found = re.search(r"ISTC i[a-z]\d{8}", record_300)
+                                    if istc_found:
+                                        bid.name = "ISTC"
+                                        bid.id = istc_found.group(0)[5:]
+                                        good_record = True
+                                        m.bibliographic_id.append(bid)
+                                    gw_found = re.search(r"GW [\w]*", record_300)
+                                    if gw_found:
+                                        print("GW found in 300")
+                                        bid.name = "GW"
+                                        bid.id = gw_found.group(0)[3:]
+                                        good_record = True
+                                        m.bibliographic_id.append(bid)
+                                    
+                case "321": # In most cases, it seems, bibliographical references are here, in a relatively ordered list
+                    for step2 in step1:
+                        match step2.get("code"):
+                            case "a":
+                                if "ISTC" in step2.text or "istc" in step2.text or "gesamtkatalogderwiegendrucke" in step2.text or "GW" in step2.text or "VD16" in step2.text:
+                                    good_record = True # I need this for later - I only check for other catalogues, if good_record is false. 
+                                if ". - " in step2.text:
+                                    bibliographical_references =  step2.text.split(". - ")
+                                elif "; " in step2.text:
+                                    bibliographical_references =  step2.text.split("; ")        
+                                else: 
+                                    bibliographical_references.append(step2.text)
+        if bibliographical_references:
+            for bibref in bibliographical_references:
+                bid = Bibliographic_id()
+                bibref = bibref.replace("n°", "")
+                print(bibref)
+                if bibref[0:4] == "ISTC":
+                    bid.name = "ISTC"
+                    bid.id = bibref[4:].strip()
+                    m.bibliographic_id.append(bid)
+                if bibref[0:2] == "GW":
+                    bid.name = "GW"
+                    bid.id = bibref[3:].strip()
+                    m.bibliographic_id.append(bid)
+                if bibref[0:4] == "VD16": 
+                    bid.name = "VD16"
+                    bid.id = bibref[4:].strip()              
+                    m.bibliographic_id.append(bid)
+                if bibref[0:4] == "VD17": 
+                    bid.name = "VD17"
+                    bid.id = bibref[4:].strip()
+                    m.bibliographic_id.append(bid)
+                if bibref[0:4] == "VD18": 
+                    bid.name = "VD18"
+                    bid.id = bibref[4:].strip()
+                    m.bibliographic_id.append(bid)
+                if bibref[0:49] == "https://www.gesamtkatalogderwiegendrucke.de/docs/":
+                    bid.name = "GW"
+                    bid.id = bibref[49:].strip()
+                    m.bibliographic_id.append(bid)                    
+                if bibref[0:27] == "https://data.cerl.org/istc/im00626000":
+                    bid.name = "ISTC"
+                    bid.id = bibref[27:37].strip()
+                    m.bibliographic_id.append(bid)
+
+
+                if good_record == False: # I check the following only, if I don't have any standard bibliographic ID
+                    if bibref[0:13] == "Hain-Copinger":
+                        bid.name = "HC"
+                        bid.id = bibref[13:].strip()
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:2] == "HC":
+                        bid.name = "HC"
+                        bid.id = bibref[2:].strip()
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:4] == "Goff":
+                        bid.name = "Goff"
+                        bid.id = bibref[4:].strip().replace("-", "", 1)
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:4] == "Pell":
+                        bid.name = "Pell Ms"
+                        bid.id = bibref[4:]
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:9] == "Pellechet":
+                        bid.name = "Pell Ms"
+                        bid.id = bibref[9:]
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:4] == "CIBN":
+                        bid.name = "CIBN"
+                        bid.id = bibref[4:]
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:2] == "C ":
+                        bid.name = "C"
+                        bid.id = bibref[2:]
+                        m.bibliographic_id.append(bid)
+                    if bibref[0:8] == "Copinger":
+                        bid.name = "C"
+                        bid.id = bibref[8:]
+                        m.bibliographic_id.append(bid)
+            print(m.bibliographic_id)
+                
+
+
+
+    
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    canvas_label_pattern = r'(.*?)([(].*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        canvas_label_long = im.label_raw
+        if canvas_label_long == "NP": #this is the default if no pagination is given
+            im.label_page = ""
+        else:
+            im.label_page = canvas_label_long #Since paris does not seem to give any prefixes
+        
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+ 
+    return m
+
+
+
+def Ecodices_parsing(URI_entered):
+    #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    metadata=manifest["metadata"]
+    m = Metadata()
+    repository = Organisation()
+    m.manifest = url.read()
+    m.license = manifest["license"]
+    for step1 in metadata:
+        bid = Bibliographic_id()
+        label = step1["label"]
+        if label == "Location":
+            collection_place = step1["value"]
+        if label == "Collection Name": 
+            collection_name = step1["value"]
+        if label == "Shelfmark":
+            m.shelfmark = step1["value"]
+        
+    
+    attribution = manifest["attribution"]
+    repository.name = collection_name.strip() + " " + collection_place.strip()
+    repository.role = "col"
+    m.repository.append(repository)
+
+    
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    canvas_label_pattern = r'(.*?)([(].*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        im.label_page = im.label_raw
+        
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+
+   
+    return m
+
+
+def Erara_parsing(URI_entered):
+    #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1: Extracting relevant fields from the general section of the Manifest
+    metadata=manifest["metadata"]
+    m = Metadata()
+    repository = Organisation()
+    bibliographic_reference_long = ""
+    bibliographic_reference_divided = []
+    m.manifest = url.read()
+    m.license = "Public Domain" # das ist provisorisch, die License ist hier nicht angeben
+    for step1 in metadata:
+        bid = Bibliographic_id()
+        label = step1["label"]
+        if label == "Besitzende Institution":
+            location_long = step1["value"]
+        if label == "Bibliografische Referenz":
+            bibliographic_reference_long = step1["value"]
+        
+    
+    attribution = manifest["attribution"]
+    
+    # Step 2: Parsing the extracted fields
+    if "," in location_long: # I assume there always is one I have to find out what it looks like if there isn't. 
+        location_divided = location_long.split(",", maxsplit = 1)
+        if location_divided:
+            repository.name = location_divided[0]
+            repository.role = "col"
+            m.repository.append(repository)
+            m.shelfmark = location_divided[1]
+    if bibliographic_reference_long:
+        if ";" in bibliographic_reference_long:
+            bibliographic_reference_divided = bibliographic_reference_long.split(";")
+        else:
+            bibliographic_reference_divided.append(bibliographic_reference_long)
+        for reference in bibliographic_reference_divided:
+            bid = Bibliographic_id()
+            reference = reference.strip()
+            if "GW" in reference:
+                bid.name = "GW"
+                bid.id = reference[2:].strip()
+                m.bibliographic_id.append(bid)
+            if "ISTC" in reference:
+                bid.name = "ISTC"
+                bid.id = reference[4:].strip()
+                m.bibliographic_id.append(bid)
+            if "VD16" in reference:
+                bid.name = "VD16"
+                bid.id = reference[4:].strip()
+                m.bibliographic_id.append(bid)
+            if "VD17" in reference:
+                bid.name = "VD17"
+                bid.id = reference[4:].strip()                
+                m.bibliographic_id.append(bid)
+            if "VD18" in reference:
+                bid.name = "VD18"
+                bid.id = reference[4:].strip()
+                m.bibliographic_id.append(bid)
+            if "ESTC" in reference:
+                bid.name = "ESTC"
+                bid.id = reference[4:].strip()
+                m.bibliographic_id.append(bid)
+            if "CNCE" in reference:
+                bid.name = "EDIT16 CNCE"
+                bid.id = reference[4:].strip()
+                m.bibliographic_id.append(bid)
+
+
+
+
+
+
+
+    
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    
+    canvas_label_pattern = r'(\[\d*\])(.*)?'#There is always a counting of canvases, and sometimes a page-number following it
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        label_page_divided = re.match(canvas_label_pattern, im.label_raw)
+        if label_page_divided[2]:
+            im.label_page = label_page_divided[2].strip()
+        
+        
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+
+   
+    return m
+
+
+def Bodleian_parsing(URI_entered):
+    #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1: Extracting relevant fields from the general section of the Manifest and parsing them
+    metadata=manifest["metadata"]
+    m = Metadata()
+    repository = Organisation()
+    m.manifest = url.read()
+    shelfmark_pattern = r'(.*?)(College|Hall|Church)(.*)'
+    attribution_pattern = r'(.*?)(https://creativecommons[^>]*)'
+    repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
+    for step1 in metadata:
+        bid = Bibliographic_id()
+        label = step1["label"]
+        if label == "Shelfmark":
+            shelfmark_long = step1["value"]
+        if label == "Catalogue Identifier":
+            bibliographic_record = step1["value"]          
+        #if label == "Other Identifier":
+            #additional_bibliographic_record = step1["value"] This is a reference to the Bodleian Catalogue. However, since up to now there are hardly any non-Enlish
+            #Post-1500 books digitised, I don't bother with this now. 
+    attribution = manifest["attribution"]
+
+    
+    
+    #Step 2: Parsing the extracted fields
+    
+    if "All rights reserved" in attribution or "all rights reserved" in attribution:
+        m.license = "All rights reserved"
+    if "https://creativecommons" in attribution:
+        m.license = re.match(attribution_pattern, attribution)[2]
+
+
+    if "Bodleian Library" in shelfmark_long:
+        repository.name = "Bodleian Library"
+        repository.role = "col"
+        m.repository.append(repository)
+        m.shelfmark = shelfmark_long[16:].strip()
+    if "Ashmolean Museum" in shelfmark_long:
+        repository.name = "Ashmolean Museum"
+        repository.role = "col"
+        m.repository.append(repository)
+        m.shelfmark = shelfmark_long[16:].strip()
+    if "Museum of Natural History OUM" in shelfmark_long:
+        repository.name = "Oxford University Museum of Natural History"
+        repository.role = "col"
+        m.repository.append(repository)
+        m.shelfmark = shelfmark_long[30:].strip()
+    if "College" in shelfmark_long or "Hall" in shelfmark_long or "Church" in shelfmark_long:
+        shelfmark_long_divided = re.match(shelfmark_pattern, shelfmark_long)
+        repository.name = shelfmark_long_divided[1] + shelfmark_long_divided[2] + " Oxford"
+        repository.role = "col"
+        m.shelfmark = shelfmark_long_divided[3].strip()   
+        m.repository.append(repository)
+
+    if bibliographic_record:
+        bid = Bibliographic_id()
+        if "Bod-inc." in bibliographic_record:
+            bid.name = "Bod-inc"
+            bid.id = bibliographic_record[9:].strip()
+            m.bibliographic_id.append(bid)
+        if "ESTC" in bibliographic_record:
+            bid.name = "ESTC"
+            bid.id = bibliographic_record[5:].strip()
+            m.bibliographic_id.append(bid)
+
+
+
+    
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        if im.label_raw[0:5] == "fol. ":
+            im.label_prefix = "fol. "
+            im.label_page = im.label_raw[5:]
+        if im.label_raw[0:3] == "p. ":
+            im.label_prefix = "p. "
+            im.label_page = im.label_raw[3:]
+    m.images = images
+
+   
+    return m
+
+def Heidelberg_parsing(URI_entered):
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    metadata=manifest["metadata"]
+    attribution = manifest["attribution"][0]["@value"]
+    m = Metadata()
+    repository = Organisation()
+    bibliographic_information = ""
+    m.manifest = url.read()
+    m.license = manifest["license"]
+    for step1 in metadata:
+        label = step1["label"]
+        if label == "Shelfmark":
+            shelfmark = step1["value"][0]
+            if "Universitätsbibliothek Heidelberg, " in shelfmark:
+                m.shelfmark = shelfmark[34:].strip()
+        if label =="Bibliographic Information":
+            bibliographic_information = step1["value"][0]
+
+    
+    repository.name = attribution
+    repository.role = "col"
+    m.repository.append(repository)
+
+    if bibliographic_information:
+        catalogue_text = requests.get(bibliographic_information).text
+        record = ""
+        record_raw = re.search(r'(GW|VD16|VD17|VD18) [^<]*', catalogue_text)
+        if record_raw:
+            record = record_raw.group(0)
+        if record:
+            record_divided = record.split(" ", maxsplit=1)
+            bid = Bibliographic_id()
+            bid.name = record_divided[0]
+            bid.id = record_divided[1]
+            m.bibliographic_id.append(bid)
+        
+               
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+
+    for im in images:
+        #for the label (page-number) of the canvas
+        im.label_page = im.label_raw
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+    return m
+
+
+def Vaticana_parsing(URI_entered):
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    metadata=manifest["metadata"]
+    m = Metadata()
+    repository = Organisation()
+    bibliographic_information = ""
+    m.manifest = url.read()
+    m.license = manifest["attribution"] # There is no license field, hence I copy the attribution
+    bibliographic_information = manifest["seeAlso"][0]
+    print("reference to catalogue BAV")
+    print(bibliographic_information)
+    for step1 in metadata:
+        label = step1["label"]
+        if label == "Shelfmark":
+            m.shelfmark = step1["value"]
+        
+            
+        
+
+    
+    repository.name = "Biblioteca Apostolica Vaticana" # I indicate it manually since it stands nowhere. 
+    repository.role = "col"
+    m.repository.append(repository)
+
+    if bibliographic_information:
+        catalogue_text = requests.get(bibliographic_information).text
+        if catalogue_text:
+            print("BAV catalogue text found")
+        record = ""
+        #record_raw = re.search(r'ISTC i\w\d{8}', catalogue_text)
+        record_raw = re.search(r'ISTC i\w\d{8}', catalogue_text)
+        if record_raw:
+            print("text found BAV")
+            record = record_raw.group(0)
+            print("identified bibliography: ")
+            print(record)
+        if record:
+            bid = Bibliographic_id()
+            bid.name = "ISTC"
+            bid.id = record[5:].strip()
+            m.bibliographic_id.append(bid)
+        
+               
+ 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+
+    for im in images:
+        #for the label (page-number) of the canvas
+        im.label_page = im.label_raw
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+    return m
+
+def Vienna_parsing(URI_entered):
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    m.manifest = url.read()
+    
+    repository = Organisation()
+    bibliographic_information = ""
+    attribution = manifest["attribution"]
+    for step1 in attribution:
+        if step1["@language"] == "ger":
+            repository.name = step1["@value"]
+            repository.role = "col"
+            m.repository.append(repository)
+
+    metadata=manifest["metadata"]
+    m.license = manifest["license"] # There is no license field, hence I copy the attribution
+    for step1 in metadata:
+        label = step1["label"]
+        for step2 in label:
+            if isinstance(step2, dict):
+                if step2["@value"] == "Ort":
+                    shelfmark_long = step1["value"]
+
+        if step1["label"] == "Barcode":          
+            bibliographic_information = step1["value"]
+
+    if "href" in shelfmark_long: # I am not sure if the shelfmark always contains a link
+        shelfmark_pattern = r'>[^<]*<'
+        m.shelfmark = re.search(shelfmark_pattern, shelfmark_long).group(0)[1:-1]
+    else:
+        m.shelfmark = shelfmark_long # In fact, if such shelfmarks appear, I have to check what their syntax is
+            
+     
+
+    
+
+    if bibliographic_information:
+        record_url = r'https://obv-at-oenb.alma.exlibrisgroup.com/view/sru/43ACC_ONB?version=1.2&query=alma.barcode=' + bibliographic_information + r'&startRecord=0&maximumRecords=1&operation=searchRetrieve&recordSchema=marcxml'
+        # The plus-sign of the barcode has to be changed for the URL, hence I keep it here in percent code and leave it out in the barcode
+        print("URL for bibliographical information: ")
+        print(record_url)
+        url = urllib.request.urlopen(record_url)
+        tree = xml.etree.ElementTree.parse(url)
+        root = tree.getroot()
+        record = root[2][0][2][0]
+        for step1 in record:
+            match step1.get("tag"):
+                # In the examples I saw, bibligraphical references for Post-1501 books are in field 24, those for incunables in field 555. I have no clue if this is consistently handled like that. 
+                case "024":
+                    print("field with bibliography found in catalogue")
+                    bid = Bibliographic_id()
+                    for step2 in step1:
+                        print("tag of subfield: ")
+                        print(step2.get("code"))
+                        match step2.get("code"):                            
+                            case "a":
+                                print("bibliographical reference from catalogue: ")
+                                print(step2.text)
+                                if step2.text[0:4] == "VD16":
+                                    bid.name = "VD16"
+                                    bid.id = step2.text[4:].strip()
+                                    m.bibliographic_id.append(bid)
+                                if step2.text[0:4] == "VD17":
+                                    bid.name = "VD17"
+                                    bid.id = step2.text[4:].strip()
+                                    m.bibliographic_id.append(bid)
+                                if step2.text[0:4] == "VD18":
+                                    bid.name = "VD18"
+                                    bid.id = step2.text[4:].strip()
+                                    m.bibliographic_id.append(bid)
+                                if step2.text[0:4] == "CNCE":
+                                    bid.name = "EDIT16 CNCE"
+                                    bid.id = step2.text[4:].strip()
+                                    m.bibliographic_id.append(bid) # Vienna quotes this a lot, so I already inserted that here. 
+                                    # I wonder if how to abbreviate it
+                case "555": # I include this although up to now there are no IIIF manifests for incunables. 
+                    bid = Bibliographic_id()
+                    for step2 in step1:
+                        match step2.get("code"):
+                            case "d":
+                                if step2.text == "GW":
+                                    bid.name = "GW"
+                                    bid.id = step2.text[2:].strip()
+                                    m.bibliographic_id.append(bid)                                     
+                      
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    # It appears that Vienna does not give any page numbers, and that the numbers such as "page50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
+    m.images = images
+    return m
+
+
+
+def Washington_parsing(URI_entered): # This section is still untested since I couldn't open the manifest
+    print("starting LoC")
+    print(URI_entered)
+    url = requests.get(URI_entered) # I have to use here this, since the usual urllib.request returns 'forbidden'. 
+    manifest = url.json()
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    repository = Organisation()
+    bibliographic_information = ""
+    shelfmark_part1 = ""
+    shelfmark_part2 = ""
+    shelfmark_part3 = ""
+    m.manifest = json.dumps(manifest)
+    m.license = "Fair Use"
+    repository.name = "Library of Congress"
+    repository.role = "col"
+    m.repository.append(repository)
+
+    
+    bibliographical_reference = manifest["seeAlso"]    
+    for step1 in bibliographical_reference:
+        if "marcxml" in step1["@id"]:
+            record_url = step1["@id"] # Apparently, every digitised item has such a URL
+            print("LoC record URL: ")
+            print(record_url)
+
+    url = urllib.request.urlopen(record_url)
+    tree = xml.etree.ElementTree.parse(url)
+    record = tree.getroot() # Much simpler than other MarcXML records!
+    for step1 in record:
+        match step1.get("tag"):
+            case "050":
+                for step2 in step1:
+                    match step2.get("code"):
+                        case "a":
+                            shelfmark_part1 = step2.text
+                        case "b":
+                            shelfmark_part2 = step2.text
+            case "510":
+                bid = Bibliographic_id()
+                for step2 in step1:
+                    match step2.get("code"):
+                        case "a":
+                            if "ISTC" in step2.text:
+                                bid.name = "ISTC"
+                            if "VD16" in step2.text:
+                                bid.name = "VD16"
+                            if "VD17" in step2.text:
+                                bid.name = "VD17"
+                            if "VD18" in step2.text:
+                                bid.name = "VD18"
+                            if "ESTC" in step2.text:
+                                bid.name = "ESTC"
+                            if "EDIT 16" in step2.text or "EDIT16" in step2.text or "CNCE" in step2.text:
+                                bid.name = "EDIT16 CNCE"
+                            if "Gesamtkatalog der Wiegendrucke" in step2.text:
+                                bid.name = "GW"
+                            if "Goff" in step2.text:
+                                bid.name = "Goff"
+                        case "c":
+                            bid.id = step2.text
+                            if bid.id[0:4] == "ISTC" or bid.id[0:4] == "VD16" or bid.id[0:4] == "VD17" or bid.id[0:4] == "VD18" or bid.id[0:4] == "ESTC" or bid.id[0:4] == "CNCE":
+                                bid.id = bid.id[4:].strip()
+                if bid.name:
+                    m.bibliographic_id.append(bid) # Only append this if it is one of these references.                         
+            case "856":
+                for step2 in step1:
+                    match step2.get("code"):
+                        case "u":
+                            shelfmark_part3_long = step2.text
+                shelfmark_part3_long_pattern = r'(.*?)([^/]*$)'
+                shelfmark_part3 = re.match(shelfmark_part3_long_pattern, shelfmark_part3_long)[2]
+    m.shelfmark = shelfmark_part1 + shelfmark_part2 + " (" + shelfmark_part3 + ")"
+    print("List of bibliographic records: ")
+    for record in m.bibliographic_id:
+        print(record.id)
+    
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+    # It appears that LoC does not give any page numbers, and that the numbers such as "page 50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
+    m.images = images
+    return m
+
+
+
+def Goettingen_parsing (URI_entered): 
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    repository = Organisation()
+    record_url = ""
+    m.manifest = url.read()
+    bibliographical_reference_long = manifest["@id"]
+    if "PPN" in bibliographical_reference_long: # This is the case for books, but apparently not always for manuscripts
+        bibliographical_reference_long_pattern = r'(.*?)(PPN)(\d*$)'
+        bibliographical_reference = re.match(bibliographical_reference_long_pattern, bibliographical_reference_long)[3]
+        record_url = r'http://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.ppn%3D' + bibliographical_reference + r'&maximumRecords=10&recordSchema=marcxml'
+        print("URL of catalogue record: ")
+        print(record_url)
+    if "license" in manifest:
+        m.license = manifest["license"]
+    else:
+        m.license = "no license information"
+    repository.name = manifest["attribution"]
+    repository.role = "col"
+    m.repository.append(repository)
+    metadata = manifest["metadata"]
+    for step1 in metadata:
+        if step1["label"] == "Signatur":
+            m.shelfmark = step1["value"]
+
+
+    # In many cases, the shelf mark is not given in the manifest, but only in the METS/MODS file connected to it. 
+    if m.shelfmark == "":
+        shelfmark_reference_long = manifest['seeAlso']      
+        for record in shelfmark_reference_long:
+            if "mets.xml" in record["@id"]:
+                shelfmark_reference = record["@id"]
+                print("URL of METS file: ")
+                print(shelfmark_reference)
+        if shelfmark_reference:
+            mets = urllib.request.urlopen(shelfmark_reference)
+            tree = xml.etree.ElementTree.parse(mets)
+            root = tree.getroot()
+            print("Root found")
+            for location in root.iter(r'{http://www.loc.gov/mods/v3}shelfLocator'):
+                m.shelfmark = location.text
+    
+    if record_url:
+        url = urllib.request.urlopen(record_url)
+        tree = xml.etree.ElementTree.parse(url)
+        root = tree.getroot()
+        if len(root[2][0]) > 1: # Some old PPNs do not have a record that can be called this way - if it is called, a useless dummy record appears. 
+            record = root[2][0][2][0]
+            for step1 in record:
+                match step1.get("tag"):
+                    case "024":
+                        bid = Bibliographic_id()
+                        for step2 in step1:
+                            match step2.get("code"):
+                                case "2":
+                                    if "GW" in step2.text:
+                                        bid.name = "GW"
+                                    if "VD16" in step2.text or "vd16" in step2.text:
+                                        bid.name = "VD16"
+                                    if "VD17" in step2.text or "vd17" in step2.text:
+                                        bid.name = "VD17"
+                                    if "VD18" in step2.text or "vd18" in step2.text:
+                                        bid.name = "VD18"
+                                    if "ESTC" in step2.text:
+                                        bid.name = "ESTC"
+                                    if "EDIT 16" in step2.text or "EDIT16" in step2.text or "CNCE" in step2.text:
+                                        bid.name = "EDIT16 CNCE"
+                                case "a":
+                                    bid.id = step2.text
+                                    print("bid.id uncropped: ")
+                                    print(bid.id)
+                                    if bid.id[0:4] == "VD16" or bid.id[0:4] == "VD17" or bid.id[0:4] == "VD18" or bid.id[0:4] == "ESTC" or bid.id[0:4] == "CNCE":
+                                        bid.id = bid.id[4:].strip()
+                                    if bid.id[0:2] == "GW":
+                                        bid.id = bid.id[2:].strip()
+                        if bid.name:
+                            print(bid.name)
+                            print("bid.id cropped: ")
+                            print(bid.id)
+                            m.bibliographic_id.append(bid) # Only append this if it is one of these references. 
+                    
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    canvas_id_pattern = r'(.*)(canvas/)(.*)'
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
+    canvas_properties = []
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        im.label_page = im.label_raw
+        #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+        #but has as last character "r" or "v", it is probably a folio number. 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+    m.images = images
+    return m
+
+
+
+def Princeton_parsing (URI_entered): 
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    repository = Organisation()
+    
+    m.manifest = url.read()
+    repository.name = "Princeton University Library"
+    repository.role = "col"
+    m.repository.append(repository)
+    if "license" in manifest:
+        m.license = manifest["license"]
+    else:
+        m.license = "no license information"
+    metadata = manifest["metadata"]
+    for step1 in metadata:
+        if step1["label"] == "Location":
+            m.shelfmark = step1["value"][0]
+            if m.shelfmark[0:20] == "Special Collections ":
+                m.shelfmark = m.shelfmark[20:]
+
+    seeAlso = manifest["seeAlso"]
+    for step1 in seeAlso:
+        if step1["format"] == "text/xml":
+            catalogue_address = step1["@id"]
+    
+
+    url = urllib.request.urlopen(catalogue_address)
+    tree = xml.etree.ElementTree.parse(url)
+    root = tree.getroot()
+    for step1 in root:
+        match step1.get("tag"):
+            case "510":
+                bid = Bibliographic_id()
+                for step2 in step1:
+                    match step2.get("code"):
+                        case "a":
+                            if "GW" in step2.text:
+                                bid.name = "GW"
+                            if "Goff" in step2.text:
+                                bid.name = "Goff"
+                            if "ISTC" in step2.text:
+                                bid.name = "ISTC"
+                            if "VD16" in step2.text or "vd16" in step2.text:
+                                bid.name = "VD16"
+                            if "VD17" in step2.text or "vd17" in step2.text:
+                                bid.name = "VD17"
+                            if "VD18" in step2.text or "vd18" in step2.text:
+                                bid.name = "VD18"
+#                            if "ESTC" in step2.text: I remove it because I have not yet programmed it. 
+#                                bid.name = "ESTC"
+                            if "EDIT 16" in step2.text or "EDIT16" in step2.text or "CNCE" in step2.text:
+                                bid.name = "EDIT16 CNCE"
+                        case "c":
+                            bid.id = step2.text
+                if bid.name:
+                    m.bibliographic_id.append(bid)
+                    print(bid.id)
+                    print(bid.name)
+    
+
+
+                    
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+
+    
+    for im in images:
+        #for the label (page-number) of the canvas
+        if im.label_raw[0:2] == "f.":
+            im.label_prefix = "fol."
+            im.label_page = im.label_raw[2:].strip()
+            if im.label_page[-1] == ".":
+                im.label_page = im.label_page[:-1]
+
+        elif im.label_raw[0:2] == "p.":
+            im.label_prefix = "p."
+            im.label_page = im.label_raw[2:].stri()
+            if im.label_page[-1] == ".":
+                im.label_page = im.label_page[:-1]
+        elif "board" in im.label_raw or "leaf" in im.label_raw:
+            im.label_page = im.label_raw
+
+       
+    
+    m.images = images
+    return m
+
+
+def Yale_parsing (URI_entered): 
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    repository = Organisation()
+    bibliographical_references_list = []
+    m.manifest = url.read()
+    repository.name = manifest["requiredStatement"]["value"]["en"][0]
+    repository.role = "col"
+    m.repository.append(repository)
+    metadata = manifest["metadata"]
+    for step1 in metadata:
+        if step1["label"]["en"][0] == "Call Number":
+            m.shelfmark = step1["value"]["none"][0]
+        if step1["label"]["en"][0] == "Rights":
+            m.license = step1["value"]["none"][0]
+        if step1["label"]["en"][0] == "Citation":
+            for reference in step1["value"]["none"]:
+                print("bibliographical reference found: " + reference)
+                bibliographical_references_list.append(reference)
+
+    for reference in bibliographical_references_list:
+        bid = Bibliographic_id()
+        reference_divided = reference.split(",")
+        if "Gesamtkatalog" in reference:
+            bid.name = "GW"
+            bid.id = reference_divided[1].strip()
+            m.bibliographic_id.append(bid)
+        if "Incunabula short" in reference:
+            bid.name = "ISTC"
+            bid.id = reference_divided[1].strip()
+            m.bibliographic_id.append(bid)
+        if "Goff" in reference:
+            bid.name = "Goff"
+            bid.id = reference[4:].strip() # this works if it is quoted Goff + number
+            m.bibliographic_id.append(bid)
+    
+
+
+                    
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
+    canvas_list = (manifest["items"])
+    images = Canvas_parsing_Yale(canvas_list)    
+    m.numberOfImages = len(images)
+
+    
+    for im in images:
+        im.label_page = im.label_raw
+        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            im.label_prefix = "p. "
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            im.label_prefix = "fol. "
+        else:
+            im.label_prefix = ""
+
+
+       
+    
+    m.images = images
+    return m
+
+
+
+def Boston_parsing (URI_entered): 
+    url = urllib.request.urlopen(URI_entered)
+    manifest = json.load(url)
+    #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
+    m = Metadata()
+    repository = Organisation()
+    rights_list = []
+    identifiers_list = []
+    
+    m.manifest = url.read()
+    metadata = manifest["metadata"]
+    for step1 in metadata:
+        if step1["label"] == "Location":
+            repository.name = step1["value"]
+            repository.role = "col"
+            m.repository.append(repository)
+        if step1["label"] == "Identifier": # there are several identifiers given - I assume that the relevant one starts always with "RARE"
+            for line1 in step1["value"]:
+                identifiers_list.append(line1)
+            for line2 in identifiers_list:
+                if "RARE" in line2: 
+                    m.shelfmark = line2 
+        if step1["label"] == "Terms of Use":
+            for line1 in step1["value"]:
+                rights_list.append(line1)
+            for line2 in rights_list:
+                m.license = m.license + line2 + "; "
+            m.license = m.license[0:-2]
+
+
+    if manifest["seeAlso"]:
+        bibliographical_reference = manifest["seeAlso"]
+        url = requests.get(bibliographical_reference)
+        record = url.text
+        reference_istc = re.search(r'Incunabula short title catalogue, i\w\d{8}', record)
+        if reference_istc:
+            bid = Bibliographic_id()
+            bid.name = "ISTC"
+            bid.id = reference_istc.group(0)[34:].strip()
+            m.bibliographic_id.append(bid)
+        reference_gw = re.search(r'Gesamtkatalog der Wiegendrucke, \w*<', record)
+        if reference_gw:
+            bid = Bibliographic_id()
+            bid.name = "GW"
+            bid.id = reference_gw.group(0)[32:-1].strip()
+                                 
+    
+                 
+    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+    
+    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    images = Canvas_parsing(canvas_list)    
+    m.numberOfImages = len(images)
+
+    # Apparently, the BPL does not use page numbers
+    m.images = images
+    return m
+
+
