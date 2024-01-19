@@ -288,6 +288,9 @@ def metadata_dissection(metadata):
         new_book.volume_number = metadata.bibliographic_information[0].volume_number
         new_book.part_title = metadata.bibliographic_information[0].part_title
         new_book.printing_date = metadata.bibliographic_information[0].printing_date
+        new_book.date_string = metadata.bibliographic_information[0].date_string
+        new_book.date_start = metadata.bibliographic_information[0].date_start
+        new_book.date_end = metadata.bibliographic_information[0].date_end
         if metadata.bibliographic_information[0].bibliographic_id:
             for bibliographic_id in metadata.bibliographic_information[0].bibliographic_id:
                 new_bibliographic_id = External_id()
@@ -322,6 +325,8 @@ def metadata_dissection(metadata):
                 new_book.places.append(new_place)
         new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
         book_record_id = new_book.id # I'll need that later
+        print(new_book.date_start)
+        print("Completed book record")
 #        print("New book record: ")
 #        print(new_book)
         dbactions.insertRecordBook(new_book)

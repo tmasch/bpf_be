@@ -5,7 +5,12 @@ from classes import *
 import re
 import dbactions
 #from dbactions import *
-url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "Ä" : "%C3%84", "Ö" : "%C3%96", "Ü": "%C3%9C", "ß" : r"%C3%9F", "(" : "", ")" : "", "," : "", "é" : "%C3%A9", "è" : "%C3%A8", "." : ""}  
+url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "Ä" : "%C3%84", "Ö" : "%C3%96", "Ü": "%C3%9C", \
+                   "ß" : r"%C3%9F", "(" : "", ")" : "", "," : "",  "." : "" , "-" : "", \
+                    "â": "%C3%A2", "ê" : "%C3%AA", "î" : "%C3%AE", "ô": "%C3%B4", "û" : "%C3%BB", "&" : "", \
+                        "á" : "%C3%A1", "é" : "%C3%A9", "í" : "%C3%AD", "ó" : "%C3%B3", "ú": "%C3%BA", \
+                        "à" : "%C3%A0", "è" : "%C3%A8", "ì": "%C3%AC", "ò" : "%C3%B2", "ù" : "%C3%B9", \
+                        "Č" : "%C4%8C", "č" : "%C4%8D", "Ř": "%C5%98", "ř" : "%C5%99", "Š" : "%C5%A0", "š" : "%C5%A1"}  
 #perhaps more signs will have to be added here later
 # I also exclude "." - this is permissted in an URL, but the search dislikes it
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
@@ -122,6 +127,7 @@ def person_identification(person):
                     search_phrase = r"Per=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
                     name_query = name_query + search_phrase
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
+            print(authority_url)
             new_potential_candidates = gnd_parsing_person(authority_url)
             person.potential_candidates = person.potential_candidates + new_potential_candidates
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
@@ -376,7 +382,7 @@ def place_identification(place):
             place_name_search = place.name.strip()
             for old, new in url_replacement.items():
                 place_name_search = place_name_search.replace(old, new)
-                print("Search term for place :x" + place_name_search + "x")
+                #print("Search term for place :x" + place_name_search + "x")
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
             print('URL for place name search : '+ authority_url)
             place.potential_candidates = gnd_parsing_place(authority_url)
@@ -476,10 +482,14 @@ def gnd_parsing_person(authority_url):
                                 pe.name_preferred = step2.text                               
                             case "b": # The numbering for rulers
                                 pe.name_preferred = pe.name_preferred + " " + step2.text
-                            case "c": # For rulers, comments on Territory, title and time of ruling. 
+                            case "c": # For rulers, comments on Territory, title and time of ruling. However, 
                                 # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
                                 # but I fear it is too messy to make it worthwhile. 
-                                pe.comments = step2.text
+                                if not ("Kaiser" in step2.text or "König" in step2.text or "Herzog" in step2.text or "Kurfürst" in step2.text or "Markgraf" in step2.text or \
+                                        "Bischof" in step2.text or "Fürstbischof" in step2.text or "Erzbischof" in step2.text or "Fürsterzbischof" in step2.text or "Abt" in step2.text):
+                                    pe.name_preferred = pe.name_preferred + " (" +  step2.text + ")"
+                                else:
+                                    pe.comments = step2.text
 
                 case "375":
                     for step2 in step1:
@@ -634,6 +644,8 @@ def gnd_parsing_person(authority_url):
                                     pe.comments = step2.text + "; " + pe.comments
                                 else:
                                     pe.comments = step2.text
+        #if pe.dates_from_source:
+            #pe.dates = dates_parsing(pe.dates_from_source)
         if pe.comments:                
             comments_preview = " (" + pe.comments + ")"
         if pe.name_variant:
@@ -641,6 +653,7 @@ def gnd_parsing_person(authority_url):
             for variant in pe.name_variant:
                 name_variant_preview = name_variant_preview + variant + "; "
             name_variant_preview = name_variant_preview[:-2]
+        
 
         pe.preview = pe.name_preferred + date_preview + ortg_preview + ortw_preview + orts_preview + name_variant_preview + comments_preview
         potential_persons_list.append(pe)
@@ -674,6 +687,7 @@ def gnd_parsing_person(authority_url):
 
 def gnd_parsing_organisation(authority_url):
     potential_organisations_list = []
+    print("organisation-authority: " + authority_url)
     url = urllib.request.urlopen(authority_url)
     tree = xml.etree.ElementTree.parse(url)
     root = tree.getroot()

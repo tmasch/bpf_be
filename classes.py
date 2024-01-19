@@ -3,6 +3,8 @@ import bson
 #import pydantic
 #import pydantic
 from typing import Optional
+from datetime import date
+from datetime import datetime
 
 class Image(BaseModel):
     def __str__(self):
@@ -38,7 +40,14 @@ class Connected_entity(BaseModel):
 class Date_import(BaseModel):
     datestring : Optional[str] = ""
     datetype : Optional[str] = ""
-    
+    #date_start : Optional[date] = None
+    #date_end : Optional[date] = None
+
+class Date(BaseModel):
+    date_string : Optional[str] = ""
+    date_type : Optional[str] = "" # The only current plan to use it is to determinate dates of life and dates of activity
+    date_start : Optional[datetime] = None
+    date_end : Optional[date] = None
 
 
 class Person_import(BaseModel):
@@ -50,6 +59,7 @@ class Person_import(BaseModel):
     name_variant : Optional[list[str]] = []
     sex : Optional[str] = ""
     dates_from_source : Optional[list[Date_import]] = []
+    #dates : Optional[list[Date]] = []
     connected_persons : Optional[list[Connected_entity]] = []
     connected_organisations : Optional[list[Connected_entity]] = []
     connected_locations : Optional[list[Connected_entity]] = []
@@ -176,7 +186,10 @@ class Bibliographic_information(BaseModel):
     title: Optional[str] = ""
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""
-    printing_date : Optional[str] = ""
+    printing_date : Optional[str] = "" # This will be later replaced
+    date_string : Optional[str] = ""
+    date_start : Optional[datetime] = None
+    date_end : Optional[datetime] = None
     printing_information : Optional[str] = ""
 
 
@@ -308,6 +321,9 @@ class Book_db(BaseModel):
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    date_string : Optional[str] = ""
+    date_start : Optional[datetime] = None
+    date_end : Optional[datetime] = None
     preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
     
 class Pages_db(BaseModel):

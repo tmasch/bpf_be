@@ -22,11 +22,11 @@ def bibliography_select (bid_name, bid_id):
     elif bid_name == "GW":
         GW_number = bid_id.lstrip("0")
         ##Removing leading zeros that are accepted in many cases but not by the ISTC            
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + GW_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + GW_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography) 
     elif bid_name  == "ISTC":
         ISTC_number = bid_id
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + ISTC_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + ISTC_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography) 
     # the following options (and perhaps more will have to follow) are only used for libraries such as the BnF that do not regularly give ISTC or GW numbers
     elif bid_name == "Goff":
@@ -34,32 +34,32 @@ def bibliography_select (bid_name, bid_id):
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
         if bibliographic_information_single == None: # Sometimes, ISTC write the Goff number without a hyphen
             bid_id = bid_id.replace("-", "")
-            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full&style=full'
             print("search string without hyphen: ")
             print(url_bibliography)
             bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name == "CIBN":
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22CIBN ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22CIBN ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name == "C":
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22C ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22C ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name == "HC":
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HC ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HC ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
         if bibliographic_information_single == None: # ISTC makes a distinction between "H" (the main part of the work), "HC" (the most common addition) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
-            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22H ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22H ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
             bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
         if bibliographic_information_single == None: # ISTC makes a distinction between "HC" (the main part of the work) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
-            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HCR ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+            url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HCR ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
             bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)       
     elif bid_name == "Pell Ms":
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Pell Ms ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Pell Ms ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name == "Bod-inc":
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Bod-inc ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Bod-inc ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
-
+    
 
     #print(bibliographic_information_single)
     return(bibliographic_information_single)
@@ -104,7 +104,6 @@ def iiifparse(URI_entered):
         m = books_parsing_manifests.Vienna_parsing(URI_entered)
     elif "loc.gov" in URI_entered:
         m = books_parsing_manifests.Washington_parsing(URI_entered)
-        # This does not work yet since I cannot download the manifests
     elif "sub.uni-goettingen" in URI_entered:
         m = books_parsing_manifests.Goettingen_parsing(URI_entered)
     elif "figgy.princeton.edu" in URI_entered:
@@ -113,6 +112,27 @@ def iiifparse(URI_entered):
         m = books_parsing_manifests.Yale_parsing(URI_entered)
     elif "digitalcommonwealth" in URI_entered:
         m = books_parsing_manifests.Boston_parsing(URI_entered)
+    elif "manchester.ac.uk" in URI_entered:
+        m = books_parsing_manifests.Manchester_parsing(URI_entered)
+    elif "cudl.lib.cam.ac.uk" in URI_entered:
+        m = books_parsing_manifests.Cambridge_UL_parsing(URI_entered)
+    elif "irht.cnrs.fr" in URI_entered:
+        m = books_parsing_manifests.IRHT_parsing(URI_entered)
+    elif "ub.uni-frankfurt.de" in URI_entered:
+        m = books_parsing_manifests.Frankfurt_parsing(URI_entered)
+    elif "haab-digital" in URI_entered:
+        m = books_parsing_manifests.Weimar_parsing(URI_entered)
+    elif "dibiki.ub.uni-kiel" in URI_entered:
+        m = books_parsing_manifests.Kiel_parsing(URI_entered)
+    elif "sub.uni-hamburg.de" in URI_entered:
+        m = books_parsing_manifests.Hamburg_parsing(URI_entered)
+    elif "rosdok.uni-rostock.de" in URI_entered:
+        m = books_parsing_manifests.Rostock_parsing(URI_entered)
+    elif "online-service.nuernberg.de" in URI_entered:
+        m = books_parsing_manifests.Nuernberg_StB_parsing(URI_entered)
+    elif "manuscriptorium.com" in URI_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
+        m = books_parsing_manifests.Manuscriptorium_parsing(URI_entered)
+
     #else:
     #    print("This book comes from a library that is not yet supported by the system.")
     #    break
