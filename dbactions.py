@@ -43,8 +43,8 @@ def getAllRessourcesFromDb():
 #    print(".")
     collection = dbname['bpf']
 # the next line is not working for me :-(
-#    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book"]}}, {"id": 1, "type" : 1, "preview" : 1}))
-    r=list(collection.find())
+    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
+#    r=list(collection.find())
     print(r)
     return(r)        
     
