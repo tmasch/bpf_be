@@ -168,6 +168,7 @@ async def saveConnectedRecords(metadata: Metadata):
 @app.get("/allRessources", response_model=List[Preview_list_db]) 
 async def getAllRessources():
     r=getAllRessourcesFromDb()  
+    print(r)
     return(r)
     
 @app.get("/ressource", response_model=Metadata)
@@ -177,9 +178,12 @@ async def getRessource(id: str):
     return(r)
     
 @app.get("/findImages")    
-async def findImages(id: str):
+async def findAllImages(id: str):
     print(id)
+    print("starting")
     r=findImages(id)
+    print(r)
+    return()
     
 
 @app.get("/getBookRecord", response_model = Book_db_display)
@@ -217,6 +221,3 @@ async def getPlaceRecord(id: str):
     placeRecord = displayRecords.getRecord(id)
     print("Person record sent off from BFF")
     return(placeRecord)
-
-
-

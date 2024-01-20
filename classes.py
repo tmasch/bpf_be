@@ -6,6 +6,24 @@ from typing import Optional
 from datetime import date
 from datetime import datetime
 
+
+
+class Frame(BaseModel):
+    def __str__(self):
+        t="Index: "+self.index+"\n"
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
+    index : Optional[int] = ""
+    x_abs : Optional[int] = ""
+    y_abs : Optional[int] = ""
+    w_abs : Optional[int] = ""
+    h_abs : Optional[int] = ""
+    x_rel : Optional[float] = ""
+    y_rel : Optional[float] = ""
+    w_rel : Optional[float] = ""
+    h_rel : Optional[float] = ""
+
 class Image(BaseModel):
     def __str__(self):
         t="Index: "+self.index+"\n"
@@ -19,7 +37,8 @@ class Image(BaseModel):
     baseurl : Optional[str] = ""
     format : Optional[str] = ""
     label : Optional[str] = ""
-    
+    frames : Optional[list[Frame]] = []
+
 class External_id(BaseModel):
 # This class is used for references to external IDs in bibliographic records and in authority files such as the GND
 # It contains the name of the repertory (e.g., VD16, GND), the ID of the book or person within the repertory

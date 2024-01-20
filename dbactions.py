@@ -42,7 +42,9 @@ def getAllRessourcesFromDb():
     print("Database name:",dbname)
 #    print(".")
     collection = dbname['bpf']
-    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book"]}}, {"id": 1, "type" : 1, "preview" : 1}))
+# the next line is not working for me :-(
+#    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book"]}}, {"id": 1, "type" : 1, "preview" : 1}))
+    r=list(collection.find())
     print(r)
     return(r)        
     
@@ -57,6 +59,12 @@ def getRessourceFromDb(id):
 #        print(rr)
     return(r[0])
 
+def updateImageWithFrames(id,i,frames):
+    dbname = get_database()
+    collection = dbname['bpf']
+    print(json.dumps([ob.__dict__ for ob in frames]))
+    result = collection.update_one({"id" : id}, {'$set' : {"images."+str(i)+".frames" : [ob.__dict__ for ob in frames] }})
+#json.dumps([ob.__dict__ for ob in frames])
 
 def insertRecordPerson(person: Person_db):
     # This function insserts a newly created record for a person into the database
