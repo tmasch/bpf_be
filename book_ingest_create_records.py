@@ -11,6 +11,7 @@ from classes import *
 from nanoid import generate
 import dbactions
 from pymongo import MongoClient
+from dates_parsing import date_overall_parsing
 
 
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
@@ -362,7 +363,9 @@ def metadata_dissection(metadata):
 def person_ingest(person):
     # This function is about translating the imported information of a person into the information record used for the database. 
     # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
-    person_selected = person.potential_candidates[person.chosen_candidate]               
+    person_selected = person.potential_candidates[person.chosen_candidate]   
+    print("selected person: ")            
+    print(person_selected)
     person_new = Person_db()
     person_new.id = generate()
     person_new.type = "Person"
@@ -374,7 +377,30 @@ def person_ingest(person):
         # This is necessary because up to now, Iconobase uses a string search for variants and not a word search. 
         person_new.name_variant.append(person.name)
     person_new.sex = person_selected.sex
-    person_new.dates_from_source = person_selected.dates_from_source # A lot of works needs to be done here. 
+    """ Currently, I still use the list of dates_from_source and simply add the newly parsed datestring and start and end dates to it. 
+        In a later stage, the entire list will be sent to the parsing function, and only one date will come back for inclusion into the database """
+    for date_from_source in person_selected.dates_from_source:
+        date_parsed = date_overall_parsing(date_from_source.datestring_raw, date_from_source.date_comments, date_from_source.datetype)
+        print("date parsed: ")
+        print(date_parsed)
+        datestring = date_parsed[0]
+        date_start = date_parsed[1]
+        date_end = date_parsed[2]
+        date_aspect = date_parsed[3]
+        date = Date_import()
+        date.datestring_raw = date_from_source.datestring_raw
+        date.date_comments = date_from_source.date_comments
+        date.datetype = date_from_source.datetype
+        date.datestring = datestring
+        date.date_start = date_start
+        date.date_end = date_end
+        date.date_aspect = date_aspect
+        person_new.dates_from_source.append(date)
+
+    #person_new.dates_from_source = person_selected.dates_from_source # A lot of works needs to be done here. 
+    print("person_new.dates entered into database:")
+    print(person_selected.dates_from_source)
+    print(person_new.dates_from_source)
     if person_selected.connected_persons:
         # The GND has very few standardised abbreviations for relationships, largely 'bezf' (family relationship), 'bezb' (professional relationship) and 'beza' (anything else)
         # Sometimes, the concrete type of relationship is given in a comment field, but it is not standardised. 

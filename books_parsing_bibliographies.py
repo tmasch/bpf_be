@@ -325,7 +325,7 @@ def VD17_parsing(url_bibliography):
                 print(bi.date_string)
                 print(bi.date_start.isoformat())
                 print(bi.date_end.isoformat())
-                bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat() + " - " + bi.date_end.isoformat() + ")"
+                bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
 
                     
 
@@ -477,7 +477,7 @@ def VD16_parsing(url_bibliography):
         end_month = 12
         bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
         bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
-        bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat() + " - " + bi.date_end.isoformat() + ")"
+        bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
 
             
 
@@ -891,7 +891,7 @@ def ISTC_parsing(URL_bibliography):
 
             # Until I have changed it everyhwhere and also in the FE, I still use the old bi.printing_date function. 
 
-            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat() + " - " + bi.date_end.isoformat() + ")"
+            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
 
 
 

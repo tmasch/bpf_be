@@ -78,7 +78,7 @@ def person_identification(person):
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
-            candidate.preview = candidate.name_preferred # The years should be added once I have them
+            candidate.preview = candidate.name_preferred + " (in Database)" # The years should be added once I have them
             print("Found as preferred name")
             print(candidate.internal_id)
             print(candidate.name_preferred)
@@ -91,7 +91,7 @@ def person_identification(person):
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
-            candidate.preview = candidate.name_preferred # Also here, the years should be added
+            candidate.preview = candidate.name_preferred + " (in Database)" # Also here, the years should be added
             print("Found as variant: ")
             print(candidate.internal_id)
             print(candidate.name_preferred)
@@ -132,8 +132,8 @@ def person_identification(person):
             person.potential_candidates = person.potential_candidates + new_potential_candidates
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
-
-    
+    print("new person record")
+    print(person)
     return person         
                 
 
@@ -443,6 +443,7 @@ def additional_place_identification(new_authority_id, role):
 
 
 def gnd_parsing_person(authority_url):
+    print("arrived in gnd_parsing_person")
     potential_persons_list = []
     url = urllib.request.urlopen(authority_url)
     tree = xml.etree.ElementTree.parse(url)
@@ -450,6 +451,7 @@ def gnd_parsing_person(authority_url):
     #print(root)
     
     for record in root[2]:
+        print("Parsing person information")
         pe = Person_import()
         comment = ""
         date_preview = ""
@@ -586,15 +588,19 @@ def gnd_parsing_person(authority_url):
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                date.datestring = step2.text
+                                date.datestring_raw = step2.text
+                            case "v":
+                                date.date_comments = step2.text
                             case "4":
                                 if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
                                     date.datetype = step2.text
                     if date.datetype == "datl":
-                        date_preview = " (" + date.datestring + ")"
+                        date_preview = " (" + date.datestring_raw + ")"
                     if date.datetype == "datw" and date_preview == "": # only shown in the preview if there is no datl
-                        date_preview = " (active: " + date.datestring + ")" 
+                        date_preview = " (active: " + date.datestring_raw + ")" 
                     pe.dates_from_source.append(date)
+                    print("Date as imported from GND: ")
+                    print(pe.dates_from_source)
  #                   pe.dates_from_source.append(date)
                     # If the GND contains the exact date ("datx"), it also gives the years only ("datl"). 
                     # The latter should be removed later
@@ -679,7 +685,7 @@ def gnd_parsing_person(authority_url):
         
     #record = root[2][0][2][0][0]
     #print(record.text)
-    
+    #print("potential persons list made")
     return potential_persons_list
 
 
@@ -1178,3 +1184,25 @@ def gnd_parsing_place(authority_url):
 #x = place_identification(place)
 
 #print(x)
+
+
+def dates_parsing(dates_from_source):
+# This module chooses the most relevant datestring and turns it into a standardised date, consisting of a (standardised) datestring, a logical field determining if it is dates of life or dates of activity,
+    # and datetime objects for start and end. 
+    # Unfortunately, there is a large number of variants of dates used in the GND - hence, a large number of cases has to be defined (for the start only a few)
+# for the moment, I ignore entries with "datu" and "rela" - the former seems to be in most cases an additional date, the 
+    if len(dates_from_source) == 1:
+        if dates_from_source[0].datetype == "datl" or dates_from_source[0].datetype == "datx": # normally, the latter does not appear alone, but maybe it does sometimes
+            datetype = "lived"
+            date_raw = dates_from_source[0].datestring
+        elif dates_from_source[0].datetype == "datw" or dates_from_source[0].datetype == "datz": # normally, the latter does not appear alone, but maybe it does sometimes
+            datetype = "active"
+            date_raw = dates_from_source[0].datestring
+    if len(dates_from_source) == 2:
+        if dates_from_source[0].datetype == "datl" or dates_from_source[1].datetype == "datx":
+            datetype = "lived"
+            date_raw = dates_from_source[0].datestring
+            # this is only provisional - there are - alas - cases in which the datx field contains one exact date, and the datl field both 
+            # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
+        
+    pass

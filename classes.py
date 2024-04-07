@@ -57,16 +57,22 @@ class Connected_entity(BaseModel):
     connection_time : Optional[str] = ""
 
 class Date_import(BaseModel):
-    datestring : Optional[str] = ""
+    # This class is used for the import of dates of life or activity of persons. Currently, it is still saved in the database, but eventually it will be replaced with a 
+    # class Date_person
+    datestring_raw : Optional[str] = ""
+    date_comments : Optional[str] = ""
     datetype : Optional[str] = ""
-    #date_start : Optional[date] = None
-    #date_end : Optional[date] = None
+    datestring : Optional[str] = ""
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
+    date_aspect : Optional[str] = ""
 
 class Date(BaseModel):
     date_string : Optional[str] = ""
-    date_type : Optional[str] = "" # The only current plan to use it is to determinate dates of life and dates of activity
-    date_start : Optional[datetime] = None
-    date_end : Optional[date] = None
+#    date_type : Optional[str] = "" # The only current plan to use it is to determinate dates of life and dates of activity of a person. 
+#    I can probably omit the date_type and have a separate class for dates of persons
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
 
 
 class Person_import(BaseModel):
@@ -78,7 +84,9 @@ class Person_import(BaseModel):
     name_variant : Optional[list[str]] = []
     sex : Optional[str] = ""
     dates_from_source : Optional[list[Date_import]] = []
-    #dates : Optional[list[Date]] = []
+    datestring : Optional[str] = ""
+    date_start : Optional[datetime] = None
+    date_end : Optional[datetime] = None
     connected_persons : Optional[list[Connected_entity]] = []
     connected_organisations : Optional[list[Connected_entity]] = []
     connected_locations : Optional[list[Connected_entity]] = []
@@ -211,6 +219,12 @@ class Bibliographic_information(BaseModel):
     date_end : Optional[datetime] = None
     printing_information : Optional[str] = ""
 
+class Making_process(BaseModel):
+    process_number : Optional[int] = 0
+    process_type : Optional[str] = ""
+    process_qualifier : Optional[str] = ""
+    person : Optional[str] = ""
+    place : Optional[str] = ""
 
 
      
@@ -241,6 +255,7 @@ class Metadata(BaseModel):
     manifest : Optional[str] = ""
     images : Optional[list[Image]] = []
     title : Optional[str] = ""
+    making_processes : Optional[list[Making_process]] = []
 
 
 
@@ -456,3 +471,10 @@ class Place_db_display(BaseModel):
     connected_organisations : Optional[list[Connected_entity]] = []
     connected_locations : Optional[list[Connected_entity]] = []
     comments : Optional[str] = ""
+
+class Making_process(BaseModel):
+    process_number : Optional[int] = 0
+    process_type : Optional[str] = ""
+    process_qualifier : Optional[str] = ""
+    person : Optional[str] = ""
+    place : Optional[str] = ""
