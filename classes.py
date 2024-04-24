@@ -223,8 +223,9 @@ class Making_process(BaseModel):
     process_number : Optional[int] = 0
     process_type : Optional[str] = ""
     process_qualifier : Optional[str] = ""
-    person : Optional[str] = ""
-    place : Optional[str] = ""
+    person : Optional[Person] = None
+    place : Optional[Place] = None
+    date : Optional[Date_import] = None
 
 
      
@@ -472,9 +473,3 @@ class Place_db_display(BaseModel):
     connected_locations : Optional[list[Connected_entity]] = []
     comments : Optional[str] = ""
 
-class Making_process(BaseModel):
-    process_number : Optional[int] = 0
-    process_type : Optional[str] = ""
-    process_qualifier : Optional[str] = ""
-    person : Optional[str] = ""
-    place : Optional[str] = ""

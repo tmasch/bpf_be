@@ -62,8 +62,8 @@ async def root():
 async def getMetadata(iiifUrl, material):
     print("iiifURL: ")
     print(iiifUrl)
-    m = iiifparse.iiifparse(iiifUrl)
-    m.material = material
+    m = iiifparse.iiifparse(iiifUrl, material)
+    #m.material = material
 #    print(iiifUrl)
 #    url = urllib.request.urlopen(iiifUrl)
 #    manifest = url.read()
@@ -143,7 +143,13 @@ async def load_new_repository_authority_record(new_authority_id_rep):
 #    print(potential_organisation)
     return(potential_organisation)
 
-
+@app.post("/submitAdditionalInformation")
+async def submit_additional_information(making_processes: list[Making_process]):
+    print(making_processes)
+    making_processes = gndparse.making_process_identification(making_processes)
+    print("The following is sent back: ")
+    print(making_processes)
+    return(making_processes)
 
 @app.post("/createNewRessource")
 async def createNewRessource(metadata: Metadata):

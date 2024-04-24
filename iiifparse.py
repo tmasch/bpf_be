@@ -1,5 +1,6 @@
 import re
 from lxml import etree
+from classes import *
 import books_parsing_manifests
 import books_parsing_bibliographies
 URI_entered = "abc"
@@ -66,7 +67,7 @@ def bibliography_select (bid_name, bid_id):
 
 
 
-def iiifparse(URI_entered):
+def iiifparse(URI_entered, material):
 
 # Step 1: Information is collected from the IIIF manifest
 
@@ -137,6 +138,7 @@ def iiifparse(URI_entered):
     #    print("This book comes from a library that is not yet supported by the system.")
     #    break
     m.iiifUrl = URI_entered
+    m.material = material
     
 
 # Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added. 
@@ -180,6 +182,62 @@ def iiifparse(URI_entered):
             print("counter1 after increment" + str(counter1))
 
 
+    """The following lines create - depending on the type of material - 
+    fields for manually entering artist, place, date, and illustrated text. 
+    They will later be copied to the individual Artwork records
+    For manuscripts, there is one making process, for printed books, there are two (design / making of matrix)
+    The third making process for printed books, the printing, does not appear here, since the relevant information
+    will be taken automatically from the bibliographic information. 
+    """
+    print("Material: ")
+    print(material)
+    if material == "m": # manuscripts
+        making_process_blank = Making_process()
+        making_process_blank.process_number = 1
+        making_process_blank.process_type = "Painting"
+        person_blank = Person()
+        person_blank.name = ""
+        person_blank.chosen_candidate = 999
+        making_process_blank.person = person_blank
+        place_blank = Place()
+        place_blank.name = ""
+        place_blank.chosen_candidate = 999
+        making_process_blank.place = place_blank
+        date_blank = Date_import()
+        date_blank.datestring_raw = ""
+        making_process_blank.date = date_blank
+        m.making_processes.append(making_process_blank)
+    if material == "b": #Printed books
+        making_process_blank = Making_process()
+        making_process_blank.process_number = 1
+        making_process_blank.process_type = "Design"
+        person_blank = Person()
+        person_blank.name = ""
+        person_blank.chosen_candidate = 999
+        making_process_blank.person = person_blank
+        place_blank = Place()
+        place_blank.name = ""
+        place_blank.chosen_candidate = 999
+        making_process_blank.place = place_blank
+        date_blank = Date_import()
+        date_blank.datestring_raw = ""
+        making_process_blank.date = date_blank
+        m.making_processes.append(making_process_blank)
+        making_process_blank = Making_process()
+        making_process_blank.process_number = 2
+        making_process_blank.process_type = "Production of Matrix"
+        person_blank = Person()
+        person_blank.chosen_candidate = 999
+        person_blank.name = ""
+        making_process_blank.person = person_blank
+        place_blank = Place()
+        place_blank.name = ""
+        place_blank.chosen_candidate = 999
+        making_process_blank.place = place_blank
+        date_blank = Date_import()
+        date_blank.datestring_raw = ""
+        making_process_blank.date = date_blank
+        m.making_processes.append(making_process_blank)
 
     return m
 

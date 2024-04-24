@@ -15,7 +15,8 @@ url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC
 # I also exclude "." - this is permissted in an URL, but the search dislikes it
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
 role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
-role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical", "uvp" : "Town - historical"}
+role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical", "uvp" : "Town - historical", "Place of Making" : "Town - historical"}
+#There is a problem - "Place of Making" could also go with "Region - historical" - I ignore that for the moment. 
 from pymongo import MongoClient
 
 
@@ -1187,6 +1188,9 @@ def gnd_parsing_place(authority_url):
 
 
 def dates_parsing(dates_from_source):
+    """
+    I don't think that this module is in use. 
+    """
 # This module chooses the most relevant datestring and turns it into a standardised date, consisting of a (standardised) datestring, a logical field determining if it is dates of life or dates of activity,
     # and datetime objects for start and end. 
     # Unfortunately, there is a large number of variants of dates used in the GND - hence, a large number of cases has to be defined (for the start only a few)
@@ -1206,3 +1210,33 @@ def dates_parsing(dates_from_source):
             # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
         
     pass
+    return
+
+
+def making_process_identification(making_processes):
+    """This module has bene primarily made for parsing information about the making process of a manuscript or printed book
+    that had been entered manually during the ingest process. 
+    If such information is added when working on individual records, it might be possible to adopt this module, but one would probably rather go directly
+    to parsing the individual parts of it. 
+    Manuscripts have by default one Making Process, Printed Books two (in theory three, but the third, printing, is already defined by bibliographic data
+    and hence would not be added here). 
+    Each making process has a number (currently as integer, although I wonder if one should not rather use a string to allow for e.g. 1a, 1b etc), 
+    a process_type (the activity, e.g. design, blockcutting, etc.), and a process qualifier (e.g., none, attributed, follower of, etc.) - these two 
+    will eventually probably belong drop-down fields. 
+    It also has three fields that need parsing - one for a person (normally the artist), one for a place, and one for a date. 
+    The person will be parsed similar to persons conntected to a book - but instead of the GND, the Getty ULAN would be the preferred source of information. 
+    The place will be parsed as places conntected to a book (also here historical names), and the GND will also here be the principal source. 
+    The date will be entered according to relatively simple rules that the editors would have to learn and would be parsed in a separate routine. 
+
+    Eventually, two more fields will be added - the Medium, and the Illustrated Text.     
+    """
+    for making_process in making_processes:
+        place = making_process.place
+        if place.name != "":
+            place.role = "Place of Making"
+            place_new = place_identification(place)
+            print(place_new)
+            making_process.place = place_new
+    return(making_processes)
+
+

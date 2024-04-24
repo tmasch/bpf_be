@@ -692,6 +692,9 @@ def ISTC_parsing(URL_bibliography):
                 #bi.printing_date = step1["imprint_date"].strip("[]")
                 printing_date_raw = step1["imprint_date"].strip("[]")
                 print("printing_date_raw: " + printing_date_raw)
+                if "[" in printing_date_raw or "]" in printing_date_raw:
+                    printing_date_raw = printing_date_raw.replace("[", "")
+                    printing_date_raw = printing_date_raw.replace("]", "")
                 printing_date_divided = re.match(date_pattern, printing_date_raw).groups()              
                 if printing_date_divided[0]:
                     date_prefix = printing_date_divided[0]
@@ -879,12 +882,12 @@ def ISTC_parsing(URL_bibliography):
 #                print(string_month)
 #            if string_year: 
 #                print(string_year)
-#            print("start_day: ")
-#            print(start_day)
-#            print("start_month: ")
-#            print(start_month)
-#            print("start_year: ")
-#            print(start_year)
+            print("start_day: ")
+            print(start_day)
+            print("start_month: ")
+            print(start_month)
+            print("start_year: ")
+            print(start_year)
             bi.date_string = string_prefix + string_day + string_month + string_year + date_between_indicator + string_day_between + string_month_between + string_year_between
             bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
             bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
