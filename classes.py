@@ -85,8 +85,9 @@ class Person_import(BaseModel):
     sex : Optional[str] = ""
     dates_from_source : Optional[list[Date_import]] = []
     datestring : Optional[str] = ""
-    date_start : Optional[datetime] = None
-    date_end : Optional[datetime] = None
+    date_start : Optional[tuple] = None
+    date_end : Optional[tuple] = None
+    date_aspect : Optional[str] = ""
     connected_persons : Optional[list[Connected_entity]] = []
     connected_organisations : Optional[list[Connected_entity]] = []
     connected_locations : Optional[list[Connected_entity]] = []
@@ -373,6 +374,7 @@ class Pages_db(BaseModel):
     numberOfImages : Optional[int] = 0
     images : Optional[list[Image]] = []
     preview : Optional[str] = ""
+    making_processes : Optional[list[Making_process]] = []
 
 class Preview_list_db(BaseModel):
 # This class is for displaying preview and id of all manuscripts and books in Iconobase.

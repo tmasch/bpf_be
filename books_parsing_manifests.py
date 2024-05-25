@@ -1129,6 +1129,7 @@ def Bodleian_parsing(URI_entered):
     shelfmark_pattern = r'(.*?)(College|Hall|Church)(.*)'
     attribution_pattern = r'(.*?)(https://creativecommons[^>]*)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
+    bibliographic_record = ""
     for step1 in metadata:
         bid = Bibliographic_id()
         label = step1["label"]

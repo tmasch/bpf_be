@@ -933,6 +933,464 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
         date_start = only_start_date
         date_end = only_end_date
         date_aspect = only_aspect
-
+    # question: should one have fictive end dates for start dates only given? e.g. for life + 70, for active + 50? ditto for fictive start dates?
     return (date_string, date_start, date_end, date_aspect)
 
+
+
+
+def artist_date_single_parsing(date_raw):
+    # This function is called by artist_date_parsing. It receives an element of the date (the original date statement is broken at commas and dashes into these elements)
+    # it returns a datestring, start and end dates, the date_aspect (life or activity), the date_type (beginning or end), and if it can be used as a 'short date' (e.g., written with dash)
+    prefix_0_raw = ""
+    prefix_1_raw = ""
+    prefix_1_raw = ""
+    date_prefix_0 = ""
+    date_prefix_1 = ""
+    date_prefix_2 = ""
+    year_string_raw = ""
+    year_string_raw = ""
+    year_end_string_raw = ""
+    year_end_value_end = 0
+    year_string = ""
+    year_start_string = ""
+    year_end_string = ""
+    year_value_start = 0
+    year_value_end = 0
+    BC_indicator = False
+    date_aspect = ""
+    date_type = ""
+    short_date = True
+    date_pattern = r'(active |active from | active by |master |active in |active until |documented |documented from |documented in |born |baptised |died |buried )?(ca. |approximately |before |by |after )?(early |early to mid |late |mid |mid to late |first half of the |second half of the |first quarter of the |second quarter of the |third quarter of the |fourth quarter of the |last quarter of the )?(\d{1,4})(st|nd|rd|th)?(/| or )?(\d{,4})?(st|nd|rd|th)?( bc)?(.*)?'
+    try:
+        date_single_parsed = re.match(date_pattern, date_raw).groups()
+    except AttributeError:
+        return(("", 0, 0, "", "", False))
+    prefix_0_raw = date_single_parsed[0]        
+    prefix_1_raw = date_single_parsed[1] 
+    prefix_2_raw = date_single_parsed[2]
+    year_string_raw = date_single_parsed[3]
+    centuries_ordinal_raw = date_single_parsed[4]
+    figures_combination_raw = date_single_parsed[5]
+    year_end_string_raw = date_single_parsed[6]
+    centuries_end_ordinal_raw = date_single_parsed[7]
+    bc_string_raw = date_single_parsed[8]
+        
+    if bc_string_raw == " bc":
+        BC_indicator = True
+    if centuries_ordinal_raw:
+        if figures_combination_raw: # if there is something like "15th or 16th century, the word 'century is not repeated"
+            year_start_string = year_string_raw + centuries_ordinal_raw 
+        else:
+            year_start_string = year_string_raw + centuries_ordinal_raw + " century"
+        if not BC_indicator:
+            year_start_value_start = (int(year_string_raw)-1) * 100 + 1
+            year_start_value_end = int(year_string_raw) * 100
+        else: 
+            year_start_value_start = -int(year_string_raw) * 100
+            year_start_value_end = -(int(year_string_raw)-1) * 100 -1
+    else:
+        year_start_string = year_string_raw
+        if not BC_indicator:
+            year_start_value_start = int(year_string_raw)
+            year_start_value_end = int(year_string_raw)
+        else: 
+            year_start_value_start = -int(year_string_raw)
+            year_start_value_end = -int(year_string_raw)
+            
+
+    if year_end_string_raw:
+        if centuries_end_ordinal_raw: # if it is a century
+            year_end_string = year_end_string_raw + centuries_end_ordinal_raw + " century"
+            if not BC_indicator:
+                year_end_value_start = (int(year_end_string_raw)-1) * 100 + 1
+                year_end_value_end = int(year_end_string_raw) * 100
+            else: 
+                year_end_value_start = -int(year_end_string_raw) * 100
+                year_end_value_end = -(int(year_end_string_raw)-1) * 100 -1
+        elif len(year_start_string) > 2 and len(year_end_string_raw) == 1:
+                year_end_string = year_start_string[:-1] + year_end_string_raw
+                year_end_value_start = int(year_end_string)
+                year_end_value_end = int(year_end_string)
+        elif len(year_start_string) > 2 and len(year_end_string_raw) == 2:
+                year_end_string = year_start_string[:-2] + year_end_string_raw
+                year_end_value_start = int(year_end_string)
+                year_end_value_end = int(year_end_string)
+        else: 
+            year_end_string = year_end_string_raw
+            if not BC_indicator:
+                year_end_value_start = int(year_end_string_raw)
+                year_end_value_end = int(year_end_string_raw)
+            else: 
+                year_end_value_start = -int(year_end_string_raw)
+                year_end_value_end = -int(year_end_string_raw)
+
+        
+    if figures_combination_raw and year_end_string:
+        short_date = False
+        if figures_combination_raw == "/":
+            year_string = "between " + year_start_string + " and " + year_end_string
+        elif figures_combination_raw == " or ":
+            if year_start_value_start > year_end_value_start: # to put them into correct order
+                year_provisional_start = year_start_value_start
+                year_provisional_end = year_start_value_end
+                year_start_value_start = year_end_value_start
+                year_start_value_end = year_end_value_end
+                year_end_value_start = year_provisional_start
+                year_end_value_end = year_provisional_end                
+                year_string = year_end_string + " or " + year_start_string
+            else:
+                year_string = year_start_string + " or " + year_end_string
+        year_value_start = year_start_value_start
+        year_value_end = year_end_value_end
+    else: 
+
+        year_string = year_start_string
+        year_value_start = year_start_value_start
+        year_value_end = year_start_value_end
+
+    if BC_indicator:
+        year_string = year_string + " BC"
+        
+            
+    if prefix_0_raw:
+        prefix_0_raw = prefix_0_raw.strip()
+        match prefix_0_raw:
+            case "born":
+                date_aspect = "l"
+                date_type = "start"
+            case  "baptised":
+                date_prefix_0 = "baptised "
+                date_aspect = "l"
+                date_type = "start"
+                short_date = False
+            case "active"|"active in":
+                date_aspect = "a"
+            case "active from":
+                date_aspect = "a"
+                date_type = "start"
+                short_date = False
+            case "master":
+                date_prefix_0 = "master "
+                date_aspect = "a"
+                date_type = "start"
+                short_date = False
+            case "active by":
+                date_prefix_0 = "active by"
+                date_aspect = "a"
+                date_type = "start"
+                short_date = False
+            case "active until":
+                date_aspect = "a"
+                date_type = "end"
+                short_date = False
+            case "documented"|"documented in":
+                date_prefix_0 = "documented "
+                date_aspect = "a"
+            case "documented from":
+                date_prefix_0 = "documented from "
+                date_aspect = "a"
+                date_type = "start"
+            case "died":
+                date_aspect = "l"
+                date_type = "end"
+            case "buried":
+                date_prefix_1 = "buried "
+                date_aspect = "l"
+                date_type = "end"
+                short_date = False
+    if prefix_1_raw:
+        prefix_1_raw = prefix_1_raw.strip()
+        match prefix_1_raw:
+            case "ca."|"approximately":
+                date_prefix_1 = "c. "
+                year_value_start = year_value_start - 5
+                year_value_end = year_value_end + 5
+            case "before":
+                date_prefix_1 = "before "
+                year_value_start = year_value_start - 10
+            case "by":
+                date_prefix_1 = "by " # I don't have this in date_parsing
+                year_value_end = year_value_start
+                year_value_start = year_value_start - 10
+            case "after":
+                date_prefix_1 = "after "
+                year_value_end = year_value_end + 10  
+    
+    
+    
+    if prefix_2_raw:
+        prefix_2_raw = prefix_2_raw.strip()
+        match prefix_2_raw: # under these conditions, year_end_value_start and year_end_value_end are never in use
+            case "first half of the": 
+                date_prefix_2 = "first half "
+                year_value_end = year_value_end -50
+            case "second half of the":
+                date_prefix_2 = "second half "
+                year_value_start = year_value_start +50
+            case "first quarter of the":
+                date_prefix_2 = "first quarter "
+                year_value_end = year_value_start + 24
+            case "second quarter of the":
+                date_prefix_2 = "second quarter "
+                year_value_start = year_value_start +25
+                year_value_end = year_value_start + 24
+            case "third quarter of the":
+                date_prefix_2 = "third quarter "
+                year_value_start = year_value_start +50
+                year_value_end = year_value_start + 24
+            case "fourth quarter of the":
+                date_prefix_2 = "last quarter "
+                year_value_start = year_value_start +75
+            case "early":
+                date_prefix_2 = "early "
+                if BC_indicator == False:
+                    year_value_end = year_value_start + 19
+                else:
+                    year_value_end = year_value_start +20
+            case "mid":
+                date_prefix_2 ="Mid-"
+                if BC_indicator == False:
+                    year_value_start = year_value_start + 39
+                    year_value_end = year_value_start + 20
+                else: 
+                    year_value_start = year_value_start + 39
+                    year_value_end = year_value_start + 20
+            case "late":
+                date_prefix_2 = "late "
+                year_value_start = year_value_start + 80 
+            case "early to mid":
+                date_prefix_2 = "early to Mid-"
+                year_value_end = year_value_end - 40 # should mean, from e.g. 1900-1960
+            case "mid to late":
+                date_prefix_2 = "Mid- to late "
+                year_value_start = year_value_start + 40 # should mean, from e.g. 1900-1960
+
+            case _:
+                pass
+    else:
+        pass             
+    
+    date_string = date_prefix_0 + date_prefix_1 + date_prefix_2 + year_string 
+
+    return(date_string, year_value_start, year_value_end, date_type, date_aspect, short_date)
+    
+def artist_date_parsing(date_from_source):
+    # This programme takes the date from source from ULAN (i.e., the short biography text, with all sections between commas that contain no figures cut out)
+    # It returns a date string, start and end dates (only years, since Getty ULAN normally only gives yers, and the aspect - if date of life or of activity)
+    date_from_source_divided = []
+    date_single_start = []
+    date_single_end = []
+    date_processed = ()
+    dates_processed_list = []
+    start_aspect = ""
+    end_aspect = ""
+    single_aspect = ""
+    date_aspect = ""
+    datestring = ""
+    date_replacement = {"–" : "-", "c." : "", ";" : ",", "st c " : "st ", "nd c " : "nd ", "rd c " : "rd ", "th c ": "th ", "centuries" : "", "cs." : "", "century" : "", "b.c." : "bc", "bce" : "bc", "cent." : "", "b." : "born ", "d.": "died ", \
+                        "act." : "active", "act " : "active ", "acitve" : "active", "1st half" : "first half", "2nd half" : "second half", "last half" : "second half", "1st quarter" : "first quarter", "2nd quarter" : "second quarter", "3rd quarter" : "third quarter", "4th quarter" : "fourth quarter", "mid-late" : "mid to late", "mid-" : "mid ", "th to mid" : "th - mid",\
+                        "fl. -" : "-active ", "fl." : "active", "flourished" : "active", "fl " : "active ", "active in the" : "active", "active to" : "active until", "active since" : "active from", "active beginning" : "active from", "-p." : "-after ", "aft." : "after", "-a." : "-before", "bef." : "before ", "(?)" : "?", "op." : "active ",\
+                            "baptized" : "baptised", "baptised in" : "baptised", "sculptor" : "sculptor,", "painter" : "painter,", "artist" : "artist,", "printmaker" : "printmaker,", "miniaturist" : "miniaturist,", "illustrator" : "illustrator,", "illuminator" : "illuminator," , "architect" : "architect,", "draftsman" : "draftsman,", "medalist" : "medalist," , "etcher" : "etcher," , "clockmaker" : "clockmaker,", "united states" : "",
+                        "half " : "half of the ", "quarter " : "quarter of the ", "of the of the" : "of the", "of the of" : "of the", "   " : " ", "  " : " ", " in 1" : " 1",\
+                        "probably active" : "active ca.", "probably died" : "died ca.", "possibly active" : "active ca.", "possibly born" : "born ca.", "probably born" : "born ca.", "probably" : "ca.", "before ca." : "before", "possibly died" : "died ca.", "possibly" : "ca.",\
+                        "in the early" : "early", "in the late" : "late", "in the mid" : "mid", "early-to mid" : "early to mid", "early-mid" : "early to mid", "ca. after" : "after", "born in the " : "born ", "born in 1" : "born 1", "died in" : "died", "active after" : "active from", "active from ca." : "active from", "after ca." : "after", \
+                            "ca " : "ca. ", "between " : "", " and " : "/"}
+    date_from_source = date_from_source.lower()
+    for old, new in date_replacement.items():
+        date_from_source = date_from_source.replace(old, new)
+        
+    if "," in date_from_source:
+        date_from_source_divided = date_from_source.split(",")
+    else:
+        date_from_source_divided.append(date_from_source)
+    activity_place_pattern = r'(active in )([a-z].*? )(.*)'
+    birth_place_pattern = r'(born in )([a-z].*? )(.*)'
+    documented_place_pattern = r'(documented in )([a-z].*? )(.*)'
+    for date_raw in date_from_source_divided:
+        date_raw = date_raw.strip()
+        if re.match(activity_place_pattern, date_raw): # taking out place-names in phrases like "active in Rome 1500" (works only if the place name consists of one word)
+            date_raw = "active " + re.match(activity_place_pattern, date_raw).groups()[2]
+        elif re.match(birth_place_pattern, date_raw):
+            date_raw = "born " + re.match(birth_place_pattern, date_raw).groups()[2]
+        elif re.match(documented_place_pattern, date_raw):
+            date_raw = "documented " + re.match(documented_place_pattern, date_raw).groups()[2]
+   
+        if "-" in date_raw:
+            date_raw_pattern = r'([^-]*)?(-)(.*)?'
+            try:
+                date_raw_divided = re.match(date_raw_pattern, date_raw).groups()
+            except AttributeError:
+                return(("xxx", 0, 0, ""))
+            if date_raw_divided[0] and date_raw_divided[0] != "xxx":
+                date_single_start = artist_date_single_parsing(date_raw_divided[0].strip())
+                start_datestring = date_single_start[0]
+                start_start = date_single_start[1]
+                start_end = date_single_start[2]
+                start_type = date_single_start[3]
+                start_aspect = date_single_start[4]
+                start_short = date_single_start[5]
+            if date_raw_divided[2] and date_raw_divided[2] != "xxx":
+                date_single_end = artist_date_single_parsing(date_raw_divided[2].strip())
+                end_datestring = date_single_end[0]
+                end_start = date_single_end[1]
+                end_end = date_single_end[2]
+                end_type = date_single_end[3]
+                end_aspect = date_single_end[4]
+                end_short = date_single_end[5]
+
+            if date_single_start and not date_single_end:
+                if start_aspect == "a" and "documented" not in start_datestring:
+                    date_aspect = "a"
+                    datestring = "active from " + start_datestring
+                    date_start = start_start
+                    date_end = start_end
+                else:
+                    date_aspect = "l" # everything is dates of life, unless defined otherwise
+                    datestring = "born " + start_datestring
+                    date_start = start_start
+                    date_end = start_end
+            elif date_single_end and not date_single_start:
+
+                if end_aspect == "a":
+                    date_aspect = "a"
+                    datestring = "active until " + end_datestring
+                    date_end = end_end
+
+                    date_start = end_start
+                else:
+                    date_aspect = "l" # everything is dates of life, unless defined otherwise
+                    datestring = "died " + end_datestring
+                    date_end = end_end
+                    date_start = end_start
+            elif date_single_start and date_single_end:
+                date_start = start_start
+                date_end = end_end
+                if date_end < 0 and date_start > 0:
+                    date_start = 0 - date_start
+                if start_short and end_short:
+                    if start_aspect == "a" and end_aspect != "l":
+                        date_aspect = "a"
+                        if "documented" not in start_datestring and "master" not in start_datestring:
+                            datestring = "active " + start_datestring + " - " + end_datestring
+                        else: 
+                            datestring = start_datestring + " - " + end_datestring
+
+                    elif start_aspect != "a" and end_aspect != "a":
+                        datestring = start_datestring + " - " + end_datestring
+                        date_aspect = "l"
+                    elif start_aspect == "a" and end_aspect == "l": # I am not sure if this will ever happen
+                        date_aspect = "a"
+                        if start_type == "start" and "documented" not in start_datestring and "master" not in start_datestring:
+                            start_datestring = "active from " + start_datestring
+                        elif start_type != "start" and "documented" not in start_datestring:
+                            start_datestring = "active "
+                        end_datestring = "died " + end_datestring
+                        datestring = start_datestring + ", " + end_datestring
+                    elif start_aspect == "l" and end_aspect == "a": # I am not sure if this will ever happen
+                        date_aspect = "l"
+                        if "bapti" not in start_datestring:
+                            start_datestring = "born " + start_datestring
+                        if end_type == "end" and "documented" not in end_datestring:
+                            end_datestring = "active until " + end_datestring
+                        if end_type != "end" and "documented" not in datestring:
+                            end_datestring = "active " + end_datestring
+                        datestring = start_datestring + ", " + end_datestring
+
+                else:
+                    if start_aspect == "a" and start_type == "start" and "documented" not in start_datestring and "master" not in start_datestring:
+                        start_datestring = "active from " + start_datestring
+                    if start_aspect != "a" and start_type == "start" and "bapti" not in start_datestring:
+                        start_datestring = "born " + start_datestring
+                    if end_aspect == "a" and end_type == "end" and "documented" not in end_datestring and "master" not in end_datestring:
+                        end_datestring = "active until " + end_datestring
+                    if end_aspect != "a" and end_type == "end" and "buried" not in end_datestring:
+                        end_datestring = "died " + end_datestring
+                    datestring = start_datestring + ", " + end_datestring
+                    date_start = start_start
+                    date_end = end_end
+            else: # no usable date            
+                datestring = "xxx"
+                date_start = 0
+                date_end = 0
+                date_aspect = "l"
+            
+        else:
+            date_single = artist_date_single_parsing(date_raw)
+            if date_single[0] != "xxx": # that is invalid date
+                single_datestring = date_single[0]
+                single_start = date_single[1]
+                single_end = date_single[2]
+                single_type = date_single[3]
+                single_aspect = date_single[4]
+
+            if single_aspect == "a":
+                date_aspect = "a"
+                if single_type == "start" :
+                    if "master" not in single_datestring and "documented" not in single_datestring:
+                        datestring = "active from " + single_datestring
+                    else: 
+                        datestring = single_datestring
+                    date_start = single_start
+                    date_end = single_end + 50 # fictive dates if only start/end are given. They are not yet included in the GND dates parser                    
+                elif single_type == "end":
+                    if "master" not in single_datestring and "documented" not in single_datestring:
+                        datestring = "active until " + single_datestring
+                    else: 
+                        datestring = single_datestring
+                    date_start = single_start-50 # fictive dates if only start/end are given. They are not yet included in the GND dates parser
+                    date_end = single_end  
+                else:
+                    if "master" not in single_datestring and "documented" not in single_datestring:
+                        datestring = "active " + single_datestring
+                    else: 
+                        datestring = single_datestring
+                    date_start = single_start
+                    date_end = single_end
+            else:
+                date_aspect = "l" # everything is dates of life, unless defined otherwise
+                if single_type == "start" and "bapti" not in single_datestring:
+                    datestring = "born " + single_datestring
+                    date_start = single_start
+                    date_end = single_end
+                elif single_type == "end" and "buried" not in single_datestring:
+                    datestring = "died " + single_datestring
+                    date_start = single_start
+                    date_end = single_end  
+                else:
+                    datestring = single_datestring
+                    date_start = single_start
+                    date_end = single_end
+        date_processed = (datestring, date_start, date_end, date_aspect)
+        dates_processed_list.append(date_processed)
+        if len(dates_processed_list) == 2: # is either 1 or 2
+            if dates_processed_list[0][1] < dates_processed_list[1][1]:
+                datestring = dates_processed_list[0][0] + ", " + dates_processed_list[1][0]
+                date_start = dates_processed_list[0][1]
+                if dates_processed_list[1][2] > dates_processed_list[0][2]:
+                    date_end = dates_processed_list[1][2]
+                else:
+                    date_end = dates_processed_list[0][2]
+                date_aspect = dates_processed_list[0][3]
+            elif dates_processed_list[0][1] > dates_processed_list[1][1]:
+                datestring = dates_processed_list[1][0] + ", " + dates_processed_list[0][0]
+                date_start = dates_processed_list[1][1]
+                if dates_processed_list[1][2] > dates_processed_list[0][2]:
+                    date_end = dates_processed_list[1][2]
+                else:
+                    date_end = dates_processed_list[0][2]
+
+                date_aspect = dates_processed_list[1][3]
+            date_processed = (datestring, date_start, date_end, date_aspect)
+        else:
+            if date_start == date_end: # I do not yet have anything like that in the GND parsing sequence
+                if "born" in datestring or "bapti" in datestring:
+                    date_end = date_start + 70
+                elif "active from" in datestring or "active by" in datestring:                                           
+                    date_end = date_start + 50
+                elif "died" in datestring or "buried" in datestring:                                           
+                    date_start = date_start - 70
+                elif "active until" in datestring:
+                    date_start = date_start - 50
+            date_processed = (datestring, date_start, date_end, date_aspect)
+    return(date_processed)
