@@ -9,9 +9,14 @@
 
 from classes import *
 from nanoid import generate
+import requests
 import dbactions
 from pymongo import MongoClient
 from dates_parsing import date_overall_parsing
+dbname = dbactions.get_database()
+coll=dbname['bpf']
+
+
 
 
 role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
@@ -25,6 +30,29 @@ person_person_connection_type_correspondence = {"Vater" : "father", "Mutter" : "
                                             "Schwiegersohn" : "son-in-law", "Schwiegertochter" : "daughter-in-law", "Schwager" : "brother-in-law", "Schwägerin" : "sister-in-law", \
                                                 "Schüler" : "pupil", "Lehrer" : "teacher"}
 role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
+
+
+def get_viaf_from_authority(url):
+    # This function the URL of an authority file (currently GND and ULAN) and returns an External_id object
+    # It will be used numerous times for 'stitching' records together
+    print("URL as it arrives in get_viaf_from_authorty")
+    print(url)
+    if r"/gnd/" in url:
+        identifier = "DNB%7C" + url[22:]
+        print("URI comes from GND")
+        print(identifier)
+    elif r"vocab.getty.edu/page/ulan/" in url:
+        identifier = "JPG%7C" + url[33:]
+    url_search = r'https://viaf.org/viaf/sourceID/' + identifier
+    print("URL sent to VIAF: ")
+    print(url_search)
+    url_header = requests.head(url_search)
+    viaf_url = url_header.headers["location"]
+    viaf_id = External_id()
+    viaf_id.uri = viaf_url
+    viaf_id.name = "viaf"
+    viaf_id.id = viaf_url[21:]
+    return viaf_id
 
 class Person_against_duplication(BaseModel): # I have these classes here and not in 'classes' because they are only needed in these functions.
     preview : Optional[str] = ""
@@ -371,7 +399,13 @@ def person_ingest(person):
     person_new.type = "Person"
     person_new.person_type1.append(role_person_type_correspondence[person.role])
     person_new.external_id = person_selected.external_id
+    # Here, the VIAF ID is added to the person' record
+    new_record_viaf_id = get_viaf_from_authority(person_new.external_id[0].uri)
+    person_new.external_id.append(new_record_viaf_id)
+    connection_already_made = False
+
     person_new.name_preferred = person_selected.name_preferred
+    print("now processiong person: " + person_new.id + person_new.name_preferred)
     person_new.name_variant = person_selected.name_variant
     if person.name not in person_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.
         # This is necessary because up to now, Iconobase uses a string search for variants and not a word search. 
@@ -409,6 +443,7 @@ def person_ingest(person):
             # If there is the general abbreviation plus a common word in the comments field, I use an English translation of the concrete relationship)
             # If there is the general abbreviation plus a word in the comments field that is not common (or simply has escaped me), the relationship will be a general English phrase plus the original German comment
         for connected_person in person_selected.connected_persons:
+            print("now processing connected person " + connected_person.name)
             match connected_person.connection_type:
                 case "bezf":
                     if connected_person.connection_comment: 
@@ -436,16 +471,77 @@ def person_ingest(person):
                         connected_person.connection_type = "connected (" + connected_person.connection_type + "; " + connected_person.connection_comment + ")"
                     else:
                         connected_person.connection_type = "connected (" + connected_person.connection_type +  ")"
+            """The following section 'stitches' the new entry into the system by creating connections to internal IDs. It does so in different steps.
+                Step 1: Checking the list of connected_entities in the new record, and if one of these entities is already in Iconobase, inserting its ID in the connected_entities record
+                Step 2: Checking if the identified connected record gives the new connected record as connected_entity. 
+                    Step 2a: if yes: adding the internal ID of the new record as connected_entity (+ checking if the connection_types are compatible)
+                    Step 2b: if no: adding the connection, with a connection type that is the complement to the one used in the original connection
+                Step 3: Check if any record already in Iconobase has a connection with the new record, without the new record having a connection with it. 
+                    If yes, addition of a connection to the extant record with a complementary connection in the new record. 
+            """
+            if connected_person.external_id:  
+                for external_id in connected_person.external_id:
+                    # This is step 1 (see above)
+                    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                    if person_found:
+                        print("connected person found via GND ID")
+                        connected_person.id = person_found["id"]
+                        connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                        break # if a connection with one ID is found, the other connections would be the same. 
+                    if "viaf" not in external_id.uri: # it should not reprocess the VIAF number it just created
+                        viaf_id = get_viaf_from_authority(external_id.uri)
+#                        print("external id for search for VIAF")
+#                        print(external_id.uri)
+                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "viaf", "id": viaf_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                        if person_found:
+#                            print("connected person found via VIAF")
+                            connected_person.id = person_found["id"]
+                            connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                            break #in this case, there is no need to append the VIAF ID
+                        connected_person.external_id.append(viaf_id)
+#                        print("connection person not yet in Database, VIAF ID added to it")
+                if person_found: # this is for making the reciprocal connection
+#                    print("There is a person record corresponding to this connection")
+                    far_record = person_found["connected_persons"]
+                    connection_found = False
+                    for far_person in far_record:
+#                        print("making reciprocal connection in the record of " + person_found["name_preferred"])
+                        for far_external_id in far_person["external_id"]:
+#                            print("person found in search:")
+#                            print(far_external_id["name"] + far_external_id["id"] + " compared to" + new_record_viaf_id.id)
+                            if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id.id:
+                                # This is step 2a: there is already a connection, to which the ID of the new record is added
+#                                print("found record for inserting reciprocal ID")
+                                far_person["id"] = person_new.id
+                                dbactions.add_connection_id(person_found["id"], far_person["name"], far_person["id"])
+                                connection_found = True
+                                break
+#                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
+                        print(connection_found)
+                    if connection_found == False:
+                        # This is step 2b: there is no reciprocal connection, it needs to be established
+#                        print("For person " + person_found["name_preferred"] + " no connection has been found")
+                        new_connection = Connected_entity()
+                        new_connection.id = person_new.id
+                        new_connection.external_id = person_new.external_id
+                        new_connection.name = person_new.name_preferred # better use preview including year
+                        new_connection.connection_type = "counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
+                        dbactions.add_connection(person_found["id"], "connected_persons", new_connection)
+                    
 
-                
+
             new_connected_person = Connected_entity()
-            new_connected_person.external_id = connected_person.external_id
+            new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
+            new_connected_person.external_id = connected_person.external_id
+            if connected_person.name == "": # if there is no preview, i.e. no connection found
+                new_connected_person.name = connected_person.name
             new_connected_person.connection_type = connected_person.connection_type
             new_connected_person.connection_time = connected_person.connection_time 
             # In theory, one should also replace this time string through a proper date object However, since I don't assume that anything will ever be made with 
             # this information apart from displaying it, this is unnecessary or at least not urgent. 
             person_new.connected_persons.append(new_connected_person)
+
     if person_selected.connected_organisations:
         for connected_organisation in person_selected.connected_organisations:
             # I have the feeling that the only type of relationship that is common here is 'affi', 'affiliated to'. 
@@ -460,6 +556,56 @@ def person_ingest(person):
                         connected_organisation.connection_type = "connected (" + connected_organisation.connection_type + "; " + connected_organisation.connection_comment + ")"
                     else:
                         connected_organisation.connection_type = "connected (" + connected_organisation.connection_type +  ")"
+            if connected_organisation.external_id:  
+                for external_id in connected_organisation.external_id:
+                    # This is step 1 (see above)
+                    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                    if org_found:
+                        print("connected person found via GND ID")
+                        connected_organisation.id = org_found["id"]
+                        connected_organisation.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                        break # if a connection with one ID is found, the other connections would be the same. 
+                    if "viaf" not in external_id.uri: # it should not reprocess the VIAF number it just created
+                        viaf_id = get_viaf_from_authority(external_id.uri)
+#                        print("external id for search for VIAF")
+#                        print(external_id.uri)
+                        org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "viaf", "id": viaf_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                        if org_found:
+#                            print("connected person found via VIAF")
+                            connected_organisation.id = org_found["id"]
+                            connected_organisation.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                            break #in this case, there is no need to append the VIAF ID
+                        connected_organisation.external_id.append(viaf_id)
+#                        print("connection person not yet in Database, VIAF ID added to it")
+                if org_found: # this is for making the reciprocal connection
+#                    print("There is a person record corresponding to this connection")
+                    far_record = org_found["connected_persons"]
+                    connection_found = False
+                    for far_person in far_record:
+#                        print("making reciprocal connection in the record of " + person_found["name_preferred"])
+                        for far_external_id in far_person["external_id"]:
+#                            print("person found in search:")
+#                            print(far_external_id["name"] + far_external_id["id"] + " compared to" + new_record_viaf_id.id)
+                            if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id.id:
+                                # This is step 2a: there is already a connection, to which the ID of the new record is added
+#                                print("found record for inserting reciprocal ID")
+                                far_person["id"] = person_new.id
+                                dbactions.add_connection_id(org_found["id"], far_person["name"], far_person["id"])
+                                connection_found = True
+                                break
+#                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
+                        print(connection_found)
+                    if connection_found == False:
+                        # This is step 2b: there is no reciprocal connection, it needs to be established
+#                        print("For person " + person_found["name_preferred"] + " no connection has been found")
+                        new_connection = Connected_entity()
+                        new_connection.id = person_new.id
+                        new_connection.external_id = person_new.external_id
+                        new_connection.name = person_new.name_preferred # better use preview including year
+                        new_connection.connection_type = "counterpart to " + connected_organisation.connection_type # This has to be replaced by a proper term
+                        dbactions.add_connection(org_found["id"], "connected_persons", new_connection)
+                    
+
             new_connected_organisation = Connected_entity()
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -501,6 +647,48 @@ def person_ingest(person):
             # For connection time see above under new connected person (only relevant for location of activity)
             person_new.connected_locations.append(new_connected_location)
     person_new.comments = person_selected.comments
+
+    # Here comes step 3 of the stitching process: checking if there is any record in Iconobase that has a reference to the new record (only relevant if the new record has no reference to that record)
+    print("In step 3 of person identification")
+    # I must define what external_id is! 
+    print("Searching for records that have the following VIAF id in connections" + new_record_viaf_id.id)
+    #person_found = list(coll.find({"connected_persons.external_id.name": "viaf", "connected_persons.external_id.id": new_record_viaf_id.id}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1}))
+    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id.id}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1}))
+    #if person_found: 
+    if len(person_found) > 0:
+        print("A person connected with the new record has been found")
+        print(person_found)
+        
+    else:
+        print("No person connected with the new record has been found")
+    for far_person in person_found:
+        far_person_id = far_person["id"]
+        for connected_person in person_new.connected_persons:
+            connection_already_made = False
+            for external_id in connected_person.external_id:
+                if external_id.id == far_person_id:
+                    connection_already_made = True
+                    # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+            if connection_already_made == True:
+                break
+        if connection_already_made == False: # i.e., one has to create a connection
+            # first getting the data from the 'far record'
+            far_person_connected_persons = far_person["connected_persons"]
+            far_connection_type = ""
+            for far_connected_person in far_person_connected_persons:              
+                for far_external_id in far_connected_person["external_id"]:
+                    if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id.id:
+                        far_connection_type = far_connected_person["connection_type"]
+                        dbactions.add_connection_id_and_name(far_person_id, far_connected_person["name"], person_new.name_preferred, person_new.id) 
+                        # The 'name_preferred' should be later replaced by a preview including the date
+            new_connection = Connected_entity()
+            new_connection.id = far_person_id
+            new_connection.name = far_person["name_preferred"]
+            new_connection.connection_type = "counterpart to " + far_connection_type
+            person_new.connected_persons.append(new_connection)
+            
+
     dbactions.insertRecordPerson(person_new)
 
     return person_new.id
@@ -517,6 +705,11 @@ def org_ingest(org):
     org_new.type = "Organisation"
     org_new.org_type1.append(role_org_type_correspondence[org.role])
     org_new.external_id = org_selected.external_id
+    # Here, the VIAF ID is added to the organisation's record
+# I have cancelled the next two lines as long as VIAF doesn't work properly with organisation IDs. 
+    #new_record_viaf_id = get_viaf_from_authority(org_new.external_id[0].uri)
+    #org_new.external_id.append(new_record_viaf_id)
+    connection_already_made = False
     org_new.name_preferred = org_selected.name_preferred
     org_new.name_variant = org_selected.name_variant
     if org.name not in org_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.

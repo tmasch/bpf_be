@@ -75,6 +75,36 @@ def insertRecordPerson(person: Person_db):
     collection.insert_one(person.dict())
     return("Hello World")
 
+#def add_external_id(record_id, external_id):
+    # I think that this is not needed and should be removed
+    # This function is used to add another external ID (typically a VIAF ID) to a record that has an array for external IDs (currently Person, Organisation, Place)
+    dbname = get_database()
+    collection=dbname['bpf']
+    result = collection.update_one({"id" : record_id}, {'$addToSet' : {"external_id" : external_id}})
+
+def add_connection_id(record_id, name, new_internal_id):
+    print("in dabactions - inserting new connection")
+    # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection
+    dbname = get_database()
+    collection=dbname['bpf']
+    result = collection.update_one({"id" : record_id, "connected_persons.name" : name}, {'$set' : {"connected_persons.$.id" : new_internal_id}})
+
+def add_connection_id_and_name(record_id, name, name_replacement, new_internal_id):
+    print("in dabactions - inserting new connection")
+    # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection and replaces the name with the name connected to the internal ID
+    # Later, the name connected to the internal ID should be a preview with dates
+    dbname = get_database()
+    collection=dbname['bpf']
+    result = collection.update_one({"id" : record_id, "connected_persons.name" : name}, {'$set' : {"connected_persons.$.id" : new_internal_id, "connected_persons.$.name" : name_replacement}})
+
+
+def add_connection(record_id, connected_entity_type, new_connection):
+    # This function is used to go to a specific record that has not yet a reciprocal connection, and inserts it
+    print("The following connection will be added to record" + record_id)
+    print(new_connection)
+    dbname = get_database()
+    collection=dbname['bpf']
+    result = collection.update_one({"id" : record_id}, {'$addToSet' : {connected_entity_type : new_connection.dict()}})
 
 def add_person_type(person_id, person_type1):
     # This function is used to add another person type (e.g., Author, Artist etc.) to a person record

@@ -76,7 +76,7 @@ async def getMetadata(iiifUrl, material):
             #print("m.bibliographic_information: ")
             #print(m.bibliographic_information)
             for person in m.bibliographic_information[0].persons:
-                person = gndparse.person_identification(person)
+                person = await gndparse.person_identification(person)
             #  m.bibliographic_information[0].persons[person_counter] = person
             for organisation in m.bibliographic_information[0].organisations:
                 organisation = gndparse.organisation_identification(organisation)
@@ -94,7 +94,7 @@ async def getMetadata(iiifUrl, material):
 async def supply_biblio_information(additional_bid):
     bi = iiifparse.supply_bibliographic_information(additional_bid)
     for person in bi.persons:
-        person = gndparse.person_identification(person)
+        person = await gndparse.person_identification(person)
     for organisation in bi.organisations:
         organisation = gndparse.organisation_identification(organisation)
     for place in bi.places:
@@ -146,7 +146,7 @@ async def load_new_repository_authority_record(new_authority_id_rep):
 @app.post("/submitAdditionalInformation")
 async def submit_additional_information(making_processes: list[Making_process]):
     print(making_processes)
-    making_processes = gndparse.making_process_identification(making_processes)
+    making_processes = await gndparse.making_process_identification(making_processes)
     print("The following is sent back: ")
     print(making_processes)
     return(making_processes)

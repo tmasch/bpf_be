@@ -6,6 +6,10 @@ import re
 import dbactions
 from dates_parsing import date_overall_parsing
 from dates_parsing import artist_date_parsing
+import asyncio
+import aiohttp
+import ast
+
 #from dbactions import *
 url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "Ä" : "%C3%84", "Ö" : "%C3%96", "Ü": "%C3%9C", \
                    "ß" : r"%C3%9F", "(" : "", ")" : "", "," : "",  "." : "" , "-" : "", \
@@ -32,18 +36,7 @@ dbname = dbactions.get_database()
 coll=dbname['bpf']
 
 
-
-
-
-def get_viaf_from_gnd(gnd_id):
-    # This function takes the GND ID as a string and returns the VIAF ID as a string
-    urn_gnd = r'http://viaf.org/viaf/sourceID/DNB|' + gnd_id
-    urn_viaf = requests.get(urn_gnd)
-    ### I don't continue because the API apparently does not give the result I need. 
-    
-
-
-def person_identification(person):
+async def person_identification(person):
 # This function is used for every person named in the bibliographic record (author, editor, printer etc.)
 # It will first search if a record for this person is already in the MongoDB database, and then search in the GND
 # If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
@@ -135,31 +128,7 @@ def person_identification(person):
                 person.potential_candidates = person.potential_candidates + new_potential_candidates
         else:
             if not person.potential_candidates:
-                person_name_search = person.name
-                for old, new in url_replacement.items():
-                    person_name_search = person_name_search.replace(old, new)
-                authority_url = r'https://vocab.getty.edu/sparql.json?query=select%20distinct%20%3Fartist_id%20%7B%0A%20%7B%3FSubject%20luc%3Aterm%20%22' + \
-                    person.name + r'%22%3B%20skos%3AinScheme%20ulan%3A%20%3B%20a%20%3Ftyp%3B%20gvp%3AprefLabelGVP%20%5Bxl%3AliteralForm%20%3FTerm%5D%7D' +\
-                    r'%20union%20%7B%3FSubject%20luc%3Aterm%20%22' + person.name + r'%22%3B%20skos%3AinScheme%20ulan%3A%20%3B%20a%20%3Ftyp%3B%20xl%3AaltLabel' +\
-                    r'%20%5Bxl%3AliteralForm%20%3FTerm%5D%7D%0A%20%20%3Ftyp%20rdfs%3AsubClassOf%20gvp%3ASubject%3B%20rdfs%3Alabel%20%3FType.%0A%20filter' + \
-                    r'%20(%3Ftyp%20!%3D%20gvp%3ASubject)%20%0A%20optional%20%7B%3FSubject%20gvp%3AparentString%20%3FType2%7D%0A%20filter%20(%3FType2%20!%3D%20' +\
-                    r'%22Unidentified%20Named%20People%20and%20Firms%22)%20%0A%20optional%20%7B%3FSubject%20dc%3Aidentifier%20%3Fartist_id%7D%7D%0AORDER%20BY%20' + \
-                    r'(fn%3Alower-case(str(%3FTerm)))%0A&toc=Finding_Subjects&implicit=true&equivalent=false&_form=/queriesF'
-                ulan_list_raw = requests.get(authority_url)
-                ulan_list = ulan_list_raw.json()
-                if "results" in ulan_list:
-                    list_results = ulan_list["results"]
-                    if "bindings" in list_results:
-                        bindings = list_results["bindings"]
-                        for artist in bindings:
-                            artist_id = artist["artist_id"]["value"]
-                            artist_authority_url = r'https://vocab.getty.edu/ulan/' + artist_id + r'.json'
-                            print(artist_authority_url)
-                            candidate = artist_record_parsing(artist_authority_url)
-                            print("candidate identified: ")
-                            print(candidate)
-                            #authority_url_list.append(artist_authority_url)
-                            person.potential_candidates.append(candidate) 
+                person = await ulan_search(person)
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
     print("new person record")
@@ -500,6 +469,7 @@ def gnd_parsing_person(authority_url):
                                 pe_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
                                     pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+                                    pe_id.uri = r'https://d-nb.info/gnd/' + pe_id.id
                                     if not pe.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
                                         pe.external_id.append(pe_id)
                                 # Quite often, there are several GND records for one person, and if discovered, they are merged, and all GND IDs but become obsolete.
@@ -568,6 +538,7 @@ def gnd_parsing_person(authority_url):
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_pe.external_id.append(conn_id)
 
                             case "a":
@@ -599,6 +570,7 @@ def gnd_parsing_person(authority_url):
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_org.external_id.append(conn_id)
                             case "a": 
                                 conn_org.name = step2.text
@@ -653,6 +625,7 @@ def gnd_parsing_person(authority_url):
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_pl.external_id.append(conn_id)
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                             case "a": 
                                 conn_pl.name = step2.text
                             case "g": 
@@ -753,6 +726,7 @@ def gnd_parsing_organisation(authority_url):
                                 org_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
                                     org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+                                    org_id.uri = r'https://d-nb.info/gnd/' + org_id.id
                                     if not org.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
                                         org.external_id.append(org_id)
                                 # Quite often, there are several GND records for one organisation, and if discovered, they are merged, and all GND IDs but become obsolete.
@@ -804,6 +778,7 @@ def gnd_parsing_organisation(authority_url):
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_pe.external_id.append(conn_id)
 
                             case "a":
@@ -832,6 +807,7 @@ def gnd_parsing_organisation(authority_url):
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_org.external_id.append(conn_id)
                             case "a": 
                                 conn_org.name = step2.text
@@ -880,6 +856,7 @@ def gnd_parsing_organisation(authority_url):
                                 if step2.text[0:8] == "(DE-588)":
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_pl.external_id.append(conn_id)
                             case "a": 
                                 conn_pl.name = step2.text
@@ -973,8 +950,10 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 pl_id = External_id()
                                 pl_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
-                                    pl_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.                             
+                                    pl_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.   
+                                    pl_id.uri = r'https://d-nb.info/gnd/' + pl_id.id                          
                                     pl.external_id.append(pl_id)
+                        
                                 # Quite often, there are several GND records for one place, and if discovered, they are merged, and all GND IDs but become obsolete.
                                 # However, they are still stored in the record (035z) and are found by the search. 
                                 # Hence, this ID may be different from the person.id I used for the search in the first place.
@@ -1014,6 +993,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id               
                                     conn_pe.external_id.append(conn_id)
 
                             case "a":
@@ -1045,6 +1025,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                     conn_id = External_id()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_org.external_id.append(conn_id)
                             case "a": 
                                 conn_org.name = step2.text
@@ -1088,6 +1069,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 if step2.text[0:8] == "(DE-588)":
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
                                     conn_pl.external_id.append(conn_id)
                             case "a": 
                                 conn_pl.name = step2.text
@@ -1244,27 +1226,41 @@ def dates_parsing(dates_from_source):
 
 
 
-def artist_record_parsing(authority_url):
+def artist_record_parsing(artist_record):
     print("arrived in artists_parsing")
     # Currently, this file is also used if an organisation is found at the search for artists. 
     # One needs a separate function for parsing organisations. 
     pe = Person_import()
+    name_preferred_inversed = ""
+    name_variant_preview = ""
+    date_preview = ""
     ortg_preview = ""
     orts_preview = ""
     ortw_preview = ""
-    url = requests.get(authority_url)
-    artist_record = url.json()
+    print("artist_record as it arrives in artist_record_parsing")
+    print("type of artist_record: ")
+    print(type(artist_record))
+    print(artist_record)
+    
+    artist_record = ast.literal_eval(artist_record)
+    print("type of artist_record after transformation: ")
+    print(type(artist_record))
+    #url = requests.get(authority_url)
+    #artist_record = artist_record.json()
     external_id = External_id()
-    external_id.uri = authority_url
+    external_id.uri = artist_record["id"]
     external_id.name = "ULAN"
-    external_id.id = authority_url[29:-5]
+    external_id.id = external_id.uri[29:-5]
     pe.external_id.append(external_id)
     pe.name_preferred = artist_record["_label"]
+    name_preferred_split = pe.name_preferred.split(",", maxsplit = 1) # One of the variant names is normally just the preferred name inversed, e.g. "John Smith" instead of "Smith, John"
+    if len(name_preferred_split) == 2: # excluding names without a comma, e.g. of non-Western artists
+        name_preferred_inversed = name_preferred_split[1].strip() + " " + name_preferred_split[0]
     connections_list = []
     if "identified_by" in artist_record:
         name_variant_list = []       
         for variant in artist_record["identified_by"]:
-            if variant["type"] == "Name":
+            if variant["type"] == "Name" and variant["content"] != name_preferred_inversed: # if the inversed versions of the names are ignored
                 name_variant = variant["content"]
                 name_variant_list.append(name_variant)
         if len(name_variant_list) > 1: 
@@ -1301,6 +1297,8 @@ def artist_record_parsing(authority_url):
             pe.date_start = (date_processed[1], 1, 1)
             pe.date_end = (date_processed[2], 12, 31)
             pe.date_aspect = date_processed[3]
+            if pe.datestring:
+                date_preview = " (" + pe.datestring + ")"
    
     if "la:related_from_by" in artist_record:
         connections_list = []
@@ -1786,14 +1784,14 @@ def artist_record_parsing(authority_url):
     # attention: ULAN defines any number of places of activity. I will need one and only one place defined as preferred place. 
     # thus: I need to introduce a function that makes the editor choose one place if there are several, and enter one if there are none.          
 
-    pe.preview = pe.name_preferred + " " + pe.datestring + " " + ortg_preview + ortw_preview + orts_preview + name_variant_preview
+    pe.preview = pe.name_preferred + " " + date_preview + " " + ortg_preview + ortw_preview + orts_preview + name_variant_preview
     print(pe)
     return(pe)
 
 
 
 
-def making_process_identification(making_processes):
+async def making_process_identification(making_processes):
     """This module has bene primarily made for parsing information about the making process of a manuscript or printed book
     that had been entered manually during the ingest process. 
     If such information is added when working on individual records, it might be possible to adopt this module, but one would probably rather go directly
@@ -1822,9 +1820,56 @@ def making_process_identification(making_processes):
             print("Artist found")
             print(artist.name)
             artist.role = "art"
-            artist_new = person_identification(artist)
+            artist_new = await person_identification(artist)
             print(artist_new)
             making_process.person = artist_new
     return(making_processes)
 
+
+async def get(session, url): 
+    # This is a short programme I received from Gregor Dick. Together with a gather funciton i
+    async with session.get(url) as response:
+        # Wait for the start of the response.
+        await response.read()
+        # Wait for the complete response and return its body.
+        return await response.text()
+        
+
+async def ulan_search(person):
+    person_name_search = person.name
+    for old, new in url_replacement.items():
+        person_name_search = person_name_search.replace(old, new)
+    authority_url = r'https://vocab.getty.edu/sparql.json?query=select%20distinct%20%3Fartist_id%20%7B%0A%20%7B%3FSubject%20luc%3Aterm%20%22' + \
+        person.name + r'%22%3B%20skos%3AinScheme%20ulan%3A%20%3B%20a%20%3Ftyp%3B%20gvp%3AprefLabelGVP%20%5Bxl%3AliteralForm%20%3FTerm%5D%7D' +\
+        r'%20union%20%7B%3FSubject%20luc%3Aterm%20%22' + person.name + r'%22%3B%20skos%3AinScheme%20ulan%3A%20%3B%20a%20%3Ftyp%3B%20xl%3AaltLabel' +\
+        r'%20%5Bxl%3AliteralForm%20%3FTerm%5D%7D%0A%20%20%3Ftyp%20rdfs%3AsubClassOf%20gvp%3ASubject%3B%20rdfs%3Alabel%20%3FType.%0A%20filter' + \
+        r'%20(%3Ftyp%20!%3D%20gvp%3ASubject)%20%0A%20optional%20%7B%3FSubject%20gvp%3AparentString%20%3FType2%7D%0A%20filter%20(%3FType2%20!%3D%20' +\
+        r'%22Unidentified%20Named%20People%20and%20Firms%22)%20%0A%20optional%20%7B%3FSubject%20dc%3Aidentifier%20%3Fartist_id%7D%7D%0AORDER%20BY%20' + \
+        r'(fn%3Alower-case(str(%3FTerm)))%0A&toc=Finding_Subjects&implicit=true&equivalent=false&_form=/queriesF'
+    ulan_list_raw = requests.get(authority_url)
+    ulan_list = ulan_list_raw.json()
+    ulan_url_list = []
+    if "results" in ulan_list:
+        list_results = ulan_list["results"]
+        if "bindings" in list_results:
+            bindings = list_results["bindings"]
+            for artist in bindings:
+                artist_id = artist["artist_id"]["value"]
+                artist_authority_url = r'https://vocab.getty.edu/ulan/' + artist_id + r'.json'
+                ulan_url_list.append(artist_authority_url)
+            print(ulan_url_list)
+            async with aiohttp.ClientSession() as session:
+                results = await asyncio.gather(*(get(session, url) for url in ulan_url_list))
+#                print("results")
+#                print(results)
+#                print(len(results))
+            for result in results:
+                candidate = artist_record_parsing(result)
+#                print("candidate identified: ")
+#                print(candidate)
+                #authority_url_list.append(artist_authority_url)
+                person.potential_candidates.append(candidate)
+                #print("candidate appended, now" + str(len(person.potential_candidates)) + "candidates")
+                      
+    return person
 
