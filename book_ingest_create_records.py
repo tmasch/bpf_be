@@ -13,6 +13,9 @@ import requests
 import dbactions
 from pymongo import MongoClient
 from dates_parsing import date_overall_parsing
+import re
+import person_relations
+
 dbname = dbactions.get_database()
 coll=dbname['bpf']
 
@@ -30,6 +33,7 @@ person_person_connection_type_correspondence = {"Vater" : "father", "Mutter" : "
                                             "Schwiegersohn" : "son-in-law", "Schwiegertochter" : "daughter-in-law", "Schwager" : "brother-in-law", "Schwägerin" : "sister-in-law", \
                                                 "Schüler" : "pupil", "Lehrer" : "teacher"}
 role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection"}
+connection_comment_pattern = r'([^,\(]*)([,\()])(.*)'
 
 
 def get_viaf_from_authority(url):
@@ -53,6 +57,7 @@ def get_viaf_from_authority(url):
     viaf_id.name = "viaf"
     viaf_id.id = viaf_url[21:]
     return viaf_id
+
 
 class Person_against_duplication(BaseModel): # I have these classes here and not in 'classes' because they are only needed in these functions.
     preview : Optional[str] = ""
@@ -444,6 +449,7 @@ def person_ingest(person):
             # If there is the general abbreviation plus a word in the comments field that is not common (or simply has escaped me), the relationship will be a general English phrase plus the original German comment
         for connected_person in person_selected.connected_persons:
             print("now processing connected person " + connected_person.name)
+            """The following is the old approach that did not translate the relationships
             match connected_person.connection_type:
                 case "bezf":
                     if connected_person.connection_comment: 
@@ -470,7 +476,30 @@ def person_ingest(person):
                     if connected_person.connection_comment:
                         connected_person.connection_type = "connected (" + connected_person.connection_type + "; " + connected_person.connection_comment + ")"
                     else:
-                        connected_person.connection_type = "connected (" + connected_person.connection_type +  ")"
+                        connected_person.connection_type = "connected (" + connected_person.connection_type +  ")"""
+            if connected_person.connection_comment:
+                if "," in connected_person.connection_comment or "(" in connected_person.connection_comment:
+                    connection_comment_divided = re.match(connection_comment_pattern, connected_person.connection_comment).groups()
+                    connection_type_raw = connection_comment_divided[0]
+                else:
+                    connection_type_raw = connected_person.connection_comment
+                connected_person.connection_type = person_relations.gnd_person_relation(connection_type_raw, person_new.sex, connected_person.connection_type)
+                # add what happens if connection not in list
+            else:
+                match connected_person.connection_type:
+                    case "bezf":
+                        connected_person.connection_type = "related to (to be determined)"
+                    case "bezb":
+                        connected_person.connection_type = "professional relation (to be determined)"
+                    case "beza": 
+                        connected_person.connection_type = "other relationship to (details to be determined)"
+
+
+
+
+
+
+            
             """The following section 'stitches' the new entry into the system by creating connections to internal IDs. It does so in different steps.
                 Step 1: Checking the list of connected_entities in the new record, and if one of these entities is already in Iconobase, inserting its ID in the connected_entities record
                 Step 2: Checking if the identified connected record gives the new connected record as connected_entity. 
@@ -525,7 +554,7 @@ def person_ingest(person):
                         new_connection.id = person_new.id
                         new_connection.external_id = person_new.external_id
                         new_connection.name = person_new.name_preferred # better use preview including year
-                        new_connection.connection_type = "counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
+                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
                         dbactions.add_connection(person_found["id"], "connected_persons", new_connection)
                     
 
@@ -565,19 +594,22 @@ def person_ingest(person):
                         connected_organisation.id = org_found["id"]
                         connected_organisation.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
                         break # if a connection with one ID is found, the other connections would be the same. 
-                    if "viaf" not in external_id.uri: # it should not reprocess the VIAF number it just created
-                        viaf_id = get_viaf_from_authority(external_id.uri)
+#I comment this out untill there is a way to have VIAF deal with hyphens
+#                    if "viaf" not in external_id.uri: # it should not reprocess the VIAF number it just created
+#                        viaf_id = get_viaf_from_authority(external_id.uri)
 #                        print("external id for search for VIAF")
 #                        print(external_id.uri)
-                        org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "viaf", "id": viaf_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
-                        if org_found:
+#                        org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "viaf", "id": viaf_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+#                        if org_found:
 #                            print("connected person found via VIAF")
-                            connected_organisation.id = org_found["id"]
-                            connected_organisation.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
-                            break #in this case, there is no need to append the VIAF ID
-                        connected_organisation.external_id.append(viaf_id)
+#                            connected_organisation.id = org_found["id"]
+#                            connected_organisation.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+#                            break #in this case, there is no need to append the VIAF ID
+#                        connected_organisation.external_id.append(viaf_id)
 #                        print("connection person not yet in Database, VIAF ID added to it")
+
                 if org_found: # this is for making the reciprocal connection
+
 #                    print("There is a person record corresponding to this connection")
                     far_record = org_found["connected_persons"]
                     connection_found = False
@@ -602,7 +634,7 @@ def person_ingest(person):
                         new_connection.id = person_new.id
                         new_connection.external_id = person_new.external_id
                         new_connection.name = person_new.name_preferred # better use preview including year
-                        new_connection.connection_type = "counterpart to " + connected_organisation.connection_type # This has to be replaced by a proper term
+                        new_connection.connection_type = "2counterpart to " + connected_organisation.connection_type # This has to be replaced by a proper term
                         dbactions.add_connection(org_found["id"], "connected_persons", new_connection)
                     
 
@@ -665,13 +697,12 @@ def person_ingest(person):
         far_person_id = far_person["id"]
         for connected_person in person_new.connected_persons:
             connection_already_made = False
-            for external_id in connected_person.external_id:
-                if external_id.id == far_person_id:
-                    connection_already_made = True
+            if connected_person.id == far_person_id:
+                connection_already_made = True
                     # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-            if connection_already_made == True:
                 break
+#            if connection_already_made == True:
+#                break
         if connection_already_made == False: # i.e., one has to create a connection
             # first getting the data from the 'far record'
             far_person_connected_persons = far_person["connected_persons"]
