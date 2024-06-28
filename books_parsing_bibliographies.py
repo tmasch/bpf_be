@@ -8,7 +8,7 @@ import re
 from lxml import etree
 import requests
 from classes import *
-from  datetime import datetime
+#from  datetime import datetime
 
 def roman_numerals(roman_number):
     # This function translates a Roman numeral written according to rules (permitting two "I", "X" or "C" left of a higher value) into Arabic numbers
@@ -229,9 +229,11 @@ def VD17_parsing(url_bibliography):
         year_pattern_isolated = r'\d{4}'
         year_pattern_brackets = r'\[(ca. |ca.|ca |circa |um |vor |nicht vor |nach |nicht nach |erschienen |erschienen ca. \
             |erschienen nach |i.e. )?(\d{4})?([MDCLXVI\.]*)?(\?|\? )?(/\d{2}|/\d{4})?\]'
-        year_pattern_Arabic_in_text = r'(1\d{3})[\D$]' # should mean 1XXX, then a non-number or end of string
+        year_pattern_Arabic_in_text = r'(1\d{3})[\D$]?' # should mean 1XXX, then a non-number or end of string
         year_pattern_Roman_in_text = r'(M[DCLXVI\. ]*)'
         if printing_date_raw:
+            print("Rohdatum: ")
+            print(printing_date_raw)
             if re.match(year_pattern_isolated, printing_date_raw): # This means ca. 80% of the cases, when there is just a four-digit year
                 print("Year simple number")
                 bi.date_string = printing_date_raw
@@ -302,6 +304,7 @@ def VD17_parsing(url_bibliography):
             
                 if re.search(year_pattern_Arabic_in_text, printing_date_raw): #This means that if there is a four-digit date starting with '1' in the text and nothing in square brackets
                     year_string = re.search(year_pattern_Arabic_in_text, printing_date_raw).groups()[0]
+                    print("four arabic digits found in text")
                     bi.date_string = year_string
                     start_year = int(year_string)
                     end_year = int(year_string)
@@ -319,13 +322,15 @@ def VD17_parsing(url_bibliography):
 
                 else:           
                     print("year not digested")
-            bi.date_start = datetime(start_year, 1, 1, 0, 0, 0, 0) #There are apparently never months or days in standardised format. 
-            bi.date_end = datetime(end_year, 12, 31, 23, 59, 59, 0)
-            if bi.date_string:
-                print(bi.date_string)
-                print(bi.date_start.isoformat())
-                print(bi.date_end.isoformat())
-                bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
+            bi.date_start = (start_year, 1, 1)
+            bi.date_end = (end_year, 12, 31)
+#            bi.date_start = datetime(start_year, 1, 1, 0, 0, 0, 0) #There are apparently never months or days in standardised format. 
+#            bi.date_end = datetime(end_year, 12, 31, 23, 59, 59, 0)
+#            if bi.date_string:
+#                print(bi.date_string)
+#                print(bi.date_start.isoformat())
+#                print(bi.date_end.isoformat())
+#                bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
 
                     
 
@@ -475,10 +480,11 @@ def VD16_parsing(url_bibliography):
         start_month = 1        
         end_day = 31
         end_month = 12
-        bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
-        bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
-        bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
-
+        #bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
+        #bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
+        #bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
+        bi.date_start = (start_year, start_month, start_day)
+        bi.date_end = (end_year, end_month, end_day)
             
 
     return bi
@@ -889,12 +895,14 @@ def ISTC_parsing(URL_bibliography):
             print("start_year: ")
             print(start_year)
             bi.date_string = string_prefix + string_day + string_month + string_year + date_between_indicator + string_day_between + string_month_between + string_year_between
-            bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
-            bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
+#            bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
+#            bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
+            bi.date_start = (start_year, start_month, start_day)
+            bi.date_end = (end_year, end_month, end_day)
 
             # Until I have changed it everyhwhere and also in the FE, I still use the old bi.printing_date function. 
 
-            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
+#            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + " - " + bi.date_end.isoformat()[0:10] + ")"
 
 
 

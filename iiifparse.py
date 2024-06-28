@@ -134,9 +134,11 @@ def iiifparse(URI_entered, material):
     elif "manuscriptorium.com" in URI_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
         m = books_parsing_manifests.Manuscriptorium_parsing(URI_entered)
 
+    # I commented this out since I think I need a more robust system to pass on error messages. 
     #else:
-    #    print("This book comes from a library that is not yet supported by the system.")
-    #    break
+    #    m = Metadata()
+    #    m.title = "Either the entered URL does not refer to a IIIF manifest, or it comes from a library that is not yet supported by Iconobase."
+    #    return(m)
     m.iiifUrl = URI_entered
     m.material = material
     

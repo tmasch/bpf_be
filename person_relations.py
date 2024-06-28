@@ -162,6 +162,7 @@ def gnd_person_relation(relation, sex, relation_type):
     "evtl.identität" : ["possibly identified with"], \
     "ex-ehefrau" : ["former husband of"], \
     "ex-ehemann" : ["former wife of"], \
+    "faktor" : ["head of workshop ('faktor') was"], \
     "familie" : ["member of this family"], \
     "familie?" : ["possibly member of this family"], \
     "familienangehöriger" : ["to this family belonged"], \
@@ -522,7 +523,7 @@ def relation_correspondence(relation, sex):
 # Up to now, it only covers relationships between persons - relationships between persons and organisations are to be added
 # The function takes a relationship phrase from one person record ('A') and the sex from another person record ('B') and formulates a relationship phrase for 'B'
 
-    corresponding_relationship_list = { \
+    corresponding_relationships = { \
     "acquaintance of" : ["acquaintance of"], \
     "administrator of" : ["administrated by"], \
     "adopted daughter of" : ["adoptive father of", "adoptive mother of", "adoptive father or mother of"], \
@@ -692,6 +693,7 @@ def relation_correspondence(relation, sex):
     "half-brother of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
     "half-brother or half-sister of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
     "half-sister of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
+    "head of workshop ('faktor') was" : ["head of workshop ('faktor') for"], \
     "husband of" : ["wife of"], \
     "husband of (his fifth marriage)" : ["fifth wife of"], \
     "husband of (his first marriage)" : ["first wife of"], \
@@ -841,9 +843,9 @@ def relation_correspondence(relation, sex):
     "younger sister of" : ["older brother of", "older sister of", "older brother or sister of"], \
     }
 
-    if relation in relation_correspondence:
-        corresponding_relation_list = relation_correspondence[relation]
-        if len(corresponding_relation_list = 1):
+    if relation in corresponding_relationships:
+        corresponding_relation_list = corresponding_relationships[relation]
+        if len(corresponding_relation_list) == 1:
             corresponding_relation = corresponding_relation_list[0]
         else:
             if sex == "male":
@@ -852,5 +854,7 @@ def relation_correspondence(relation, sex):
                 corresponding_relation = corresponding_relation_list[1]
             else:
                 corresponding_relation = corresponding_relation_list[2]
+    else:
+        corresponding_relation = "counterpart to " + relation
     return(corresponding_relation)
 

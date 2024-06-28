@@ -357,7 +357,7 @@ def metadata_dissection(metadata):
                 else: 
                     new_place.name = place.name # This is a stopgap measure if a place could not be identified
                 new_book.places.append(new_place)
-        new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
+        new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].date_string + ")"
         book_record_id = new_book.id # I'll need that later
         print(new_book.date_start)
         print("Completed book record")
@@ -554,7 +554,8 @@ def person_ingest(person):
                         new_connection.id = person_new.id
                         new_connection.external_id = person_new.external_id
                         new_connection.name = person_new.name_preferred # better use preview including year
-                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
+                        new_connection.connection_type = person_relations.relation_correspondence(connected_person.connection_type, person_new.sex)
+#                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
                         dbactions.add_connection(person_found["id"], "connected_persons", new_connection)
                     
 
@@ -634,7 +635,8 @@ def person_ingest(person):
                         new_connection.id = person_new.id
                         new_connection.external_id = person_new.external_id
                         new_connection.name = person_new.name_preferred # better use preview including year
-                        new_connection.connection_type = "2counterpart to " + connected_organisation.connection_type # This has to be replaced by a proper term
+                        new_connection.connection_type = person_relations.relation_correspondence(connected_person.connection_type, person_new.sex)
+#                        new_connection.connection_type = "2counterpart to " + connected_organisation.connection_type # This has to be replaced by a proper term
                         dbactions.add_connection(org_found["id"], "connected_persons", new_connection)
                     
 
@@ -716,7 +718,8 @@ def person_ingest(person):
             new_connection = Connected_entity()
             new_connection.id = far_person_id
             new_connection.name = far_person["name_preferred"]
-            new_connection.connection_type = "counterpart to " + far_connection_type
+            new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
+#            new_connection.connection_type = "counterpart to " + far_connection_type
             person_new.connected_persons.append(new_connection)
             
 

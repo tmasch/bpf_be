@@ -4,7 +4,7 @@ import bson
 #import pydantic
 from typing import Optional
 from datetime import date
-from datetime import datetime
+#from datetime import datetime
 
 
 
@@ -85,8 +85,8 @@ class Person_import(BaseModel):
     sex : Optional[str] = ""
     dates_from_source : Optional[list[Date_import]] = []
     datestring : Optional[str] = ""
-    date_start : Optional[tuple] = None
-    date_end : Optional[tuple] = None
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
     date_aspect : Optional[str] = ""
     connected_persons : Optional[list[Connected_entity]] = []
     connected_organisations : Optional[list[Connected_entity]] = []
@@ -216,8 +216,8 @@ class Bibliographic_information(BaseModel):
     part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # This will be later replaced
     date_string : Optional[str] = ""
-    date_start : Optional[datetime] = None
-    date_end : Optional[datetime] = None
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
     printing_information : Optional[str] = ""
 
 class Making_process(BaseModel):
@@ -358,8 +358,8 @@ class Book_db(BaseModel):
     part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # Has to be later replaced with a date object
     date_string : Optional[str] = ""
-    date_start : Optional[datetime] = None
-    date_end : Optional[datetime] = None
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
     preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
     
 class Pages_db(BaseModel):
@@ -404,6 +404,9 @@ class Book_db_display(BaseModel):
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    date_string : Optional[str] = ""
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
     preview : Optional[str] = "" # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
 
 class Link_to_repository_display(BaseModel):

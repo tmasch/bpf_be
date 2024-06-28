@@ -313,6 +313,7 @@ def place_identification(place):
         print(place.role)
     else:
         print("No place.role")
+        place.role = "pup" # I just define this for the time being. 
     place.internal_id_place_type1_needed =  role_place_type_correspondence[place.role] 
     place.chosen_candidate = 999
     print("Arrived in place_identification")
@@ -1342,13 +1343,13 @@ def artist_record_parsing(artist_record):
                     conn_ent.connection_comment = "meaning overlaps with"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1101":                
-                    conn_ent.connection_comment = "was teacher of"
+                    conn_ent.connection_comment = "teacher of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1102":                
-                    conn_ent.connection_comment = "was student of"
+                    conn_ent.connection_comment = "student of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1105":                
-                    conn_ent.connection_comment = "was apprentice of"
+                    conn_ent.connection_comment = "apprentice of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1106":                
                     conn_ent.connection_comment = "apprentice was"
@@ -1360,7 +1361,7 @@ def artist_record_parsing(artist_record):
                     conn_ent.connection_comment = "influenced by"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1111":                
-                    conn_ent.connection_comment = "was master of"
+                    conn_ent.connection_comment = "master of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1112":                
                     conn_ent.connection_comment = "master was"
@@ -1369,13 +1370,13 @@ def artist_record_parsing(artist_record):
                     conn_ent.connection_comment = "fellow student of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1201":                
-                    conn_ent.connection_comment = "was patron of"
+                    conn_ent.connection_comment = "patron of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1202":                
                     conn_ent.connection_comment = "patron was"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1203":                
-                    conn_ent.connection_comment = "was donor of"
+                    conn_ent.connection_comment = "donor of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1204":                
                     conn_ent.connection_comment = "donor was"
@@ -1511,7 +1512,7 @@ def artist_record_parsing(artist_record):
                     elif pe.sex == "female":
                         conn_ent.connection_comment = "grandmother of"
                     else:
-                        conn_ent.connection_comment = "grandfather or grandmother of"
+                        conn_ent.connection_comment = "grandparent of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1515":                
                     if pe.sex == "male":                                        
@@ -1652,7 +1653,7 @@ def artist_record_parsing(artist_record):
                     elif pe.sex == "female":
                         conn_ent.connection_comment = "godmother of"
                     else:
-                        conn_ent.connection_comment = "godfather or godmother of"
+                        conn_ent.connection_comment = "godparent of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1575":                
                     if pe.sex == "male":                                        
@@ -1660,7 +1661,7 @@ def artist_record_parsing(artist_record):
                     elif pe.sex == "female":
                         conn_ent.connection_comment = "goddaughter of"
                     else:
-                        conn_ent.connection_comment = "godson or goddaughter of"
+                        conn_ent.connection_comment = "godchild of"
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1581":                
                     conn_ent.connection_comment = "descendant of"   
