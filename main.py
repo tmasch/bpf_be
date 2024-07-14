@@ -166,7 +166,7 @@ async def saveConnectedRecords(metadata: Metadata):
     m = metadata
     print("Repository in main.py: ")
     print(m.repository)
-    book_ingest_create_records.metadata_dissection(m)
+    ingest_result = await book_ingest_create_records.metadata_dissection(m)
     #print(m)
     return(m)
 

@@ -2,17 +2,14 @@
 This module contains a number of simple functions that standardise information about relationships taken from authority records. 
 """
 
-def gnd_person_relation(relation, sex, relation_type): 
+def gnd_person_person_relation(relation_original, sex, relation_type): 
 # This function takes the German phrase for a relationship from the GND and gives an English phrase (in reverse, since the GND describes the connection of the 'far' person to the 'near' person, and I do it vice versa)
 # Up to now, it only covers relationships between persons - relationships between persons and organisations are to be added
 # The function takes the relationship phrase from the GND plus the sex of the 'near' person and returns one phrase for the relationship. 
 # The abbreviated relation types from 
-    relation = relation.lower()
-    gnd_person_relations_replace = {". ": ".", "ehegatte" : "ehemann", "ehegattin" : "ehefrau", "gemahl" : "ehemann", "gemahlin" : "ehefrau", \
-        "erste " : "1.", "erster " : "1.", "zweite " : "2.", "zweiter " : "2.", "dritte " : "3.", "dritter " : "3.", "vierte" : "4.", "vierter" : "4.", "gross" : "groß"}
-    for old, new in gnd_person_relations_replace.items():
-        relation = relation.replace(old, new)
-
+    relation = ""
+    relation_new = ""
+    relation_comments = ""
     gnd_person_relations = { \
     "1.ehe" : ["husband of (his first marriage)", "wife of (her first marriage)", "husband or wife of (first marriage)"], \
     "1.ehefrau" : ["husband of (his first marriage)"], \
@@ -59,7 +56,7 @@ def gnd_person_relation(relation, sex, relation_type):
     "ältester bruder" : ["younger brother of", "younger sister of", "younger brother or sister of"], \
     "ältester sohn" : ["father of (first son)", "mother of (first son)", "father or mother of (first son)"], \
     "amtsnachfolger" : ["predecessor of"], \
-    "amtsvorgänger" : ["successor to"], \
+    "amtsvorgänger" : ["successor of"], \
     "angehörige" : ["related to"], \
     "angehöriger" : ["related to"], \
     "arbeitsgeber" : ["employee of"], \
@@ -458,8 +455,8 @@ def gnd_person_relation(relation, sex, relation_type):
     "vorfahr" : ["descendant of"], \
     "vorfahre" : ["descendant of"], \
     "vorfahren" : ["descendant of"], \
-    "vorgänger" : ["successor to"], \
-    "vorgängerin" : ["successor to"], \
+    "vorgänger" : ["successor of"], \
+    "vorgängerin" : ["successor of"], \
     "vorgesetzter" : ["worked under"], \
     "vormund" : ["ward of"], \
     "weggefährte" : ["ally of"], \
@@ -472,7 +469,14 @@ def gnd_person_relation(relation, sex, relation_type):
     "zwillingsbruder" : ["twin brother of", "twin sister of", "twin brother or sister of"], \
     "zwillingsschwester" : ["twin brother of", "twin sister of", "twin brother or sister of"], \
     }
-    if relation in gnd_person_relations:
+    if relation_original != "":
+        relation = relation_original.lower()
+        gnd_person_relations_replace = {". ": ".", "ehegatte" : "ehemann", "ehegattin" : "ehefrau", "gemahl" : "ehemann", "gemahlin" : "ehefrau", \
+        "erste " : "1.", "erster " : "1.", "zweite " : "2.", "zweiter " : "2.", "dritte " : "3.", "dritter " : "3.", "vierte" : "4.", "vierter" : "4.", "gross" : "groß"}
+        for old, new in gnd_person_relations_replace.items():
+            relation = relation.replace(old, new)
+    
+    if relation != "" and relation in gnd_person_relations:
         relation_list = gnd_person_relations[relation]
         if len(relation_list) == 1:
             relation_new = relation_list[0]
@@ -484,13 +488,14 @@ def gnd_person_relation(relation, sex, relation_type):
             else:
                 relation_new = relation_list[2]
     else:
+        relation_comments = relation_original      
         if relation_type == "bezf":
-            relation_new = "related toxxx (" + relation + ")"
-        if relation_type == "bezb":
-            relation_new = "professional relation to (" + relation + ")"
-        if relation_type == "beza": 
-            relation_new = "other relationship to (" + relation + ")"
-    return(relation_new)
+            relation_new = "related to" 
+        elif relation_type == "bezb":
+            relation_new = "professional relation to" 
+        elif relation_type == "beza": 
+            relation_new = "other relationship to"
+    return(relation_new, relation_comments)
 
 
 
@@ -517,6 +522,383 @@ def gnd_person_relation(relation, sex, relation_type):
 # vater (dates)
 # often vater, job
 
+def gnd_person_org_relation(relation_original, sex, relation_type):
+    relation_comment = ""
+    relation = relation_original.lower()
+    gnd_person_org_relations = { \
+        "1. vorsitzende" : ["chairwoman of"], \
+        "1. vorsitzender" : ["chairman of"], \
+        "2. vorsitzende" : ["deputy chairwoman of"], \
+        "2. vorsitzender" : ["deputy chairman of"], \
+        "absolvent" : ["graduate of"], \
+        "absolventin" : ["graduate of"], \
+        "abt" : ["abbot of"], \
+        "äbtissin" : ["abbess of"], \
+        "alumnus" : ["graduate of"], \
+        "ausbildung" :  ["trained at"], \
+        "begründer" : ["founder of"], \
+        "berater" : ["advisor of"], \
+        "beraterin" : ["advisor of"], \
+        "beistzer" : ["owner of"], \
+        "besitzerin" : ["owner of"], \
+        "bibliothekar" : ["librarian to"], \
+        "bischof" : ["bishop of"], \
+        "chairman" : ["chairman of"], \
+        "chordirektor" : ["choir master at"], \
+        "chorleiter" : ["choir master at"], \
+        "chorsänger" : ["chorister at"], \
+        "co-founder" : ["co-founder of"], \
+        "dean" : ["dean of"], \
+        "dekan" : ["dean of"], \
+        "deputy director" : ["deputy director of"], \
+        "directeur" : ["director of"], \
+        "director" : ["director of"], \
+        "direktor" : ["director of"], \
+        "direktorin" : ["director of"], \
+        "diss." : ["doctorate at"], \
+        "dissertation" : ["doctorate at"], \
+        "doctoral candidate" : ["doctoral student at"], \
+        "doctoral student" : ["doctoral student at"], \
+        "doktorand" : ["doctoral student at"], \
+        "doktorandin" : ["doctoral Student at"], \
+        "dozent" : ["teacher at"], \
+        "dozentin" : ["teacher at"], \
+        "eigentümer" : ["owner of"], \
+        "erzbischof" : ["archbishopf of"], \
+        "faktor" : ["head of workshop ('faktor') of"], \
+        "fellow" : ["fellow of"], \
+        "firmengründer" : ["founder of"], \
+        "founder" : ["founder of"], \
+        "founding director" : ["founding director of"], \
+        "gehilfe" : ["assistant at"], \
+        "geschäftsführer" : ["chief clerk of"], \
+        "gesellschafter" : ["partner of"], \
+        "gesellschafterin" : ["partner of"], \
+        "grue" : ["founder of"], \
+        "gründer" : ["founder of"], \
+        "gründerin" : ["founder of"], \
+        "gründungsdirektor" : ["founding director of"], \
+        "gründungsmitglied" : ["founding member of"], \
+        "gymnasiallehrer" : ["teacher at"], \
+        "gymnasialprofessor" : ["teacher at"], \
+        "habilitation" : ["habilitation at"], \
+        "häftling" : ["prisoner at"], \
+        "herausgeber" : ["editor of"], \
+        "hilfsprediger" : ["assistant preacher at"], \
+        "hochschullehrer" : ["professor at"], \
+        "hochschullehrerin" : ["professor at"], \
+        "inhaber" : ["owner of"], \
+        "inhaberin" : ["owner of"], \
+        "kantor" : ["cantor at"], \
+        "kanzler" : ["chancellor of"], \
+        "kapellmeister" : ["head of music at"], \
+        "kommandant" : ["commander of"], \
+        "konrektor" : ["deputy director of"], \
+        "lehre" : ["apprentice at"], \
+        "lehrer" : ["teacher at"], \
+        "lehrerin" : ["teacher at"], \
+        "lehrkraft" : ["teacher at"], \
+        "lehrling" : ["apprentice at"], \
+        "lehrling und gehilfe" : ["apprentice and assistant at"], \
+        "leiter" : ["director of"], \
+        "leiterin" : ["director of"], \
+        "leitung" : ["director of"], \
+        "member" : ["member of"], \
+        "minister" : ["minister at"], \
+        "mitarbeiter" : ["collaborator at"], \
+        "mitbegr." : ["co-founder of"], \
+        "mitbegründer" : ["co-founder of"], \
+        "mitbegründer" : ["co-foundress of"], \
+        "mitglied" : ["member of"], \
+        "mitgründer" : ["co-founder of"], \
+        "mitgründer" : ["co-foundress of"], \
+        "mitinhaber" : ["co-owner of"], \
+        "mönch" : ["monk at"], \
+        "nachfolgeinstitution" : ["successor of"], \
+        "nachfolgeinstitution der druckerei" : ["successor of"], \
+        "nachfolger" : ["successor of"], \
+        "nachlass" : ["papers at"], \
+        "nutzer" : ["user of"], \
+        "oberin" : ["mother superior of"], \
+        "oberlehrer" : ["senior teacher at"], \
+        "obfrau" : ["chairwoman of"], \
+        "obmann" : ["chairman of"], \
+        "ordensgründer" : ["founder of"], \
+        "ordensgründerin" : ["foundress of"], \
+        "ordensmitglied" : ["member of"], \
+        "ordentliches mitglied" : ["full member of"], \
+        "papiermacher" : ["paper maker at"], \
+        "partner" : ["partner at"], \
+        "pastor" : ["minister at"], \
+        "pfarrer" : ["rector at"], \
+        "ph. d." : ["doctorate at"], \
+        "ph. d. candidate" : ["doctoral student at"], \
+        "ph. d. student" : ["doctoral student at"], \
+        "ph.d." : ["doctorate at"], \
+        "ph.d. candidate" : ["doctoral student at"], \
+        "ph.d. student" : ["doctoral student at"], \
+        "phd." : ["doctorate at"], \
+        "phd. candidate" : ["doctoral student at"], \
+        "phd. student" : ["doctoral student at"], \
+        "präfekt" : ["prefect of"], \
+        "praeses" : ["praeses of"], \
+        "präsident" : ["president of"], \
+        "president" : ["president of"], \
+        "principal" : ["principal of"], \
+        "prior" : ["prior of"], \
+        "priorin" : ["prioress of"], \
+        "prof." : ["professor at"], 
+        "professor" : ["professor at"], \
+        "professorin" : ["professor at"], \
+        "professur" : ["professor at"], \
+        "promotion" : ["doctorate at"], \
+        "prorektor" : ["prorector (pro vice-chancellor) at"], \
+        "provinzial" : ["provincial of"], \
+        "rector" : ["rector at"], \
+        "regens" : ["principal of"], \
+        "rektor" : ["rector (vice-chancellor) at"], \
+        "richter" : ["judge at"], \
+        "sammler" : ["collector for"], \
+        "sänger" : ["singer at"], \
+        "sängerin" : ["singer at"], \
+        "schauspieler" : ["actor at"], \
+        "schauspielerin" : ["actress at"], \
+        "schüler" : ["pupil at"], \
+        "schülerin" : ["pupil at"], \
+        "schulleiter" : ["headmaster of"], \
+        "schulleiterin" : ["headmistress of"], \
+        "stifter" : ["benefactor of"], \
+        "stifterin" : ["benefactress of"], \
+        "stud. jur.": ["law student at"], \
+        "stud. med." : ["medical student at"], \
+        "stud. kam." : ["student of economy at"], \
+        "stud. phil" : ["student of philosphy at"], \
+        "stud. theol" : ["divinity student at"], \
+        "student" : ["student at"], \
+        "studentin" : ["student at"], \
+        "studienort" : ["student at"], \
+        "studienstätte" : ["student at"], \
+        "studium" : ["student at"], \
+        "subprior" : ["sub-prior at"], \
+        "superintendent" : ["superintendent at"], \
+        "superior" : ["religious superior at"], \
+        "tänzer" : ["dancer at"], \
+        "tänzerin" : ["dancer at"], \
+        "theaterdirektor" : ["director of"], \
+        "universitätsverwandter" : ["affiliated to"], \
+        "verleger" : ["owner"], \
+        "vizekanzler" : ["vice-chancellor of"], \
+        "vizepräsident" : ["vice-president of"], \
+        "vizepräsidentin" : ["vice-president of"], \
+        "vorgängerinstitution" : ["predecessor of"], \
+        "vorgängerinstitution der druckerei" : ["predecessor of"], \
+        "vorsitzende" : ["chairwoman of"], \
+        "vorsitzender" : ["chairman of"], \
+        "vorsteher" : ["head of"], \
+        "weiterführender betrieb" : ["succeded by (organisation)"]
+    }
+    if relation in gnd_person_org_relations:
+        relation_list = gnd_person_org_relations[relation]
+        if len(relation_list) == 1:
+            relation_new = relation_list[0]
+        else:
+            if sex == "male":
+                relation_new = relation_list[0]
+            elif sex == "female": 
+                relation_new = relation_list[1]
+            else:
+                relation_new = relation_list[2]
+    else:
+        relation_comment = relation_original
+        if relation_type == "affi":
+            relation_new = "belonged to"
+        elif relation_type == "grue":
+            relation_new = "founded by"
+        elif relation_type == "korr": 
+            relation_new = "corresponded with"
+        elif relation_type == "mitg": 
+            relation_new = "member of"
+        elif relation_type == "rela": 
+            relation_new = "related to"
+
+
+    return(relation_new, relation_comment)
+
+
+def gnd_person_place_relation(relation_original, sex, relation_type):
+    print("in module gnd_person_place_relation")
+    print("relation as imported:")
+    print(relation_original)
+    connection_location_alternative1 = {"geburtsort:" : "geburtsort", "sterbeort:" : "sterbeort", "andersltd.:" : "andersltd.", "begr.:" : "begr.", "auch:" : "auch"}
+    connection_location_alternative2 = ["abw ", "abweichend: ", "abweichend " , "abweichende ", "abweichender ", "alternativer ", \
+                                        "anders lautender ", "andersl. ", "anderslaut. ", "anderslautend. ", "anderslautend ", "anderslautender ", \
+                                        "anderslt. ", "andersltd. ", "anderstl. ", "anderstlautender "]
+    connection_location_alternative3 = {"other geburtsort" :  "or", "other geburtsorte:" : "or", "other sterbeort" : "or", "adresse" : "", "begr." : "buried in", \
+                                        "begraben in" : "buried in" , "bei " : "near ", "bestattet in" : "buried in", "eigentl." : "in reality", \
+                                        "falscher geburtsort" : "not", "falscher sterbeort" : "not", "geburtsort nicht:" : "not", "geburtsort other" : "or", "geburtsort auch" : "or", 
+                                        "other" : "or", "oder" : "or", "sterbeort other" : "or", "sterbeort auch" : "or", "sterbeort nicht:" : "not", "nicht:" : "not", 
+                                        "vielm." : "rather"}
+    connection_location_doubtful = {"?" : "possibly ", "Ang. unsicher" : "possibly", "fragwürdiger geburtsort" : "supposedly", \
+                                    "fragwürdiger sterbeort" : "supposedly", "geburtsort fraglich" : "possibly",  "geburtsort unsicher" : "possibly", \
+                                    "geburtsort vermutet" : "possibly", "geburtsort vermutl." : "possibly", "geburtsort vermutlich" : "possibly", "möglicher geburtsort" : "possibly", \
+                                    "möglicher sterbeort" : "possibly", "mutmaßl. geburtsort" : "possibly",  \
+                                    "mußmaßlicher geburtsort" : "possibly", "mutmaßlicher sterbeort" : "possibly", "mutmaßlicher wirkungsort" : "possibly",  \
+                                    "sterbeort fraglich" : "possibly", "sterbeort nicht sicher" : "possibly", "sterbeort unsicher" : "possibly", \
+                                    "sterbeort vermutlich" : "possibly", "vermuteter geburtsort" : "possibly", "vermutl." : "possibly", \
+                                    "vermutl. geburtsort" : "possibly", "vermutl. sterbeort" : "possibly", "vermutl. wirkungsort" : "possibly", \
+                                    "vermutlicher geburtsort" : "possibly", "vermutlicher sterbeort" : "possibly", "vermutlicher wirkungsort" : "possibly", "wahrsch. geburtsort" : "possibly", \
+                                    "wahrscheinlicher geburtsort" : "possibly", "wahrscheinlicher sterbeort" : "possibly", "zuordnung nicht sicher" : "posssibly", 
+                                    "zuordnung ungewiss" : "possibly", "angeblich" : "supposedly", "fraglich" : "possibly", "möglicherweise" : "possibly", "mußmaßlich" : "possibly","nicht gesichert" : "possibly","nicht sicher" : "possibly", \
+                                    "unsicher" : "possibly", "vermutet" : "possibly", "vermutlich" : "possibly", "wahrscheinlich" : "possibly"}    
+
+    gnd_person_place_relations = {
+    "alterssitz" : ["retired to"], \
+    "arbeitsort" : ["worked in"], \
+    "architekt" : ["architect in"], \
+    "arzt" : ["physician in"], \
+    "aufgewachsen" : ["grown up in"], \
+    "aufwachsen" : ["grown up in"], \
+    "ausbildung" : ["trained in"], \
+    "ausbildungs- oder studienort" : ["trained or studied in"], \
+    "ausbildungsort" : ["trained in"], \
+    "beerdigungsort" : ["buried in"], \
+    "begräbnisort" : ["buried in"], \
+    "beisetzungsort" : ["buried in"], \
+    "bestattungsort" : ["buried in"], \
+    "bishof" : ["bishop in"], \
+    "bürgermeister" : ["mayor of"], \
+    "diss." : ["did doctorate in"], \
+    "dort aufgewachsen" : ["grown up in"], \
+    "erscheinungsort" : ["publications in"], \
+    "getauft" : ["baptised in"], \
+    "gutsbesitzer" : ["landowner in"], \
+    "gutsherr" : ["landowner in"], \
+    "habil." : ["habilitation in"], \
+    "habilitation" : ["habilitation in"], \
+    "hauptlebensort" : ["lived chiefly in"], \
+    "hauslehrer" : ["private tutor in"], \
+    "heimatort" : ["home was"], \
+    "herkunft" : ["came from"], \
+    "herkunftsort" : ["came from"], \
+    "hilfsprediger" : ["assistant preacher in"], \
+    "hingerichtet" :  ["executed in"], \
+    "kindheit" : ["childhood spent in"], \
+    "kindheit und jugend" : ["grown up in"], \
+    "lebensort" : ["lived in"], \
+    "lehrer" : ["teacher in "], \
+    "ort der promotion" : ["did doctorate in"], \
+    "papiermühle" : ["at paper mill in"], \
+    "pastor" : ["minister in"], \
+    "pfarrer" : ["rector in"], \
+    "promotion" : ["did doctorate in"], \
+    "promotion und habil." : ["did doctorate and habilitation in"], 
+    "promotionsort" : ["did doctorate in"], \
+    "promotion und habilitation" : ["did doctorate and habilitation in"], \
+    "schulbesuch" : ["went to school in"], \
+    "schule" : ["went to school in"], \
+    "schulort" : ["went to school in"], \
+    "schulzeit" : ["went to school in"], \
+    "stud." : ["studied in"], \
+    "stud. med." : ["studied medicine in"], \
+    "stud. theol." : ["studied divinity in"], \
+    "student" : ["studied in"], \
+    "student der rechte" : ["studied law in"], \
+    "studien- u. wohnort" : ["studied and lived in"], \
+    "studien- u.wohnort" : ["studied and lived in"], \
+    "studien- und promotionsort" : ["studied and did doctorate in"], \
+    "studien- und wohnort" : ["studied and lived in"], \
+    "studienort" : ["studied in"], \
+    "studienort und promotion" : ["studied and did doctorate in"], \
+    "studienort, wohnort" : ["studied and lived in"], \
+    "studium" : ["studied in"], \
+    "studium und promotion" : ["studied and did doctorate in"], \
+    "studiumsort" : ["studied in"], \
+    "superintendent" : ["superintendent in"], \
+    "taufe" : ["baptised in"], \
+    "taufort" : ["baptised in"], \
+    "volksschullehrer" : ["teacher in"], \
+    "wohnort" : ["lived in"]
+    }
+    
+    relation_prefix = ""
+    relation_new = ""
+    relation_comments = ""
+    if relation_original:
+        print("commentary on relation that is to be parsed")
+        print(relation_original)
+        relation = relation_original.lower() #I need the original relation later
+        for old, new in connection_location_alternative1.items():
+            relation = relation.replace(old, new)
+            print("relation change 1: " + relation)
+        for term in connection_location_alternative2:
+            relation = relation.replace(term, "other ")
+            print("relation change 2 "+ relation)
+        for old, new in connection_location_alternative3.items():
+            if relation.startswith(old): # This means that there is a composite phrase, such giving e.g. an alternative birth place. In this case, the phrase is standardised, and it is moved to the comment field. 
+                # The relation, by contrast, will be shown through the standard relation type
+                print("The phrase "+ old + "was found at the start of " + relation + "and will be replaced with " + new)
+                string_length = 0-(len(relation) - len(old))
+                relation_comments = new + relation_original[string_length:] # Thus, the new relational term is added to the comment in its original capitalisation
+                print("newly identified comments to relation")
+                print(relation_comments)
+                relation = ""
+        for old, new in connection_location_doubtful.items(): # in this case, the relation is taken from the relation type, and a prefix (e.g., "supposedly") is added to it
+            if old in relation:
+                relation = relation.replace(old, new)
+                relation_prefix = relation + " "
+                relation = ""
+        if relation[:5] == "auch ": # this means that the location given here has not only the main type but also an addition type
+            print("relation starts with 'auch'")
+            if relation_type == "ortg":
+                if relation == "auch sterbeort":
+                    relation_new = "born and died in"                  
+                elif relation == "auch studien- u. wohnort" or relation == "auch studien- und wohnort":
+                    relation_new = "born, studied, and lived in"
+                elif relation == "auch studienort": 
+                    relation_new =  "born and studied in"
+                elif relation == "auch wohnort":
+                    relation_new = "born and lived in"
+            elif relation_type == "ortw":
+                if relation == "auch sterbeort":
+                    relation_new = "active and died in"
+                elif relation == "auch studienort":
+                    relation_new = "studied and active in"
+            elif relation_type == "orts":
+                if relation == "auch studienort":
+                    relation_new = "studied and died in"
+        else:
+            if relation in gnd_person_place_relations:
+                relation_new = gnd_person_place_relations[relation][0]
+            elif relation_comments == "":
+                relation_comments = relation_original # This is different from persons - I put the non-standard text strictly into a comments field
+    if relation_new == "":
+        if relation_type == "ortg":
+            relation_new = "born in"
+        elif relation_type == "orts":
+            relation_new = "died in"
+        elif relation_type == "ortw":
+            relation_new = "active in"
+        elif relation_type == "rela":
+            relation_new = "connected_place"
+    if relation_prefix:
+        relation_new = relation_prefix + relation_new
+    print("results of module person_place_relation:")
+    print("type of relation: ")
+    print(relation_new)
+    print("comments: " + relation_comments)
+    
+
+    return(relation_new, relation_comments)
+    
+  
+
+    """
+
+    with comments:
+    Abt (years)
+    Abt years
+    """
+
 
 def relation_correspondence(relation, sex):
 # This function produces the corresponding term of relationship to a given term. 
@@ -524,7 +906,13 @@ def relation_correspondence(relation, sex):
 # The function takes a relationship phrase from one person record ('A') and the sex from another person record ('B') and formulates a relationship phrase for 'B'
 
     corresponding_relationships = { \
+    "abbess of" : ["abbess was"], \
+    "abbot of" : ["abbot was"], \
     "acquaintance of" : ["acquaintance of"], \
+    "active and died in" : ["place of activity and death of"], \
+    "active in" : ["place of activity of"], \
+    "actor at" : ["actor here was"], \
+    "actress at" : ["actress here was"], \
     "administrator of" : ["administrated by"], \
     "adopted daughter of" : ["adoptive father of", "adoptive mother of", "adoptive father or mother of"], \
     "adopted son of" : ["adoptive father of", "adoptive mother of", "adoptive father or mother of"], \
@@ -533,37 +921,73 @@ def relation_correspondence(relation, sex):
     "adoptive father or mother of" : ["adopted son of", "adopted daughter of", "adopted son or daughter of"], \
     "adoptive mother of" : ["adopted son of", "adopted daughter of", "adopted son or daughter of"], \
     "advisor of" : ["advised by"], \
+    "affiliated to" : ["affiliated was"], \
     "ally of" : ["ally of"], \
     "ancestor of" : ["descendant of"], \
     "appointed by" : ["appointee of"], \
     "appointee of" : ["appointed by"], \
+    "apprentice at" : ["apprentice was"], \
     "apprentice of" : ["apprentice was"], \
     "apprentice was" : ["apprentice of"], \
+    "apprentice and assistant at" : ["apprentice and assistant was"], \
+    "archbishop of" : ["archbishop was"], \
+    "architect in" : ["architect here was"], \
     "artist to" : ["artist was"], \
     "artist was" : ["artist to"], \
+    "assistant at" : ["assistant was"], \
     "assistant of" : ["assisted by"], \
     "assisted by" : ["assistant of"], \
+    "assistant preacher at" : ["assistant preacher was"], \
+    "assistant preacher in" : ["assistant preacher here was"], \
     "associate of" : ["associate of"], \
     "associated with" : ["associated with"], \
+    "at paper mill in" : ["worked at paper mill here"], \
     "aunt of" : ["nephew of", "niece of", "nephew or niece of"], \
+    "baptised in" : ["place of baptism of"], \
+    "benefactor of" : ["benefactor was"], \
+    "benefactress of" : ["benefactress was"], \
     "benefactor was" : ["benefactor of"], \
+    "benefactress was" : ["benefactress of"], \
     "biography by" : ["biographer of"], \
+    "bishop in" : ["bishop here was"], \
+    "bishop of" : ["bishop was"], 
+    "born and died in" : ["place of birth and death of"], \
+    "born, studied and lived in" : ["place of birth, residence, and death of"], \
+    "born and lived in" : ["place of birth and residence of"], \
+    "born and studied in" : ["place of birth and studies of"], \
+    "born in" : ["place of birth of"], \
     "bride of" : ["bridegroom of"], \
     "bridegroom of" : ["bride of"], \
     "brother of" : ["brother of", "sister of", "brother or sister of"], \
     "brother or sister of" : ["brother of", "sister of", "brother or sister of"], \
     "brother- or sister-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-law of"], \
     "brother-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-law of"], \
+    "buried in" : ["place of burial of"], \
+    "came from" : ["place of origin of"], \
+    "cantor at" : ["cantor was"], \
+    "chairman of" : ["chairman was"], 
+    "chairwoman of" : ["chairwoman was"], \
+    "chancellor of" : ["chancellor was"], \
+    "chief clerk of" : ["chief clerk was"], \
+    "childhood spent in" : ["childhood home of"], \
+    "choir master of" : ["choir master was"], \
+    "chorister at" : ["chorister was"], \
     "classmate of" : ["classmate of"], \
     "client of" : ["client was"], \
     "client was" : ["client of"], \
+    "collector for" : ["collector was"], \
     "close friend of" : ["close friend of"], \
+    "co-founder of" : ["co-founded by"], \
+    "co-foundress of" : ["co-founded by"], \
     "collaborated with" : ["collaborated with"], \
+    "collaborator at" : ["collaborated with"], \
     "colleague of" : ["colleague of"], \
+    "commander of" : ["commanded by"], \
     "confessor of" : ["confessor was"], \
     "confessor was" : ["confessor of"], \
     "consort of" : ["consort was"], \
     "consort was" : ["consort of"], \
+    "co-owner of" : ["co-owned by"], \
     "corresponded with" : ["corresponded with"], \
     "counselled by" : ["counsellor was"], \
     "court artist to" : ["court artist was"], \
@@ -572,6 +996,7 @@ def relation_correspondence(relation, sex):
     "crowned" : ["crowned by"], \
     "crowned by" : ["crowned"], \
     "customer was" : ["customer of"], \
+    "dancer at" : ["dancer was"], \
     "daughter of" : ["father of", "mother of", "father or mother of"], \
     "daughter-in-law of" : ["father-in-law of", "mother-in-law of", "father- or mother-in-law of"], \
     "daughter-in-law of (her fifth marriage)" : ["father-in-law of (her fifth marriage)", "mother-in-law of (her fifth marriage)", "father- or mother-in-law of (her fifth marriage)"], \
@@ -579,15 +1004,27 @@ def relation_correspondence(relation, sex):
     "daughter-in-law of (her fourth marriage)" : ["father-in-law of (her fourth marriage)", "mother-in-law of (her fourth marriage)", "father- or mother-in-law of (her fourth marriage)"], \
     "daughter-in-law of (her second marriage)" : ["father-in-law of (her second marriage)", "mother-in-law of (her second marriage)", "father- or mother-in-law of (her second marriage)"], \
     "daughter-in-law of (her third marriage)" : ["father-in-law of (her third marriage)", "mother-in-law of (her third marriage)", "father- or mother-in-law of (her third marriage)"], \
+    "dean of" : ["dean was"], \
+    "deputy chaimrman of" : ["deputy chairman was"], \
+    "deputy chairwoman of" : ["deputy chairwoman was"], \
+    "deputy director of" : ["deputy director was"], \
     "descendant of" : ["ancestor of"], \
-    "director of" : ["directed by"], \
+    "did doctorate and habilitation in" : ["place of doctorate and habilitation of"], \
+    "did doctorate in" : ["place of doctorate of"], \
+    "died in" : ["place of death of"], \
+    "director of" : ["director was"], \
     "distinguished from" : ["distinguished from"], \
+    "divinity student at" : ["divinity student was"], \
+    "doctoral student at" : ["doctoral student was"], \
+    "doctorate at" : ["doctoral student was"], \
     "domestic partner of" : ["domestic partner of"], \
     "donor of" : ["donor was"], \
     "donor was" : ["donor of"], \
     "drawing teacher was" : ["drawing teacher of"], \
+    "editor of" : ["editor was"], \
     "employee of" : ["employee was"], \
     "employee was" : ["employee of"], \
+    "executed in" : ["place of execution of"], \
     "father or mother of (fifth son)" : ["fifth son of"], \
     "father or mother of (first son)" : ["first son of"], \
     "father or mother of (fourth son)" : ["fourth son of"], \
@@ -624,6 +1061,7 @@ def relation_correspondence(relation, sex):
     "father or mother of (youngest son)" : ["youngest son of"], \
     "father- or mother-in-law of" : ["son-in-law of", "daughter-in-law of", "son- or daughter-in-law of"], \
     "father-in-law of" : ["son-in-law of", "daughter-in-law of", "son- or daughter-in-law of"], \
+    "fellow of" : ["fellow was"], \
     "fellow pupil of " : ["fellow pupil of"], \
     "fellow student of" : ["fellow student of"], \
     "fiancé of" : ["fiancée of"], \
@@ -637,16 +1075,21 @@ def relation_correspondence(relation, sex):
     "foster-mother of" : ["foster-son of", "foster-daughter of", "foster-child of"], \
     "foster-parent of" : ["foster-son of", "foster-daughter of", "foster-child of"], \
     "foster-son of" : ["foster-father of", "foster-mother of", "foster-parent of"], \
-    "founder of" : ["foster-father of", "foster-mother of", "foster-parent of"], \
+    "founder of" : ["founded by"], \
+    "founding director of" : ["founding director was"], \
+    "founding member of" : ["founding member was"], \
+    "foundress of" : ["foundress was"], \
     "friend of" : ["friend of"], \
     "friend of (at school)" : ["friend of (at school)"], \
     "friend of (in youth)" : ["friend of (in youth)"], \
+    "full member of" : ["full member was"], \
     "godchild of" : ["godfather of", "godmother of", "godparent of"], \
     "goddaughter of" : ["godfather of", "godmother of", "godparent of"], \
     "godfather of" : ["godson of", "goddaughter of", "godchild of"], \
     "godmother of" : ["godson of", "goddaughter of", "godchild of"], \
     "godparent of" : ["godson of", "goddaughter of", "godchild of"], \
     "godson of" : ["godfather of", "godmother of", "godparent of"], \
+    "graduate of" : ["graduate was"], \
     "grandchild (daughter's son or daughter) of" : ["maternal grandfather", "maternal grandmother", "maternal grandparent"], \
     "grandchild (son's son or daughter) of" : ["paternal grandfather", "paternal grandmother", "paternal grandparent"], \
     "grandchild of" : ["grandfather of", "grandmother of", "grandparent of"], \
@@ -689,11 +1132,20 @@ def relation_correspondence(relation, sex):
     "great-niece of" : ["great-uncle of", "great-aunt of", "great-uncle or great-aunt of"], \
     "great-uncle of" : ["grand-nephew of", "grand-niece of", "grand-nephew or grand-niece of"], \
     "great-uncle or great-aunt of" : ["grand-nephew of", "grand-niece of", "grand-nephew or grand-niece of"], \
+    "grown up in" : ["youth home of"], \
     "guardian of" : ["ward of"], \
+    "habilitation at" : ["habilitation done by"], \
+    "habilitation in" : ["place of habilitation of"], \
     "half-brother of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
     "half-brother or half-sister of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
     "half-sister of" : ["half-brother of", "half-sister of", "half-brother or half-sister of"], \
+    "head of music at" : ["head of music was"], \
     "head of workshop ('faktor') was" : ["head of workshop ('faktor') for"], \
+    "head of workshop ('faktor') of" : ["head of workshop ('faktor) for"], \
+    "head of" : ["headed by"], \
+    "headmaster of" : ["headmaster was"], \
+    "headmistress of" : ["headmistress was"], \
+    "home was" : ["home of"], \
     "husband of" : ["wife of"], \
     "husband of (his fifth marriage)" : ["fifth wife of"], \
     "husband of (his first marriage)" : ["first wife of"], \
@@ -712,18 +1164,30 @@ def relation_correspondence(relation, sex):
     "illegitimate son or daughter of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
     "influenced" : ["influenced by"], \
     "influenced by" : ["influenced"], \
-    "lady-in-waiting was" : ["lady-in-waiting of"], \
+    "judge at" : ["judge was"], \
+    "lady-in-waiting was" : ["lady-in-waiting to"], \
     "landlord of" : ["tenant of"], \
+    "landowner in" : ["landowner here was"], \
+    "law student at" : ["law student was"], \
     "leader of" : ["lead by"], \
+    "librarian to" : ["librarian was"], \
+    "lived chiefly in" : ["main residence of"], \
+    "lived in" : ["residence of"], 
     "master of" : ["master was"], \
     "master or mistress of" : ["master of mistress was"], \
     "master or mistress was" : ["master of mistress of"], \
     "master was" : ["master of"], \
+    "mayor of" : ["mayor was"], \
     "meaning overlaps with" : ["meaning overlaps with"], \
+    "medical student at" : ["medical student was"], \
+    "member of" : ["member was"], \
     "member of this family" : ["family of"], \
     "mentee of" : ["mentor of"], \
+    "minister at" : ["minister was"], \
+    "minister in" : ["minister here was"], \
     "mistress of" : ["mistress was"], \
     "mistress was" : ["mistress of"], \
+    "monk at" : ["monk was"], \
     "mother of" : ["son of", "daughter of", "son or daughter of"], \
     "mother of (fifth daughter)" : ["fifth daughter of"], \
     "mother of (fifth son)" : ["fifth son of"], \
@@ -741,6 +1205,7 @@ def relation_correspondence(relation, sex):
     "mother of (third son)" : ["third son of"], \
     "mother of (youngest daughter)" : ["youngest daughter of"], \
     "mother of (youngest son)" : ["youngest son of"], \
+    "mother superior of" : ["mother superior was"], \
     "mother-in-law of" : ["son-in-law of", "daughter-in-law of", "son- or daughter-in-law of"], \
     "murdered by" : ["murderer of"], \
     "murderer of" : ["murdered by"], \
@@ -751,8 +1216,11 @@ def relation_correspondence(relation, sex):
     "older brother or sister of" : ["younger brother of", "younger sister of", "younger brother or sister of"], \
     "older sister of" : ["younger brother of", "younger sister of", "younger brother or sister of"], \
     "opponent of" : ["opponent of"], \
-    "owner of" : ["owner was"], \
+    "owner of" : ["owned by"], \
+    "paper maker at" : ["paper maker was"], \
+    "papers at" : ["papers kept here"], \
     "partner of" : ["partner of"], \
+    "partner at" : ["partner was"], \
     "patron of" : ["patron was"], \
     "patron was" : ["patron of"], \
     "performed with" : ["performed with"], \
@@ -760,10 +1228,13 @@ def relation_correspondence(relation, sex):
     "PhD student of" : ["PhD supervisor of"], \
     "PhD supervisor of" : ["PhD student of"], \
     "physician of" : ["personal physician was"], \
+    "possibly active in" : ["possible place of activity of"], 
+    "possibly born in" : ["possible place of birth of"], \
     "possibly brother of" : ["possibly brother of", "possibly sister of", "possibly brother of sister of"], \
     "possibly brother or sister of" : ["possibly brother of", "possibly sister of", "possibly brother of sister of"], \
     "possibly cousin of" : ["possibly cousin of"], \
     "possibly daughter of" : ["possibly father of", "possibly mother of", "possibly father or mother of"], \
+    "possibly died in" : ["possible place of death of"], \
     "possibly father of" : ["possibly son of", "possibly daughter of", "possibly son or daughter of"], \
     "possibly father or mother of" : ["possibly son of", "possibly daughter of", "possibly son or daughter of"], \
     "possibly grandchild of" : ["possibly grandfather of", "possibly grandmother of", "possibly grandparent of"], \
@@ -781,13 +1252,34 @@ def relation_correspondence(relation, sex):
     "possibly son of" : ["possibly father of", "possibly mother of", "possibly father or mother of"], \
     "possibly son or daughter of" : ["possibly father of", "possibly mother of", "possibly father or mother of"], \
     "possibly wife of" : ["possibly husband of"], \
-    "predecessor of" : ["successor to"], \
+    "physician in" : ["physician here was"], \
+    "praeses of" : ["praeses was"], \
+    "predecessor of" : ["successor of"], \
+    "prefect of" : ["prefect was"], \
+    "president of" : ["president was"], \
+    "principal of" : ["principal was"], \
+    "prior of" : ["prior was"], \
+    "prioress of" : ["prioress was"], \
+    "prisoner at" : ["prisoner was"], \
+    "private tutor in" : ["private tutor here was"], \
+    "professor at" : ["professor was"], \
+    "prorector (pro vice-chancellor) at" : ["prorector (pro vice-chancellor was)"], \
+    "provincial of" : ["provincial was"], \
+    "publications in" : ["place of publications of"], \
+    "pupil at" : ["pupil was"], \
+    "rector (vice-chancellor) at" : ["rector (vice-chancellor) was"], \
+    "rector at" : ["rector was"], \
+    "rector in" : ["rector here was"], \
     "related to" : ["related to"], \
     "relative by marriage of" : ["relative by marriage of"], \
+    "religious superior at" : ["religious superior was"], \
+    "retired to" : ["place of retirement of"], \
     "romantic partner of" : ["romantic partner of"], \
     "romantic partner of (in youth)]" : ["romantic partner of"], \
     "second cousin of" : ["second cousin of"], \
     "secretary was" : ["secretary of"], \
+    "senior teacher at" : ["senior teacher was"], \
+    "singer at" : ["singer was"], \
     "sister of" : ["brother of", "sister of", "brother or sister of"], \
     "sister-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-la of"], \
     "son of" : ["father of", "mother of", "father or mother of"], \
@@ -812,23 +1304,49 @@ def relation_correspondence(relation, sex):
     "step-sister of" : ["step-brother of", "step-sister of", "step-brother or step-sister of"], \
     "step-son of" : ["step-father of", "step-mother of", "step-father or step-mother of"], \
     "step-son or step-daughter of" : ["step-father of", "step-mother of", "step-father or step-mother of"], \
+    "student at" : ["student was"], \
     "student of" : ["student was"], \
     "student was" : ["student of"], \
+    "student of economy at" : ["student of economy was"], \
+    "student of philosophy at" : ["student of philosophy was"], \
+    "studied and did doctorate in" : ["place of studies and doctorate of"], \
+    "studied and active in" : ["plae of studies and activity of"], \
+    "studied and lived in" : ["place of studies and residence of"], \
+    "studied divinity in" : ["place of divinity studies of"], \
+    "studied in" : ["place of studies of"], \
+    "studied law in" : ["place of law studies of"], \
+    "studied medicine in" : ["place of medical studies of"], \
+    "sub-prior at" : ["sub-prior was"], \
     "subordinate to (military)" : ["military superior of"], \
-    "successor to" : ["predecessor of"], \
+    "succeeded by (organisation)" : ["preceded by (person)"], \
+    "successor of" : ["predecessor of"], \
+    "superintendent at" : ["superintendent was"], \
+    "superintendent in" : ["superintendent here was"], \
     "superior of" : ["worked under"], \
+    "supposecly active in" : ["supposed plce of activity of"], \
+    "supposedly born in" : ["suposed place of birth of"], \
+    "supposedly died in" : ["supposed place of death of"], \
     "teacher of" : ["teacher was"], \
+    "teacher in" : ["teacher here was"], \
+    "teacher at" : ["teacher was"], \
     "to this family belonged" : ["family of"], \
+    "trained at" : ["trainee was"], \
+    "trained in" : ["place of training of"], \
+    "trained or studied in" : ["place of training or studies of"], \
     "tutor was" : ["tutor of"], \
     "twin brother of" : ["twin brother of", "twin sister of", "twin brother or twin sister of"], \
     "twin brother or sister of" : ["twin brother of", "twin sister of", "twin brother or twin sister of"], \
     "twin sister of" : ["twin brother of", "twin sister of", "twin brother or twin sister of"], \
     "uncle of" : ["nephew of", "niece of", "nephew or niece of"], \
     "uncle or aunt of" : ["nephew of", "niece of", "nephew or niece of"], \
+    "user of" : ["user was"], \
     "friend of (at university)" : ["friend of (at university)"], \
     "vasall of" : ["liege lord of"], \
+    "vice-chancellor of" : ["vice-chancellor was"], \
+    "vice-president of" : ["vice-president was"], \
     "victim was" : ["victim of"], \
     "ward of" : ["guardian of"], \
+    "went to school in" : ["place of school of"], \
     "wife of" : ["husband of"], \
     "wife of (her fifth marriage)" : ["fifth husband of"], \
     "wife of (her first marriage)" : ["first husband of"], \
@@ -836,6 +1354,7 @@ def relation_correspondence(relation, sex):
     "wife of (her second marriage)" : ["second husband of"], \
     "wife of (her third marriage)" : ["third husband of"], \
     "worked under" : ["superior of"], \
+    "worked in" : ["place of work of"], \
     "worked with" : ["worked with"], \
     "worker was" : ["worked for"], \
     "younger brother of" : ["older brother of", "older sister of", "older brother or sister of"], \
@@ -857,4 +1376,51 @@ def relation_correspondence(relation, sex):
     else:
         corresponding_relation = "counterpart to " + relation
     return(corresponding_relation)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
