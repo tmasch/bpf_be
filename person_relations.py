@@ -726,9 +726,9 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
 
 
 def gnd_person_place_relation(relation_original, sex, relation_type):
-    print("in module gnd_person_place_relation")
-    print("relation as imported:")
-    print(relation_original)
+    #print("in module gnd_person_place_relation")
+    #print("relation as imported:")
+    #print(relation_original)
     connection_location_alternative1 = {"geburtsort:" : "geburtsort", "sterbeort:" : "sterbeort", "andersltd.:" : "andersltd.", "begr.:" : "begr.", "auch:" : "auch"}
     connection_location_alternative2 = ["abw ", "abweichend: ", "abweichend " , "abweichende ", "abweichender ", "alternativer ", \
                                         "anders lautender ", "andersl. ", "anderslaut. ", "anderslautend. ", "anderslautend ", "anderslautender ", \
@@ -882,10 +882,10 @@ def gnd_person_place_relation(relation_original, sex, relation_type):
             relation_new = "connected_place"
     if relation_prefix:
         relation_new = relation_prefix + relation_new
-    print("results of module person_place_relation:")
-    print("type of relation: ")
-    print(relation_new)
-    print("comments: " + relation_comments)
+    #print("results of module person_place_relation:")
+    #print("type of relation: ")
+    #print(relation_new)
+    #print("comments: " + relation_comments)
     
 
     return(relation_new, relation_comments)

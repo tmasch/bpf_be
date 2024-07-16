@@ -83,14 +83,14 @@ def insertRecordPerson(person: Person_db):
     result = collection.update_one({"id" : record_id}, {'$addToSet' : {"external_id" : external_id}})
 
 def add_connection_id(record_id, name, new_internal_id):
-    print("in dabactions - inserting new connection")
+    print("in dabactions - inserting new connection id")
     # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection
     dbname = get_database()
     collection=dbname['bpf']
     result = collection.update_one({"id" : record_id, "connected_persons.name" : name}, {'$set' : {"connected_persons.$.id" : new_internal_id}})
 
 def add_connection_id_and_name(record_id, name, name_replacement, new_internal_id):
-    print("in dabactions - inserting new connection")
+    print("in dabactions - inserting new connection and name")
     # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection and replaces the name with the name connected to the internal ID
     # Later, the name connected to the internal ID should be a preview with dates
     dbname = get_database()

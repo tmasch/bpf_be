@@ -80,9 +80,11 @@ def add_relationship_in_far_record(person_found, person_new, connected_person_co
             person_found["sex"] = ""
         connection_found = False
         for far_person in far_record:
+            expected_connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"])
+            # Sometimes, one and the same person appears twice, in different relations. If one relation had just been inserted, it should have the reciprocal connection type - hopefully
             for far_external_id in far_person["external_id"]:
                 for external_id_number in range(len(person_new.external_id)):
-                    if far_external_id["uri"] == person_new.external_id[external_id_number].uri:
+                    if far_external_id["uri"] == person_new.external_id[external_id_number].uri and far_person["connection_type"] == expected_connection_type:
                         # This is step 2a: there is already a connection, to which the ID of the new record is added
     #                                print("found record for inserting reciprocal ID")
                         far_person["id"] = person_new.id
@@ -97,7 +99,8 @@ def add_relationship_in_far_record(person_found, person_new, connected_person_co
             new_connection.id = person_new.id
             new_connection.external_id = person_new.external_id
             new_connection.name = person_new.name_preferred # better use preview including year
-            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"]) 
+            new_connection.connection_type = expected_connection_type
+#            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"]) 
             # I need a separate formular, without 'sex', for orgs and places
 #                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
             dbactions.add_connection(person_found["id"], "connected_persons", new_connection)
@@ -659,35 +662,55 @@ async def person_ingest(person):
 #   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
 #    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
 # record with sex
-    person_found = list(coll.find({ "$or": [{"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"connected_persons.external_id.name" : "GND", "connected_persons.external_id.id" : new_record_gnd_id}]}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+    list_found = list(coll.find({ "$or": [{"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"connected_persons.external_id.name" : "GND", "connected_persons.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+    print("far records found: ")
+    print(list_found)
 
-    #if person_found: 
-    for far_person in person_found:
-        far_person_id = far_person["id"]
-        for connected_person in person_new.connected_persons:
-            connection_already_made = False
-            if connected_person.id == far_person_id:
-                connection_already_made = True
-                    # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                break
-#            if connection_already_made == True:
-#                break
+    for far_record in list_found:
+        far_record_id = far_record["id"]
+        if far_record["type"] == "Person":
+            for connected_person in person_new.connected_persons:
+                connection_already_made = False
+                if connected_person.id == far_record_id:
+                    connection_already_made = True
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        elif far_record["type"] == "Organisation": 
+            for connected_org in person_new.connected_organisations:
+                connection_already_made = False
+                if connected_org.id == far_record_id:
+                    connection_already_made = True
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        elif far_record["type"] == "Place":
+            for connected_location in person_new.connected_locations:
+                connection_already_made = False
+                if connected_location.id == far_record_id:
+                    connection_already_made = True
+                    print("connection in location found")
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        
         if connection_already_made == False: # i.e., one has to create a connection
             # first getting the data from the 'far record'
-            far_person_connected_persons = far_person["connected_persons"]
+            far_record_connected_persons = far_record["connected_persons"]
             far_connection_type = ""
-            for far_connected_person in far_person_connected_persons:              
+            for far_connected_person in far_record_connected_persons:              
                 for far_external_id in far_connected_person["external_id"]:
                     if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id:
                         far_connection_type = far_connected_person["connection_type"]
-                        dbactions.add_connection_id_and_name(far_person_id, far_connected_person["name"], person_new.name_preferred, person_new.id) 
-                        # The 'name_preferred' should be later replaced by a preview including the date
-            new_connection = Connected_entity()
-            new_connection.id = far_person_id
-            new_connection.name = far_person["name_preferred"]
-            new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
-#            new_connection.connection_type = "counterpart to " + far_connection_type
-            person_new.connected_persons.append(new_connection)
+                        dbactions.add_connection_id_and_name(far_record_id, far_connected_person["name"], person_new.name_preferred, person_new.id) 
+                new_connection = Connected_entity()
+                new_connection.id = far_record_id
+                new_connection.name = far_record["name_preferred"]
+                new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
+    #            new_connection.connection_type = "counterpart to " + far_connection_type
+                if far_record["type"] == "Person": 
+                    person_new.connected_persons.append(new_connection)
+                if far_record["type"] == "Organisation": 
+                    person_new.connected_organisations.append(new_connection)
+                if far_record["type"] == "Place": 
+                    person_new.connected_locations.append(new_connection)
           
     dbactions.insertRecordPerson(person_new)
     return person_new.id
