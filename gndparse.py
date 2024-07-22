@@ -584,7 +584,7 @@ def gnd_parsing_person(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_org.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_org.connection_time = step2.text
+                                    conn_org.connection_time = step2.text[2:]
                     pe.connected_organisations.append(conn_org)
                 case "548":
                     date = Date_import()
@@ -796,7 +796,7 @@ def gnd_parsing_organisation(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_pe.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pe.connection_time = step2.text
+                                    conn_pe.connection_time = step2.text[2:]
                     org.connected_persons.append(conn_pe)
                 case "510":
                     conn_org = Connected_entity()
@@ -821,7 +821,7 @@ def gnd_parsing_organisation(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_org.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_org.connection_time = step2.text
+                                    conn_org.connection_time = step2.text[2:]
                     if conn_org.connection_type == "vorg":
                         vorg_preview = ", (precursor: " + conn_org.name + ")"
                     if conn_org.connection_type == "nach":
@@ -870,7 +870,7 @@ def gnd_parsing_organisation(authority_url):
                                 if step2.text[0:2] == "v:":
                                     conn_pl.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pl.connection_time = step2.text
+                                    conn_pl.connection_time = step2.text[2:]
                     if conn_pl.connection_type == "orta":
                         orta_preview = ", located in " + conn_pl.name
                     if conn_pl.connection_type == "geow":
@@ -1011,7 +1011,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 if step2.text[0:2] == "v:":
                                     conn_pe.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pe.connection_time = step2.text
+                                    conn_pe.connection_time = step2.text[2:]
                     if "VD-16 Mitverf." not in conn_pe.connection_comment: 
                             # someone connected all persons who appear together as authors in the VD16,
                             # I want them removed. 
@@ -1039,7 +1039,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 if step2.text[0:2] == "v:":
                                     conn_org.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_org.connection_time = step2.text
+                                    conn_org.connection_time = step2.text[2:]
                     pl.connected_organisations.append(conn_org)
                 case "548": #I wonder if this is ever used for places
                     date = Date_import()
@@ -1083,7 +1083,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 if step2.text[0:2] == "v:":
                                     conn_pl.connection_comment = step2.text[2:]
                                 if step2.text[0:2] == "Z:":
-                                    conn_pl.connection_time = step2.text
+                                    conn_pl.connection_time = step2.text[2:]
                     if conn_pl.connection_type == "obpa":
                         obpa_preview = ", part of " + conn_pl.name
                     if conn_pl.connection_type == "adue":

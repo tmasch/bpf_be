@@ -2,6 +2,9 @@
 This module contains a number of simple functions that standardise information about relationships taken from authority records. 
 """
 
+encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"}
+
+
 def gnd_person_person_relation(relation_original, sex, relation_type): 
 # This function takes the German phrase for a relationship from the GND and gives an English phrase (in reverse, since the GND describes the connection of the 'far' person to the 'near' person, and I do it vice versa)
 # Up to now, it only covers relationships between persons - relationships between persons and organisations are to be added
@@ -470,6 +473,9 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
     "zwillingsschwester" : ["twin brother of", "twin sister of", "twin brother or sister of"], \
     }
     if relation_original != "":
+        for old, new in encoding_list.items():
+            if old in relation_original:
+                relation_original = relation_original.replace(old, new)    
         relation = relation_original.lower()
         gnd_person_relations_replace = {". ": ".", "ehegatte" : "ehemann", "ehegattin" : "ehefrau", "gemahl" : "ehemann", "gemahlin" : "ehefrau", \
         "erste " : "1.", "erster " : "1.", "zweite " : "2.", "zweiter " : "2.", "dritte " : "3.", "dritter " : "3.", "vierte" : "4.", "vierter" : "4.", "gross" : "groß"}
@@ -524,6 +530,8 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
 
 def gnd_person_org_relation(relation_original, sex, relation_type):
     relation_comment = ""
+    for old, new in encoding_list.items():
+        relation_original = relation_original.replace(old, new)    
     relation = relation_original.lower()
     gnd_person_org_relations = { \
         "1. vorsitzende" : ["chairwoman of"], \
@@ -616,7 +624,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "mönch" : ["monk at"], \
         "nachfolgeinstitution" : ["successor of"], \
         "nachfolgeinstitution der druckerei" : ["successor of"], \
-        "nachfolger" : ["successor of"], \
+        "nachfolger" : ["predecessor of"], \
         "nachlass" : ["papers at"], \
         "nutzer" : ["user of"], \
         "oberin" : ["mother superior of"], \
@@ -638,6 +646,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "ph.d. candidate" : ["doctoral student at"], \
         "ph.d. student" : ["doctoral student at"], \
         "phd." : ["doctorate at"], \
+        
         "phd. candidate" : ["doctoral student at"], \
         "phd. student" : ["doctoral student at"], \
         "präfekt" : ["prefect of"], \
@@ -824,6 +833,8 @@ def gnd_person_place_relation(relation_original, sex, relation_type):
     relation_new = ""
     relation_comments = ""
     if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
         print("commentary on relation that is to be parsed")
         print(relation_original)
         relation = relation_original.lower() #I need the original relation later
@@ -879,7 +890,7 @@ def gnd_person_place_relation(relation_original, sex, relation_type):
         elif relation_type == "ortw":
             relation_new = "active in"
         elif relation_type == "rela":
-            relation_new = "connected_place"
+            relation_new = "related to"
     if relation_prefix:
         relation_new = relation_prefix + relation_new
     #print("results of module person_place_relation:")
@@ -898,6 +909,374 @@ def gnd_person_place_relation(relation_original, sex, relation_type):
     Abt (years)
     Abt years
     """
+
+
+def gnd_org_person_relation(relation_original, sex, relation_type):
+    # I have in this list different encodings of the ü, maybe that helps
+    gnd_org_person_relations = { \
+        "architekt" : ["architect was"], \
+        "begründer" : ["founded by"], \
+        "besitzer" : ["owned by"], \
+        "chorleiter" : ["choir master was"], \
+        "director" : ["director was"], \
+        "dirigent" : ["conductor was"], \
+        "drucker" : ["printer was"], \
+        "eigentümer" : ["owned by"], \
+        "eigentümer?" : ["possibly owned by"], \
+        "eigentümerin" : ["owned by"], \
+        "faktor" : ["head of workshop ('faktor') was"], \
+        "firmenbegründer" : ["founded by"], \
+        "firmengründer" : ["founded by"], \
+        "firmeninhaber" : ["owned by"], \
+        "früherer eigentümer" : ["formerly owned by"], \
+        "geschäftsführer" : ["chief clerk was"], \
+        "geschäftsführerin" : ["chief clerk was"], \
+        "gesellschafter" : ["partner was"], \
+        "gründer" : ["founded by"], \
+        "gründer der offizin" : ["founded by"], \
+        "inhaber" : ["owned by"], \
+        "inhaberin" : ["owned by"], \
+        "leiter" : ["director was"], \
+        "leiterin" : ["director was"], \
+        "leitung" : ["director was"], \
+        "mitbegründer" : ["co-founded by"], \
+        "miteigentümer" : ["co-owned by"], \
+        "mitglied" : ["member was"], \
+        "mitgründer" : ["co-founded by"], \
+        "mitinhaber" : ["co-owned by"], \
+        "mitinhaberin" : ["co-owned by"], \
+        "nachfolger" : ["predecessor of"], \
+        "namensgeber" : ["named after"], \
+        "namensgeberin" : ["named after"], \
+        "präsident" : ["president was"], \
+        "president" : ["president was"], \
+        "späterer eigentümer" : ["later owned by"], \
+        "teilhaber" : ["partner was"], \
+        "verlagsleiter" : ["owned by"], \
+        "verleger" : ["owned by"], \
+        "vorbesitzer" : ["formerly owned by"], \
+        "vorgänger" : ["successor of"], \
+        "vorsitzender" : ["chairman was"]   
+    }
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+        relation = relation_original.lower()
+    
+    if relation in gnd_org_person_relations:
+        relation_list = gnd_org_person_relations[relation]
+        if len(relation_list) == 1:
+            relation_new = relation_list[0]
+        else:
+            if sex == "male":
+                relation_new = relation_list[0]
+            elif sex == "female": 
+                relation_new = relation_list[1]
+            else:
+                relation_new = relation_list[2]
+    else:
+        relation_comment = relation_original
+        match relation_type:
+            case "arch":
+                relation_new = "architect was"
+            case "befr":
+                relation_new = "formerly owned by"
+            case "besi":
+                relation_new = "owned by"
+            case "bete":
+                relation_new = "part of" # this is awkward, but I think that 'bete' can be both partner and someone who participated
+            case "bezb" : 
+                relation_new = "professional relation to"
+            case "feie" :
+                relation_new = "named after"
+            case "grue" : 
+                relation_new = "founded by"
+            case "kuen" : 
+                relation_new = "artist at"
+            case "mitg":
+                relation_new = "member was"
+            case "musi":
+                relation_new = "musician was"
+            case "rela": 
+                relation_new = "related to"
+            case "saml": 
+                relation_new = "collector was"
+            case "spon":
+                if sex == "male":
+                    relation_new = "benefactor was"
+                elif sex == "emale":
+                    relation_new = "benefactress was"
+                elif sex == "":
+                    relation_new = "benefctor or benefactress was"
+            case "stif":
+                relation_new = "endowed by"
+            case "them":
+                relation_new = "is about"
+            case "vbal":
+                relation_new = "related to"
+    return(relation_new, relation_comment)
+
+
+def gnd_org_org_relation(relation_original, sex, relation_type):
+    gnd_org_org_relations = {
+        "anfangs" : ["originally part of"], \
+        "aufgegangen in" : ["later incorporated into"], \
+        "ausgegangen von" : ["split from"], \
+        "daraus hervorgegangen" : ["successor of"], \
+        "darin aufgegangen" : ["later incorporated into"], \
+        "eingegangen in" : ["later incorporated into"], \
+        "früher siehe" : ["formerly"], \
+        "früher, siehe" : ["formerly"], \
+        "hervorgegangen aus" : ["successor of"], \
+        "indirekter nachfolger" : ["indirect predecessor of"], \
+        "indirekter vorgänger" : ["indirect successor of"], \
+        "inkorporiert" : ["parish incorporated into"], \
+        "inkorporierte pfarre" : ["parish incorporated into"], \
+        "später" : ["later"], \
+        "später siehe" : ["later"], \
+        "später, siehe" : ["later"], \
+        "stiftspfarre" : ["parish incorporated into"], \
+        "träger" : ["parent institution was"]      
+      }
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+        relation = relation_original.lower()
+
+    if relation == "früher": # this is apparently the only instance of the type and the comment forming a joint meaning
+        if relation_type == "adue":
+            relation_new = "formerly part of"
+        elif relation_type == "rela":
+            relation_new = "formerly"
+    elif relation in gnd_org_org_relations:
+        relation_new = gnd_org_org_relations[relation][0]
+    else:
+        relation_comment = relation
+        match relation:
+            case "adue":
+                relation_new = "part of"
+            case "affi":
+                relation_new = "affiliated to"
+            case "besi": 
+                relation_new = "owned by"
+            case "bete":
+                relation_new = "partner of"
+            case "grue":
+                relation_new = "founded by"
+            case "mitg":
+                relation_new = "member of"
+            case "nach":
+                relation_new = "predecessor of"
+            case "nazw":
+                relation_new = "temporary name was"
+            case "obpa":
+                relation_new = "part of"
+            case "rela":
+                relation_new = "related to"
+            case "spon":
+                if sex == "male":
+                    relation_new = "benefactor was"
+                elif sex == "emale":
+                    relation_new = "benefactress was"
+                elif sex == "":
+                    relation_new = "benefctor or benefactress was"
+            case "stif":
+                relation_new = "endowed by"
+            case "them":
+                relation_new = "is about"
+            case "vbal":
+                relation_new = "related to"
+            case "vorg":
+                relation_new = "successor to"         
+    return (relation_new, relation_comment)
+
+def gnd_org_place_relation(relation_original, sex, relation_type):
+    org_place_relations = {
+        "anfangs" : ["originally in"], \
+        "betriebsgewässer" : ["used river"], \
+        "früherer ortssitz" : ["formerly in"], \
+        "früherer sitz" : ["formerly in"], \
+        "gründungsort" : ["founded in"], \
+        "hauptsitz" : ["main seat was"], \
+        "nebensitz" : ["secondary seat was"], \
+        "sitz" : ["in"], \
+        "sitz früher" : ["formerly in"], \
+        "später" : ["later in"], \
+        "späterer sitz" : ["later in"], \
+        "standort" : ["in"], \
+        "ursprünglicher sitz" : ["originally in"], \
+        "vermutlicher sitz" : ["possibly in"], \
+        "zeitweilig" : ["temporarily in"], 
+        "zeitweise" : ["temporarily in"]   
+    }
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+        relation = relation_original.lower
+    if relation == "früher":
+        if relation_type == "orta":
+            relation_new = "formerly in"
+        elif relation_type == "geow":
+            relation_new = "formerly responsible for"
+    elif relation in org_place_relations:
+        relation_new = org_place_relations[relation][0]
+    else:
+        relation_comment = relation_original
+        "relation comment was not in list, now matching relation type"
+        match relation_type:
+            case "adue":
+                relation_new = "part of"
+            case "geoa": # I am not really sure what this means
+                relation_new = "in"
+            case "geow": # I think that most of these would be deleted later manually
+                relation_new = "serves location"
+            case "nach": # I have no clue why this is so common with place-names
+                relation_new = "predecessor of"
+            case "orta"|"ortb"|"ortg"|"orts"|"ortv": 
+                relation_new = "in"
+            case "rela"|"vbal":
+                relation_new = "related to"
+            case "them":
+                relation_new = "is about"
+            case "vorg":
+                relation_new = "successor of"
+        return(relation_new, relation_comment)
+
+
+def gnd_place_person_relation(relation_original, sex, relation_type):
+    place_person_relations = {
+        "ausführung" : ["building executed by"], \
+        "entwurf" : ["building designed by"], \
+    }
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+        relation = relation_original.lower
+#        if relation == "früher":
+#            if relation_type == "orta":
+#                relation_new = "formerly in"
+#            elif relation_type == "geow":
+#                relation_new = "formerly responsible for"
+    if relation in place_person_relations:
+        relation_new = place_person_relations[relation][0]
+    else:
+        relation_comment = relation_original
+        match relation_type:
+            case "arch":
+                relation_new = "architect was"
+            case "bauh":
+                relation_new = "built for"
+            case "befr":
+                relation_new = "formerly owned by"
+            case "besi":
+                relation_new = "owned by"
+            case "bete":
+                relation_new = "part of" # this is awkward, but I think that 'bete' can be both partner and someone who participated
+            case "bilh":
+                relation_new = "sculptor was" # I wonder if I shouldn't kick that out later since I do artists separately
+            case "feie":
+                relation_new = "built in honour of"
+            case "kuen":
+                relation_new = "artist was"
+            case "obpa":
+                relation_new = "part of"
+            case "rela":
+                relation_new = "related to"
+            case "stif":
+                relation_new = "endowed by"
+
+    return(relation_new, relation_comment)
+
+
+def gnd_place_org_relation(relation_original, sex, relation_type):
+# Here, there are so few terms that it does not make sense to parse them, hence I will only parse the main abbreviations
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+
+        relation_comment = relation_original
+    match relation_type:
+        case "arch":
+            relation_new = "architect was"
+        case "bauh":
+            relation_new = "built for"
+        case "befr":
+            relation_new = "formerly owned by"
+        case "besi":
+            relation_new = "owned by"
+        case "bete":
+            relation_new = "part of" # this is awkward, but I think that 'bete' can be both partner and someone who participated
+        case "bilh":
+            relation_new = "sculptor was" # I wonder if I shouldn't kick that out later since I do artists separately
+        case "kuen":
+            relation_new = "artist was"
+        case "rela":
+            relation_new = "related to"
+        case "stif":
+            relation_new = "endowed by"
+
+    return(relation_new, relation_comment)
+
+
+def gnd_place_place_relation(relation_original, sex, relation_type):
+    place_place_relations = {
+        "aufgegangen in" : ["later incorporated into"], \
+        "darin aufgegangen" : ["later incorporated into"], \
+        "hauptort" : ["chief town of"], \
+        "hauptstadt" : ["capital of"]
+    }
+    relation = ""
+    relation_new = ""
+    relation_comment = ""
+    if relation_original:
+        for old, new in encoding_list.items():
+            relation_original = relation_original.replace(old, new)    
+        relation = relation_original.lower
+    if relation in place_place_relations:
+        relation_new = place_place_relations[relation][0]
+    else:
+        relation_comment = relation_original
+        match relation_type:
+            case "adue":
+                relation_new = "part of"
+            case "geoa": # I am not really sure what this means
+                relation_new = "in"
+            case "geow": # I think that most of these would be deleted later manually
+                relation_new = "serves location"
+            case "nach": # I have no clue why this is so common with place-names
+                relation_new = "formerly called"
+            case "nazw":
+                relation_new = "temporary name was"
+            case "obpa":
+                relation_new = "part of"
+            case "orta"|"ortb"|"ortg"|"orts"|"ortv": 
+                relation_new = "in"
+            case "punk":
+                relation_new = "begins or ends in"
+            case "rela"|"vbal":
+                relation_new = "related to"
+            case "vorg":
+                relation_new = "later named"
+
+
+    return(relation_new, relation_comment)
+
+    
 
 
 def relation_correspondence(relation, sex):
@@ -932,8 +1311,9 @@ def relation_correspondence(relation, sex):
     "apprentice and assistant at" : ["apprentice and assistant was"], \
     "archbishop of" : ["archbishop was"], \
     "architect in" : ["architect here was"], \
-    "artist to" : ["artist was"], \
-    "artist was" : ["artist to"], \
+    "architect was" : ["architect of"], \
+    "artist of" : ["artist was"], \
+    "artist was" : ["artist of"], \
     "assistant at" : ["assistant was"], \
     "assistant of" : ["assisted by"], \
     "assisted by" : ["assistant of"], \
@@ -962,32 +1342,43 @@ def relation_correspondence(relation, sex):
     "brother or sister of" : ["brother of", "sister of", "brother or sister of"], \
     "brother- or sister-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-law of"], \
     "brother-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-law of"], \
+    "built for" : ["had built"], \
+    "built in honour of" : ["building in honour"], \
     "buried in" : ["place of burial of"], \
     "came from" : ["place of origin of"], \
     "cantor at" : ["cantor was"], \
-    "chairman of" : ["chairman was"], 
+    "capital of" : ["capital was"], \
+    "chairman of" : ["chairman was"],
+    "chairman was"  : ["chairman of"], \
     "chairwoman of" : ["chairwoman was"], \
     "chancellor of" : ["chancellor was"], \
     "chief clerk of" : ["chief clerk was"], \
+    "chief clerk was" : ["chief clerk of"], \
+    "chief town of" : ["chief town was"], \
     "childhood spent in" : ["childhood home of"], \
     "choir master of" : ["choir master was"], \
+    "choir master was" : ["choir master of"], \
     "chorister at" : ["chorister was"], \
     "classmate of" : ["classmate of"], \
     "client of" : ["client was"], \
     "client was" : ["client of"], \
     "collector for" : ["collector was"], \
+    "collector was" : ["collector for"], \
     "close friend of" : ["close friend of"], \
     "co-founder of" : ["co-founded by"], \
     "co-foundress of" : ["co-founded by"], \
+    "co-founded by" : ["co-counder of", "co-foundress of", "co-founder or co-foundress of"], \
     "collaborated with" : ["collaborated with"], \
     "collaborator at" : ["collaborated with"], \
     "colleague of" : ["colleague of"], \
     "commander of" : ["commanded by"], \
     "confessor of" : ["confessor was"], \
     "confessor was" : ["confessor of"], \
+    "conductor was" : ["conductor of"], \
     "consort of" : ["consort was"], \
     "consort was" : ["consort of"], \
     "co-owner of" : ["co-owned by"], \
+    "co-owned by" : ["co-owner of"], \
     "corresponded with" : ["corresponded with"], \
     "counselled by" : ["counsellor was"], \
     "court artist to" : ["court artist was"], \
@@ -1013,6 +1404,7 @@ def relation_correspondence(relation, sex):
     "did doctorate in" : ["place of doctorate of"], \
     "died in" : ["place of death of"], \
     "director of" : ["director was"], \
+    "director was" : ["director of"], \
     "distinguished from" : ["distinguished from"], \
     "divinity student at" : ["divinity student was"], \
     "doctoral student at" : ["doctoral student was"], \
@@ -1024,6 +1416,7 @@ def relation_correspondence(relation, sex):
     "editor of" : ["editor was"], \
     "employee of" : ["employee was"], \
     "employee was" : ["employee of"], \
+    "endowed by" : ["endowed"], \
     "executed in" : ["place of execution of"], \
     "father or mother of (fifth son)" : ["fifth son of"], \
     "father or mother of (first son)" : ["first son of"], \
@@ -1068,13 +1461,18 @@ def relation_correspondence(relation, sex):
     "fiancée of" : ["fiancé of"], \
     "former husband of" : ["former wife of"], \
     "former wife of" : ["former husband of"], \
+    "formerly" : ["later"], \
+    "formerly in" : ["former location of"], \
     "formerly identified with" : ["formerly identified with"], \
+    "formerly owned by" : ["former owner of"], \
     "foster-child of" : ["foster-father of", "foster-mother of", "foster-parent of"], \
     "foster-daughter of" : ["foster-father of", "foster-mother of", "foster-parent of"], \
     "foster-father of" : ["foster-son of", "foster-daughter of", "foster-child of"], \
     "foster-mother of" : ["foster-son of", "foster-daughter of", "foster-child of"], \
     "foster-parent of" : ["foster-son of", "foster-daughter of", "foster-child of"], \
     "foster-son of" : ["foster-father of", "foster-mother of", "foster-parent of"], \
+    "founded by" : ["founder of", "foundress of", "founder or foundress of"], \
+    "founded in" : ["place of foundation of"], \
     "founder of" : ["founded by"], \
     "founding director of" : ["founding director was"], \
     "founding member of" : ["founding member was"], \
@@ -1162,17 +1560,26 @@ def relation_correspondence(relation, sex):
     "illegitimate mother of" : ["illegitimate son of", "illegitimate daughter of", "illegitimate son or daughter of"], \
     "illegitimate son of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
     "illegitimate son or daughter of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
+    "in" : ["location of"], \
+    "indirect predecessor of" : ["indirect successor of"], \
+    "indirect successor of" : ["indirect predecessor of"], \
     "influenced" : ["influenced by"], \
     "influenced by" : ["influenced"], \
+    "is about" : ["subject is"], \
     "judge at" : ["judge was"], \
     "lady-in-waiting was" : ["lady-in-waiting to"], \
     "landlord of" : ["tenant of"], \
     "landowner in" : ["landowner here was"], \
+    "later" : ["formerly"], \
+    "later in" : ["later location of"], \
+    "later incorporated into" : ["later incorporating"], \
+    "later owned by" : ["later owner of"], \
     "law student at" : ["law student was"], \
     "leader of" : ["lead by"], \
     "librarian to" : ["librarian was"], \
     "lived chiefly in" : ["main residence of"], \
     "lived in" : ["residence of"], 
+    "main seat was" : ["main seat of"], \
     "master of" : ["master was"], \
     "master or mistress of" : ["master of mistress was"], \
     "master or mistress was" : ["master of mistress of"], \
@@ -1182,6 +1589,7 @@ def relation_correspondence(relation, sex):
     "medical student at" : ["medical student was"], \
     "member of" : ["member was"], \
     "member of this family" : ["family of"], \
+    "member was" : ["member of"], \
     "mentee of" : ["mentor of"], \
     "minister at" : ["minister was"], \
     "minister in" : ["minister here was"], \
@@ -1209,6 +1617,8 @@ def relation_correspondence(relation, sex):
     "mother-in-law of" : ["son-in-law of", "daughter-in-law of", "son- or daughter-in-law of"], \
     "murdered by" : ["murderer of"], \
     "murderer of" : ["murdered by"], \
+    "musician was" : ["musician at"], \
+    "named after" : ["name used by "], \
     "nephew of" : ["uncle of", "aunt of", "uncle or aunt of"], \
     "nephew or niece of" : ["uncle of", "aunt of", "uncle or aunt of"], \
     "niece of" : ["uncle of", "aunt of", "uncle or aunt of"], \
@@ -1216,11 +1626,18 @@ def relation_correspondence(relation, sex):
     "older brother or sister of" : ["younger brother of", "younger sister of", "younger brother or sister of"], \
     "older sister of" : ["younger brother of", "younger sister of", "younger brother or sister of"], \
     "opponent of" : ["opponent of"], \
+    "originally in" : ["original location of"], \
+    "originally part of" : ["originally incorporated in"], \
+    "owned by" : ["owner of"], \
     "owner of" : ["owned by"], \
+    "parent institution was" : ["child institution was"], \
     "paper maker at" : ["paper maker was"], \
+    "parish incorporated into" : ["incorporated parish was"], \
     "papers at" : ["papers kept here"], \
+    "part of" : ["part was"], \
     "partner of" : ["partner of"], \
     "partner at" : ["partner was"], \
+    "partner was" : ["partner at"], \
     "patron of" : ["patron was"], \
     "patron was" : ["patron of"], \
     "performed with" : ["performed with"], \
@@ -1242,11 +1659,13 @@ def relation_correspondence(relation, sex):
     "possibly grandson of" : ["possibly grandfather of", "possibly grandmother of", "possibly grandparent of"], \
     "possibly husband of" : ["possibly wife of"], \
     "possibly identified with" : ["possibly identified with"], \
+    "possibly in" : ["possibly location of"], \
     "possibly member of this family" : ["possibly family of"], \
     "possibly mother of" : ["possibly son of", "possibly daughter of", "possibly son or daughter of"], \
     "possibly nephew of" : ["possibly uncle of", "possibly aunt of", "possibly uncle or aunt of"], \
     "possibly nephew or niece of" : ["possibly uncle of", "possibly aunt of", "possibly uncle or aunt of"], \
     "possibly niece of" : ["possibly uncle of", "possibly aunt of", "possibly uncle or aunt of"], \
+    "possibly owned by" : ["possible owner of"], \
     "possibly related to" : ["possibly related to"], \
     "possibly sister of" : ["possibly brother of", "possibly sister of", "possibly brother of sister of"], \
     "possibly son of" : ["possibly father of", "possibly mother of", "possibly father or mother of"], \
@@ -1257,7 +1676,9 @@ def relation_correspondence(relation, sex):
     "predecessor of" : ["successor of"], \
     "prefect of" : ["prefect was"], \
     "president of" : ["president was"], \
+    "president was" : ["president of"], \
     "principal of" : ["principal was"], \
+    "printer was" : ["printer to"], \
     "prior of" : ["prior was"], \
     "prioress of" : ["prioress was"], \
     "prisoner at" : ["prisoner was"], \
@@ -1277,8 +1698,11 @@ def relation_correspondence(relation, sex):
     "romantic partner of" : ["romantic partner of"], \
     "romantic partner of (in youth)]" : ["romantic partner of"], \
     "second cousin of" : ["second cousin of"], \
+    "secondary seat was" : ["secondary seat of"], \
     "secretary was" : ["secretary of"], \
+    "sculptor was" : ["sculptor of"], \
     "senior teacher at" : ["senior teacher was"], \
+    "servers location" : ["location served by"], \
     "singer at" : ["singer was"], \
     "sister of" : ["brother of", "sister of", "brother or sister of"], \
     "sister-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-la of"], \
@@ -1294,6 +1718,7 @@ def relation_correspondence(relation, sex):
     "son-in-law of (his fourth marriage)" : ["father-in-law (fourth marriage)", "mother-in-law (fourth marriage)", "father- or mother-in-law (fourth marriage)"], \
     "son-in-law of (his second marriage)" : ["father-in-law (second marriage)", "mother-in-law (second marriage)", "father- or mother-in-law (second marriage)"], \
     "son-in-law of (his third marriage)" : ["father-in-law (third marriage)", "mother-in-law (third marriage)", "father- or mother-in-law (third marriage)"], \
+    "split from" : ["formerly part was"], \
     "spouse of" : ["spouse of"], \
     "step-brother of" : ["step-brother of", "step-sister of", "step-brother or step-sister of"], \
     "step-brother or step-sister of" : ["step-brother of", "step-sister of", "step-brother or step-sister of"], \
@@ -1329,6 +1754,8 @@ def relation_correspondence(relation, sex):
     "teacher of" : ["teacher was"], \
     "teacher in" : ["teacher here was"], \
     "teacher at" : ["teacher was"], \
+    "temporary name was" : ["temporary name of"], \
+    "temporarily in" : ["temporary locatin of"], \
     "to this family belonged" : ["family of"], \
     "trained at" : ["trainee was"], \
     "trained in" : ["place of training of"], \
@@ -1339,6 +1766,7 @@ def relation_correspondence(relation, sex):
     "twin sister of" : ["twin brother of", "twin sister of", "twin brother or twin sister of"], \
     "uncle of" : ["nephew of", "niece of", "nephew or niece of"], \
     "uncle or aunt of" : ["nephew of", "niece of", "nephew or niece of"], \
+    "used river" : ["river used for"], \
     "user of" : ["user was"], \
     "friend of (at university)" : ["friend of (at university)"], \
     "vasall of" : ["liege lord of"], \
@@ -1375,6 +1803,9 @@ def relation_correspondence(relation, sex):
                 corresponding_relation = corresponding_relation_list[2]
     else:
         corresponding_relation = "counterpart to " + relation
+        print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+        print("person_relations: corresponding relation")
+        print(corresponding_relation)
     return(corresponding_relation)
 
 

@@ -70,25 +70,38 @@ async def get_viaf_from_authority(url_list):
     viaf_urls_dict = dict(zip(url_list, results))          
     return viaf_urls_dict
 
-def add_relationship_in_far_record(person_found, person_new, connected_person_connection_type):
-# This module is used for the 'stitching' together of person records; it checks, if an already extant record ('far record') already has a connection with the new record. 
+def add_relationship_in_far_record(record_found, record_new, record_new_type, connected_person_connection_type):
+# This module is used for the 'stitching' together of records; it checks, if an already extant record ('far record') already has a connection with the new record. 
 # If so, it adds the ID of the new record to the connection; if no, it creates a new connection from scratch
-# It appears that it works also for organisations and places connected to persons. 
-    if person_found: # this is for making the reciprocal connection
-        far_record = person_found["connected_persons"]
-        if "sex" not in person_found: # this is to avoid error messages, since person_found can be also an organisation or a place
-            person_found["sex"] = ""
+# record_found is the record that will receive the reciprocal connection, record_new is the newly created record, record_new_type indicates, if the connection has to be inserted
+# under "connected_persons", "connected_organisations", or "connected_locations". 
+    expected_connection_type = ""
+    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    print("arrived in add_relationship_in_far_record")
+    print("record_found:")
+    print(record_found)
+    print("record_new:" )
+    print(record_new)
+    print("connected_person_connection_type: ")
+    print(connected_person_connection_type)
+    if record_found: # this is for making the reciprocal connection
+        far_record = record_found[record_new_type]
+        print("record_new_type")
+        print(record_new_type)
         connection_found = False
-        for far_person in far_record:
-            expected_connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"])
+        for far_entity in far_record:
+            expected_connection_type = person_relations.relation_correspondence(connected_person_connection_type, "")
+            print("expected_connection_type:")
+            print(expected_connection_type)
             # Sometimes, one and the same person appears twice, in different relations. If one relation had just been inserted, it should have the reciprocal connection type - hopefully
-            for far_external_id in far_person["external_id"]:
-                for external_id_number in range(len(person_new.external_id)):
-                    if far_external_id["uri"] == person_new.external_id[external_id_number].uri and far_person["connection_type"] == expected_connection_type:
+            for far_external_id in far_entity["external_id"]:
+                for external_id_number in range(len(record_new.external_id)):
+                    if far_external_id["uri"] == record_new.external_id[external_id_number].uri and far_entity["connection_type"] == expected_connection_type:
                         # This is step 2a: there is already a connection, to which the ID of the new record is added
     #                                print("found record for inserting reciprocal ID")
-                        far_person["id"] = person_new.id
-                        dbactions.add_connection_id(person_found["id"], far_person["name"], far_person["id"])
+                        far_entity["id"] = record_new.id
+
+                        dbactions.add_connection_id(record_found["id"], record_new_type, far_entity["name"], far_entity["id"])
                         connection_found = True
                         break
 #                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
@@ -96,16 +109,16 @@ def add_relationship_in_far_record(person_found, person_new, connected_person_co
             # This is step 2b: there is no reciprocal connection, it needs to be established
 #                        print("For person " + person_found["name_preferred"] + " no connection has been found")
             new_connection = Connected_entity()
-            new_connection.id = person_new.id
-            new_connection.external_id = person_new.external_id
-            new_connection.name = person_new.name_preferred # better use preview including year
+            new_connection.id = record_new.id
+            new_connection.external_id = record_new.external_id
+            new_connection.name = record_new.name_preferred # better use preview including year
             new_connection.connection_type = expected_connection_type
 #            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"]) 
             # I need a separate formular, without 'sex', for orgs and places
 #                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
-            dbactions.add_connection(person_found["id"], "connected_persons", new_connection)
+            dbactions.add_connection(record_found["id"], record_new_type, new_connection)
                     
-def person_relationship_parse(connected_entity_type, connection_comment, connection_type, person_new_sex):
+def relationship_parse(main_entity_type, connected_entity_type, connection_comment, connection_type, person_new_sex):
 # This module is a transmission for the terms that describe a relationship - it does some preliminary parsing and then calls a function in person_relations, that contains lists of the relevant translations
     connection_type_raw = ""
     if connection_comment:
@@ -118,13 +131,27 @@ def person_relationship_parse(connected_entity_type, connection_comment, connect
                 connection_comment = connection_comment_divided[2][:-1]
         else:
             connection_type_raw = connection_comment
-    if connected_entity_type == "person":
-        connection_type, connection_comment = person_relations.gnd_person_person_relation(connection_type_raw, person_new_sex, connection_type)
-    elif connected_entity_type == "organisation":
-        connection_type, connection_comment = person_relations.gnd_person_org_relation(connection_type_raw, person_new_sex, connection_type)
-    elif connected_entity_type == "location": 
-        connection_type, connection_comment = person_relations.gnd_person_place_relation(connection_type_raw, person_new_sex, connection_type)
-                  
+    if main_entity_type == "person":
+        if connected_entity_type == "person":
+            connection_type, connection_comment = person_relations.gnd_person_person_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "organisation":
+            connection_type, connection_comment = person_relations.gnd_person_org_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "location": 
+            connection_type, connection_comment = person_relations.gnd_person_place_relation(connection_type_raw, person_new_sex, connection_type)
+    elif main_entity_type == "organisation":
+        if connected_entity_type == "person":
+            connection_type, connection_comment = person_relations.gnd_org_person_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "organisation":
+            connection_type, connection_comment = person_relations.gnd_org_org_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "location": 
+            connection_type, connection_comment = person_relations.gnd_org_place_relation(connection_type_raw, person_new_sex, connection_type)
+    elif main_entity_type == "location":
+        if connected_entity_type == "person":
+            connection_type, connection_comment = person_relations.gnd_place_person_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "organisation":
+            connection_type, connection_comment = person_relations.gnd_place_org_relation(connection_type_raw, person_new_sex, connection_type)
+        elif connected_entity_type == "location": 
+            connection_type, connection_comment = person_relations.gnd_place_place_relation(connection_type_raw, person_new_sex, connection_type)
     return(connection_comment, connection_type)
 
 
@@ -263,7 +290,7 @@ async def metadata_dissection(metadata):
                             break
                     else: 
     #                        print("New Organisation is not a duplicate")
-                            org.internal_id = org_ingest(org)
+                            org.internal_id = await org_ingest(org)
                             org_against_duplication.preview = org.potential_candidates[org.chosen_candidate].preview
                             org_against_duplication.id = org.internal_id
                             org_against_duplication.org_type1 = role_org_type_correspondence[org.role]
@@ -329,7 +356,7 @@ async def metadata_dissection(metadata):
                 
                     else: 
                             print("New Place is not a duplicate")
-                            place.internal_id = place_ingest(place)
+                            place.internal_id = await place_ingest(place)
                             place_against_duplication.preview = place.potential_candidates[place.chosen_candidate].preview
                             place_against_duplication.id = place.internal_id
                             place_against_duplication.place_type1 = ["Town - historical"]
@@ -366,7 +393,7 @@ async def metadata_dissection(metadata):
                 dbactions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
         else: 
             print("new repository")
-            org.potential_candidates[org.chosen_candidate].internal_id = org_ingest(org)
+            org.potential_candidates[org.chosen_candidate].internal_id = await org_ingest(org)
 
 
 
@@ -491,7 +518,7 @@ async def person_ingest(person):
     person_new.type = "Person"
     person_new.person_type1.append(role_person_type_correspondence[person.role])
     person_new.external_id = person_selected.external_id
-    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time
+    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time        
     new_record_gnd_id = person_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
     list_of_ids_to_check.append(person_new.external_id[0].uri) # The VIAF IDs added from this list will later be added to the record
     person_new.name_preferred = person_selected.name_preferred
@@ -525,13 +552,13 @@ async def person_ingest(person):
 
         # This is step 1 of the stitching process
         for connected_person in person_selected.connected_persons:
-            connected_person.connection_comment, connected_person.connection_type = person_relationship_parse("person", connected_person.connection_comment, connected_person.connection_type, person_new.sex)
+            connected_person.connection_comment, connected_person.connection_type = relationship_parse("person", "person", connected_person.connection_comment, connected_person.connection_type, person_new.sex)
             for external_id in connected_person.external_id:
                 person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
                 if person_found:
                     connected_person.id = person_found["id"]
                     connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
-                    add_relationship_in_far_record(person_found, person_new, connected_person.connection_type) # This is step 2, the reciprocal connection
+                    add_relationship_in_far_record(person_found, person_new, "connected_persons", connected_person.connection_type) # This is step 2, the reciprocal connection
                     break # if a connection with one ID is found, the other connections would be the same. 
 
             if not person_found and connected_person.external_id:
@@ -539,26 +566,26 @@ async def person_ingest(person):
                     # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
     if person_selected.connected_organisations:    
         for connected_org in person_selected.connected_organisations:
-            connected_org.connection_comment, connected_org.connection_type = person_relationship_parse("organisation", connected_org.connection_comment, connected_org.connection_type, person_new.sex)
+            connected_org.connection_comment, connected_org.connection_type = relationship_parse("person", "organisation", connected_org.connection_comment, connected_org.connection_type, person_new.sex)
             for external_id in connected_org.external_id:
                 org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
                 if org_found:
                     connected_org.id = org_found["id"]
                     connected_org.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
-                    add_relationship_in_far_record(org_found, person_new, connected_person.connection_type) # This is step 2, the reciprocal connection
+                    add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type) # This is step 2, the reciprocal connection
                     break # if a connection with one ID is found, the other connections would be the same. 
 #           The following two lines are commented out until VIAF can deal with GND organisations
 #            if not org_found and connected_org.external_id:
 #                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
     if person_selected.connected_locations:
         for connected_location in person_selected.connected_locations:
-            connected_location.connection_comment, connected_location.connection_type = person_relationship_parse("location", connected_location.connection_comment, connected_location.connection_type, person_new.sex)                    
+            connected_location.connection_comment, connected_location.connection_type = relationship_parse("person", "location", connected_location.connection_comment, connected_location.connection_type, person_new.sex)                    
             for external_id in connected_location.external_id:
                 location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
                 if location_found:
                     connected_location.id = location_found["id"]
                     connected_location.name = location_found["name_preferred"]
-                    add_relationship_in_far_record(location_found, person_new, connected_location.connection_type) # This is step 2, the reciprocal connection
+                    add_relationship_in_far_record(location_found, person_new, "connected_persons", connected_location.connection_type) # This is step 2, the reciprocal connection
                     break # if a connection with one ID is found, the other connections would be the same. 
 #           The following two lines are commented out until VIAF can deal with GND locations
 #            if not location_found and connected_location.external_id:
@@ -590,17 +617,16 @@ async def person_ingest(person):
 
     if person_selected.connected_persons:
         for connected_person in person_selected.connected_persons:                
-#            connected_person.connection_comment, connected_person.connection_type = person_relationship_parse("person", connected_person.connection_comment, connected_person.connection_type, person_new.sex)
             if not connected_person.id and connected_person.external_id: # If there is already an id, no 'stitching' is required                               
                 for external_id in connected_person.external_id:
-                    if external_id.id != "DNB": # If it is, the connection has been made earlier
+                    if external_id.name != "DNB": # If it is, the connection has been made earlier
                     # This is 'stitching' step 1 for the records that can only be connected through VIAF
                         person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
                     if person_found:
                         connected_person.id = person_found["id"]
                         connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
                          # if a connection with one ID is found, the other connections would be the same. 
-                        add_relationship_in_far_record(person_found, person_new, connected_person.connection_type) # This is step 2, the reciprocal connection
+                        add_relationship_in_far_record(person_found, person_new, "connected_persons", connected_person.connection_type) # This is step 2, the reciprocal connection
                         break
             
 
@@ -697,31 +723,36 @@ async def person_ingest(person):
             far_connection_type = ""
             for far_connected_person in far_record_connected_persons:              
                 for far_external_id in far_connected_person["external_id"]:
-                    if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id:
+                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
                         far_connection_type = far_connected_person["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record_id, far_connected_person["name"], person_new.name_preferred, person_new.id) 
-                new_connection = Connected_entity()
-                new_connection.id = far_record_id
-                new_connection.name = far_record["name_preferred"]
-                new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
-    #            new_connection.connection_type = "counterpart to " + far_connection_type
-                if far_record["type"] == "Person": 
-                    person_new.connected_persons.append(new_connection)
-                if far_record["type"] == "Organisation": 
-                    person_new.connected_organisations.append(new_connection)
-                if far_record["type"] == "Place": 
-                    person_new.connected_locations.append(new_connection)
-          
+                        dbactions.add_connection_id_and_name(far_record_id, "connected persons", far_connection_type, far_connected_person["name"], person_new.name_preferred, person_new.id) 
+                        new_connection = Connected_entity()
+                        new_connection.id = far_record_id
+                        new_connection.name = far_record["name_preferred"]
+                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
+            #            new_connection.connection_type = "counterpart to " + far_connection_type
+                        if far_record["type"] == "Person": 
+                            person_new.connected_persons.append(new_connection)
+                        if far_record["type"] == "Organisation": 
+                            person_new.connected_organisations.append(new_connection)
+                        if far_record["type"] == "Place": 
+                            person_new.connected_locations.append(new_connection)
+                
     dbactions.insertRecordPerson(person_new)
     return person_new.id
 
 
 
 
-def org_ingest(org):
+async def org_ingest(org):
     # This function is about translating the imported information of a organisation into the information record used for the database. 
     # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
+    list_of_ids_to_check = []
+    new_record_viaf_id = ""
+    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time
+    # Maybe I should adapt this for the dates connected with orgs. 
     org_selected = org.potential_candidates[org.chosen_candidate]               
+    new_record_gnd_id = org_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
     org_new = Organisation_db()
     org_new.id = generate()
     org_new.type = "Organisation"
@@ -746,91 +777,200 @@ def org_ingest(org):
             # If there is the general abbreviation plus a common word in the comments field, I use an English translation of the concrete relationship)
             # If there is the general abbreviation plus a word in the comments field that is not common (or simply has escaped me), the relationship will be a general English phrase plus the original German comment
         for connected_person in org_selected.connected_persons: 
-            match connected_person.connection_type: 
-                case "rela":
-#                    print(connected_person.connection_comment)
-                    if connected_person.connection_comment == "Eigentümer" or connected_person.connection_comment == "Eigentümer":
-                        # The word "Eigentümer" is given here twice in two different encodings - oddly, that seems to help. 
-                        connected_person.connection_type = "Owner"
-                    else:
-                        if connected_person.connection_comment:
-                            connected_person.connection_type = "connected (" + connected_person.connection_comment + ")"  
-                        else: 
-                            connected_person.connection_type = "connected"
-                case "saml":
-                    connected_person.connection_type = "Collector"
-                case _:            
-                    if connected_person.connection_comment:
-                        connected_person.connection_type = "connected (" + connected_person.connection_type + "; " + connected_person.connection_comment + ")"
-                    else:
-                        connected_person.connection_type = "connected (" + connected_person.connection_type +  ")"             
+            connected_person.connection_comment, connected_person.connection_type = relationship_parse("organisation", "person", connected_person.connection_comment, connected_person.connection_type, "")
+            for external_id in connected_person.external_id:
+                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+                if person_found:
+                    connected_person.id = person_found["id"]
+                    connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                    add_relationship_in_far_record(person_found, org_new, "connected_organisations", connected_person.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+
+            if not person_found and connected_person.external_id:
+                    list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+                    # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
+    if org_selected.connected_organisations:    
+        for connected_org in org_selected.connected_organisations:
+            connected_org.connection_comment, connected_org.connection_type = relationship_parse("organisation", "organisation", connected_org.connection_comment, connected_org.connection_type, "")
+            for external_id in connected_org.external_id:
+                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+                if org_found:
+                    connected_org.id = org_found["id"]
+                    connected_org.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                    add_relationship_in_far_record(org_found, org_new, "connected_organisations", connected_org.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+#           The following two lines are commented out until VIAF can deal with GND organisations
+#            if not org_found and connected_org.external_id:
+#                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+    if org_selected.connected_locations:
+        for connected_location in org_selected.connected_locations:
+            connected_location.connection_comment, connected_location.connection_type = relationship_parse("organisation", "location", connected_location.connection_comment, connected_location.connection_type, "")                    
+            for external_id in connected_location.external_id:
+                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+                if location_found:
+                    connected_location.id = location_found["id"]
+                    connected_location.name = location_found["name_preferred"]
+                    add_relationship_in_far_record(location_found, org_new, "connected_organisations", connected_location.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+#           The following two lines are commented out until VIAF can deal with GND locations
+#            if not location_found and connected_location.external_id:
+#                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+    # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF. 
+
+    list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
+#    print(list_of_viaf_ids)
+
+# The following has to be commented out until I can process organisation VIAF IDs
+    """
+    org_viaf_url = list_of_viaf_ids[org_new.external_id[0].uri]
+    id = External_id()
+    id.name = "viaf"
+    id.uri = org_viaf_url
+    id.id = org_viaf_url[21:]
+    new_record_viaf_id = id.id # I need this later
+    org_new.external_id.append(id)
+    # this has to be expanded for organisations and locations, once this is possible
+    # then, to the record of the connected person
+    """
+    for connected_person in org_selected.connected_persons:
+        if connected_person.external_id:
+            if connected_person.external_id[0].uri in list_of_viaf_ids:
+                person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
+                id = External_id()
+                id.name = "viaf"
+                id.uri = person_viaf_url
+                id.id = person_viaf_url[21:]
+                connected_person.external_id.append(id)    
+
+# Similar features have to be added for connected organisations and places, once this is possible. 
+
+    if org_selected.connected_persons:
+        for connected_person in org_selected.connected_persons:                
+            if not connected_person.id and connected_person.external_id: # If there is already an id, no 'stitching' is required                               
+                for external_id in connected_person.external_id:
+                    if external_id.id != "DNB": # If it is, the connection has been made earlier
+                    # This is 'stitching' step 1 for the records that can only be connected through VIAF
+                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+                    if person_found:
+                        connected_person.id = person_found["id"]
+                        connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                         # if a connection with one ID is found, the other connections would be the same. 
+                        add_relationship_in_far_record(person_found, org_new, "connected_organisations", connected_person.connection_type) # This is step 2, the reciprocal connection
+                        break
+
+# Similar features have to be added for connected organisations and places, once this is possible.             
+
             new_connected_person = Connected_entity()
-            new_connected_person.external_id = connected_person.external_id
+            new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
+            new_connected_person.external_id = connected_person.external_id
+            if connected_person.name == "": # if there is no preview, i.e. no connection found
+                new_connected_person.name = connected_person.name
             new_connected_person.connection_type = connected_person.connection_type
             new_connected_person.connection_time = connected_person.connection_time 
+            new_connected_person.connection_comment = connected_person.connection_comment
             # In theory, one should also replace this time string through a proper date object However, since I don't assume that anything will ever be made with 
             # this information apart from displaying it, this is unnecessary or at least not urgent. 
             org_new.connected_persons.append(new_connected_person)
+
     if org_selected.connected_organisations:
-            # There are three constellations: precursors, successors, and parent organisations (there are apparently no links to child organisations)
         for connected_organisation in org_selected.connected_organisations:
-            match connected_organisation.connection_type:
-                case "vorg":          
-                    if connected_organisation.connection_comment:
-                        connected_organisation.connection_type = "precursor (" + connected_organisation.connection_comment + ")"
-                    else: 
-                        connected_organisation.connection_type = "precursor"
-                case "nach":          
-                    if connected_organisation.connection_comment:
-                        connected_organisation.connection_type = "successor (" + connected_organisation.connection_comment + ")"
-                    else: 
-                        connected_organisation.connection_type = "successor"
-                case "adue":          
-                    if connected_organisation.connection_comment:
-                        connected_organisation.connection_type = "parent organisation (" + connected_organisation.connection_comment + ")"
-                    else: 
-                        connected_organisation.connection_type = "parent organisation"
-                case _: #not sure if this will ever happen
-                    if connected_organisation.connection_comment:
-                        connected_organisation.connection_type = "connected (" + connected_organisation.connection_type + "; " + connected_organisation.connection_comment + ")"
-                    else:
-                        connected_organisation.connection_type = "connected (" + connected_organisation.connection_type +  ")"
+            print("now processing connected organisation " + connected_organisation.name)
             new_connected_organisation = Connected_entity()
+            new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
             new_connected_organisation.connection_type = connected_organisation.connection_type
             new_connected_organisation.connection_time = connected_organisation.connection_time
             # For connection time see above under new connected person
             org_new.connected_organisations.append(new_connected_organisation)
+
     if org_selected.connected_locations:
         for connected_location in org_selected.connected_locations:
-            # For locations, there are two standard relationships, 'orta' for the seat of an organisation, and 'geow' for the area of its responsibility         
-            match connected_location.connection_type:
-                case "orta":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "Seat + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "Seat"
-                case "geow":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "Area of responsibility + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "Area of responsibility"
-                case _:
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "connected location + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "connected (details to be determined)"
+            # in not few cases, dates are written not into the date field but into the comment field of the connection, or they follow the descriptions "Wohnort" or "Wirkungsort"
+            if re.match(connected_location_comment_is_date, connected_location.connection_comment): # This means that the 'comment' field contains information that should have gone into the 'time' field.
+                if connected_location.connection_time:
+                    connected_location.connection_time = connected_location.connection_time + ", " + connected_location.connection_comment
+                else:
+                    connected_location.connection_time = connected_location.connection_comment
+                connected_location.connection_comment = ""
+            elif connected_location.connection_comment[0:12] == "Wirkungsort ":
+                connected_location.connection_time = connected_location.connection_comment[12:]
+                connected_location.connection_comment = "wirkungsort"
+            elif connected_location.connection_comment[0:8] == "Wohnort ":
+                connected_location.connection_time = connected_location.connection_comment[8:]
+                connected_location.connection_comment = "wohnort"
 
             new_connected_location = Connected_entity()
+            new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
             new_connected_location.connection_type = connected_location.connection_type
             new_connected_location.connection_time = connected_location.connection_time
+            new_connected_location.connection_comment = connected_location.connection_comment
             # For connection time see above under new connected person (only relevant for location of activity)
             org_new.connected_locations.append(new_connected_location)
     org_new.comments = org_selected.comments
+    # Here comes step 3 of the stitching process: checking if there is any record in Iconobase that has a reference to the new record (only relevant if the new record has no reference to that record)
+    # I must define what external_id is! 
+    #person_found = list(coll.find({"connected_persons.external_id.name": "viaf", "connected_persons.external_id.id": new_record_viaf_id.id}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1}))
+
+#   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
+#    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+# record with sex
+    list_found = list(coll.find({ "$or": [{"connected_organisations.external_id.name" : "viaf", "connected_organisations.external_id.id" : new_record_viaf_id}, {"connected_organisations.external_id.name" : "GND", "connected_organisations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_organisations" : 1}))
+    print("far records found: ")
+    print(list_found)
+
+    for far_record in list_found:
+        far_record_id = far_record["id"]
+        if far_record["type"] == "Person":
+            for connected_person in org_new.connected_persons:
+                connection_already_made = False
+                if connected_person.id == far_record_id:
+                    connection_already_made = True
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        elif far_record["type"] == "Organisation": 
+            for connected_org in org_new.connected_organisations:
+                connection_already_made = False
+                if connected_org.id == far_record_id:
+                    connection_already_made = True
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        elif far_record["type"] == "Place":
+            for connected_location in org_new.connected_locations:
+                connection_already_made = False
+                if connected_location.id == far_record_id:
+                    connection_already_made = True
+                    print("connection in location found")
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        
+        if connection_already_made == False: # i.e., one has to create a connection
+            # first getting the data from the 'far record'
+            far_record_connected_orgs = far_record["connected_organisations"]
+            far_connection_type = ""
+            for far_connected_org in far_record_connected_orgs:              
+                for far_external_id in far_connected_org["external_id"]:
+                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
+                        far_connection_type = far_connected_org["connection_type"]
+                        dbactions.add_connection_id_and_name(far_record_id, "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id) 
+                        new_connection = Connected_entity()
+                        new_connection.id = far_record_id
+                        new_connection.name = far_record["name_preferred"]
+                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
+            #            new_connection.connection_type = "counterpart to " + far_connection_type
+                        if far_record["type"] == "Person": 
+                            org_new.connected_persons.append(new_connection)
+                        if far_record["type"] == "Organisation": 
+                            org_new.connected_organisations.append(new_connection)
+                        if far_record["type"] == "Place": 
+                            org_new.connected_locations.append(new_connection)
+                
+
+
+
     done = dbactions.insertRecordOrganisation(org_new)
 
     return org_new.id
@@ -838,14 +978,23 @@ def org_ingest(org):
 
 
 
-def place_ingest(place):
+async def place_ingest(place):
+    list_of_ids_to_check = []
+    new_record_viaf_id = ""
+    new_record_gnd_id = ""
+    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time
+    # Maybe I should adapt this for the dates connected with places. 
     # This function is about translating the imported information of a place into the place record used for the database. 
     # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
     print("place_ingest, start, number of potential candidates:")
     print(len(place.potential_candidates))
     print("place_ingest, start, number of chosen candidate")
     print(place.chosen_candidate)
-    place_selected = place.potential_candidates[place.chosen_candidate]               
+    place_selected = place.potential_candidates[place.chosen_candidate]             
+    if len(place_selected.external_id) > 1:
+        new_record_gnd_id = place_selected.external_id[1].id # I need this only as long as I cannot get VIAF to work for organisations. Normally, the GND ID is listed second. 
+    else:
+        new_record_gnd_id = place_selected.external_id[0].id
     place_new = Place_db()
     place_new.id = generate()
     place_new.type = "Place"
@@ -858,37 +1007,105 @@ def place_ingest(place):
         place_new.name_variant.append(place.name)
     place_new.dates_from_source = place_selected.dates_from_source # A lot of works needs to be done here. 
     if place_selected.connected_persons:
-        # The GND has very few standardised abbreviations for relationships, largely 'bezf' (family relationship), 'bezb' (professional relationship) and 'beza' (anything else)
-        # Sometimes, the concrete type of relationship is given in a comment field, but it is not standardised. 
-        # Hence, the only thing I can come up with is the following: 
-            # If there is only the general abbreviation, I replace it with a general English phrase
-            # If there is the general abbreviation plus a common word in the comments field, I use an English translation of the concrete relationship)
-            # If there is the general abbreviation plus a word in the comments field that is not common (or simply has escaped me), the relationship will be a general English phrase plus the original German comment
-        for connected_person in place_selected.connected_persons: 
-            match connected_person.connection_type: # I keep the match structure here in case that there is a constellation where I need it, but I doubt htat it will ever happen
-                case _:            
-                    if connected_person.connection_comment:
-                        connected_person.connection_type = "connected (" + connected_person.connection_type + "; " + connected_person.connection_comment + ")"
-                    else:
-                        connected_person.connection_type = "connected (" + connected_person.connection_type +  ")"             
+        # This is step 1 of the stitching process
+        for connected_place in place_selected.connected_persons:
+            connected_place.connection_comment, connected_person.connection_type = relationship_parse("location", "person", connected_person.connection_comment, connected_person.connection_type, "")
+            for external_id in connected_person.external_id:
+                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+                if person_found:
+                    connected_person.id = person_found["id"]
+                    connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                    add_relationship_in_far_record(person_found, place_new, "connected_locations", connected_person.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+            if not person_found and connected_person.external_id:
+                    list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+                    # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
+    if place_selected.connected_organisations:    
+        for connected_org in place_selected.connected_organisations:
+            connected_org.connection_comment, connected_org.connection_type = relationship_parse("location", "organisation", connected_org.connection_comment, connected_org.connection_type, "")
+            for external_id in connected_org.external_id:
+                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+                if org_found:
+                    connected_org.id = org_found["id"]
+                    connected_org.name = org_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                    add_relationship_in_far_record(org_found, place_new, "connected_locations", connected_org.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+#           The following two lines are commented out until VIAF can deal with GND organisations
+#            if not org_found and connected_org.external_id:
+#                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+    if place_selected.connected_locations:
+        for connected_location in place_selected.connected_locations:
+            connected_location.connection_comment, connected_location.connection_type = relationship_parse("location", "location", connected_location.connection_comment, connected_location.connection_type, "")                    
+            for external_id in connected_location.external_id:
+                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+                if location_found:
+                    connected_location.id = location_found["id"]
+                    connected_location.name = location_found["name_preferred"]
+                    add_relationship_in_far_record(location_found, place_new, "connected_locations", connected_location.connection_type) # This is step 2, the reciprocal connection
+                    break # if a connection with one ID is found, the other connections would be the same. 
+#           The following two lines are commented out until VIAF can deal with GND locations
+#            if not location_found and connected_location.external_id:
+#                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+    # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF. 
+    list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
+#    print(list_of_viaf_ids)
+    # The following has to be commented out until I can process organisation VIAF IDs
+    """
+
+    location_viaf_url = list_of_viaf_ids[person_new.external_id[0].uri]
+    id = External_id()
+    id.name = "viaf"
+    id.uri = location_viaf_url
+    id.id = location_viaf_url[21:]#####
+    new_record_viaf_id = id.id # I need this later
+    place_new.external_id.append(id)
+    # this has to be expanded for organisations and locations, once this is possible
+    # then, to the record of the connected person
+    """
+    for connected_person in place_selected.connected_persons:
+        if connected_person.external_id:
+            if connected_person.external_id[0].uri in list_of_viaf_ids:
+                person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
+                id = External_id()
+                id.name = "viaf"
+                id.uri = person_viaf_url
+                id.id = person_viaf_url[21:]
+                connected_place.external_id.append(id)    
+    # Similar features have to be added for connected organisations and places, once this is possible. 
+
+
+    if place_selected.connected_persons:
+        for connected_person in place_selected.connected_persons:                
+            if not connected_person.id and connected_person.external_id: # If there is already an id, no 'stitching' is required                               
+                for external_id in connected_person.external_id:
+                    if external_id.name != "DNB": # If it is, the connection has been made earlier
+                    # This is 'stitching' step 1 for the records that can only be connected through VIAF
+                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+                    if person_found:
+                        connected_person.id = person_found["id"]
+                        connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                         # if a connection with one ID is found, the other connections would be the same. 
+                        add_relationship_in_far_record(person_found, place_new, "connected_persons", connected_person.connection_type) # This is step 2, the reciprocal connection
+                        break
+            
+
             new_connected_person = Connected_entity()
-            new_connected_person.external_id = connected_person.external_id
+            new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
+            new_connected_person.external_id = connected_person.external_id
+            if connected_person.name == "": # if there is no preview, i.e. no connection found
+                new_connected_person.name = connected_person.name
             new_connected_person.connection_type = connected_person.connection_type
             new_connected_person.connection_time = connected_person.connection_time 
+            new_connected_person.connection_comment = connected_person.connection_comment
             # In theory, one should also replace this time string through a proper date object However, since I don't assume that anything will ever be made with 
-            # this information apart from displaying it, this is unnecessary or at least not urgent. 
-        place_new.connected_persons.append(new_connected_person)
+            # this information apart from displaying it, this is unnecessary or at least not urgent.         place_new.connected_persons.append(new_connected_person)
     if place_selected.connected_organisations:
-            # I am not sure if this will ever be needed, so I have here the minimum requirements, just in case
         for connected_organisation in place_selected.connected_organisations:
-            match connected_organisation.connection_type:
-                case _: 
-                    if connected_organisation.connection_comment:
-                        connected_organisation.connection_type = "connected (" + connected_organisation.connection_type + "; " + connected_organisation.connection_comment + ")"
-                    else:
-                        connected_organisation.connection_type = "connected (" + connected_organisation.connection_type +  ")"
+            print("now processing connected organisation " + connected_organisation.name)
             new_connected_organisation = Connected_entity()
+            new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
             new_connected_organisation.connection_type = connected_organisation.connection_type
@@ -897,53 +1114,113 @@ def place_ingest(place):
             place_new.connected_organisations.append(new_connected_organisation)
     if place_selected.connected_locations:
         for connected_location in place_selected.connected_locations:
-            # For locations, there are two standard relationships, 'orta' for the seat of an organisation, and 'geow' for the area of its responsibility         
-            match connected_location.connection_type:
-                case "vorg":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "formerly called + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "formerly called"
-                case "nach":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "later called + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "later called"
-                case "nazw":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "temporarily called + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "temporarily called"
-                case "obpa":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "parent location + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "parent location"
-                case "orta":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "Seat + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "Seat"
-                case "geow":
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "Area of responsibility + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "Area of responsibility"
-                case _:
-                    if connected_location.connection_comment:
-                        connected_location.connection_type = "connected location + (" + connected_location.connection_comment + ")"
-                    else: 
-                        connected_location.connection_type = "connected (details to be determined)"
+            # in not few cases, dates are written not into the date field but into the comment field of the connection, or they follow the descriptions "Wohnort" or "Wirkungsort"
+            if re.match(connected_location_comment_is_date, connected_location.connection_comment): # This means that the 'comment' field contains information that should have gone into the 'time' field.
+                if connected_location.connection_time:
+                    connected_location.connection_time = connected_location.connection_time + ", " + connected_location.connection_comment
+                else:
+                    connected_location.connection_time = connected_location.connection_comment
+                connected_location.connection_comment = ""
+            elif connected_location.connection_comment[0:12] == "Wirkungsort ":
+                connected_location.connection_time = connected_location.connection_comment[12:]
+                connected_location.connection_comment = "wirkungsort"
+            elif connected_location.connection_comment[0:8] == "Wohnort ":
+                connected_location.connection_time = connected_location.connection_comment[8:]
+                connected_location.connection_comment = "wohnort"
 
             new_connected_location = Connected_entity()
+            new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
             new_connected_location.connection_type = connected_location.connection_type
             new_connected_location.connection_time = connected_location.connection_time
+            new_connected_location.connection_comment = connected_location.connection_comment
             # For connection time see above under new connected person (only relevant for location of activity)
             place_new.connected_locations.append(new_connected_location)
     place_new.comments = place_selected.comments
     place_new.coordinates = place_selected.coordinates # I leave them now as they are, but perhaps I should remove duplicates
+        # Here comes step 3 of the stitching process: checking if there is any record in Iconobase that has a reference to the new record (only relevant if the new record has no reference to that record)
+    # I must define what external_id is! 
+    #person_found = list(coll.find({"connected_persons.external_id.name": "viaf", "connected_persons.external_id.id": new_record_viaf_id.id}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1}))
+
+#   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
+#    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+# record with sex
+    list_found = list(coll.find({ "$or": [{"connected_locations.external_id.name" : "viaf", "connected_locations.external_id.id" : new_record_viaf_id}, {"connected_locations.external_id.name" : "GND", "connected_locations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_locations" : 1}))
+    print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+    print("new_record_viaf_id: ")
+    print(new_record_viaf_id)
+    print("new_record_gnd_id: ")
+    print(new_record_gnd_id)
+    print("far records found: ")
+    print(list_found)
+
+    for far_record in list_found:
+        far_record_id = far_record["id"]
+        connection_already_made = False
+        if far_record["type"] == "Person":
+            for connected_person in place_new.connected_persons:
+                connection_already_made = False
+                print("checking record of person with a connection to this place")
+                print("connected_person.id: ")
+                print(connected_person.id)
+                print("far_record_id:")
+                print(far_record_id)
+                if connected_person.id == far_record_id:
+                    connection_already_made = True
+                    # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+                print(connection_already_made)
+        elif far_record["type"] == "Organisation": 
+            for connected_org in place_new.connected_organisations:
+                connection_already_made = False
+                if connected_org.id == far_record_id:
+                    connection_already_made = True
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        elif far_record["type"] == "Place":
+            for connected_location in place_new.connected_locations:
+                connection_already_made = False
+                if connected_location.id == far_record_id:
+                    connection_already_made = True
+                    print("connection in location found")
+                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
+                    break
+        
+        print("summary of comparison: ")
+        print(connection_already_made)
+        if connection_already_made == False: # i.e., one has to create a connection
+            # first getting the data from the 'far record'
+            far_record_connected_places = far_record["connected_locations"]
+            far_connection_type = ""
+            for far_connected_place in far_record_connected_places:       
+                print("far_connected_place")       
+                print(far_connected_place)
+                for far_external_id in far_connected_place["external_id"]:
+                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
+                        far_connection_type = far_connected_place["connection_type"]
+                        print("establishing a new connection")
+
+                        dbactions.add_connection_id_and_name(far_record_id, "connected_locations", far_connection_type, far_connected_place["name"], place_new.name_preferred, place_new.id) 
+                        new_connection = Connected_entity()
+                        new_connection.id = far_record_id
+                        new_connection.name = far_record["name_preferred"]
+                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
+                        print("establishing new connection: ")
+                        print("far_connection_type: ")
+                        print(far_connection_type)
+                        print("connection_type for insertion: ")
+                        print(new_connection.connection_type)
+                        print("new connection added to place record: ")
+                        print(new_connection)
+            #            new_connection.connection_type = "counterpart to " + far_connection_type
+                        if far_record["type"] == "Person": 
+                            place_new.connected_persons.append(new_connection)
+                        if far_record["type"] == "Organisation": 
+                            place_new.connected_organisations.append(new_connection)
+                        if far_record["type"] == "Place": 
+                            place_new.connected_locations.append(new_connection)
+    
     done = dbactions.insertRecordPlace(place_new)
 
     return place_new.id
