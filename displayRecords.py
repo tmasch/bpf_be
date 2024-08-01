@@ -18,7 +18,7 @@ def getBookRecord(id):
             id = organisation["id"]
             organisation_record = collection.find_one({"id" : id}, {"name_preferred" : 1})
             organisation["preview"] = organisation_record["name_preferred"]
-    if result["persons"]:
+    if result["places"]:
         for place in result["places"]:
             id = place["id"]
             place_record = collection.find_one({"id" : id}, {"name_preferred" : 1})

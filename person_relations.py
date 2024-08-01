@@ -499,7 +499,7 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
             relation_new = "related to" 
         elif relation_type == "bezb":
             relation_new = "professional relation to" 
-        elif relation_type == "beza": 
+        elif relation_type == "beza" or relation_type == "rela": 
             relation_new = "other relationship to"
     return(relation_new, relation_comments)
 
@@ -720,7 +720,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
     else:
         relation_comment = relation_original
         if relation_type == "affi":
-            relation_new = "belonged to"
+            relation_new = "affiliated to"
         elif relation_type == "grue":
             relation_new = "founded by"
         elif relation_type == "korr": 
@@ -1044,6 +1044,11 @@ def gnd_org_org_relation(relation_original, sex, relation_type):
     relation = ""
     relation_new = ""
     relation_comment = ""
+    print("ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß")
+    print("determining an org > org relation")
+    print("original relation: ")
+    print(relation_original)
+    print(relation_type)
     if relation_original:
         for old, new in encoding_list.items():
             relation_original = relation_original.replace(old, new)    
@@ -1058,7 +1063,7 @@ def gnd_org_org_relation(relation_original, sex, relation_type):
         relation_new = gnd_org_org_relations[relation][0]
     else:
         relation_comment = relation
-        match relation:
+        match relation_type:
             case "adue":
                 relation_new = "part of"
             case "affi":
@@ -1093,7 +1098,10 @@ def gnd_org_org_relation(relation_original, sex, relation_type):
             case "vbal":
                 relation_new = "related to"
             case "vorg":
-                relation_new = "successor to"         
+                relation_new = "successor to" 
+    print("created new connection for org > org: ")
+    print(relation_new)
+    print(relation_comment)        
     return (relation_new, relation_comment)
 
 def gnd_org_place_relation(relation_original, sex, relation_type):
@@ -1149,7 +1157,8 @@ def gnd_org_place_relation(relation_original, sex, relation_type):
                 relation_new = "is about"
             case "vorg":
                 relation_new = "successor of"
-        return(relation_new, relation_comment)
+        
+    return(relation_new, relation_comment)
 
 
 def gnd_place_person_relation(relation_original, sex, relation_type):
@@ -1460,6 +1469,7 @@ def relation_correspondence(relation, sex):
     "fiancé of" : ["fiancée of"], \
     "fiancée of" : ["fiancé of"], \
     "former husband of" : ["former wife of"], \
+    "former owner of" : ["formerly owned by"], \
     "former wife of" : ["former husband of"], \
     "formerly" : ["later"], \
     "formerly in" : ["former location of"], \
@@ -1702,7 +1712,7 @@ def relation_correspondence(relation, sex):
     "secretary was" : ["secretary of"], \
     "sculptor was" : ["sculptor of"], \
     "senior teacher at" : ["senior teacher was"], \
-    "servers location" : ["location served by"], \
+    "serves location" : ["location served by"], \
     "singer at" : ["singer was"], \
     "sister of" : ["brother of", "sister of", "brother or sister of"], \
     "sister-in-law of" : ["brother-in-law of", "sister-in-law of", "brother- or sister-in-la of"], \

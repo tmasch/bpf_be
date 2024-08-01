@@ -6,9 +6,27 @@ import re
 import dbactions
 from dates_parsing import date_overall_parsing
 from dates_parsing import artist_date_parsing
+from dates_parsing import entered_date
 import asyncio
 import aiohttp
 import ast
+class InvalidDateException(Exception):
+    pass
+
+class InvalidMonthException(Exception):
+    pass
+
+class InvalidDayException(Exception):
+    pass
+
+class InvalidDateStringException(Exception):
+    pass
+
+class InvalidDateRangeException(Exception):
+    pass
+
+
+
 
 #from dbactions import *
 url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC", "Ä" : "%C3%84", "Ö" : "%C3%96", "Ü": "%C3%9C", \
@@ -24,7 +42,7 @@ role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Pri
 role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical", "uvp" : "Town - historical", "Place of Making" : "Town - historical"}
 #There is a problem - "Place of Making" could also go with "Region - historical" - I ignore that for the moment. 
 from pymongo import MongoClient
-
+encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"}
 
 
 #This is only for stand-alone execution of functions in this module, in other cases, a connection to the database has already been made. 
@@ -68,6 +86,8 @@ async def person_identification(person):
     else:
 
         person.name = person.name.strip()
+        for old, new in encoding_list.items():
+            person.name = person.name.replace(old, new)
         candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
         for candidate_result in candidates_result:
             candidate = Person_import()   
@@ -140,6 +160,7 @@ def additional_person_identification(new_authority_id, role):
     # This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
     # Normally, they are parsed with gnd_parsing_person - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
     # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    new_authority_id = new_authority_id.strip()
     potential_persons_list = []
     potential_person = Person_import()
     person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
@@ -274,6 +295,7 @@ def additional_organisation_identification(new_authority_id, role):
     # This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
     # Normally, they are parsed with gnd_parsing_organisation - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
     # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
     potential_org = Person_import()
     org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
@@ -413,6 +435,7 @@ def additional_place_identification(new_authority_id, role):
     # This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
     # Normally, they are parsed with gnd_parsing_place - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
     # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    new_authority_id = new_authority_id.strip()
     potential_places_list = []
     potential_place = Place_import()
     place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
@@ -462,6 +485,13 @@ def gnd_parsing_person(authority_url):
         comments_preview = ""
         for step1 in record[2][0]:
             match step1.get('tag'):
+#                case "001":
+#                    pe_id = External_id()
+#                    pe_id.name = "GND_intern"
+#                    pe_id.id = step1.text
+#                    pe_id.uri = "GND_intern" + step1.text                    
+#                    pe.external_id.append(pe_id)
+
                 case "035":
                     for step2 in step1:
                         match step2.get('code'):
@@ -471,8 +501,14 @@ def gnd_parsing_person(authority_url):
                                 if step2.text[0:8] == "(DE-588)":
                                     pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
                                     pe_id.uri = r'https://d-nb.info/gnd/' + pe_id.id
-                                    if not pe.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                    duplicate_id = False  # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                    for id_duplicate in pe.external_id:
+                                        if id_duplicate.uri == pe_id.uri:
+                                            duplicate_id = True
+                                    if not duplicate_id:
                                         pe.external_id.append(pe_id)
+#                                    if not pe.external_id: #
+#                                        pe.external_id.append(pe_id)
                                 # Quite often, there are several GND records for one person, and if discovered, they are merged, and all GND IDs but become obsolete.
                                 # However, they are still stored in the record (035z) and are found by the search. 
                                 # Hence, this ID may be different from the person.id I used for the search in the first place.
@@ -717,8 +753,13 @@ def gnd_parsing_organisation(authority_url):
 #        print(record_number)
         record_number = record_number + 1
         for step1 in record[2][0]:
-
             match step1.get('tag'):
+#                case "001":
+#                    org_id = External_id()
+#                    org_id.name = "GND_intern"
+#                    org_id.id = step1.text
+#                    org_id.uri = "GND_intern" + step1.text
+#                    org.external_id.append(org_id)
                 case "035":
                     for step2 in step1:
                         match step2.get('code'):
@@ -728,8 +769,15 @@ def gnd_parsing_organisation(authority_url):
                                 if step2.text[0:8] == "(DE-588)":
                                     org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
                                     org_id.uri = r'https://d-nb.info/gnd/' + org_id.id
-                                    if not org.external_id: # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                    duplicate_id = False  # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+                                    for id_duplicate in org.external_id:
+                                        if id_duplicate.uri == org_id.uri:
+                                            duplicate_id = True
+                                    if not duplicate_id:
                                         org.external_id.append(org_id)
+
+#                                    if not org.external_id: 
+#                                        org.external_id.append(org_id)
                                 # Quite often, there are several GND records for one organisation, and if discovered, they are merged, and all GND IDs but become obsolete.
                                 # However, they are still stored in the record (035z) and are found by the search. 
                                 # Hence, this ID may be different from the organisation.id I used for the search in the first place.
@@ -896,7 +944,8 @@ def gnd_parsing_organisation(authority_url):
         if entity != "wis" and not cross_reference: # 'wis' means catalogue entries of manuscripts. For strange reasons, they are found through the same search pattern as the libraries
             # and thus have to be weeded out here. 
             potential_organisations_list.append(org)
-#        print(potential_organisations_list)
+    print("This list comes from gnd parsing, thus very early on")    
+    print(potential_organisations_list)
     return(potential_organisations_list)
 
 
@@ -919,6 +968,12 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
         entity_list = []
         for step1 in record[2][0]:
             match step1.get('tag'):
+#                case "001":
+#                    pl_id = External_id()
+#                    pl_id.name = "GND_intern"
+#                    pl_id.id = step1.text
+#                    pl_id.uri = "GND_intern" + step1.text
+#                    pl.external_id.append(pl_id)                
                 case "024":
                     pl_id = External_id()
                     for step2 in step1:
@@ -1824,6 +1879,25 @@ async def making_process_identification(making_processes):
             artist_new = await person_identification(artist)
             print(artist_new)
             making_process.person = artist_new
+        date = making_process.date
+        if date.datestring_raw != "":
+            print("Date_found")
+            print(date.datestring_raw)
+            try:
+                date_new = entered_date(date.datestring_raw)
+                making_process.date = date_new
+            except InvalidDateStringException as d:
+                print(f"String could not be divided into individual dates: {d}")
+            except InvalidDateException as e:
+                print(f"Failed to parse date string {e}")
+            except InvalidMonthException as f:
+                print(f"Failed to parse date string {f}")
+            except InvalidDayException as g:
+                print(f"Failed to parse date string {g}")
+            except InvalidDateRangeException as h:
+                print(f"{h}")
+
+    
     return(making_processes)
 
 

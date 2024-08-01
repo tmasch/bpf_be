@@ -82,7 +82,8 @@ def insertRecordPerson(person: Person_db):
     collection=dbname['bpf']
     result = collection.update_one({"id" : record_id}, {'$addToSet' : {"external_id" : external_id}})
 
-def add_connection_id(record_id, connected_entity_type, name, new_internal_id):
+#def add_connection_id(record_id, connected_entity_type, name, new_internal_id):
+# I replaced this everywhere (I hopeI with add_connection_id_and_name)
     print("in dabactions - inserting new connection id")
     # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection
     dbname = get_database()
@@ -94,7 +95,7 @@ def add_connection_id(record_id, connected_entity_type, name, new_internal_id):
     #result = collection.update_one({"id" : record_id, "connected_entity_type.name" : name}, {'$set' : {"connected_entity_type.$.id" : new_internal_id}})
     result = collection.update_one({"id" : record_id, mongo_term1 : name}, {'$set' : {mongo_term2 : new_internal_id}})
 
-def add_connection_id_and_name(record_id, connected_entity_type, far_connection_type, name, name_replacement, new_internal_id):
+def add_connection_id_and_name(record_id, connected_entity_type, far_connection_type, name, name_replacement, new_internal_id, connection_type, connection_time, connection_comments):
     print("in dabactions - inserting new connection and name")
     # This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection and replaces the name with the name connected to the internal ID
     # Later, the name connected to the internal ID should be a preview with dates
@@ -107,6 +108,12 @@ def add_connection_id_and_name(record_id, connected_entity_type, far_connection_
     print(new_internal_id)
     dbname = get_database()
     collection=dbname['bpf']
+    print("overwriting connection_type with: ")
+    print(connection_type)
+    old_record = collection.find_one({"id": record_id})
+    print("far record before addition of new connection")
+    print(old_record)
+
     #mongo_term1 = connected_entity_type + ".na
     #mongo_term2 = connected_entity_type + ".connection_type"
     #mongo_term3 = connected_entity_type + ".$.id"
@@ -115,8 +122,12 @@ def add_connection_id_and_name(record_id, connected_entity_type, far_connection_
     #mongo_term2 = connected_entity_type + ".name"
     mongo_term1 = connected_entity_type + ".$[elem].id"
     mongo_term2 = connected_entity_type + ".$[elem].name"
-    print(mongo_term1)
-    print(mongo_term2)
+    mongo_term3 = connected_entity_type + ".$[elem].connection_type"     
+    mongo_term4 = connected_entity_type + ".$[elem].connection_comment" 
+    mongo_term5 = connected_entity_type + ".$[elem].connection_time"
+
+#    print(mongo_term1)
+#    print(mongo_term2)
 #    print(mongo_term3)
 #    print(mongo_term4)
     #result = collection.update_one({"id" : record_id, "connected_entity_type.name" : name}, {'$set' : {"connected_entity_type.$.id" : new_internal_id, "connected_entity_type.$.name" : name_replacement}})
@@ -130,7 +141,21 @@ def add_connection_id_and_name(record_id, connected_entity_type, far_connection_
     #result = collection.aggregate([{"$match" : {"id" : record_id}}, {"$project" : { "length" :  { "$cond" : { "if" : { "$isArray": mongo_term1 }, "then": { "$size": mongo_term1 }, "else" : 0}} } }])
     #array_length = result[0]["length"]
     #for x in range(array_length):
-    result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement}}, upsert=False, array_filters = [{"elem.name" : name}])
+    #if connection_time == "": # This means, no time for connection is to be inserted - either because there is already one in the extant record, or because there is none in the new record
+    #    if connection_comments == "": # ditto for comments
+    #        result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement}}, upsert=False, array_filters = [{"elem.name" : name, "elem.connection_type" : far_connection_type}])
+    #    else:             
+    #        result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement, mongo_term3 : connection_comments}}, upsert=False, array_filters = [{"elem.name" : name, "elem.connection_type" : far_connection_type}])
+    #else: 
+    #    if connection_comment == "":
+    #        result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement, mongo_term4 : connection_time}}, upsert=False, array_filters = [{"elem.name" : name, "elem.connection_type" : far_connection_type}])
+    #    else: 
+    #        result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement, mongo_term4 : connection_comments, mongo_term4 : connection_time}}, upsert=False, array_filters = [{"elem.name" : name, "elem.connection_type" : far_connection_type}])
+    result = collection.update_one({"id" : record_id}, {'$set' : {mongo_term1 : new_internal_id, mongo_term2 : name_replacement, mongo_term3 : connection_type, mongo_term4 : connection_comments, mongo_term5 : connection_time}}, upsert=False, array_filters = [{"elem.name" : name, "elem.connection_type" : far_connection_type}])
+    changed_record = collection.find_one({"id": record_id})
+    print("far record after addition of new connection")
+    print(changed_record)
+    return
 
 def add_connection(record_id, connected_entity_type, new_connection):
     # This function is used to go to a specific record that has not yet a reciprocal connection, and inserts it
@@ -140,6 +165,10 @@ def add_connection(record_id, connected_entity_type, new_connection):
     dbname = get_database()
     collection=dbname['bpf']
     result = collection.update_one({"id" : record_id}, {'$addToSet' : {connected_entity_type : new_connection.dict()}})
+    record = collection.find_one({"id" : record_id})
+    print("far record after addition of new connection")
+    print(record)
+    return
 
 def add_person_type(person_id, person_type1):
     # This function is used to add another person type (e.g., Author, Artist etc.) to a person record
