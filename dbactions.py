@@ -1,9 +1,20 @@
+"""
+This module contains all functions that contain database actions, like
+creating new records, reading from the DB etc.
+
+There should be no business logic here.
+"""
+
 from pymongo import MongoClient
 from classes import *
 import json
 import os
 from typing import List
 from nanoid import generate
+
+
+
+
 
 client=None
 
@@ -29,14 +40,14 @@ def get_database():
 #   return client['bpf']
    
    
-def insertMetadata(metadata: Metadata):
+def insert_metadata(metadata: Metadata):
     print("Inserting metadata in database")
     dbname = get_database()
     collection=dbname['bpf']
     collection.insert_one(metadata.dict())
     return("Hello World")
     
-def getAllRessourcesFromDb():
+def get_all_ressources_from_DB():
     print("Getting all ressources from the database")
     dbname = get_database()
     print("Database name:",dbname)
@@ -48,7 +59,7 @@ def getAllRessourcesFromDb():
     print(r)
     return(r)        
     
-def getRessourceFromDb(id):
+def get_ressource_from_DB(id):
     print(id)
     dbname = get_database()
     collection = dbname['bpf']
@@ -240,3 +251,13 @@ def insertRecordPages(pages : Pages_db):
     collection.insert_one(pages.dict())
     return("Hello World")
 
+def create_image_record():
+    print("Creating an image record in the database")
+    dbname = get_database()
+    collection=dbname['bpf']
+
+
+
+
+    
+    

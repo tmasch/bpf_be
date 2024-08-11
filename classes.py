@@ -10,10 +10,11 @@ from datetime import date
 
 class Frame(BaseModel):
     def __str__(self):
-        t="Index: "+self.index+"\n"
+        t="Index: "+str(self.index)+"\n"
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)
+    id : Optional[str] = ""
     index : Optional[int] = ""
     x_abs : Optional[int] = ""
     y_abs : Optional[int] = ""
@@ -39,10 +40,22 @@ class Image(BaseModel):
     label : Optional[str] = ""
     frames : Optional[list[Frame]] = []
 
+"""
+class ImageCoordinates(BaseModel):
+    id : Optional[str] = ""
+    page : Optional[int] = ""
+    x_abs : Optional[int] = ""
+    y_abs : Optional[int] = "" 
+    w_abs : Optional[int] = ""
+    h_abs : Optional[int] = ""
+"""
+
 class External_id(BaseModel):
-# This class is used for references to external IDs in bibliographic records and in authority files such as the GND
-# It contains the name of the repertory (e.g., VD16, GND), the ID of the book or person within the repertory
-# and, if available, the URI of the entry. 
+    """
+This class is used for references to external IDs in bibliographic records and in authority files such as the GND
+It contains the name of the repertory (e.g., VD16, GND), the ID of the book or person within the repertory
+and, if available, the URI of the entry. 
+    """
     uri : Optional[str] = ""
     name : Optional[str] = ""
     id : Optional[str] = ""
@@ -57,8 +70,10 @@ class Connected_entity(BaseModel):
     connection_time : Optional[str] = ""
 
 class Date_import(BaseModel):
-    # This class is used for the import of dates of life or activity of persons. Currently, it is still saved in the database, but eventually it will be replaced with a 
-    # class Date_person
+    """
+    This class is used for the import of dates of life or activity of persons. Currently, it is still saved in the database, but eventually it will be replaced with a 
+    class Date_person
+    """
     datestring_raw : Optional[str] = ""
     date_comments : Optional[str] = ""
     datetype : Optional[str] = ""
@@ -96,13 +111,15 @@ class Person_import(BaseModel):
 
 
 class Person(BaseModel):
-# This class is used for references to persons in book records. 
-# id is the id of the person in authority files (currently, the GND), name the name given in the source
-# and role the person's role in making the book, according to standard bibliographical abbreviations, e.g. "prt" for printer.
-# If the person's ID (GND, ULAN etc.) is found to already have a record in the database, internal_id and internal_id_preview are filled.
-# If the person's name is searched in the database, or if the person's ID or name is searched in an external repository such as the GND,
-# The results will be put into the field 'potential candidates'. 
-# The user can pick one of them (or confirm if only one was found)
+    """
+ This class is used for references to persons in book records. 
+ id is the id of the person in authority files (currently, the GND), name the name given in the source
+ and role the person's role in making the book, according to standard bibliographical abbreviations, e.g. "prt" for printer.
+ If the person's ID (GND, ULAN etc.) is found to already have a record in the database, internal_id and internal_id_preview are filled.
+ If the person's name is searched in the database, or if the person's ID or name is searched in an external repository such as the GND,
+ The results will be put into the field 'potential candidates'. 
+ The user can pick one of them (or confirm if only one was found)
+    """
     #model_config = ConfigDict(arbitrary_types_allowed=True)
     id : Optional[str] = ""
     id_name : Optional[str] = ""
@@ -120,7 +137,9 @@ class Person(BaseModel):
 
 
 class Organisation_import(BaseModel):
-# This class is used for importing data on organisations from authority records such as the GND
+    """
+ This class is used for importing data on organisations from authority records such as the GND
+    """
     external_id : Optional[list[External_id]] = []
     internal_id : Optional[str] = ""
     internal_id_org_type1 : Optional[list[str]] = []
@@ -136,10 +155,12 @@ class Organisation_import(BaseModel):
     preview : Optional[str] = ""
 
 class Organisation(BaseModel):
-# This class is used for references to organisations (publishing houses) in book records. 
-# id is the id of the place in authority files (currently, the GND), name the name given the source
-# and role either "pub" for the publisher, or "prt" for the printer
-# If an organisation is both, there will be two different record for it. 
+    """
+ This class is used for references to organisations (publishing houses) in book records. 
+ id is the id of the place in authority files (currently, the GND), name the name given the source
+ and role either "pub" for the publisher, or "prt" for the printer
+ If an organisation is both, there will be two different record for it. 
+    """
     id : Optional[str] = ""
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
@@ -176,10 +197,12 @@ class Place_import(BaseModel):
     preview : Optional[str] = ""
 
 class Place(BaseModel):
-# This class is used for references to places (virtually alwys towns) in book records.
-# id is the id of the place in authority files (currently, the GND), name the name given the source
-# and role either "mfp" for the place of printing, or "pup" for the place of publishing. 
-# If a place is both, there will be two different record for it. 
+    """
+ This class is used for references to places (virtually alwys towns) in book records.
+ id is the id of the place in authority files (currently, the GND), name the name given the source
+ and role either "mfp" for the place of printing, or "pup" for the place of publishing. 
+ If a place is both, there will be two different record for it. 
+    """
     id : Optional[str] = ""
     id_name : Optional[str] = ""
     internal_id : Optional[str] = ""
@@ -195,9 +218,11 @@ class Place(BaseModel):
 
 
 class Bibliographic_id(BaseModel):
-# Here, the name is the name of the repertory (e.g., VD16), the id the id of a book in the repertory
-# and the uri the uri of the record of the book in the repertory.
-# This class should be superseded everywhere by External_id, I keep it for the moment just to be sure
+    """
+Here, the name is the name of the repertory (e.g., VD16), the id the id of a book in the repertory
+and the uri the uri of the record of the book in the repertory.
+This class should be superseded everywhere by External_id, I keep it for the moment just to be sure
+    """
     uri : Optional[str] = ""
     name : Optional[str] = ""
     id : Optional[str] = ""
@@ -262,10 +287,12 @@ class Metadata(BaseModel):
 
 
 class Person_db(BaseModel):
-# This class is for entering Person authority records into the database. 
-# It contains all needed fields (or better, will do so), so many will remain empty. 
-# I hope it will be possible to delete empty fields when turning it into a dict object. 
-# If not, one should probably have different classes for different 
+    """
+This class is for entering Person authority records into the database. 
+It contains all needed fields (or better, will do so), so many will remain empty. 
+I hope it will be possible to delete empty fields when turning it into a dict object. 
+If not, one should probably have different classes for different 
+    """
     id : Optional[str] = ""
     type : Optional[str] = "" # Is always 'Person'
     person_type1 : Optional[list[str]] = [] # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
@@ -286,7 +313,9 @@ class Person_db(BaseModel):
 
 
 class Organisation_db(BaseModel):
-# This class is for entering Organisation authority records into the database. 
+    """
+This class is for entering Organisation authority records into the database. 
+    """
     id : Optional[str] = "" 
     type : Optional[str] = ""  # Is always "Organisation"
     org_type1: Optional[list[str]] = [] # Types 1 are: "Printer", "Collection", "Group of Persons"
@@ -463,7 +492,7 @@ class Org_db_display(BaseModel):
     comments : Optional[str] = ""
 
 class Place_db_display(BaseModel):
-# This class is for displaying (and perhaps later also editing) Place authority records from the database
+## This class is for displaying (and perhaps later also editing) Place authority records from the database
     id : Optional[str] = ""
     type : Optional[str] = "" # Is always "Place"
     place_type1 : Optional[list[str]] = "" # Types 1 are: "Region - historical", "Region - modern", "Town - historical", "Town - modern", "Building", "Building-part"
@@ -477,4 +506,6 @@ class Place_db_display(BaseModel):
     connected_organisations : Optional[list[Connected_entity]] = []
     connected_locations : Optional[list[Connected_entity]] = []
     comments : Optional[str] = ""
+    
+
 

@@ -1,9 +1,14 @@
+"""
+\todo refactor to follow naming conventions!
+
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import urllib.request
 import json 
 import iiifparse
-from dbactions import *
+import dbactions
 from classes import *
 from imageActions import *
 from nanoid import generate
@@ -38,6 +43,7 @@ print(get_database())
 app = FastAPI()
 
 origins = [
+    "*",
     "http://localhost",
     "http://localhost:5173",
     "http://localhost:8000",
@@ -156,9 +162,23 @@ async def createNewRessource(metadata: Metadata):
     print("hello world")
     m = metadata
 #    print(m)
-    insertMetadata(m)
+    insert_metadata(m)
 #    print(m)
     return(m)
+    
+    
+@app.post("/createImageRecord")
+async def create_image_record(coords: Frame):
+    print("index",coords.index)
+    print("x position",coords.x_abs)
+    print("y position",coords.y_abs)
+    print("width",coords.w_abs)
+    print("height",coords.h_abs)
+    print("Saving image as file")
+    save_image_file(coords)
+    dbactions.create_image_record()
+    
+    return()
 
 @app.post("/saveConnectedRecords")
 async def saveConnectedRecords(metadata: Metadata):
@@ -172,35 +192,35 @@ async def saveConnectedRecords(metadata: Metadata):
 
 
 @app.get("/allRessources", response_model=List[Preview_list_db]) 
-async def getAllRessources():
-    r=getAllRessourcesFromDb()  
+async def get_all_ressources():
+    r=get_all_ressources_from_DB()  
     print(r)
     return(r)
     
 @app.get("/ressource", response_model=Metadata)
-async def getRessource(id: str):
+async def get_ressource(id: str):
     print(id)
-    r=getRessourceFromDb(id)
+    r=get_ressource_from_DB(id)
     return(r)
     
 @app.get("/findImages")    
-async def findAllImages(id: str):
+async def find_all_images(id: str):
     print(id)
     print("starting")
-    r=findImages(id)
+    r=find_images(id)
     print(r)
     return()
     
 
 @app.get("/getBookRecord", response_model = Book_db_display)
-async def getBookRecord(id: str):
+async def get_book_record(id: str):
     bookRecord = displayRecords.getBookRecord(id)
     print("bookrecord before returning from main.py: ")
     print(bookRecord)
     return(bookRecord)
 
 @app.get("/getManuscriptRecord", response_model = Manuscript_db_display)
-async def getBookRecord(id: str):
+async def get_manuscript_record(id: str):
     manuscriptRecord = displayRecords.getManuscriptRecord(id)
     print("manuscriptkrecord before returning from main.py: ")
     print(manuscriptRecord)

@@ -7,10 +7,10 @@ import random as rng
 
 
 
-def findImages(id):
+def find_images(id):
     print("finding images")
     print(id)
-    r=getRessourceFromDb(id)
+    r=get_ressource_from_DB(id)
     print(r["images"][0])
     i=r["images"][0]
     frames=processImage(i)
@@ -19,9 +19,7 @@ def findImages(id):
     r={"val" : "finding images done"}
     return(r)
     
-    
-
-def processImage(image):
+def fetch_image_from_web(image):
     print(image)
     url=image["baseurl"]+"/full/full/0/default.jpg"
     print(url)
@@ -33,6 +31,11 @@ def processImage(image):
     print("decoding")
     image = cv2.imdecode(image, cv2.IMREAD_COLOR) 
     print("writing")
+    return(image)
+
+def process_image(image):
+    image=fetch_image_from_web(image)
+
     cv2.imwrite("input.jpg", image)
     frames=strategy1(image)
 #    print(response.content)
@@ -134,5 +137,29 @@ def strategy1(image):
              cv2.drawContours(drawing, contours_poly, i, color)	
     cv2.imwrite("contours.jpg",drawing)
     return(frames)
- 
+
+
+
+def save_image_file(coords):
+    """
+This function extracts a single image from a page in a book, given the coordinates, 
+and saves an image file in the local file system
+
+\todo configurable path for the file
+
+\todo configurable/ automatic file name 
+
+    """
+    print("Saving an image file")
+    r=get_ressource_from_DB(coords.id)
+    i=r["images"][coords.index]
+    image=fetch_image_from_web(i)
+    print("y1: ",coords.y_abs)
+    print("y2: ",coords.y_abs+coords.h_abs)
+    print("x1: ",coords.x_abs)
+    print("x2: ",coords.x_abs+coords.w_abs)
+    cropped=image[coords.y_abs:coords.y_abs+coords.h_abs,coords.x_abs:coords.x_abs+coords.w_abs]
+    cv2.imwrite("photo_file.jpg",cropped)
+    path="."
+    return(path)
     
