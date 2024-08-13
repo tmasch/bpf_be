@@ -1,7 +1,8 @@
-# This module contains a number of functions for extracting bibliographical information from standard bibliographies such as the VD16. 
-# Eventually, this information will be added to the book_properties record from book_parsing_manifests. 
-# There has to be a function for every bibliography (perhaps altogether about 10 the end)
-
+"""
+This module contains a number of functions for extracting bibliographical information from standard bibliographies such as the VD16. 
+Eventually, this information will be added to the book_properties record from book_parsing_manifests. 
+There has to be a function for every bibliography (perhaps altogether about 10 the end)
+"""
 import urllib.request
 import xml.etree.ElementTree
 import re
@@ -83,7 +84,7 @@ def VD17_parsing(url_bibliography):
     #This function can be used for parsing both the VD17 and the VD18
     print(url_bibliography)
     printing_information_pattern = r'(.*)(: )(.*)'
-    bi = Bibliographic_information()
+    bi = BibliographicInformation()
     #url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0&operation=searchRetrieve&query=pica.vds=" + bibliographic_id_number + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
     url = urllib.request.urlopen(url_bibliography)
     tree = xml.etree.ElementTree.parse(url)
@@ -99,7 +100,7 @@ def VD17_parsing(url_bibliography):
             field = step1            
             match field.get('tag'):
                 case "024": #for the VD17 number
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in field:                                            
                         match(step2.get("code")):                        
                             case "a":                                
@@ -354,7 +355,7 @@ def VD16_parsing(url_bibliography):
     printing_date_long = ""
     printing_date_divided = []
 
-    bi = Bibliographic_information()
+    bi = BibliographicInformation()
     try: 
         record_text = etree.tostring(tree,encoding=str)
     except TypeError:
@@ -376,7 +377,7 @@ def VD16_parsing(url_bibliography):
     #parsing the individual values
     bibliographic_id = record_structured["Normnummer"]
     bibliographic_id_pattern = r'(....)(\s)([A-Z]{1,2}\s[0-9]{1,5})(.*)'
-    bid = Bibliographic_id()
+    bid = BibliographicId()
     bid.name = re.match(bibliographic_id_pattern, bibliographic_id)[1]
     bid.id = re.match(bibliographic_id_pattern, bibliographic_id)[3]
 #    bibliographic_id_single = (bibliographic_id_name, bibliographic_id_number)
@@ -504,7 +505,7 @@ def ISTC_parsing_alt(URL_bibliography):
     person_list = []
     place_list = []
     author = ""
-    bi = Bibliographic_information()
+    bi = BibliographicInformation()
     istc_record_raw = requests.get(URL_bibliography)    
     istc_record_full = (istc_record_raw).json()
        
@@ -513,7 +514,7 @@ def ISTC_parsing_alt(URL_bibliography):
         return
 
     istc_record_short = (istc_record_full["rows"])[0]
-    bid = Bibliographic_id()
+    bid = BibliographicId()
     bid.id = istc_record_short["id"]
     bid.name = "ISTC"
     bid.uri = r"https://data.cerl.org/istc/"+bid.id
@@ -522,7 +523,7 @@ def ISTC_parsing_alt(URL_bibliography):
     #bibliographic_id_list.append(bibliographic_id_single_1)
     for step1 in istc_record_short['references']:        
         if step1[0:3] == "GW ":            
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.id = step1[3:]
             bid.name = "GW"
 #            bid.uri = This will need more work!
@@ -646,7 +647,7 @@ def ISTC_parsing(URL_bibliography):
     end_year = 0
 
 
-    bi = Bibliographic_information()
+    bi = BibliographicInformation()
     print("URL for search in ISTC: " + URL_bibliography)
     istc_record_raw = requests.get(URL_bibliography)    
     istc_record_full = (istc_record_raw).json()
@@ -656,7 +657,7 @@ def ISTC_parsing(URL_bibliography):
         return
 
     istc_record_short = istc_record_full["rows"][0]
-    bid = Bibliographic_id()
+    bid = BibliographicId()
     bid.id = istc_record_short["id"]
     bid.name = "ISTC"
     bid.uri = r"https://data.cerl.org/istc/"+bid.id
@@ -664,7 +665,7 @@ def ISTC_parsing(URL_bibliography):
     for step1 in istc_record_short['references']: 
         #print("step1: " + step1)  
         if step1["reference_name"] == "GW":        
-                bid = Bibliographic_id()
+                bid = BibliographicId()
                 if type (step1["reference_location_in_source"]) == int: # Sometimes, this is a mere number - a problem not occurring with ISTC, VD16 and VD17, but perhaps with VD18
                     bid.id = str(step1["reference_location_in_source"])
                 else:
@@ -897,8 +898,11 @@ def ISTC_parsing(URL_bibliography):
             bi.date_string = string_prefix + string_day + string_month + string_year + date_between_indicator + string_day_between + string_month_between + string_year_between
 #            bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
 #            bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
-            bi.date_start = (start_year, start_month, start_day)
-            bi.date_end = (end_year, end_month, end_day)
+#            bi.date_start = (start_year, start_month, start_day)
+#            bi.date_end = (end_year, end_month, end_day)
+            bi.date_start = (1500, 1, 1)
+            bi.date_end = (1550, 12, 31)
+            print("date ended")
 
             # Until I have changed it everyhwhere and also in the FE, I still use the old bi.printing_date function. 
 
