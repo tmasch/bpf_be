@@ -1,6 +1,9 @@
-# This module contains a number of function that accept the URI of an IIIF manifest of a manuscript or book and return data, 
-# both on the manuscript or book as a whole (book_properties) and on the individual canvases(canvas_properties). 
-# Because much information in the manifests is not standardised, there has to be a separate function for each library. 
+"""
+This module contains a number of function that accept the URI of an IIIF manifest of a manuscript 
+or book and return data, both on the manuscript or book as a whole (book_properties) and on the 
+individual canvases(canvas_properties). Because much information in the manifests is not standardised, 
+there has to be a separate function for each library. 
+"""
 
 import urllib.request
 import json
@@ -98,7 +101,7 @@ def BSB_parsing(URI_entered):
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             if "https" in bibliographic_id_individual: #if there is a link
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
                 bid.uri = bibliographic_id_divided.groups()[1]
@@ -191,7 +194,7 @@ def Halle_parsing(URI_entered):
     if bibliographic_id:    
         for step3 in bibliographic_id:
             bibliographic_id_individual = step3
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
             if "https" in bibliographic_id_individual: #if there is a link
@@ -272,7 +275,7 @@ def Berlin_parsing(URI_entered):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
     if bibliographic_id:      
         for step3 in bibliographic_id:
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
@@ -361,7 +364,7 @@ def Cambridge_Trinity_parsing(URI_entered):
             for bibliographic_reference in bibliography_pattern_list:
                 bibliography_found = re.findall(bibliographic_reference, catalogue_text)
                 for single_bibliography in bibliography_found:
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bibliographic_id_divided = re.match(bibliography_pattern_single, single_bibliography)
                     bid.name = bibliographic_id_divided[1]
                     bid.id = bibliographic_id_divided[3]
@@ -447,7 +450,7 @@ def ThULB_parsing(URI_entered):
 
     if "GW-Nummer:" in catalogue_text or "VD16:" in catalogue_text or "VD17:" in catalogue_text or "VD18:" in catalogue_text:
     #are there ever multiple IDs? If so, one would need a loop
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         bibliography_long = re.findall(bibliographic_reference_pattern, catalogue_text, re.MULTILINE)[0]
         print(bibliography_long)
         bid.name = bibliography_long[0]
@@ -503,7 +506,7 @@ def SLUB_parsing(URI_entered):
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
 
     for step1 in metadata:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         label = step1["label"]
         if label == "Signatur":
             m.shelfmark = step1["value"]
@@ -632,7 +635,7 @@ def Leipzig_parsing(URI_entered):
 
     for step1 in metadata:
         label = step1["label"]
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         if label == "Call number": #sometimes, a German, sometimes an English term isused
             m.shelfmark = step1["value"]
         if label == "Signatur":
@@ -714,7 +717,7 @@ def Gallica_parsing(URI_entered):
     format = ""
     m.license = manifest["license"]
     for step1 in metadata:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         label = step1["label"]
         if label == "Shelfmark":
             shelfmark_long = step1["value"]
@@ -771,14 +774,14 @@ def Gallica_parsing(URI_entered):
                     for step2 in step1:
                         record_210 = step2.text
                         if "Hain-Copinger" in record_210:
-                            bid = Bibliographic_id()
+                            bid = BibliographicId()
                             hc_found = re.search(r'Hain-Copinger, \w*', record_210)
                             if hc_found:
                                 bid.name = "HC"
                                 bid.id = hc_found.group(0)[14:].strip()
                                 m.bibliographic_id.append(bid)
                         if "Pellechet" in record_210:
-                            bid = Bibliographic_id()
+                            bid = BibliographicId()
                             hc_found = re.search(r'Pellechet, \w*', record_210)
                             if hc_found:
                                 bid.name = "Pell Ms"
@@ -795,7 +798,7 @@ def Gallica_parsing(URI_entered):
                                     print("field 300: " + record_300)
                                     record_300 = record_300.replace("n°", "")
                                     record_300 = record_300.replace("  ", " ")                                    
-                                    bid = Bibliographic_id()
+                                    bid = BibliographicId()
                                     istc_long_found = re.search(r'https\://data\.cerl\.org/istc/i\w\d{8}', record_300)
                                     if istc_long_found:
                                         print("ISTC URL found in 300")
@@ -840,7 +843,7 @@ def Gallica_parsing(URI_entered):
                                     bibliographical_references.append(step2.text)
         if bibliographical_references:
             for bibref in bibliographical_references:
-                bid = Bibliographic_id()
+                bid = BibliographicId()
                 bibref = bibref.replace("n°", "")
                 print(bibref)
                 if bibref[0:4] == "ISTC":
@@ -953,7 +956,7 @@ def Ecodices_parsing(URI_entered):
     m.manifest = url.read()
     m.license = manifest["license"]
     for step1 in metadata:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         label = step1["label"]
         if label == "Location":
             collection_place = step1["value"]
@@ -1009,7 +1012,7 @@ def Erara_parsing(URI_entered):
     m.manifest = url.read()
     m.license = "Public Domain" # das ist provisorisch, die License ist hier nicht angeben
     for step1 in metadata:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         label = step1["label"]
         if label == "Besitzende Institution":
             location_long = step1["value"]
@@ -1051,7 +1054,7 @@ def Erara_parsing(URI_entered):
         else:
             bibliographic_reference_divided.append(bibliographic_reference_long)
         for reference in bibliographic_reference_divided:
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             reference = reference.strip()
             reference = reference.replace("VD ", "VD")
             if "GW" in reference:
@@ -1131,7 +1134,7 @@ def Bodleian_parsing(URI_entered):
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
     bibliographic_record = ""
     for step1 in metadata:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         label = step1["label"]
         if label == "Shelfmark":
             shelfmark_long = step1["value"]
@@ -1175,7 +1178,7 @@ def Bodleian_parsing(URI_entered):
         m.repository.append(repository)
 
     if bibliographic_record:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         if "Bod-inc." in bibliographic_record:
             bid.name = "Bod-inc"
             bid.id = bibliographic_record[9:].strip()
@@ -1242,7 +1245,7 @@ def Heidelberg_parsing(URI_entered):
             record = record_raw.group(0)
         if record:
             record_divided = record.split(" ", maxsplit=1)
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.name = record_divided[0]
             bid.id = record_divided[1]
             m.bibliographic_id.append(bid)
@@ -1309,7 +1312,7 @@ def Vaticana_parsing(URI_entered):
             print("identified bibliography: ")
             print(record)
             if record:
-                bid = Bibliographic_id()
+                bid = BibliographicId()
                 bid.name = "ISTC"
                 bid.id = record[5:].strip()
                 m.bibliographic_id.append(bid)
@@ -1321,7 +1324,7 @@ def Vaticana_parsing(URI_entered):
                 print("identified bibliography: ")
                 print(record)
                 if record:
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "GW"
                     bid.id = record[3:].strip()
                     m.bibliographic_id.append(bid)
@@ -1402,7 +1405,7 @@ def Vienna_parsing(URI_entered):
                 # In the examples I saw, bibligraphical references for Post-1501 books are in field 24, those for incunables in field 555. I have no clue if this is consistently handled like that. 
                 case "024":
                     print("field with bibliography found in catalogue")
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in step1:
                         print("tag of subfield: ")
                         print(step2.get("code"))
@@ -1428,7 +1431,7 @@ def Vienna_parsing(URI_entered):
                                     m.bibliographic_id.append(bid) # Vienna quotes this a lot, so I already inserted that here. 
                                     # I wonder if how to abbreviate it
                 case "555": # I include this although up to now there are no IIIF manifests for incunables. 
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in step1:
                         match step2.get("code"):
                             case "d":
@@ -1489,7 +1492,7 @@ def Washington_parsing(URI_entered): # This section is still untested since I co
                         case "b":
                             shelfmark_part2 = step2.text
             case "510":
-                bid = Bibliographic_id()
+                bid = BibliographicId()
                 for step2 in step1:
                     match step2.get("code"):
                         case "a":
@@ -1593,7 +1596,7 @@ def Goettingen_parsing (URI_entered):
             for step1 in record:
                 match step1.get("tag"):
                     case "024":
-                        bid = Bibliographic_id()
+                        bid = BibliographicId()
                         for step2 in step1:
                             match step2.get("code"):
                                 case "2":
@@ -1680,7 +1683,7 @@ def Princeton_parsing (URI_entered):
     for step1 in root:
         match step1.get("tag"):
             case "510":
-                bid = Bibliographic_id()
+                bid = BibliographicId()
                 for step2 in step1:
                     match step2.get("code"):
                         case "a":
@@ -1762,7 +1765,7 @@ def Yale_parsing (URI_entered):
                 bibliographical_references_list.append(reference)
 
     for reference in bibliographical_references_list:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         reference_divided = reference.split(",")
         if "Gesamtkatalog" in reference:
             bid.name = "GW"
@@ -1840,13 +1843,13 @@ def Boston_parsing (URI_entered):
         record = url.text
         reference_istc = re.search(r'Incunabula short title catalogue, i\w\d{8}', record)
         if reference_istc:
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.name = "ISTC"
             bid.id = reference_istc.group(0)[34:].strip()
             m.bibliographic_id.append(bid)
         reference_gw = re.search(r'Gesamtkatalog der Wiegendrucke, \w*<', record)
         if reference_gw:
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.name = "GW"
             bid.id = reference_gw.group(0)[32:-1].strip()
                                  
@@ -2037,12 +2040,12 @@ def Frankfurt_parsing (URI_entered):
             if len(shelfmark_long_divided) > 1:
                 m.shelfmark = shelfmark_long_divided[0].strip()
         if step1["label"] == "VD16":
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.name = "Vd16"
             bid.id = step1["value"]
             m.bibliographic_id.append(bid)
         if step1["label"] == "VD17":
-            bid = Bibliographic_id()
+            bid = BibliographicId()
             bid.name = "VD17"
             bid.id = step1["value"]
             m.bibliographic_id.append(bid)
@@ -2128,7 +2131,7 @@ def Weimar_parsing (URI_entered):
             for step1 in root[2][0][2][0]:
                 match step1.get('tag'):
                     case "024":
-                        bid = Bibliographic_id()
+                        bid = BibliographicId()
                         for step2 in step1:
                             match step2.get('code'):
                                 case "2":
@@ -2146,7 +2149,7 @@ def Weimar_parsing (URI_entered):
                             print(bid)
                             m.bibliographic_id.append(bid)
                     case "510":
-                        bid = Bibliographic_id()
+                        bid = BibliographicId()
                         for step2 in step1:
                             match step2.get('code'):
                                 case "a":
@@ -2228,17 +2231,17 @@ def Kiel_parsing (URI_entered):
                     m.repository.append(repository)
                     #At least in some instances, there is a separate field for "VD18 Nummer" - in other cases, the bibliography is given in the description field
                 if step2["@value"] == "VD16 Nummer": 
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD16"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD17"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD18"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
@@ -2254,7 +2257,7 @@ def Kiel_parsing (URI_entered):
         else:
             bibliographical_reference_divided.append(bibliographical_reference)
     for reference in bibliographical_reference_divided:
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         reference = reference.strip()
         if reference[0:2] == "GW":
             bid.name = "GW"
@@ -2330,17 +2333,17 @@ def Hamburg_parsing (URI_entered):
                     shelfmark_long = step1["value"]
 
                 if step2["@value"] == "VD16 Nummer": 
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD16"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD17"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     bid.name = "VD18"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
@@ -2377,7 +2380,7 @@ def Hamburg_parsing (URI_entered):
         for step1 in root[2][0][2][0]:
             match step1.get('tag'):
                 case "024":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "2":
@@ -2393,7 +2396,7 @@ def Hamburg_parsing (URI_entered):
                     if bid.name in ["GW", "ISTC", "VD16", "vd16", "VD17", "vd17", "VD18", "vd18"]:
                         m.bibliographic_id.append(bid)
                 case "510":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -2493,7 +2496,7 @@ def Rostock_parsing (URI_entered):
         for step1 in root[2][0][2][0]:
             match step1.get('tag'):
                 case "024":
-                    bid = Bibliographic_id()
+                    bid = BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "2":
@@ -2586,7 +2589,7 @@ def Nuernberg_StB_parsing (URI_entered):
             bibliographical_reference = bibliographical_reference_divided[1] # suppressing a preliminary '
         else: 
             bibliographical_reference = bibliographical_reference_raw
-        bid = Bibliographic_id()
+        bid = BibliographicId()
         if bibliographical_reference[0:2] == "VD":
             bid.name = bibliographical_reference[0:4]
             bid.id = bibliographical_reference[5:].strip()

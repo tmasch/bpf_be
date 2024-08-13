@@ -1,11 +1,11 @@
 # This module contains functions for displaying (and later perhaps also editing) records from the database
 
-import dbactions
+import db_actions
 from classes import *
 
 def getBookRecord(id):
     # this function displays all elements links to a printed book record
-    dbname = dbactions.get_database()
+    dbname = db_actions.get_database()
     collection=dbname['bpf']
     result = collection.find_one({"id": id})
     if result["persons"]:
@@ -29,7 +29,7 @@ def getBookRecord(id):
 
 def getManuscriptRecord(id):
     # this function displays all elements links to a printed book record
-    dbname = dbactions.get_database()
+    dbname = db_actions.get_database()
     collection=dbname['bpf']
     result = collection.find_one({"id": id})
     if result["repository"]:
@@ -44,7 +44,7 @@ def getManuscriptRecord(id):
 
 def getRecord(id):
     # this function downloads a record with a given ID from the database
-    dbname = dbactions.get_database()
+    dbname = db_actions.get_database()
     collection=dbname['bpf']
     result = collection.find_one({"id": id})
     #pipeline = [{"$match" :{"id" : id}}]  #, {"$lookup" :{"from": collection, "local_field": "connected_persons.id", "foreign_field": "id", "as":"connected_persons_details"}}]

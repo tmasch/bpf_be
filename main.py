@@ -2,24 +2,24 @@
 \todo refactor to follow naming conventions!
 
 """
+#import urllib.request
+import json
+import os
+from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
+from nanoid import generate
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import urllib.request
-import json 
 import iiifparse
-import dbactions
+import db_actions
 from classes import *
-from imageActions import *
-from nanoid import generate
-from pydantic_settings import BaseSettings
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from image_actions import *
 import gndparse
 import book_ingest_create_records
 import displayRecords
 
+load_dotenv()
 
 #class Settings(BaseSettings):
 #    class Config:
@@ -62,13 +62,19 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    """
+    Main method doing nothing
+    """
     return {"message": "Hello World port"+os.getenv('MONGODB_PORT', '')+" end port"}
-    
+
 @app.get("/getMetadata")
-async def getMetadata(iiifUrl, material):
+async def get_metadata(iiif_url, material):
+    """
+    Method returning metadata for a given iiif url
+    """
     print("iiifURL: ")
-    print(iiifUrl)
-    m = iiifparse.iiifparse(iiifUrl, material)
+    print(iiif_url)
+    m = iiifparse.iiifparse(iiif_url, material)
     #m.material = material
 #    print(iiifUrl)
 #    url = urllib.request.urlopen(iiifUrl)
@@ -89,15 +95,22 @@ async def getMetadata(iiifUrl, material):
             for place in m.bibliographic_information[0].places:
                 place = gndparse.place_identification(place)
     for repository in m.repository:
-        repository = gndparse.organisation_identification(repository) # I had to define 'repository' as a list because Pydantic forced me to do so, but it only has one member. 
-        repository.role = "col" # Normally, this role depends on the bibliographical data - in this case, it has to be set here. 
+        repository = gndparse.organisation_identification(repository)
+        # I had to define 'repository' as a list because Pydantic forced me to do so,
+        #  but it only has one member.
+        repository.role = "col"
+        # Normally, this role depends on the bibliographical data -
+        # in this case, it has to be set here.
     m.id=generate()
 #    print("List of places to be sent to FE")
 #    print(m.bibliographic_information[0].places)
-    return (m) 
+    return m
 
 @app.get("/callAdditionalBibliographicInformation")
 async def supply_biblio_information(additional_bid):
+    """
+    Method returning additional bibliographic information
+    """
     bi = iiifparse.supply_bibliographic_information(additional_bid)
     for person in bi.persons:
         person = await gndparse.person_identification(person)
@@ -106,69 +119,98 @@ async def supply_biblio_information(additional_bid):
     for place in bi.places:
         place = gndparse.place_identification(place)
 
-    print(Bibliographic_id)
+    print(BibliographicId)
     print(bi)
-    return (bi)
+    return bi
 
-    
 @app.get("/loadNewPersonAuthorityRecord")
 async def load_new_person_authority_record(new_authority_id, new_person_role):
+    """"
+    Method to find???
+    """
     print(new_authority_id)
     print(new_person_role)
-#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&
+# operation=searchRetrieve&query=NID%3D'
+# + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
 #    potential_person = gndparse.gnd_parsing_person(authority_url)
     potential_person = gndparse.additional_person_identification(new_authority_id, new_person_role)
     print(potential_person)
-    return(potential_person)
+    return potential_person
 
 @app.get("/loadNewOrganisationAuthorityRecord")
 async def load_new_organisation_authority_record(new_authority_id_org, new_organisation_role):
+    """
+    Endpoint
+    """
 #    print(new_authority_id_org)
-#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_org + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&
+# operation=searchRetrieve&query=NID%3D'
+#  + new_authority_id_org + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml
+# &maximumRecords=100'
 #    potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
-    potential_organisation = gndparse.additional_organisation_identification(new_authority_id_org, new_organisation_role)
+    potential_organisation = \
+        gndparse.additional_organisation_identification(new_authority_id_org, new_organisation_role)
 #    print(potential_organisation)
-    return(potential_organisation)
+    return potential_organisation
 
 @app.get("/loadNewPlaceAuthorityRecord")
 async def load_new_place_authority_record(new_authority_id_place, new_place_role):
+    """
+    Endpoint
+    """
 #    print(new_authority_id_place)
-#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_place + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'    
+#    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&
+# operation=searchRetrieve&query=NID%3D' + new_authority_id_place +
+#  r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
 #    potential_place = gndparse.gnd_parsing_place(authority_url)
-    potential_place = gndparse.additional_place_identification(new_authority_id_place, new_place_role)
+    potential_place = \
+        gndparse.additional_place_identification(new_authority_id_place, new_place_role)
     print("potential place to be sent to FE")
     print(potential_place)
-    return(potential_place)
+    return potential_place
 
 
 @app.get("/loadNewRepositoryAuthorityRecord")
 async def load_new_repository_authority_record(new_authority_id_rep):
+    """
+    Endpoint
+    """
 #    print(new_authority_id_rep)
-    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_rep + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+    authority_url = \
+        r'https://services.dnb.de/sru/authorities?\
+        version=1.1&operation=searchRetrieve&query=NID%3D' \
+        + new_authority_id_rep + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
     potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
 #    print(potential_organisation)
-    return(potential_organisation)
+    return potential_organisation
 
 @app.post("/submitAdditionalInformation")
-async def submit_additional_information(making_processes: list[Making_process]):
+async def submit_additional_information(making_processes: list[MakingProcess]):
+    """
+    Endpoint 
+    """
     print(making_processes)
     making_processes = await gndparse.making_process_identification(making_processes)
     print("The following is sent back: ")
     print(making_processes)
-    return(making_processes)
+    return making_processes
 
-@app.post("/createNewRessource")
-async def createNewRessource(metadata: Metadata):
-    print("hello world")
+@app.post("/createNewResource")
+async def create_new_resource(metadata: Metadata):
+    """
+    Endpoint to create a new resource in the database
+    """
     m = metadata
-#    print(m)
     insert_metadata(m)
-#    print(m)
-    return(m)
-    
-    
+    return m
+
+
 @app.post("/createImageRecord")
-async def create_image_record(coords: Frame):
+async def create_image_record_endpoint(coords: Frame):
+    """
+    Endpoint for creating a new image record in the database given the coordinates
+    """
     print("index",coords.index)
     print("x position",coords.x_abs)
     print("y position",coords.y_abs)
@@ -176,74 +218,100 @@ async def create_image_record(coords: Frame):
     print("height",coords.h_abs)
     print("Saving image as file")
     save_image_file(coords)
-    dbactions.create_image_record()
-    
-    return()
+    db_actions.create_image_record()
+    return
 
 @app.post("/saveConnectedRecords")
-async def saveConnectedRecords(metadata: Metadata):
+async def save_connected_records(metadata: Metadata):
+    """
+    \todo not quite clear what connected records should be
+    """
     print("hello world")
     m = metadata
     print("Repository in main.py: ")
     print(m.repository)
     ingest_result = await book_ingest_create_records.metadata_dissection(m)
     #print(m)
-    return(m)
+    return m
 
-
-@app.get("/allRessources", response_model=List[Preview_list_db]) 
-async def get_all_ressources():
-    r=get_all_ressources_from_DB()  
+@app.get("/allResources", response_model=List[PreviewListDb])
+async def get_all_resources():
+    """
+    Endpoint to get all resources from the database
+    """
+    r=get_all_resources_from_db()
     print(r)
-    return(r)
-    
-@app.get("/ressource", response_model=Metadata)
-async def get_ressource(id: str):
-    print(id)
-    r=get_ressource_from_DB(id)
-    return(r)
-    
-@app.get("/findImages")    
-async def find_all_images(id: str):
-    print(id)
+    return r
+
+@app.get("/resource", response_model=Metadata)
+async def get_resource(identifier: str):
+    """
+    Endpoint to get a specific ressource from the database
+    \todo use this endpoint together with a qualifier to get any record!
+    """
+    print("Getting resource")
+    print(identifier)
+    r=get_resource_from_db(identifier)
+    return r
+
+@app.get("/findImages")
+async def find_all_images(identifier: str):
+    """
+    Endpoint to start the image finding/extraction process for a ressource
+    """
+    print(identifier)
     print("starting")
-    r=find_images(id)
+    r=find_images(identifier)
     print(r)
-    return()
-    
+    return
 
-@app.get("/getBookRecord", response_model = Book_db_display)
-async def get_book_record(id: str):
-    bookRecord = displayRecords.getBookRecord(id)
+@app.get("/getBookRecord", response_model = BookDbDisplay)
+async def get_book_record(identifier: str):
+    """
+    \todo move to get_resource
+    """
+    book_record = displayRecords.getBookRecord(identifier)
     print("bookrecord before returning from main.py: ")
-    print(bookRecord)
-    return(bookRecord)
+    print(book_record)
+    return book_record
 
-@app.get("/getManuscriptRecord", response_model = Manuscript_db_display)
-async def get_manuscript_record(id: str):
-    manuscriptRecord = displayRecords.getManuscriptRecord(id)
+@app.get("/getManuscriptRecord", response_model = ManuscriptDbDisplay)
+async def get_manuscript_record(identifier: str):
+    """
+    \todo move to get_resource    
+    """
+    manuscript_record = displayRecords.getManuscriptRecord(identifier)
     print("manuscriptkrecord before returning from main.py: ")
-    print(manuscriptRecord)
-    return(manuscriptRecord)
+    print(manuscript_record)
+    return manuscript_record
 
 
-@app.get("/getPersonRecord", response_model = Person_db_display)
-async def getPersonRecord(id: str):
+@app.get("/getPersonRecord", response_model = PersonDbDisplay)
+async def get_person_record(identifier: str):
+    """
+    \todo move to get_resource    
+    """
     print("Person record request arrived in BFF")
-    personrecord = displayRecords.getRecord(id)
+    person_record = displayRecords.getRecord(identifier)
     print("Person record sent off from BFF")
-    return(personrecord)
+    return person_record
 
-@app.get("/getOrgRecord", response_model = Org_db_display)
-async def getOrgRecord(id: str):
+@app.get("/getOrgRecord", response_model = OrgDbDisplay)
+async def get_org_record(identifier: str):
+    """
+    \todo move to get_resource    
+    """
     print("Person record request arrived in BFF")
-    orgRecord = displayRecords.getRecord(id)
+    org_record = displayRecords.getRecord(identifier)
     print("Person record sent off from BFF")
-    return(orgRecord)
+    return org_record
 
-@app.get("/getPlaceRecord", response_model = Place_db_display)
-async def getPlaceRecord(id: str):
+@app.get("/getPlaceRecord", response_model = PlaceDbDisplay)
+async def get_place_record(identifier: str):
+    """
+    \todo move to get_resource  
+    """
     print("Person record request arrived in BFF")
-    placeRecord = displayRecords.getRecord(id)
+    place_record = displayRecords.getRecord(identifier)
     print("Person record sent off from BFF")
-    return(placeRecord)
+    return place_record

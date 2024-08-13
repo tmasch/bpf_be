@@ -9,8 +9,8 @@
 
 from classes import *
 from nanoid import generate
-import requests
-import dbactions
+#import requests
+import db_actions
 from pymongo import MongoClient
 from dates_parsing import date_overall_parsing
 import re
@@ -19,8 +19,8 @@ import asyncio
 import aiohttp
 
 
-dbname = dbactions.get_database()
-coll=dbname['bpf']
+#dbname = dbactions.get_database()
+#coll=dbname['bpf']
 
 
 
@@ -71,22 +71,24 @@ async def get_viaf_from_authority(url_list):
             identifier = "JPG%7C" + url[33:]
         elif r"GND_intern" in url: # This is an intern ID of the GND that cannot be used to create proper URLs - it is necessary as log as VIAF cannot read the external ID
             identifier = "DNB%7C" + url[10:]
-        if identifier != "": 
+        if identifier != "":
             url_search = r'https://viaf.org/viaf/sourceID/' + identifier
             url_search_list.append(url_search)
 
 #    print(url_list)
     async with aiohttp.ClientSession() as session:
         results = await asyncio.gather(*(get(session, url) for url in url_search_list))
-    viaf_urls_dict = dict(zip(url_list, results))          
+    viaf_urls_dict = dict(zip(url_list, results))
     return viaf_urls_dict
 
 def add_relationship_in_far_record(record_found, record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
-# This module is used for the 'stitching' together of records; it checks, if an already extant record ('far record') already has a connection with the new record. 
-# If so, it adds the ID of the new record to the connection; if no, it creates a new connection from scratch
-# record_found is the record that will receive the reciprocal connection, record_new is the newly created record, record_new_type indicates, if the connection has to be inserted
-# under "connected_persons", "connected_organisations", or "connected_locations". 
-# If the 'far record' has better information on the type of connection, its time, or comments, these fields returned to the main module. 
+    """
+This module is used for the 'stitching' together of records; it checks, if an already extant record ('far record') already has a connection with the new record.
+If so, it adds the ID of the new record to the connection; if no, it creates a new connection from scratch
+record_found is the record that will receive the reciprocal connection, record_new is the newly created record, record_new_type indicates, if the connection has to be inserted
+under "connected_persons", "connected_organisations", or "connected_locations".
+If the 'far record' has better information on the type of connection, its time, or comments, these fields returned to the main module. 
+    """
     expected_connection_type = ""
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     print("step 2: arrived in add_relationship_in_far_record")
@@ -112,7 +114,7 @@ def add_relationship_in_far_record(record_found, record_new, record_new_type, co
 
         if "sex" in record_found:
             connection_sex = record_found["sex"]
-        else: 
+        else:
             connection_sex = ""
         if hasattr(record_new, "sex"):
             connection_backwards_sex = record_new.sex
@@ -130,33 +132,33 @@ def add_relationship_in_far_record(record_found, record_new, record_new_type, co
                 for external_id_number in range(len(record_new.external_id)):
                     if far_external_id["uri"] == record_new.external_id[external_id_number].uri:
                         if far_entity["connection_type"] == expected_connection_type: 
-                             connection_type_to_be_searched = expected_connection_type
-                             connection_type_for_insert = far_entity["connection_type"]
-                             connection_found = True
-                             break
+                            connection_type_to_be_searched = expected_connection_type
+                            connection_type_for_insert = far_entity["connection_type"]
+                            connection_found = True
+                            break
                         else:
                             if far_entity["connection_type"] in vague_connection:
-                                 connection_type_for_insert = expected_connection_type
-                                 print("far connection type was vague and is to be replaced with: ")                                 
-                                 print(connection_type_for_insert)
-                                 connection_type_to_be_searched = expected_connection_type
-                                 connection_found = True
-                                 break
+                                connection_type_for_insert = expected_connection_type
+                                print("far connection type was vague and is to be replaced with: ")                                 
+                                print(connection_type_for_insert)
+                                connection_type_to_be_searched = expected_connection_type
+                                connection_found = True
+                                break
                             elif expected_connection_type in vague_connection:
                                 connection_correction = person_relations.relation_correspondence(far_entity["connection_type"], connection_backwards_sex)
                                 print("connection in new record too vague, sending back correction: ")
-                                print(connection_correction) 
+                                print(connection_correction)
                                 connection_type_to_be_searched = far_entity["connection_type"]
                                 connection_type_for_insert = far_entity["connection_type"]
                                 connection_found = True
                                 break
-                             
-            if connection_found:            
+
+            if connection_found:
                 print("step 2a: connection found, new ID and name added to it")
                 # This is step 2a: there is already a connection, to which the ID of the new record is added
 #                                print("found record for inserting reciprocal ID")
                 far_entity["id"] = record_new.id
-                if connected_entity_connection_time != "" and far_entity["connection_time"] == "": # this means that the new record gives a connection time, the old record doesn't. 
+                if connected_entity_connection_time != "" and far_entity["connection_time"] == "": # this means that the new record gives a connection time, the old record doesn't.
                     connection_time_for_insert = connected_entity_connection_time
                     print("connection_time_for_insert")
                     print(connection_time_for_insert)
@@ -165,7 +167,7 @@ def add_relationship_in_far_record(record_found, record_new, record_new_type, co
                     time_correction = far_entity["connection_time"]
                 else:
                     print("no connection time for insert in either direction")
-                if connected_entity_connection_comment != "" and far_entity["connection_comment"] == "": # this means that the new record gives a connection time, the old record doesn't. 
+                if connected_entity_connection_comment != "" and far_entity["connection_comment"] == "": # this means that the new record gives a connection time, the old record doesn't.
                     connection_comment_for_insert = connected_entity_connection_comment
                     print("connection_comment_for_insert")
                     print(connection_comment_for_insert)
@@ -175,7 +177,7 @@ def add_relationship_in_far_record(record_found, record_new, record_new_type, co
                 else:
                     print("no connection time for insert either way")
 #                        dbactions.add_connection_id(record_found["id"], record_new_type, far_entity["name"], far_entity["id"])
-                dbactions.add_connection_id_and_name(record_found["id"], record_new_type, connection_type_to_be_searched, far_entity["name"], record_new.name_preferred, record_new.id, connection_type_for_insert, connection_time_for_insert, connection_comment_for_insert) 
+                db_actions.add_connection_id_and_name(record_found["id"], record_new_type, connection_type_to_be_searched, far_entity["name"], record_new.name_preferred, record_new.id, connection_type_for_insert, connection_time_for_insert, connection_comment_for_insert)
                 connection_found = True
                 break
 #                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
@@ -183,16 +185,16 @@ def add_relationship_in_far_record(record_found, record_new, record_new_type, co
             print("step 2b: no connection found, new connection added")
             # This is step 2b: there is no reciprocal connection, it needs to be established
 #                        print("For person " + person_found["name_preferred"] + " no connection has been found")
-            new_connection = Connected_entity()
+            new_connection = ConnectedEntity()
             new_connection.id = record_new.id
             new_connection.external_id = record_new.external_id
             new_connection.name = record_new.name_preferred # better use preview including year
             new_connection.connection_type = expected_connection_type
-            new_connection.connection_time = connected_entity_connection_time            
+            new_connection.connection_time = connected_entity_connection_time
 #            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"]) 
             # I need a separate formular, without 'sex', for orgs and places
 #                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
-            dbactions.add_connection(record_found["id"], record_new_type, new_connection)
+            db_actions.add_connection(record_found["id"], record_new_type, new_connection)
         print("Values to be returned from add_relationship_in_other_record")
         print("connection_correction: ")
         print(connection_correction)
@@ -288,37 +290,37 @@ async def metadata_dissection(metadata):
                 if person.internal_id: #Scenario (a) above - in this case, no record has to be added
                     if person.internal_id_person_type1_comment: 
                         #If the person is alredy in Iconobase but has an additional person_type1 in the new entry, it has to be added to the person record. 
-                        dbactions.add_person_type(person.internal_id, person.internal_id_person_type1_needed)
+                        db_actions.add_person_type(person.internal_id, person.internal_id_person_type1_needed)
                 elif no_new_person_chosen_from_list: # Scenario (b) above
                     person.internal_id = person.potential_candidates[person.chosen_candidate].internal_id
                     if person.potential_candidates[person.chosen_candidate].internal_id_person_type1_comment:
     #                    print("Type1 to be added:")
     #                    print(person.potential_candidates[person.chosen_candidate].internal_id) 
     #                    print(person.internal_id_person_type1_needed)
-                        dbactions.add_person_type(person.potential_candidates[person.chosen_candidate].internal_id, person.internal_id_person_type1_needed)
+                        db_actions.add_person_type(person.potential_candidates[person.chosen_candidate].internal_id, person.internal_id_person_type1_needed)
 
                 else: 
     #                print("new person")
                     for person_against_duplication in persons_list:
     #                    print("in loop for new person")
-                        if person_against_duplication.preview == person.potential_candidates[person.chosen_candidate].preview: 
+                        if person_against_duplication.preview == person.potential_candidates[person.chosen_candidate].preview:
                             # this means, if a person not yet in the database appears twice in the record, in different roles
                             person.internal_id = person_against_duplication.id
                             person_type = role_person_type_correspondence[person.role]
                             if  person_type not in person_against_duplication.person_type1: 
                                 # Since the type is created automatically from the role, there can be only one type in person
-                                dbactions.add_person_type(person.internal_id, person_type)
+                                db_actions.add_person_type(person.internal_id, person_type)
 
 
     #                        print("New Person is a duplicate")
                             break
                     else: 
     #                        print("New person is not a duplicate")
-                            person.internal_id = await person_ingest(person)
-                            person_against_duplication.preview = person.potential_candidates[person.chosen_candidate].preview
-                            person_against_duplication.id = person.internal_id
-                            person_against_duplication.person_type1 = role_person_type_correspondence[person.role]
-                            persons_list.append(person_against_duplication)
+                        person.internal_id = await person_ingest(person)
+                        person_against_duplication.preview = person.potential_candidates[person.chosen_candidate].preview
+                        person_against_duplication.id = person.internal_id
+                        person_against_duplication.person_type1 = role_person_type_correspondence[person.role]
+                        persons_list.append(person_against_duplication)
     #                       print("record against duplication: ")
     #                       print(person_against_duplication)
 
@@ -351,14 +353,14 @@ async def metadata_dissection(metadata):
     #                    print("Type needed:")
     #                    print(org.internal_id_org_type1_needed)
                         #If the organisation is alredy in Iconobase but has an additional org_type1 in the new entry, it has to be added to the organisation record. 
-                        dbactions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
+                        db_actions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
                 elif no_new_org_chosen_from_list: # Scenario (b) above
                     org.internal_id = org.potential_candidates[org.chosen_candidate].internal_id
                     if org.potential_candidates[org.chosen_candidate].internal_id_org_type1_comment:
     #                    print("Type1 to be added:")
     #                    print(org.potential_candidates[org.chosen_candidate].internal_id) 
     #                    print(org.internal_id_org_type1_needed)
-                        dbactions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
+                        db_actions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
 
                 else: 
     #                print("new organisation")
@@ -370,20 +372,20 @@ async def metadata_dissection(metadata):
                             org_type = role_org_type_correspondence[org.role]
                             if  org_type not in org_against_duplication.org_type1: 
                                 # Since the type is created automatically from the role, there can be only one type in organisation
-                                dbactions.add_organisation_type(org.internal_id, org_type)
+                                db_actions.add_organisation_type(org.internal_id, org_type)
 
 
     #                        print("New Organisation is a duplicate")
                             break
                     else: 
     #                        print("New Organisation is not a duplicate")
-                            org.internal_id = await org_ingest(org)
-                            org_against_duplication.preview = org.potential_candidates[org.chosen_candidate].preview
-                            org_against_duplication.id = org.internal_id
-                            org_against_duplication.org_type1 = role_org_type_correspondence[org.role]
-                            orgs_list.append(org_against_duplication)
+                        org.internal_id = await org_ingest(org)
+                        org_against_duplication.preview = org.potential_candidates[org.chosen_candidate].preview
+                        org_against_duplication.id = org.internal_id
+                        org_against_duplication.org_type1 = role_org_type_correspondence[org.role]
+                        orgs_list.append(org_against_duplication)
     #                        print("record against duplication: ")
-                            print(org_against_duplication)
+                        print(org_against_duplication)
 
     # Section on Places
         # There are three constellations
@@ -416,14 +418,14 @@ async def metadata_dissection(metadata):
                         print("Type needed:")
                         print(place.internal_id_place_type1_needed)
                         #If the place is alredy in Iconobase but has an additional place_type1 in the new entry, a copy with the right place_type1 has to be made
-                        place.internal_id = dbactions.copy_place_record(place.internal_id, place.internal_id_place_type1_needed) # It needs to be connected with the id of the new record
+                        place.internal_id = db_actions.copy_place_record(place.internal_id, place.internal_id_place_type1_needed) # It needs to be connected with the id of the new record
                 elif no_new_place_chosen_from_list: # Scenario (b) above
                     place.internal_id = place.potential_candidates[place.chosen_candidate].internal_id
                     if place.potential_candidates[place.chosen_candidate].internal_id_place_type1_comment:
                         print("Type1 to be added:")
                         print(place.potential_candidates[place.chosen_candidate].internal_id) 
                         print(place.internal_id_place_type1_needed)
-                        place.internal_id = dbactions.copy_place_record(place.potential_candidates[place.chosen_candidate].internal_id, place.internal_id_place_type1_needed) 
+                        place.internal_id = db_actions.copy_place_record(place.potential_candidates[place.chosen_candidate].internal_id, place.internal_id_place_type1_needed) 
                         # It needs to be connected with the id of the new record
                 else: 
                     print("new place")
@@ -435,21 +437,21 @@ async def metadata_dissection(metadata):
                             place_type = "Town - historical"
                             if  place_type not in place_against_duplication.place_type1: 
                                 # Since the type is created automatically from the role, there can be only one type in organisation
-                                place.internal_id = dbactions.copy_place_record(place.internal_id, place_type)
+                                place.internal_id = db_actions.copy_place_record(place.internal_id, place_type)
                                 # It needs to be connected with the id of the new record
 
                             print("New Place is a duplicate")
                             break
                 
                     else: 
-                            print("New Place is not a duplicate")
-                            place.internal_id = await place_ingest(place)
-                            place_against_duplication.preview = place.potential_candidates[place.chosen_candidate].preview
-                            place_against_duplication.id = place.internal_id
-                            place_against_duplication.place_type1 = ["Town - historical"]
-                            places_list.append(place_against_duplication)
-                            print("record against duplication: ")
-                            print(place_against_duplication)
+                        print("New Place is not a duplicate")
+                        place.internal_id = await place_ingest(place)
+                        place_against_duplication.preview = place.potential_candidates[place.chosen_candidate].preview
+                        place_against_duplication.id = place.internal_id
+                        place_against_duplication.place_type1 = ["Town - historical"]
+                        places_list.append(place_against_duplication)
+                        print("record against duplication: ")
+                        print(place_against_duplication)
 
 
     # Section on Repositories
@@ -470,14 +472,14 @@ async def metadata_dissection(metadata):
                 print("Type for repository needed:")
                 print(org.internal_id_org_type1_needed)
                 #If the organisation is alredy in Iconobase but has an additional org_type1 in the new entry, it has to be added to the organisation record. 
-                dbactions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
+                db_actions.add_organisation_type(org.internal_id, org.internal_id_org_type1_needed)
         elif no_new_org_chosen_from_list: # Scenario (b) above
             org.internal_id = org.potential_candidates[org.chosen_candidate].internal_id
             if org.potential_candidates[org.chosen_candidate].internal_id_org_type1_comment:
                 print("Repository chosen from list - Type1 to be added:")
                 print(org.potential_candidates[org.chosen_candidate].internal_id) 
                 print(org.internal_id_org_type1_needed)
-                dbactions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
+                db_actions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
         else: 
             print("new repository")
             org.potential_candidates[org.chosen_candidate].internal_id = await org_ingest(org)
@@ -487,20 +489,20 @@ async def metadata_dissection(metadata):
 
 # Section on Manuscripts
     if metadata.material == "m": # If the item has been identified as a manuscript
-        new_manuscript = Manuscript_db()
+        new_manuscript = ManuscriptDb()
         new_manuscript.id = generate()
-        new_repository = Link_to_repository()
+        new_repository = LinkToRepository()
         new_repository.place_id = metadata.repository[0].potential_candidates[metadata.repository[0].chosen_candidate].internal_id
         new_repository.id_preferred = metadata.shelfmark
         new_manuscript.repository.append(new_repository)
         new_manuscript.preview = metadata.repository[0].name + ", " + metadata.shelfmark
         book_record_id = new_manuscript.id # I need that one later
-        dbactions.insertRecordManuscript(new_manuscript)
+        db_actions.insert_record_manuscript(new_manuscript)
 
 # Section on printed books
     if metadata.material == "b": # If the item has been identified as printed book
         print("adding new book")
-        new_book = Book_db()
+        new_book = BookDb()
         new_book.id = generate()
         new_book.title = metadata.bibliographic_information[0].title
         new_book.volume_number = metadata.bibliographic_information[0].volume_number
@@ -511,12 +513,12 @@ async def metadata_dissection(metadata):
         new_book.date_end = metadata.bibliographic_information[0].date_end
         if metadata.bibliographic_information[0].bibliographic_id:
             for bibliographic_id in metadata.bibliographic_information[0].bibliographic_id:
-                new_bibliographic_id = External_id()
+                new_bibliographic_id = ExternalId()
                 new_bibliographic_id = bibliographic_id
                 new_book.bibliographic_id.append(new_bibliographic_id)
         if metadata.bibliographic_information[0].persons:
             for person in metadata.bibliographic_information[0].persons:
-                new_person = Book_connected_entity_db()
+                new_person = BookConnectedEntityDb()
                 new_person.role = person.role
                 if person.internal_id:
                     new_person.id = person.internal_id
@@ -525,7 +527,7 @@ async def metadata_dissection(metadata):
                 new_book.persons.append(new_person)
         if metadata.bibliographic_information[0].organisations:
             for org in metadata.bibliographic_information[0].organisations:
-                new_org = Book_connected_entity_db()
+                new_org = BookConnectedEntityDb()
                 new_org.role = org.role
                 if org.internal_id:
                     new_org.id = org.internal_id
@@ -534,7 +536,7 @@ async def metadata_dissection(metadata):
                 new_book.organisations.append(new_org)
         if metadata.bibliographic_information[0].places:
             for place in metadata.bibliographic_information[0].places:
-                new_place = Book_connected_entity_db()
+                new_place = BookConnectedEntityDb()
                 new_place.role = place.role
                 if place.internal_id:
                     new_place.id = place.internal_id
@@ -547,7 +549,7 @@ async def metadata_dissection(metadata):
         print("Completed book record")
 #        print("New book record: ")
 #        print(new_book)
-        dbactions.insertRecordBook(new_book)
+        db_actions.insert_record_book(new_book)
 
                 
                 
@@ -555,7 +557,7 @@ async def metadata_dissection(metadata):
 # This class contains the list of individual pages from the IIIF manifest as well as information on repository and shelf marks. 
 # This information will eventually be copied to the individual Artwork and Photo records, once the cropping of images is complete and those records are created.
 # It is not clear if this record will be needed in the long term 
-    new_pages = Pages_db()
+    new_pages = PagesDb()
     new_pages.id = generate()
     new_pages.book_record_id = book_record_id
     if metadata.repository[0].internal_id:
@@ -570,7 +572,7 @@ async def metadata_dissection(metadata):
         new_pages.preview = metadata.repository[0].name + ", " + metadata.shelfmark
     if metadata.material == "b": 
         new_pages.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
-    dbactions.insertRecordPages(new_pages)
+    db_actions.insert_record_pages(new_pages)
 
 
     return metadata
@@ -601,7 +603,7 @@ async def person_ingest(person):
     person_found = {}
     connection_already_made = False
     person_selected = person.potential_candidates[person.chosen_candidate]   
-    person_new = Person_db()
+    person_new = PersonDb()
     person_new.id = generate()
     person_new.type = "Person"
     person_new.person_type1.append(role_person_type_correspondence[person.role])
@@ -630,7 +632,7 @@ async def person_ingest(person):
         date_start = date_parsed[1]
         date_end = date_parsed[2]
         date_aspect = date_parsed[3]
-        date = Date_import()
+        date = DateImport()
         date.datestring_raw = date_from_source.datestring_raw
         date.date_comments = date_from_source.date_comments
         date.datetype = date_from_source.datetype
@@ -668,7 +670,7 @@ async def person_ingest(person):
                     break # if a connection with one ID is found, the other connections would be the same. 
 
             if not person_found and connected_person.external_id:
-                    list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+                list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
                     # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
     if person_selected.connected_organisations:    
         for connected_org in person_selected.connected_organisations:
@@ -740,7 +742,7 @@ async def person_ingest(person):
     print(list_of_viaf_ids)
     print(person_new.external_id)
     person_viaf_url = list_of_viaf_ids[person_new.external_id[0].uri]
-    id = External_id()
+    id = ExternalId()
     id.name = "viaf"
     id.uri = person_viaf_url
     id.id = person_viaf_url[21:]
@@ -753,7 +755,7 @@ async def person_ingest(person):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = External_id()
+                id = ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -782,7 +784,7 @@ async def person_ingest(person):
                             connected_person.connection_comment = comment_correction
                         break
             
-            new_connected_person = Connected_entity()
+            new_connected_person = ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -800,7 +802,7 @@ async def person_ingest(person):
     if person_selected.connected_organisations:
         for connected_organisation in person_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = Connected_entity()
+            new_connected_organisation = ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -824,7 +826,7 @@ async def person_ingest(person):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = Connected_entity()
+            new_connected_location = ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -865,8 +867,8 @@ async def person_ingest(person):
                     else: 
                         print("connected person not yet in new record, needs to be added")
                         far_connection_type = far_connected_person["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record["id"], "connected_persons", far_connection_type, far_connected_person["name"], person_new.name_preferred, person_new.id, far_connection_type, far_connected_person["connection_time"], far_connected_person["connection_comment"]) 
-                        new_connection = Connected_entity()
+                        db_actions.add_connection_id_and_name(far_record["id"], "connected_persons", far_connection_type, far_connected_person["name"], person_new.name_preferred, person_new.id, far_connection_type, far_connected_person["connection_time"], far_connected_person["connection_comment"]) 
+                        new_connection = ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
@@ -941,7 +943,7 @@ async def person_ingest(person):
                         if far_record["type"] == "Place": 
                             person_new.connected_locations.append(new_connection)
     """                
-    dbactions.insertRecordPerson(person_new)
+    db_actions.insert_record_person(person_new)
     return person_new.id
 
 
@@ -957,7 +959,7 @@ async def org_ingest(org):
     # Maybe I should adapt this for the dates connected with orgs. 
     org_selected = org.potential_candidates[org.chosen_candidate]               
     new_record_gnd_id = org_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
-    org_new = Organisation_db()
+    org_new = OrganisationDb()
     org_new.id = generate()
     org_new.type = "Organisation"
     org_new.org_type1.append(role_org_type_correspondence[org.role])
@@ -1077,7 +1079,7 @@ async def org_ingest(org):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = External_id()
+                id = ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -1111,7 +1113,7 @@ async def org_ingest(org):
 
 # Similar features have to be added for connected organisations and places, once this is possible.             
 
-            new_connected_person = Connected_entity()
+            new_connected_person = ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -1127,7 +1129,7 @@ async def org_ingest(org):
     if org_selected.connected_organisations:
         for connected_organisation in org_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = Connected_entity()
+            new_connected_organisation = ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -1152,7 +1154,7 @@ async def org_ingest(org):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = Connected_entity()
+            new_connected_location = ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -1196,8 +1198,8 @@ async def org_ingest(org):
                     else: 
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_org["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record["id"], "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"])                 
-                        new_connection = Connected_entity()
+                        db_actions.add_connection_id_and_name(far_record["id"], "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"])                 
+                        new_connection = ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
@@ -1266,7 +1268,7 @@ async def org_ingest(org):
     """
 
 
-    done = dbactions.insertRecordOrganisation(org_new)
+    done = db_actions.insert_record_organisation(org_new)
 
     return org_new.id
 
@@ -1290,7 +1292,7 @@ async def place_ingest(place):
         new_record_gnd_id = place_selected.external_id[1].id # I need this only as long as I cannot get VIAF to work for organisations. Normally, the GND ID is listed second. 
     else:
         new_record_gnd_id = place_selected.external_id[0].id
-    place_new = Place_db()
+    place_new = PlaceDb()
     place_new.id = generate()
     place_new.type = "Place"
     print("----------------------------------")
@@ -1329,7 +1331,7 @@ async def place_ingest(place):
 
                     break # if a connection with one ID is found, the other connections would be the same. 
             if not person_found and connected_person.external_id:
-                    list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+                list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
                     # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
     if place_selected.connected_organisations:    
         for connected_org in place_selected.connected_organisations:
@@ -1395,7 +1397,7 @@ async def place_ingest(place):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = External_id()
+                id = ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -1421,7 +1423,7 @@ async def place_ingest(place):
                         break
             
 
-            new_connected_person = Connected_entity()
+            new_connected_person = ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -1435,7 +1437,7 @@ async def place_ingest(place):
     if place_selected.connected_organisations:
         for connected_organisation in place_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = Connected_entity()
+            new_connected_organisation = ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -1459,7 +1461,7 @@ async def place_ingest(place):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = Connected_entity()
+            new_connected_location = ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -1503,8 +1505,8 @@ async def place_ingest(place):
                     else: 
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_place["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record["id"], "connected_locations", far_connection_type, far_connected_place["name"], place_new.name_preferred, place_new.id, far_connected_place["connection_type"], far_connected_place["connection_time"], far_connected_place["connection_comment"]) 
-                        new_connection = Connected_entity()
+                        db_actions.add_connection_id_and_name(far_record["id"], "connected_locations", far_connection_type, far_connected_place["name"], place_new.name_preferred, place_new.id, far_connected_place["connection_type"], far_connected_place["connection_time"], far_connected_place["connection_comment"]) 
+                        new_connection = ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
@@ -1594,7 +1596,7 @@ async def place_ingest(place):
                         if far_record["type"] == "Place": 
                             place_new.connected_locations.append(new_connection)
     """
-    done = dbactions.insertRecordPlace(place_new)
+    done = db_actions.insert_record_place(place_new)
 
     return place_new.id
 

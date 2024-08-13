@@ -1750,7 +1750,7 @@ def entered_date(date_entered):
     if daterange_complete_start > daterange_complete_end:
             raise InvalidDateRangeException(f"start date: {daterange_complete_start} later than end date: {daterange_complete_end}")
 
-    date_new = Date_import()
+    date_new = DateImport()
     date_new.datestring_raw = date_entered
     date_new.datestring = date_complete
     date_new.date_start = daterange_complete_start

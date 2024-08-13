@@ -194,7 +194,7 @@ def iiifparse(URI_entered, material):
     print("Material: ")
     print(material)
     if material == "m": # manuscripts
-        making_process_blank = Making_process()
+        making_process_blank = MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Painting"
         person_blank = Person()
@@ -205,12 +205,12 @@ def iiifparse(URI_entered, material):
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = Date_import()
+        date_blank = DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
     if material == "b": #Printed books
-        making_process_blank = Making_process()
+        making_process_blank = MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Design"
         person_blank = Person()
@@ -221,11 +221,11 @@ def iiifparse(URI_entered, material):
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = Date_import()
+        date_blank = DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
-        making_process_blank = Making_process()
+        making_process_blank = MakingProcess()
         making_process_blank.process_number = 2
         making_process_blank.process_type = "Production of Matrix"
         person_blank = Person()
@@ -236,7 +236,7 @@ def iiifparse(URI_entered, material):
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = Date_import()
+        date_blank = DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
