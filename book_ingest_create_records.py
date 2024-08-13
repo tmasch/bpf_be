@@ -11,22 +11,24 @@ Later, there should be a search if there are already records for
 
 import re
 import asyncio
+from typing import Optional
+import xml.etree.ElementTree
 from nanoid import generate
+import urllib.request
 #import requests
-from pymongo import MongoClient
 import aiohttp
+from pydantic import BaseModel
 from dates_parsing import date_overall_parsing
 import db_actions
 import classes
 import person_relations
-
 #dbname = db_actions.get_database()
 #coll=dbname['bpf']
 
 
 
 
-role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer"}
+role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer", "art" : "Artist"}
 person_person_connection_type_correspondence = {"Vater" : "father", "Mutter" : "mother", "Bruder" : "brother", "Schwester" : "sister", "Sohn" : "son", "Tochter" : "daughter", \
                                          "Onkel" : "uncle", "Tante" : "aunt", "Neffe" : "nephew", "Nichte" : "niece", "Enkel" : "grandson", "Enkelin" : "granddaughter", 
                                          "Großvater" : "grandfather", "Großmutter" : "grandmother", "Ehemann" : "husband", "1. Ehemann" : "first husband", "2. Ehemann" : "second husband", \
@@ -47,7 +49,12 @@ async def get(session, url):
     async with session.head(url) as response:
         # Wait for the start of the response.
         await response.read()
-        return response.headers["Location"]
+#        print("result: ")
+#        print(response.headers)
+        if "Location" in response.headers:
+            return response.headers["Location"]
+        else:
+            return ""
 
 
 async def get_viaf_from_authority(url_list):
@@ -60,20 +67,24 @@ async def get_viaf_from_authority(url_list):
     url_list = list(dict.fromkeys(url_list)) # this shoudl remove duplicates
     for url in url_list:
         print("URL to be sent for transformation into VIAF ID")
-        print("List: ")
-        print(url_list)
-        print("single url")
-        print(url)
+#        print("List: ")
+#        print(url_list)
+#        print("single url")
+#        print(url)
         if r"/gnd/" in url:
             identifier = "DNB%7C" + url[22:]
 #            print("URI comes from GND")
 #            print(identifier)
-        elif r"vocab.getty.edu/page/ulan/" in url:
+        elif r"vocab.getty.edu/page/ulan/" in url: # I am not sure if this exists, but I leave it just in case
             identifier = "JPG%7C" + url[33:]
+        elif r"vocab.getty.edu/ulan/" in url:
+            identifier = "JPG%7C" + url[28:]
         elif r"GND_intern" in url: # This is an intern ID of the GND that cannot be used to create proper URLs - it is necessary as log as VIAF cannot read the external ID
             identifier = "DNB%7C" + url[10:]
         if identifier != "":
             url_search = r'https://viaf.org/viaf/sourceID/' + identifier
+#            print("url sent off: ")
+#            print(url_search)
             url_search_list.append(url_search)
 
 #    print(url_list)
@@ -81,6 +92,30 @@ async def get_viaf_from_authority(url_list):
         results = await asyncio.gather(*(get(session, url) for url in url_search_list))
     viaf_urls_dict = dict(zip(url_list, results))
     return viaf_urls_dict
+
+def transform_gnd_id_with_hyphen(id_with_hyphen):
+# This module is temporarily needed to replace those GND IDs of organisations and places that contain a hyphen with the internal ID of the GND that can be searched in VIAF
+# (there is a bug in VIAF preventing searches for hyphens, hence there is need for this module unless it is fixed)
+# input is merely the ID number, output is an object of the class External_id that is then added to the record. 
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + id_with_hyphen + r'&recordSchema=MARC21-xml&maximumRecords=100'
+    url = urllib.request.urlopen(authority_url)
+    tree = xml.etree.ElementTree.parse(url)
+    root = tree.getroot()
+    for record in root[2]:
+        print("Getting internal id")
+        for step1 in record[2][0]:
+            match step1.get('tag'):
+                case "001":
+                    record_id = classes.ExternalId()
+                    record_id.name = "GND_intern"
+                    record_id.id = step1.text
+                    record_id.uri = "GND_intern" + step1.text
+                    print("ID as produced by transform_gnd_id_with_hyphen")
+                    print(record_id)
+    return record_id
+                    
+
+
 
 def add_relationship_in_far_record(record_found, record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
     """
@@ -246,6 +281,20 @@ def relationship_parse(main_entity_type, connected_entity_type, connection_comme
 
 
 
+class Person_against_duplication(BaseModel): # I have these classes here and not in 'classes' because they are only needed in these functions.
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    person_type1 : Optional[list[str]]  = []
+
+class Org_against_duplication(BaseModel):
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    org_type1 : Optional[list[str]]  = []
+
+class Place_against_duplication(BaseModel):
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    place_type1 : Optional[list[str]]  = []
 
 
 async def metadata_dissection(metadata):
@@ -261,11 +310,29 @@ async def metadata_dissection(metadata):
 
     
     
+        persons_entered_list = [] # This list contains both persons from the bibliographical record and artists
         persons_list = [] # This list exists to make sure that if the same person is mentioned twice in different functions, e.g. as author and publisher, there is only one record created 
         person_against_duplication = classes.PersonAgainstDuplication()
         
         if metadata.bibliographic_information[0].persons:
             for person in metadata.bibliographic_information[0].persons:
+                persons_entered_list.append(person)
+#            persons_entered_list = metadata.bibliographic_information[0].persons
+#            print("--------------------------------------")
+#            print("Persons in metadata.bibliographic_information[0]: ")
+#            print(metadata.bibliographic_information[0].persons)
+            print("--------------------------------------")
+            print("Making_processes in metadata: ")
+            print(metadata.making_processes)
+        for making_process in metadata.making_processes:
+            if making_process.person.name:
+                persons_entered_list.append(making_process.person)
+#                print("--------------------------------------")
+#                print("Persons in metadata.bibliographic_information[0] after adding making_process to persons_list: ")
+#                print(metadata.bibliographic_information[0].persons)
+        
+        if len(persons_entered_list) > 0:
+            for person in persons_entered_list:
                 no_new_person_chosen_from_list = False
                 if person.chosen_candidate != 999: # I make this awkward construction to avoid 'out of range' exceptions
     #                print("there is a chosen candidate")
@@ -504,6 +571,9 @@ async def metadata_dissection(metadata):
                 new_bibliographic_id = bibliographic_id
                 new_book.bibliographic_id.append(new_bibliographic_id)
         if metadata.bibliographic_information[0].persons:
+#            print("-------------------------------------------------------------------")
+#            print("persons in metadata.bibliographic_information[0].persons at the end of metadata_dissection: ")
+#            print(metadata.bibliographic_information[0].persons)
             for person in metadata.bibliographic_information[0].persons:
                 new_person = classes.BookConnectedEntityDb()
                 new_person.role = person.role
@@ -596,8 +666,16 @@ async def person_ingest(person):
     person_new.person_type1.append(role_person_type_correspondence[person.role])
     person_new.external_id = person_selected.external_id
     connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time        
-    new_record_gnd_id = person_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
-    list_of_ids_to_check.append(person_new.external_id[0].uri) # The VIAF IDs added from this list will later be added to the record
+    for person_id in person_new.external_id: 
+        if person_id.name == "GND":
+            new_record_gnd_id = person_id.id
+            list_of_ids_to_check.append(person_id.uri)
+            break
+        if person_id.name == "ULAN":
+            list_of_ids_to_check.append(person_id.uri)
+
+    #new_record_gnd_id = person_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
+    #list_of_ids_to_check.append(person_new.external_id[0].uri) # The VIAF IDs added from this list will later be added to the record
     person_new.name_preferred = person_selected.name_preferred
     print("----------------------------------")
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
@@ -606,13 +684,16 @@ async def person_ingest(person):
     print(person_new.name_preferred)
     print(person_new.id)
     print(person_new.external_id)
+    print(person_selected.connected_persons)
     person_new.name_variant = person_selected.name_variant
     if person.name not in person_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.
         # This is necessary because up to now, Iconobase uses a string search for variants and not a word search. 
         person_new.name_variant.append(person.name)
     person_new.sex = person_selected.sex
-    """ Currently, I still use the list of dates_from_source and simply add the newly parsed datestring and start and end dates to it. 
-        In a later stage, the entire list will be sent to the parsing function, and only one date will come back for inclusion into the database """
+    #Currently, I still use the list of dates_from_source and simply add 
+    # the newly parsed datestring and start and end dates to it. 
+    #    In a later stage, the entire list will be sent to the parsing function, 
+    # and only one date will come back for inclusion into the database 
     for date_from_source in person_selected.dates_from_source:
         date_parsed = date_overall_parsing(date_from_source.datestring_raw, date_from_source.date_comments, date_from_source.datetype)
         datestring = date_parsed[0]
@@ -628,7 +709,7 @@ async def person_ingest(person):
         date.date_end = date_end
         date.date_aspect = date_aspect
         person_new.dates_from_source.append(date)
-
+        
     if person_selected.connected_persons:
     # As part of the process of 'stitching' the records of connected persons together with other records already dealing with these persons, I first check if connections can be made via the 
     # GND ID - and if not, I check the VIAF ID. Since donwloading VIAF IDs is a slow process, I try to use get them in one go through async. 
@@ -675,17 +756,17 @@ async def person_ingest(person):
 #                        connected_org.connection_type = person_relations.correspoding_relationships(org_found["connection_type"], "")
 #                    type_correction, time_correction, comment_correction = add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type, connected_org.connection_time, connected_org.connection_comment), connected_org.connection_time # This is step 2, the reciprocal connection
                     # The following lines were inserted since inexplicably here the function returns not three strings alone, but puts them as first element into a tuple
-                    x = add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type, connected_org.connection_time, connected_org.connection_comment), connected_org.connection_time # This is step 2, the reciprocal connection
-                    print("values returned by add_relationship_in_far_record")
-                    print(x)
-                    if len(x) == 3:
-                        type_correction = x[0]
-                        time_correction = x[1]
-                        comment_correction = x[2]
-                    elif len(x) == 2 and len(x[0]) == 3:
-                        type_correction = x[0][0]
-                        time_correction = x[0][1]
-                        comment_correction = x[0][2]
+                    type_correction, time_correction, comment_correction = add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type, connected_org.connection_time, connected_org.connection_comment) # This is step 2, the reciprocal connection
+#                    print("values returned by add_relationship_in_far_record")
+#                    print(x)
+#                    if len(x) == 3:
+#                        type_correction = x[0]
+#                        time_correction = x[1]
+#                        comment_correction = x[2]
+#                    elif len(x) == 2 and len(x[0]) == 3:
+#                        type_correction = x[0][0]
+#                        time_correction = x[0][1]
+#                        comment_correction = x[0][2]
                         #type_correction, time_correction, comment_correction = add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type, connected_org.connection_time, connected_org.connection_comment), connected_org.connection_time # This is step 2, the reciprocal connection
 
                     print("values returned from add_relationship_in_far_record")
@@ -697,9 +778,17 @@ async def person_ingest(person):
                         connected_org.connection_comment = comment_correction
 
                     break # if a connection with one ID is found, the other connections would be the same. 
-#           The following two lines are commented out until VIAF can deal with GND organisations
-#            if not org_found and connected_org.external_id:
-#                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+            if not org_found and connected_org.external_id:
+                if "-" in connected_org.external_id[0].id:
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_org.external_id[0].id)
+                    connected_org.external_id.insert(0,gnd_internal_id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else: 
+                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
     if person_selected.connected_locations:
         for connected_location in person_selected.connected_locations:
             connected_location.connection_comment, connected_location.connection_type = relationship_parse("person", "location", connected_location.connection_comment, connected_location.connection_type, person_new.sex)                    
@@ -720,9 +809,21 @@ async def person_ingest(person):
                         connected_location.connection_comment = comment_correction
 
                     break # if a connection with one ID is found, the other connections would be the same. 
-#           The following two lines are commented out until VIAF can deal with GND locations
-#            if not location_found and connected_location.external_id:
-#                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+            if not location_found and connected_location.external_id:
+                if "-place" in connected_location.external_id[0].id: # Currently, I do not know how to further process these IDs
+                    pass
+                elif "-" in connected_location.external_id[0].id:
+                    print("location with hyphen found")
+                    print("sending id to transform_gnd_id_with_hyphen")
+                    print(connected_location.external_id[0].id)
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_location.external_id[0].id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    connected_location.external_id.insert(0,gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else:
+                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+    
 
     # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF. 
     list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
@@ -731,13 +832,15 @@ async def person_ingest(person):
     print("created viaf ids")
     print(list_of_viaf_ids)
     print(person_new.external_id)
+    print("newly created VIAF URLs: ")
+    print(list_of_viaf_ids)
     person_viaf_url = list_of_viaf_ids[person_new.external_id[0].uri]
-    id = classes.ExternalId()
-    id.name = "viaf"
-    id.uri = person_viaf_url
-    id.id = person_viaf_url[21:]
-    new_record_viaf_id = id.id # I need this later
-    person_new.external_id.append(id)
+    viaf_id = classes.ExternalId()
+    viaf_id.name = "viaf"
+    viaf_id.uri = person_viaf_url
+    viaf_id.id = person_viaf_url[21:]
+    new_record_viaf_id = viaf_id.id # I need this later
+    person_new.external_id.append(viaf_id)
     # this has to be expanded for organisations and locations, once this is possible
     # then, to the record of the connected person
 
@@ -745,11 +848,30 @@ async def person_ingest(person):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id =classes.ExternalId()
-                id.name = "viaf"
-                id.uri = person_viaf_url
-                id.id = person_viaf_url[21:]
-                connected_person.external_id.append(id)    
+                person_id =classes.ExternalId()
+                person_id.name = "viaf"
+                person_id.uri = person_viaf_url
+                person_id.id = person_viaf_url[21:]
+                connected_person.external_id.append(person_id)
+    for connected_org in person_selected.connected_organisations:
+        if connected_org.external_id:
+            if connected_org.external_id[0].uri in list_of_viaf_ids:
+                org_viaf_url = list_of_viaf_ids[connected_org.external_id[0].uri]
+                org_id = classes.ExternalId()
+                org_id.name = "viaf"
+                org_id.uri = org_viaf_url
+                org_id.id = org_viaf_url[21:]
+                connected_org.external_id.append(org_id)
+    for connected_location in person_selected.connected_locations:
+        if connected_location.external_id:
+            if connected_location.external_id[0].uri in list_of_viaf_ids:
+                location_viaf_url = list_of_viaf_ids[connected_location.external_id[0].uri]
+                place_id = classes.ExternalId()
+                place_id.name = "viaf"
+                place_id.uri = location_viaf_url
+                place_id.id = location_viaf_url[21:]
+                connected_location.external_id.append(place_id)
+
 
     if person_selected.connected_persons:
         for connected_person in person_selected.connected_persons:                
@@ -876,65 +998,6 @@ async def person_ingest(person):
                         if far_record["type"] == "Place": 
                             person_new.connected_locations.append(new_connection)
                         break
-
-
-
-    """
-
-    for far_record in list_found:
-        far_record_id = far_record["id"]
-        if far_record["type"] == "Person":
-            for connected_person in person_new.connected_persons:
-                connection_already_made = False
-                if connected_person.id == far_record_id:
-                    connection_already_made = True
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        elif far_record["type"] == "Organisation": 
-            for connected_org in person_new.connected_organisations:
-                connection_already_made = False
-                if connected_org.id == far_record_id:
-                    connection_already_made = True
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        elif far_record["type"] == "Place":
-            for connected_location in person_new.connected_locations:
-                connection_already_made = False
-                if connected_location.id == far_record_id:
-                    connection_already_made = True
-                    print("connection in location found")
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        
-        if connection_already_made == False: # i.e., one has to create a connection
-            # first getting the data from the 'far record'
-            print("no connection found, making new connection")
-            far_record_connected_persons = far_record["connected_persons"]
-            far_connection_type = ""
-            for far_connected_person in far_record_connected_persons:              
-                connection_found = False
-                for far_external_id in far_connected_person["external_id"]:
-                    if far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id:
-
-#                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
-                        far_connection_type = far_connected_person["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record_id, "connected_persons", far_connection_type, far_connected_person["name"], person_new.name_preferred, person_new.id, far_connection_type, far_connected_person["connection_time"], far_connected_person["connection_comment"]) 
-                        new_connection = Connected_entity()
-                        new_connection.id = far_record_id
-                        new_connection.name = far_record["name_preferred"]
-                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
-                        new_connection.connection_comment = far_connected_person["connection_comment"]
-                        new_connection.connection_time = far_connected_person["connection_time"]
-                        print("connection time found")
-                        print(far_connected_person["connection_time"])
-            #            new_connection.connection_type = "counterpart to " + far_connection_type
-                        if far_record["type"] == "Person": 
-                            person_new.connected_persons.append(new_connection)
-                        if far_record["type"] == "Organisation": 
-                            person_new.connected_organisations.append(new_connection)
-                        if far_record["type"] == "Place": 
-                            person_new.connected_locations.append(new_connection)
-    """                
     db_actions.insert_record_person(person_new)
     return person_new.id
 
@@ -947,6 +1010,9 @@ async def org_ingest(org):
     list_of_ids_to_check = []
     new_record_viaf_id = ""
     new_record_gnd_id = ""
+    person_found = {}
+    org_found = {}
+    location_found = {}
     connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time
     # Maybe I should adapt this for the dates connected with orgs. 
     org_selected = org.potential_candidates[org.chosen_candidate]               
@@ -956,11 +1022,27 @@ async def org_ingest(org):
     org_new.type = "Organisation"
     org_new.org_type1.append(role_org_type_correspondence[org.role])
     org_new.external_id = org_selected.external_id
+    for org_id in org_new.external_id:
+        if org_id.name == "GND_intern":
+            list_of_ids_to_check.append(org_id.uri)
+            break
+        elif org_id.name == "GND":
+            new_record_gnd_id = org_id.id
+            if "-" in org_id.id:
+                gnd_internal_id = transform_gnd_id_with_hyphen(org_id.id)
+                print("This is the gnd_internal_id produced by the new module: ")
+                print(gnd_internal_id)
+                org_new.external_id.insert(0,gnd_internal_id)
+                list_of_ids_to_check.append(gnd_internal_id.uri)
+                break
+            else:
+                list_of_ids_to_check.append(org_id.uri)
+                break
+
     # Here, the VIAF ID is added to the organisation's record
 # I have cancelled the next two lines as long as VIAF doesn't work properly with organisation IDs. 
     #new_record_viaf_id = get_viaf_from_authority(org_new.external_id[0].uri)
     #org_new.external_id.append(new_record_viaf_id)
-    connection_already_made = False
     org_new.name_preferred = org_selected.name_preferred
     print("----------------------------------")
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
@@ -1026,6 +1108,17 @@ async def org_ingest(org):
                         connected_org.connection_comment = comment_correction
 
                     break # if a connection with one ID is found, the other connections would be the same. 
+            if not org_found and connected_org.external_id:
+                if "-" in connected_org.external_id[0].id:
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_org.external_id[0].id)
+                    connected_org.external_id.insert(0,gnd_internal_id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else: 
+                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+
 #           The following two lines are commented out until VIAF can deal with GND organisations
 #            if not org_found and connected_org.external_id:
 #                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
@@ -1048,8 +1141,21 @@ async def org_ingest(org):
                         connected_location.connection_time = time_correction
                     if comment_correction != "":
                         connected_location.connection_comment = comment_correction
-
                     break # if a connection with one ID is found, the other connections would be the same. 
+            if not location_found and connected_location.external_id:
+                if "-" in connected_location.external_id[0].id:
+                    print("location with hyphen found")
+                    print("sending id to transform_gnd_id_with_hyphen")
+                    print(connected_location.external_id[0].id)
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_location.external_id[0].id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    connected_location.external_id.insert(0,gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else:
+                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+
 #           The following two lines are commented out until VIAF can deal with GND locations
 #            if not location_found and connected_location.external_id:
 #                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
@@ -1059,28 +1165,46 @@ async def org_ingest(org):
 #    print(list_of_viaf_ids)
 
 # The following has to be commented out until I can process organisation VIAF IDs
-    """
+    
     org_viaf_url = list_of_viaf_ids[org_new.external_id[0].uri]
-    id = External_id()
-    id.name = "viaf"
-    id.uri = org_viaf_url
-    id.id = org_viaf_url[21:]
-    new_record_viaf_id = id.id # I need this later
-    org_new.external_id.append(id)
+    org_id = classes.ExternalId()
+    org_id.name = "viaf"
+    org_id.uri = org_viaf_url
+    org_id.id = org_viaf_url[21:]
+    new_record_viaf_id = org_id.id # I need this later
+    org_new.external_id.append(org_id)
     # this has to be expanded for organisations and locations, once this is possible
     # then, to the record of the connected person
-    """
+    
     for connected_person in org_selected.connected_persons:
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = classes.ExternalId()
-                id.name = "viaf"
-                id.uri = person_viaf_url
-                id.id = person_viaf_url[21:]
-                connected_person.external_id.append(id)    
+                person_id = classes.ExternalId()
+                person_id.name = "viaf"
+                person_id.uri = person_viaf_url
+                person_id.id = person_viaf_url[21:]
+                connected_person.external_id.append(person_id)
+    for connected_org in org_selected.connected_organisations:
+        if connected_org.external_id:
+            if connected_org.external_id[0].uri in list_of_viaf_ids:
+                org_viaf_url = list_of_viaf_ids[connected_org.external_id[0].uri]
+                org_id = classes.ExternalId()
+                org_id.name = "viaf"
+                org_id.uri = org_viaf_url
+                org_id.id = org_viaf_url[21:]
+                connected_org.external_id.append(org_id)
+    for connected_location in org_selected.connected_locations:
+        if connected_location.external_id:
+            if connected_location.external_id[0].uri in list_of_viaf_ids:
+                location_viaf_url = list_of_viaf_ids[connected_location.external_id[0].uri]
+                place_id = classes.ExternalId()
+                place_id.name = "viaf"
+                place_id.uri = location_viaf_url
+                place_id.id = location_viaf_url[21:]
+                connected_location.external_id.append(place_id)
 
-# Similar features have to be added for connected organisations and places, once this is possible. 
+
 
     if org_selected.connected_persons:
         for connected_person in org_selected.connected_persons:                
@@ -1211,61 +1335,7 @@ async def org_ingest(org):
                             org_new.connected_locations.append(new_connection)
                         break
 
-
-
-    """
-        far_record_id = far_record["id"]
-        if far_record["type"] == "Person":
-            for connected_person in org_new.connected_persons:
-                connection_already_made = False
-                if connected_person.id == far_record_id:
-                    connection_already_made = True
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        elif far_record["type"] == "Organisation": 
-            for connected_org in org_new.connected_organisations:
-                connection_already_made = False
-                if connected_org.id == far_record_id:
-                    connection_already_made = True
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        elif far_record["type"] == "Place":
-            for connected_location in org_new.connected_locations:
-                connection_already_made = False
-                if connected_location.id == far_record_id:
-                    connection_already_made = True
-                    print("connection in location found")
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        
-        if connection_already_made == False: # i.e., one has to create a connection
-            print("no connection for step 3 found, creating new connection")
-            # first getting the data from the 'far record'
-            far_record_connected_orgs = far_record["connected_organisations"]
-            far_connection_type = ""
-            for far_connected_org in far_record_connected_orgs:              
-                for far_external_id in far_connected_org["external_id"]:
-                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
-                        far_connection_type = far_connected_org["connection_type"]
-                        dbactions.add_connection_id_and_name(far_record_id, "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"]) 
-                        new_connection = Connected_entity()
-                        new_connection.id = far_record_id
-                        new_connection.name = far_record["name_preferred"]
-                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
-                        new_connection.connection_comment = far_connected_org["connection_comment"]
-                        new_connection.connection_time = far_connected_org["connection_time"]
-            #            new_connection.connection_type = "counterpart to " + far_connection_type
-                        if far_record["type"] == "Person": 
-                            org_new.connected_persons.append(new_connection)
-                        if far_record["type"] == "Organisation": 
-                            org_new.connected_organisations.append(new_connection)
-                        if far_record["type"] == "Place": 
-                            org_new.connected_locations.append(new_connection)
-                
-    """
-
-
-    done = db_actions.insert_record_organisation(org_new)
+    db_actions.insert_record_organisation(org_new)
 
     return org_new.id
 
@@ -1276,6 +1346,9 @@ async def place_ingest(place):
     list_of_ids_to_check = []
     new_record_viaf_id = ""
     new_record_gnd_id = ""
+    person_found = {}
+    org_found = {}
+    location_found = {}
     connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time
     # Maybe I should adapt this for the dates connected with places. 
     # This function is about translating the imported information of a place into the place record used for the database. 
@@ -1301,6 +1374,23 @@ async def place_ingest(place):
 
     place_new.place_type1 = ["Town - historical"]
     place_new.external_id = place_selected.external_id
+    for place_id in place_new.external_id: 
+        if place_id.name == "GND_intern":
+            list_of_ids_to_check.append(place_id.uri)
+            break
+        elif place_id.name == "GND": # this would normally not be the case. 
+            new_record_gnd_id = place_id.id
+            if "-" in place_id.id:
+                gnd_internal_id = transform_gnd_id_with_hyphen(place_id.id)
+                print("This is the gnd_internal_id produced by the new module: ")
+                print(gnd_internal_id)
+                place_new.external_id.insert(0,gnd_internal_id)
+                list_of_ids_to_check.append(gnd_internal_id.uri)
+                break                                        
+            else:
+                list_of_ids_to_check.append(place_id.uri)
+                break
+
     place_new.name_preferred = place_selected.name_preferred
     place_new.name_variant = place_selected.name_variant
     if place.name not in place_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.
@@ -1309,8 +1399,8 @@ async def place_ingest(place):
     place_new.dates_from_source = place_selected.dates_from_source # A lot of works needs to be done here. 
     if place_selected.connected_persons:
         # This is step 1 of the stitching process
-        for connected_place in place_selected.connected_persons:
-            connected_place.connection_comment, connected_person.connection_type = relationship_parse("location", "person", connected_person.connection_comment, connected_person.connection_type, "")
+        for connected_person in place_selected.connected_persons:
+            connected_person.connection_comment, connected_person.connection_type = relationship_parse("location", "person", connected_person.connection_comment, connected_person.connection_type, "")
             for external_id in connected_person.external_id:
 #                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
                 person_found = db_actions.find.person(external_id,"external_id_connected_location")
@@ -1351,6 +1441,16 @@ async def place_ingest(place):
                         connected_org.connection_comment = comment_correction
 
                     break # if a connection with one ID is found, the other connections would be the same. 
+            if not org_found and connected_org.external_id:
+                if "-" in connected_org.external_id[0].id:
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_org.external_id[0].id)
+                    connected_org.external_id.insert(0,gnd_internal_id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else: 
+                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
 #           The following two lines are commented out until VIAF can deal with GND organisations
 #            if not org_found and connected_org.external_id:
 #                    list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
@@ -1365,7 +1465,7 @@ async def place_ingest(place):
                     print("step 1 (GND): place connected to place found")
                     connected_location.id = location_found["id"]
                     connected_location.name = location_found["name_preferred"]
-                    type_correction, time_correction, comment_correction = add_relationship_in_far_record(location_found, place_new, "connected_locations", connected_location.connection_type) # This is step 2, the reciprocal connection
+                    type_correction, time_correction, comment_correction = add_relationship_in_far_record(location_found, place_new, "connected_locations", connected_location.connection_type, connected_location.connection_time, connected_location.connection_comment) # This is step 2, the reciprocal connection
                     if type_correction != "":
                         connected_location.connection_type = type_correction
                     if time_correction != "":
@@ -1373,6 +1473,20 @@ async def place_ingest(place):
                     if comment_correction != "":
                         connected_location.connection_comment = comment_correction
                     break # if a connection with one ID is found, the other connections would be the same. 
+            if not location_found and connected_location.external_id:
+                if "-" in connected_location.external_id[0].id:
+                    print("location with hyphen found")
+                    print("sending id to transform_gnd_id_with_hyphen")
+                    print(connected_location.external_id[0].id)
+                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_location.external_id[0].id)
+                    print("This is the gnd_internal_id produced by the new module: ")
+                    print(gnd_internal_id)
+                    connected_location.external_id.insert(0,gnd_internal_id)
+                    list_of_ids_to_check.append(gnd_internal_id.uri)
+                else:
+                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+
 #           The following two lines are commented out until VIAF can deal with GND locations
 #            if not location_found and connected_location.external_id:
 #                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
@@ -1380,31 +1494,48 @@ async def place_ingest(place):
     # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF. 
     list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
 #    print(list_of_viaf_ids)
-    # The following has to be commented out until I can process organisation VIAF IDs
-    """
+    
+    
 
-    location_viaf_url = list_of_viaf_ids[person_new.external_id[0].uri]
-    id = External_id()
-    id.name = "viaf"
-    id.uri = location_viaf_url
-    id.id = location_viaf_url[21:]#####
-    new_record_viaf_id = id.id # I need this later
-    place_new.external_id.append(id)
+    location_viaf_url = list_of_viaf_ids[place_new.external_id[0].uri]
+    place_id = classes.ExternalId()
+    place_id.name = "viaf"
+    place_id.uri = location_viaf_url
+    place_id.id = location_viaf_url[21:]#####
+    new_record_viaf_id = place_id.id # I need this later
+    place_new.external_id.append(place_id)
     # this has to be expanded for organisations and locations, once this is possible
     # then, to the record of the connected person
-    """
+    
     for connected_person in place_selected.connected_persons:
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = classes.ExternalId()
-                id.name = "viaf"
-                id.uri = person_viaf_url
-                id.id = person_viaf_url[21:]
-                connected_place.external_id.append(id)    
-    # Similar features have to be added for connected organisations and places, once this is possible. 
+                person_id = classes.ExternalId()
+                person_id.name = "viaf"
+                person_id.uri = person_viaf_url
+                person_id.id = person_viaf_url[21:]
+                connected_person.external_id.append(person_id)    
+    for connected_org in place_selected.connected_organisations:
+        if connected_org.external_id:
+            if connected_org.external_id[0].uri in list_of_viaf_ids:
+                org_viaf_url = list_of_viaf_ids[connected_org.external_id[0].uri]
+                org_id = classes.ExternalID()
+                org_id.name = "viaf"
+                org_id.uri = org_viaf_url
+                org_id.id = org_viaf_url[21:]
+                connected_org.external_id.append(org_id)
+    for connected_location in place_selected.connected_locations:
+        if connected_location.external_id:
+            if connected_location.external_id[0].uri in list_of_viaf_ids:
+                location_viaf_url = list_of_viaf_ids[connected_location.external_id[0].uri]
+                place_id = classes.External_id
+                place_id.name = "viaf"
+                place_id.uri = location_viaf_url
+                place_id.id = location_viaf_url[21:]
+                connected_location.external_id.append(place_id)
 
-
+    
     if place_selected.connected_persons:
         for connected_person in place_selected.connected_persons:                
             if not connected_person.id and connected_person.external_id: # If there is already an id, no 'stitching' is required                               
@@ -1530,75 +1661,7 @@ async def place_ingest(place):
                             place_new.connected_locations.append(new_connection)
 
 
-        """
-        far_record_id = far_record["id"]
-        connection_already_made = False
-        if far_record["type"] == "Person":
-            for connected_person in place_new.connected_persons:
-                connection_already_made = False
-                print("checking record of person with a connection to this place")
-                print("connected_person.id: ")
-                print(connected_person.id)
-                print("far_record_id:")
-                print(far_record_id)
-                if connected_person.id == far_record_id:
-                    connection_already_made = True
-                    # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-                print(connection_already_made)
-        elif far_record["type"] == "Organisation": 
-            for connected_org in place_new.connected_organisations:
-                connection_already_made = False
-                if connected_org.id == far_record_id:
-                    connection_already_made = True
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        elif far_record["type"] == "Place":
-            for connected_location in place_new.connected_locations:
-                connection_already_made = False
-                if connected_location.id == far_record_id:
-                    connection_already_made = True
-                    print("connection in location found")
-                        # This means that a connection has alredady been established by steps 1 and 2 and that nothing needs to be done
-                    break
-        
-        print("summary of comparison: ")
-        print(connection_already_made)
-        if connection_already_made == False: # i.e., one has to create a connection
-            # first getting the data from the 'far record'
-            far_record_connected_places = far_record["connected_locations"]
-            far_connection_type = ""
-            for far_connected_place in far_record_connected_places:       
-                print("far_connected_place")       
-                print(far_connected_place)
-                for far_external_id in far_connected_place["external_id"]:
-                    if (far_external_id["name"] == "viaf" and far_external_id["id"] == new_record_viaf_id) or (far_external_id["name"] == "GND" and far_external_id["id"] == new_record_gnd_id):
-                        far_connection_type = far_connected_place["connection_type"]
-                        print("establishing a new connection")
-
-                        dbactions.add_connection_id_and_name(far_record_id, "connected_locations", far_connection_type, far_connected_place["name"], place_new.name_preferred, place_new.id, far_connected_place["connection_type"], far_connected_place["connection_time"], far_connected_place["connection_comment"]) 
-                        new_connection = Connected_entity()
-                        new_connection.id = far_record_id
-                        new_connection.name = far_record["name_preferred"]
-                        new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
-                        new_connection.connection_comment = far_connected_place["connection_comment"]
-                        new_connection.connection_time = far_connected_place["connection_time"]
-                        print("establishing new connection: ")
-                        print("far_connection_type: ")
-                        print(far_connection_type)
-                        print("connection_type for insertion: ")
-                        print(new_connection.connection_type)
-                        print("new connection added to place record: ")
-                        print(new_connection)
-            #            new_connection.connection_type = "counterpart to " + far_connection_type
-                        if far_record["type"] == "Person": 
-                            place_new.connected_persons.append(new_connection)
-                        if far_record["type"] == "Organisation": 
-                            place_new.connected_organisations.append(new_connection)
-                        if far_record["type"] == "Place": 
-                            place_new.connected_locations.append(new_connection)
-    """
-    done = db_actions.insert_record_place(place_new)
+    db_actions.insert_record_place(place_new)
 
     return place_new.id
 

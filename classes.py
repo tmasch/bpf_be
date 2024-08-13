@@ -395,14 +395,19 @@ This class is for entering Place authority records into the database
     comments : Optional[str] = ""
 
 
+class Making_process_db(BaseModel):
+    process_number : Optional[int] = 0
+    process_type : Optional[str] = ""
+    process_qualifier : Optional[str] = ""
+    person : Optional[ConnectedEntity] = None
+    place : Optional[ConnectedEntity] = None
+    date : Optional[Date] = None
+
+
 class LinkToRepository(BaseModel):
-    """
-This class is used for entering the link between manuscripts and repositories into the database.
-It can probably be later also used for the link between artworks and repositories
-    """
-    number : Optional[int] = 0
-    #This is only needed if several former locations are added later so that they can
-    # show in a sensible order (probably back in time)
+    # This class is used for entering the link between manuscripts and repositories into the database. 
+    # It can probably be later also used for the link between artworks and repositories
+    number : Optional[int] = 0 #This is only needed if several former locations are added later so that they can show in a sensible order (probably back in time)
     place_id : Optional[str] = ""
     current : Optional[bool] = True
     collection : Optional[bool] = True

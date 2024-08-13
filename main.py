@@ -180,10 +180,8 @@ async def load_new_repository_authority_record(new_authority_id_rep):
     Endpoint
     """
 #    print(new_authority_id_rep)
-    authority_url = \
-        r'https://services.dnb.de/sru/authorities?\
-        version=1.1&operation=searchRetrieve&query=NID%3D' \
-        + new_authority_id_rep + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+    new_authority_id_rep = new_authority_id_rep.strip()
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id_rep + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
     potential_organisation = gndparse.gnd_parsing_organisation(authority_url)
 #    print(potential_organisation)
     return potential_organisation
@@ -273,6 +271,7 @@ async def get_book_record(identifier: str):
     """
     \todo move to get_resource
     """
+    print("arrived in get book record")
     book_record = displayRecords.getBookRecord(identifier)
     print("bookrecord before returning from main.py: ")
     print(book_record)

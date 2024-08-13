@@ -6,10 +6,11 @@ encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"
 
 
 def gnd_person_person_relation(relation_original, sex, relation_type): 
-# This function takes the German phrase for a relationship from the GND and gives an English phrase (in reverse, since the GND describes the connection of the 'far' person to the 'near' person, and I do it vice versa)
+# This function takes the German phrase for a relationship from the GND and gives an English phrase
+# (in reverse, since the GND describes the connection of the 'far' person to the 'near' person, and I do it vice versa)
 # Up to now, it only covers relationships between persons - relationships between persons and organisations are to be added
 # The function takes the relationship phrase from the GND plus the sex of the 'near' person and returns one phrase for the relationship. 
-# The abbreviated relation types from 
+# The abbreviated relation types from
     relation = ""
     relation_new = ""
     relation_comments = ""
@@ -270,7 +271,6 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
     "mentor" : ["mentee of"] , \
     "militärischer vorgesetzter" : ["subordinate to (military)"], \
     "mitarbeiter" : ["worked under"], \
-    "mitarbeiter" : ["worked under"], \
     "mitschüler" : ["fellow pupil of" ], \
     "mitschülerin" : ["fellow pupil of" ], \
     "mitstreiter" : ["ally of"], \
@@ -335,7 +335,6 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
     "schwiegersohn" : ["father-in-law of", "mother-in-law of", "father- or mother-in-law of"], \
     "schwiegertochter" : ["father-in-law of", "mother-in-law of", "father- or mother-in-law of"], \
     "schwiegervater" : ["son-in-law of", "daughter-in-law of", "son- or daughter-in-law of"], \
-    "schwiegervater (1. ehe)" : ["son-in-law of (his first marriage)", "daughter-in-law of (her first marriage)", "son- or daughter-in-law of (first marriage)"], \
     "schwiegervater (1. ehe)" : ["son-in-law of (his second marriage)", "daughter-in-law of (her second marriage)", "son- or daughter-in-law of (second marriage)"], \
     "schwiegervater 1. ehe" : ["son-in-law of (his first marriage)", "daughter-in-law of (her first marriage)", "son- or daughter-in-law of (first marriage)"], \
     "schwiegervater 2. ehe" : ["son-in-law of (his second marriage)", "daughter-in-law of (her second marriage)", "son- or daughter-in-law of (second marriage)"], \
@@ -415,19 +414,17 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
     "urgroßnichte" : ["great-great-uncle of", "great-great-aunt of", "great-great-uncle or aunt of"], \
     "urgroßonkel" : ["great-grand-nephew of", "great-grand-niece of", "great-grand-nephew or niece of"], \
     "urgroßtante" : ["great-grand-nephew of", "great-grand-niece of", "great-grand-nephew or niece of"], \
-    "ururenkel" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "ur-urenkel" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "ur-ur-enkel" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "ururenkelin" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "ururgroßenkel" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "ururgroßmutter": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
-    "ururgroßvater": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
     "ur-urgroßmutter": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
     "ur-ur-großmutter": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
     "ururgroßvater": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
     "ur-urgroßvater": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
     "ur-ur-großvater": ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
-    "ururenkel" : ["great-great-great-grandfather of", "great-great-great-grandmother of", "great-great-great-grandparent of"], \
+    "ururenkel" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "urururgroßmutter": ["great-great-great-grandson of", "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
     "urururgroßvater": ["great-great-great-grandson of", "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
     "vater" : ["son of", "daughter of", "son or daughter of"], \
@@ -481,7 +478,9 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
         "erste " : "1.", "erster " : "1.", "zweite " : "2.", "zweiter " : "2.", "dritte " : "3.", "dritter " : "3.", "vierte" : "4.", "vierter" : "4.", "gross" : "groß"}
         for old, new in gnd_person_relations_replace.items():
             relation = relation.replace(old, new)
-    
+    print("parsing relation person-person")
+    print("relation_original: ")
+    print(relation_original)
     if relation != "" and relation in gnd_person_relations:
         relation_list = gnd_person_relations[relation]
         if len(relation_list) == 1:
@@ -493,6 +492,8 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
                 relation_new = relation_list[1]
             else:
                 relation_new = relation_list[2]
+    elif relation != "" and relation_type == "ulan": #in this case, the parsing has happened earlier, in gndparse. 
+        relation_new = relation_original
     else:
         relation_comments = relation_original      
         if relation_type == "bezf":
@@ -501,6 +502,8 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
             relation_new = "professional relation to" 
         elif relation_type == "beza" or relation_type == "rela": 
             relation_new = "other relationship to"
+    print("exporting new relation: ")
+    print(relation_new)
     return(relation_new, relation_comments)
 
 
@@ -511,14 +514,14 @@ def gnd_person_person_relation(relation_original, sex, relation_type):
 # 2. Ehefrau, geb. Name
 # 2. Ehemann (dates) / 2. Ehemann dates
 # 3. Ehefrau (dates) / 3. Ehefrau dates
-# 3. Ehefrau, geb. 
+# 3. Ehefrau, geb.
 # 3 Ehemann (dates) / 3. Ehemann dates
 # ehefrau (dates) / ehefrau dates
 # ehemann (dates) / ehemann dates, ehemann, dates
 # erste ehefrau dates
-# großmutter, geb. 
+# großmutter, geb.
 #mutter (dates) [= rather dates of life]
-# mutter, geb. 
+# mutter, geb.
 # schwiegersohn dates
 # schwiegertochter, geb.
 #schwiegervater dates
@@ -533,6 +536,8 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
     for old, new in encoding_list.items():
         relation_original = relation_original.replace(old, new)    
     relation = relation_original.lower()
+    print("original person org relation")
+    print(relation)
     gnd_person_org_relations = { \
         "1. vorsitzende" : ["chairwoman of"], \
         "1. vorsitzender" : ["chairman of"], \
@@ -561,6 +566,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "deputy director" : ["deputy director of"], \
         "directeur" : ["director of"], \
         "director" : ["director of"], \
+        "director of" : ["director of"], \
         "direktor" : ["director of"], \
         "direktorin" : ["director of"], \
         "diss." : ["doctorate at"], \
@@ -577,6 +583,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "fellow" : ["fellow of"], \
         "firmengründer" : ["founder of"], \
         "founder" : ["founder of"], \
+        "founder of" :  ["founder of"], 
         "founding director" : ["founding director of"], \
         "gehilfe" : ["assistant at"], \
         "geschäftsführer" : ["chief clerk of"], \
@@ -612,11 +619,12 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "leiterin" : ["director of"], \
         "leitung" : ["director of"], \
         "member" : ["member of"], \
+        "member of" : ["member of"], \
         "minister" : ["minister at"], \
         "mitarbeiter" : ["collaborator at"], \
         "mitbegr." : ["co-founder of"], \
         "mitbegründer" : ["co-founder of"], \
-        "mitbegründer" : ["co-foundress of"], \
+        "mitbegründerin" : ["co-foundress of"], \
         "mitglied" : ["member of"], \
         "mitgründer" : ["co-founder of"], \
         "mitgründer" : ["co-foundress of"], \
@@ -653,7 +661,7 @@ def gnd_person_org_relation(relation_original, sex, relation_type):
         "praeses" : ["praeses of"], \
         "präsident" : ["president of"], \
         "president" : ["president of"], \
-        "principal" : ["principal of"], \
+        "principal of" : ["principal of"], \
         "prior" : ["prior of"], \
         "priorin" : ["prioress of"], \
         "prof." : ["professor at"], 
@@ -899,16 +907,16 @@ def gnd_person_place_relation(relation_original, sex, relation_type):
     #print("comments: " + relation_comments)
     
 
-    return(relation_new, relation_comments)
-    
-  
-
     """
 
     with comments:
     Abt (years)
     Abt years
     """
+
+    return(relation_new, relation_comments)
+    
+  
 
 
 def gnd_org_person_relation(relation_original, sex, relation_type):
@@ -1139,7 +1147,7 @@ def gnd_org_place_relation(relation_original, sex, relation_type):
         relation_new = org_place_relations[relation][0]
     else:
         relation_comment = relation_original
-        "relation comment was not in list, now matching relation type"
+        """relation comment was not in list, now matching relation type"""
         match relation_type:
             case "adue":
                 relation_new = "part of"
@@ -1210,13 +1218,12 @@ def gnd_place_person_relation(relation_original, sex, relation_type):
 
 
 def gnd_place_org_relation(relation_original, sex, relation_type):
-# Here, there are so few terms that it does not make sense to parse them, hence I will only parse the main abbreviations
-    relation = ""
+""" Here, there are so few terms that it does not make sense to parse them, hence I will only parse the main abbreviations """
     relation_new = ""
     relation_comment = ""
     if relation_original:
         for old, new in encoding_list.items():
-            relation_original = relation_original.replace(old, new)    
+            relation_original = relation_original.replace(old, new)
 
         relation_comment = relation_original
     match relation_type:
@@ -1498,17 +1505,22 @@ def relation_correspondence(relation, sex):
     "godparent of" : ["godson of", "goddaughter of", "godchild of"], \
     "godson of" : ["godfather of", "godmother of", "godparent of"], \
     "graduate of" : ["graduate was"], \
-    "grandchild (daughter's son or daughter) of" : ["maternal grandfather", "maternal grandmother", "maternal grandparent"], \
-    "grandchild (son's son or daughter) of" : ["paternal grandfather", "paternal grandmother", "paternal grandparent"], \
+    "grandchild (daughter's son or daughter) of" : ["maternal grandfather", \
+                                                    "maternal grandmother", "maternal grandparent"], \
+    "grandchild (son's son or daughter) of" : ["paternal grandfather", \
+                                               "paternal grandmother", "paternal grandparent"], \
     "grandchild of" : ["grandfather of", "grandmother of", "grandparent of"], \
     "granddaughter (daughter's daughter) of" : ["maternal grandfather", "maternal grandmother", "maternal grandparent"], \
-    "granddaughter (son's daughter) of" : ["paternal grandfather", "paternal grandmother", "paternal grandparent"], \
+    "granddaughter (son's daughter) of" : ["paternal grandfather", \
+                                           "paternal grandmother", "paternal grandparent"], \
     "granddaughter of" : ["grandfather of", "grandmother of", "grandparent of"], \
     "grandfather of" : ["grandson of", "granddaughter of", "grandchild of"], \
     "grandmother of" : ["grandson of", "granddaughter of", "grandchild of"], \
     "grandparent of" : ["grandson of", "granddaughter of", "grandchild of"], \
-    "grandson (daughter's son) of" : ["maternal grandfather", "maternal grandmother", "maternal grandparent"], \
-    "grandson (son's son) of" : ["paternal grandfather", "paternal grandmother", "paternal grandparent"], \
+    "grandson (daughter's son) of" : ["maternal grandfather", \
+                                      "maternal grandmother", "maternal grandparent"], \
+    "grandson (son's son) of" : ["paternal grandfather", \
+                                 "paternal grandmother", "paternal grandparent"], \
     "grandson of" : ["grandfather of", "grandmother of", "grandparent of"], \
     "great-aunt of" : ["grand-nephew of", "grand-niece of", "grand-nephew or grand-niece of"], \
     "great-grandchild of" : ["great-grandfather of", "great-grandmother of", "great-grandparent of"], \
@@ -1523,18 +1535,30 @@ def relation_correspondence(relation, sex):
     "great-great-aunt of" : ["great-grand-nephew of", "great-grand-niece of", "great-grand-nephew or niece of"], \
     "great-great-grandchild of" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
     "great-great-granddaughter of" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
-    "great-great-grandfather of" : ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
-    "great-great-grandmother of" : ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
-    "great-great-grandparent of" : ["great-great-grandson of", "great-great-granddaughter of", "great-great-grandchild of"], \
-    "great-great-grandson of" : ["great-great-grandfather of", "great-great-grandmother of", "great-great-grandparent of"], \
-    "great-great-great-grandchild of" : ["great-great-great-grandfather of", "great-great-great-grandmother of", "great-great-great-grandparent of"], \
-    "great-great-great-granddaughter of" : ["great-great-great-grandfather of", "great-great-great-grandmother of", "great-great-great-grandparent of"], \
-    "great-great-great-grandfather of" : ["great-great-great-grandson of", "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
-    "great-great-great-grandmother of" : ["great-great-great-grandson of", "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
-    "great-great-great-grandparent of" : ["great-great-great-grandson of", "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
-    "great-great-great-grandson of" : ["great-great-great-grandfather of", "great-great-great-grandmother of", "great-great-great-grandparent of"], \
-    "great-great-uncle of" : ["great-grand-nephew of", "great-grand-niece of", "great-grand-nephew or niece of"], \
-    "great-great-uncle or aunt of" : ["great-grand-nephew of", "great-grand-niece of", "great-grand-nephew or niece of"], \
+    "great-great-grandfather of" : ["great-great-grandson of", \
+                                    "great-great-granddaughter of", "great-great-grandchild of"], \
+    "great-great-grandmother of" : ["great-great-grandson of", \
+                                    "great-great-granddaughter of", "great-great-grandchild of"], \
+    "great-great-grandparent of" : ["great-great-grandson of", \
+                                    "great-great-granddaughter of", "great-great-grandchild of"], \
+    "great-great-grandson of" : ["great-great-grandfather of", \
+                                 "great-great-grandmother of", "great-great-grandparent of"], \
+    "great-great-great-grandchild of" : ["great-great-great-grandfather of", \
+                                         "great-great-great-grandmother of", "great-great-great-grandparent of"], \
+    "great-great-great-granddaughter of" : ["great-great-great-grandfather of", \
+                                            "great-great-great-grandmother of", "great-great-great-grandparent of"], \
+    "great-great-great-grandfather of" : ["great-great-great-grandson of", \
+                                          "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
+    "great-great-great-grandmother of" : ["great-great-great-grandson of", \
+                                          "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
+    "great-great-great-grandparent of" : ["great-great-great-grandson of", \
+                                          "great-great-great-granddaughter of", "great-great-great-grandchild of"], \
+    "great-great-great-grandson of" : ["great-great-great-grandfather of", \
+                                       "great-great-great-grandmother of", "great-great-great-grandparent of"], \
+    "great-great-uncle of" : ["great-grand-nephew of", \
+                              "great-grand-niece of", "great-grand-nephew or niece of"], \
+    "great-great-uncle or aunt of" : ["great-grand-nephew of", \
+                                      "great-grand-niece of", "great-grand-nephew or niece of"], \
     "great-nephew of" : ["great-uncle of", "great-aunt of", "great-uncle or great-aunt of"], \
     "great-nephew or great-niece of" : ["great-uncle of", "great-aunt of", "great-uncle or great-aunt of"], \
     "great-niece of" : ["great-uncle of", "great-aunt of", "great-uncle or great-aunt of"], \
@@ -1564,11 +1588,16 @@ def relation_correspondence(relation, sex):
     "husband or wife of" : ["husband or wife of"], \
     "husband or wife of (first marriage)" : ["first husband or wife of"], \
     "husband or wife of (second marriage)" : ["second husband or wife of"], \
-    "illegitimate daughter of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
-    "illegitimate father of" : ["illegitimate son of", "illegitimate daughter of", "illegitimate son or daughter of"], \
-    "illegitimate father or mother of" : ["illegitimate son of", "illegitimate daughter of", "illegitimate son or daughter of"], \
-    "illegitimate mother of" : ["illegitimate son of", "illegitimate daughter of", "illegitimate son or daughter of"], \
-    "illegitimate son of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
+    "illegitimate daughter of" : ["illegitimate father of", "illegitimate mother of", \
+                                  "illegitimate father or mother of"], \
+    "illegitimate father of" : ["illegitimate son of", "illegitimate daughter of", \
+                                "illegitimate son or daughter of"], \
+    "illegitimate father or mother of" : ["illegitimate son of", "illegitimate daughter of", \
+                                          "illegitimate son or daughter of"], \
+    "illegitimate mother of" : ["illegitimate son of", \
+                                "illegitimate daughter of", "illegitimate son or daughter of"], \
+    "illegitimate son of" : ["illegitimate father of", \
+                             "illegitimate mother of", "illegitimate father or mother of"], \
     "illegitimate son or daughter of" : ["illegitimate father of", "illegitimate mother of", "illegitimate father or mother of"], \
     "in" : ["location of"], \
     "indirect predecessor of" : ["indirect successor of"], \
@@ -1740,8 +1769,8 @@ def relation_correspondence(relation, sex):
     "step-son of" : ["step-father of", "step-mother of", "step-father or step-mother of"], \
     "step-son or step-daughter of" : ["step-father of", "step-mother of", "step-father or step-mother of"], \
     "student at" : ["student was"], \
-    "student of" : ["student was"], \
-    "student was" : ["student of"], \
+    "student of" : ["teacher of"], \
+    "student was" : ["student at"], \
     "student of economy at" : ["student of economy was"], \
     "student of philosophy at" : ["student of philosophy was"], \
     "studied and did doctorate in" : ["place of studies and doctorate of"], \
@@ -1761,7 +1790,7 @@ def relation_correspondence(relation, sex):
     "supposecly active in" : ["supposed plce of activity of"], \
     "supposedly born in" : ["suposed place of birth of"], \
     "supposedly died in" : ["supposed place of death of"], \
-    "teacher of" : ["teacher was"], \
+    "teacher of" : ["student of"], \
     "teacher in" : ["teacher here was"], \
     "teacher at" : ["teacher was"], \
     "temporary name was" : ["temporary name of"], \

@@ -127,7 +127,7 @@ If there is an ID-number (internal or GND, the search is done for the ID-number,
             for extant_candidate in person.potential_candidates:
                 if extant_candidate.name_preferred == candidate.name_preferred:
                     candidate_duplicate = True
-            if candidate_duplicate == False:             
+            if not candidate_duplicate:             
                 person.potential_candidates.append(candidate)
                 #print(person.potential_candidates)
             for candidate in person.potential_candidates:
@@ -264,7 +264,7 @@ If there is an ID-number (internal or GND, the search is done for the ID-number,
             for extant_candidate in organisation.potential_candidates:
                 if extant_candidate.name_preferred == candidate.name_preferred:
                     candidate_duplicate = True
-            if candidate_duplicate == False:
+            if not candidate_duplicate:
                     
 #            if candidate not in organisation.potential_candidates:
 #                print("Candidate not yet in list")
@@ -792,12 +792,12 @@ def gnd_parsing_organisation(authority_url):
         record_number = record_number + 1
         for step1 in record[2][0]:
             match step1.get('tag'):
-#                case "001":
-#                    org_id = External_id()
-#                    org_id.name = "GND_intern"
-#                    org_id.id = step1.text
-#                    org_id.uri = "GND_intern" + step1.text
-#                    org.external_id.append(org_id)
+                case "001":
+                    org_id = classes.ExternalId()
+                    org_id.name = "GND_intern"
+                    org_id.id = step1.text
+                    org_id.uri = "GND_intern" + step1.text
+                    org.external_id.append(org_id)
                 case "035":
                     for step2 in step1:
                         match step2.get('code'):
@@ -1009,12 +1009,12 @@ The longest part of the function the actual parsing of the XMl results, is moved
         entity_list = []
         for step1 in record[2][0]:
             match step1.get('tag'):
-#                case "001":
-#                    pl_id = External_id()
-#                    pl_id.name = "GND_intern"
-#                    pl_id.id = step1.text
-#                    pl_id.uri = "GND_intern" + step1.text
-#                    pl.external_id.append(pl_id)                
+                case "001":
+                    pl_id = classes.ExternalId()
+                    pl_id.name = "GND_intern"
+                    pl_id.id = step1.text
+                    pl_id.uri = "GND_intern" + step1.text
+                    pl.external_id.append(pl_id)                
                 case "024":
                     pl_id = classes.ExternalId()
                     for step2 in step1:
@@ -1079,6 +1079,8 @@ The longest part of the function the actual parsing of the XMl results, is moved
                         if name_variant in variant:
                             name_variant = ""
                     if name_variant:
+                        name_variant = name_variant + name_number
+                        #just in case this name_number is ever used with places
                         pl.name_variant.append(name_variant)
                 case "500":
                     conn_pe = classes.ConnectedEntity()
@@ -1206,7 +1208,7 @@ The longest part of the function the actual parsing of the XMl results, is moved
                 name_variant_preview = name_variant_preview + variant + "; "
             name_variant_preview = name_variant_preview[:-2]
 
-        pl.preview = pl.name_preferred + obpa_preview + adue_preview + vorg_preview + nach_preview + name_variant_preview + comments_preview
+        pl.preview = pl.name_preferred + date_preview + obpa_preview + adue_preview + vorg_preview + nach_preview + name_variant_preview + comments_preview
 #        print(pl)
 #        print(entity_list)
         if(("gik" in entity_list or "giz" in entity_list or "gxz" in entity_list) and "gil" not in entity_list):
@@ -1318,8 +1320,8 @@ def dates_parsing(dates_from_source):
             # this is only provisional - there are - alas - cases in which the datx field contains one exact date, and the datl field both 
             # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
         
-    pass
-    return
+    
+    return datetype, date_raw
 
 
 
@@ -1350,7 +1352,7 @@ One needs a separate function for parsing organisations.
     external_id = classes.ExternalId()
     external_id.uri = artist_record["id"]
     external_id.name = "ULAN"
-    external_id.id = external_id.uri[29:-5]
+    external_id.id = external_id.uri[28:]
     pe.external_id.append(external_id)
     pe.name_preferred = artist_record["_label"]
     name_preferred_split = pe.name_preferred.split(",", maxsplit = 1) # One of the variant names is normally just the preferred name inversed, e.g. "John Smith" instead of "Smith, John"
@@ -1374,15 +1376,15 @@ One needs a separate function for parsing organisations.
             name_variant_preview = name_variant_preview[:-2]
 
     if "classified_as" in artist_record:
-        for property in artist_record["classified_as"]:
-            if property["id"] == "http://vocab.getty.edu/aat/300189559":
+        for artist_property in artist_record["classified_as"]:
+            if artist_property["id"] == "http://vocab.getty.edu/aat/300189559":
                 pe.sex = "male"
-            if property["id"] == "http://vocab.getty.edu/aat/300189557":
+            if artist_property["id"] == "http://vocab.getty.edu/aat/300189557":
                 pe.sex = "female"
     if "referred_to_by" in artist_record:
         date_raw = ""
-        for property in artist_record["referred_to_by"]:
-            biography = property["content"]
+        for artist_property in artist_record["referred_to_by"]:
+            biography = artist_property["content"]
             if "," in biography:
                 biography_divided = biography.split(",")
                 for biography_statement in biography_divided:
@@ -1402,7 +1404,7 @@ One needs a separate function for parsing organisations.
    
     if "la:related_from_by" in artist_record:
         connections_list = []
-        if type((artist_record["la:related_from_by"])) is dict: # only one entry
+        if isinstance((artist_record["la:related_from_by"]), dict): # only one entry
             connections_list.append(artist_record["la:related_from_by"])           
         else:
             for connection in artist_record["la:related_from_by"]:
@@ -1417,7 +1419,7 @@ One needs a separate function for parsing organisations.
                 conn_id.name = "ULAN"
                 conn_id.id = id_raw[29:]
                 conn_ent.external_id.append(conn_id)
-            if type(connection["classified_as"][0]) is str:
+            if isinstance(connection["classified_as"][0], str):
                 conn_ent.connection_type = connection["classified_as"][0]
             else: 
                 conn_ent.connection_type = connection["classified_as"][0]["id"]
@@ -1431,127 +1433,127 @@ One needs a separate function for parsing organisations.
                     conn_ent.connection_type = "person"
                 case "http://vocab.getty.edu/ulan/relationships/1005":                
                     conn_ent.connection_comment = "possibly identified with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1006":                
                     conn_ent.connection_comment = "formerly identified with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1007":                
                     conn_ent.connection_comment = "distinguished from"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1008":                
                     conn_ent.connection_comment = "meaning overlaps with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1101":                
                     conn_ent.connection_comment = "teacher of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1102":                
                     conn_ent.connection_comment = "student of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1105":                
                     conn_ent.connection_comment = "apprentice of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1106":                
                     conn_ent.connection_comment = "apprentice was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1107":                
                     conn_ent.connection_comment = "influenced"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1108":                
                     conn_ent.connection_comment = "influenced by"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1111":                
                     conn_ent.connection_comment = "master of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1112":                
                     conn_ent.connection_comment = "master was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1113":                
                     conn_ent.connection_comment = "fellow student of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1201":                
                     conn_ent.connection_comment = "patron of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1202":                
                     conn_ent.connection_comment = "patron was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1203":                
                     conn_ent.connection_comment = "donor of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1204":                
                     conn_ent.connection_comment = "donor was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1205":                
                     conn_ent.connection_comment = "client of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1206":                
                     conn_ent.connection_comment = "client was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1211":                
                     conn_ent.connection_comment = "artist to"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1212":                
                     conn_ent.connection_comment = "artist was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1213":                
                     conn_ent.connection_comment = "court artist to"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1214":                
                     conn_ent.connection_comment = "court artist was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1217":                
                     conn_ent.connection_comment = "employee of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1218":                
                     conn_ent.connection_comment = "employee was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1221":                
                     conn_ent.connection_comment = "appointed by"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1222":                
                     conn_ent.connection_comment = "appointee of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1223":                
                     conn_ent.connection_comment = "crowned by"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1224":                
                     conn_ent.connection_comment = "crowned"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1301":                
                     conn_ent.connection_comment = "colleague of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1302":                
                     conn_ent.connection_comment = "associate of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1303":                
                     conn_ent.connection_comment = "collaborated with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1305":                
                     conn_ent.connection_comment = "worked with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1306":                
                     conn_ent.connection_comment = "performed with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1307":                
                     conn_ent.connection_comment = "assistant of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1308":                
                     conn_ent.connection_comment = "assisted by"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1309":                
                     conn_ent.connection_comment = "advisor of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1311":                
                     conn_ent.connection_comment = "partner of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1315":                
                     conn_ent.connection_comment = "principal of"
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/1317":                
                     conn_ent.connection_comment = "member of"
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/1321":                
                     conn_ent.connection_comment = "school of"
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 
 
                 # 1313/1314 partner (in firm) not included
@@ -1566,13 +1568,13 @@ One needs a separate function for parsing organisations.
 
                 case "http://vocab.getty.edu/ulan/relationships/1331":                
                     conn_ent.connection_comment = "worked with"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1332":                
                     conn_ent.connection_comment = "worker was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1500":                
                     conn_ent.connection_comment = "related to"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1501":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "brother of"
@@ -1580,7 +1582,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "sister of"
                     else:
                         conn_ent.connection_comment = "brother or sister of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1511":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "son of"
@@ -1588,7 +1590,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "daughter of"
                     else:
                         conn_ent.connection_comment = "son or daughter of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1512":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "father of"
@@ -1596,7 +1598,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "mother of"
                     else:
                         conn_ent.connection_comment = "father or mother of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1513":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "grandson of"
@@ -1604,7 +1606,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "granddaughter of"
                     else:
                         conn_ent.connection_comment = "grandchild of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1514":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "grandfather of"
@@ -1612,7 +1614,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "grandmother of"
                     else:
                         conn_ent.connection_comment = "grandparent of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1515":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "great-grandfather of"
@@ -1620,7 +1622,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "great-grandmother of"
                     else:
                         conn_ent.connection_comment = "great-grandfather or great-grandmother off"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1516":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "great-grandson of"
@@ -1628,7 +1630,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "great-granddaughter of"
                     else:
                         conn_ent.connection_comment = "great-grandchild of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1521":                
                     conn_ent.connection_comment = "cousin of"
                 case "http://vocab.getty.edu/ulan/relationships/1531":                
@@ -1638,7 +1640,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "niece of"
                     else:
                         conn_ent.connection_comment = "nephew or niece of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1532":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "uncle of"
@@ -1646,7 +1648,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "aunt of"
                     else:
                         conn_ent.connection_comment = "uncle or aunt of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1541":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "husband of"
@@ -1654,22 +1656,22 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "wife of"
                     else:
                         conn_ent.connection_comment = "husband or wife of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1542":                
                     conn_ent.connection_comment = "consort of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1543":                
                     conn_ent.connection_comment = "consort was"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1547":                
                     conn_ent.connection_comment = "romantic partner of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1548":                
                     conn_ent.connection_comment = "domestic partner of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1550":                
                     conn_ent.connection_comment = "relative by marriage of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1551":
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "brother-in-law of"
@@ -1677,7 +1679,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "sister-in-law of"
                     else:
                         conn_ent.connection_comment = "brother or sister-in-law of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1552":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "father-in-law of"
@@ -1685,7 +1687,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "mother-in-law of"
                     else:
                         conn_ent.connection_comment = "father or mother-in-law of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1553":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "son-in-law of"
@@ -1693,7 +1695,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "daughter-in-law of"
                     else:
                         conn_ent.connection_comment = "son or daughter-in-law of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1554":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "adoptive father of"
@@ -1701,7 +1703,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "adoptive mother of"
                     else:
                         conn_ent.connection_comment = "adoptive father or mother of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1555":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "adopted son of"
@@ -1709,7 +1711,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "adopted daughter of"
                     else:
                         conn_ent.connection_comment = "adopted son or daughter of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1556":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "half-brother of"
@@ -1717,7 +1719,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "half-sister of"
                     else:
                         conn_ent.connection_comment = "half-brother or half-sister of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1557":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "step-brother of"
@@ -1725,7 +1727,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "step-sister of"
                     else:
                         conn_ent.connection_comment = "step-brother or step-sister of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1561":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "step-son of"
@@ -1733,7 +1735,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "step-daughter of"
                     else:
                         conn_ent.connection_comment = "step-son or step-daughter of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1562":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "step-father of"
@@ -1741,7 +1743,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "step-mother of"
                     else:
                         conn_ent.connection_comment = "step-father or step-mother of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1571":                
                     conn_ent.connection_comment = "guardian of"   
                 case "http://vocab.getty.edu/ulan/relationships/1573":                
@@ -1753,7 +1755,7 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "godmother of"
                     else:
                         conn_ent.connection_comment = "godparent of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1575":                
                     if pe.sex == "male":                                        
                         conn_ent.connection_comment = "godson of"
@@ -1761,46 +1763,46 @@ One needs a separate function for parsing organisations.
                         conn_ent.connection_comment = "goddaughter of"
                     else:
                         conn_ent.connection_comment = "godchild of"
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1581":                
                     conn_ent.connection_comment = "descendant of"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1590":                
                     conn_ent.connection_comment = "possibly related to"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/2550":                
                     conn_ent.connection_comment = "friend of"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/2576":                
                     conn_ent.connection_comment = "patron of"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/2577":                
                     conn_ent.connection_comment = "patron was"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/1573":                
                     conn_ent.connection_comment = "ward of"   
-                    conn_ent.connection_type = "person"
+                    conn_ent.connection_type= "person"
                 case "http://vocab.getty.edu/ulan/relationships/2572":                
                     conn_ent.connection_comment = "founder of"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2574":                
                     conn_ent.connection_comment = "director of"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2581":                
                     conn_ent.connection_comment = "administrator of"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2674":                
                     conn_ent.connection_comment = "professor at"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2696":                
                     conn_ent.connection_comment = "leader of"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2778":                
                     conn_ent.connection_comment = "owner of"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
                 case "http://vocab.getty.edu/ulan/relationships/2828":                
                     conn_ent.connection_comment = "student at"   
-                    conn_ent.connection_type = "organisation"
+                    conn_ent.connection_type= "organisation"
 
 
 
@@ -1823,13 +1825,16 @@ One needs a separate function for parsing organisations.
 
 
 
-            if conn_ent.connection_type == "person": 
+            if conn_ent.connection_type == "person":
+                conn_ent.connection_type = "ulan"                 
                 pe.connected_persons.append(conn_ent)
             if conn_ent.connection_type == "organisation": 
+                conn_ent.connection_type = "ulan"
                 pe.connected_organisations.append(conn_ent)
                 # I could not test the connected organisations since they apparently used very rarely
           
-        """Annoyingly, the timespan of the connection does not appear in the json file but only in the rdf and nt files. So, one has to add it later for the selected person only """
+        #Annoyingly, the timespan of the connection does not appear in the json file but only in the rdf and nt files. 
+        # So, one has to add it later for the selected person only 
     if "born" in artist_record:
         if "took_place_at" in artist_record["born"]:
             if artist_record["born"]["took_place_at"][0]:
@@ -1858,6 +1863,7 @@ One needs a separate function for parsing organisations.
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
                     place_id_list.append(place_id)
+                    conn_place.external_id = place_id_list
                     pe.connected_locations.append(conn_place)
                     orts_preview = ", died in " + conn_place.name
     if "carried_out" in artist_record:
@@ -1885,6 +1891,7 @@ One needs a separate function for parsing organisations.
     # thus: I need to introduce a function that makes the editor choose one place if there are several, and enter one if there are none.          
 
     pe.preview = pe.name_preferred + " " + date_preview + " " + ortg_preview + ortw_preview + orts_preview + name_variant_preview
+    
     print(pe)
     return pe
 
@@ -1969,7 +1976,7 @@ async def ulan_search(person):
         r'%20(%3Ftyp%20!%3D%20gvp%3ASubject)%20%0A%20optional%20%7B%3FSubject%20gvp%3AparentString%20%3FType2%7D%0A%20filter%20(%3FType2%20!%3D%20' +\
         r'%22Unidentified%20Named%20People%20and%20Firms%22)%20%0A%20optional%20%7B%3FSubject%20dc%3Aidentifier%20%3Fartist_id%7D%7D%0AORDER%20BY%20' + \
         r'(fn%3Alower-case(str(%3FTerm)))%0A&toc=Finding_Subjects&implicit=true&equivalent=false&_form=/queriesF'
-    ulan_list_raw = requests.get(authority_url)
+    ulan_list_raw = requests.get(authority_url, timeout = 10)
     ulan_list = ulan_list_raw.json()
     ulan_url_list = []
     if "results" in ulan_list:

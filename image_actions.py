@@ -169,12 +169,15 @@ and saves an image file in the local file system
     print("Saving an image file")
     r=db_actions.get_resource_from_db(coords.id)
     i=r["images"][coords.index]
+    print("i found")
+    print(i)
     image=fetch_image_from_web(i)
     print("y1: ",coords.y_abs)
     print("y2: ",coords.y_abs+coords.h_abs)
     print("x1: ",coords.x_abs)
     print("x2: ",coords.x_abs+coords.w_abs)
     cropped=image[coords.y_abs:coords.y_abs+coords.h_abs,coords.x_abs:coords.x_abs+coords.w_abs]
+    print("writing image file")
     cv2.imwrite("photo_file.jpg",cropped)
     path="."
     return path
