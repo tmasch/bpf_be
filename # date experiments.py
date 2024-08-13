@@ -1,0 +1,1091 @@
+import re
+
+def english_ordinal_suffix(number):
+    #this function returns the suffix transforming an English number into an ordinal
+    if len(number) > 1 and number[-2] == "1": #it cannot be longer, but shorter
+                abbreviation = "th"
+    else:
+        if number[-1] == "1":
+            abbreviation = "st"
+        elif number[-1] == "2":
+            abbreviation = "nd"
+        elif number[-1] == "3":
+            abbreviation = "rd"
+        else:
+            abbreviation = "th"
+    return(abbreviation)
+
+def date_single_parsing(datestring_raw):
+#    print("single date raw: " + datestring_raw)
+    date_precision = "" # for determination of precision
+    date_aspect = "" # for determination whether it is dates of life or dates of activity
+    date_type = "" # states if there is an indication that it is a start date or an end date    
+    short_date = True #This field indicates if the date is simple so that it can be written in the fortm "X-Y" instead of "born X, died Y"
+    BC_indicator = False
+    day_string_raw = ""
+    month_string_raw = ""
+    year_string_raw = ""
+    year_end_string_raw = ""
+    year_string = "xxx"
+    date_prefix_1 = ""
+    date_prefix_2 = ""
+    date_suffix = ""
+    day_string = ""
+    month_string = ""
+    year_string = ""
+    year_end_string = ""
+    prefix_0_raw = ""
+    prefix_1_raw = ""
+    prefix_2_raw = ""
+    year_value_start = 0
+    #print("start_parsing_single_date: " + datestring_raw)
+
+    month_names = {"1" : "January ", "2" : "February ", "3": "March ", "4" : "April ", "5" : "May ", "6" : "June ", "7" : "July ", \
+                   "8" : "August ", "9" : "September ", "10" : "October ", "11" : "November ", "12" : "December "}
+    #date_single_pattern = r'((\d\.h\.|\d\.hälfte |\d h\.|\d hälfte |erste hälfte |\d\.v\.|\d\.viertel |\d v\.|\d viertel |letztes viertel |\d\.drittel |\d drittel|letztes drittel |in der \d\.hälfte )(d\.|des )?)?([a-wyzäöüß()\.* :,]*( |\.))?([\d\.\?xv/]*)([a-zäöüß()\.\?, =]*)?'
+    #r'(\d\.h\.|\d.hälfte |\d\.v\.|\d\.viertel ]*|[a-zäöüß\(\)\. ]*( |\.))?([\d\.\?xv/]*)([a-zäöüß()\. ]*)?'
+    date_single_pattern = r'(gest\.|gestorben |starb |tod |todesjahr |todesdatum |lebte noch |lebte |aktiv |wirkte |tätig |schrieb |active |\*|b\.|geb |geb\.|geboren |geburtsjahr |\(get\.\) |getauft am |getauft |\(getauft\) |taufe |taufdatum '\
+        r'begraben\) |begraben am |nachweisbar |nachgewiesen |bezeugt |dokumentiert |erwähnt |erw.|belegt |fl |fl\.|flor\.|tätig |wirkte |wirkungsdaten |wirkungsdaten: |wirkungsjahr |erstmals erwähnt |letztmals erwähnt |veröff\.|veroeff\.|erscheinungsjahr )?'\
+        r'((\d\.h\.|\d\.hälfte |\d h\.|\d hälfte |erste hälfte |\d\.v\.|\d\.viertel |\d v\.|\d viertel |erstes viertel |letztes viertel |\d\.drittel |\d drittel|letztes drittel |in der \d\.hälfte )(d\.|des )?)?' \
+        r'([a-wyzäöüß()\.* :,]*( |\.))?([\d\.\?xv/]*)([a-zäöüß()\.\?, =]*)?'
+
+
+    if re.match(r"\d{4}, ?\d{4}", datestring_raw): # This means the special case of several years separated by comma. It is simply since it seems to always about exact years AD
+        date_aspect = "a"
+        date_precision = "year"
+        prefix_1_raw = ""
+        prefix_0_raw = "erwähnt"
+        figures_raw = ""
+        day_string = ""
+        day_value_start = 1
+        day_value_end = 31
+        month_string = ""
+        month_value_start = 1
+        month_value_end = 12
+        suffix_raw = ""
+        datestring_raw = datestring_raw.replace(", ", ",")
+        if re.match(r"\d{4},\d{4},\d{4}", datestring_raw):            
+#            print("Dates separated by comma")
+            
+            year1 = datestring_raw[0:4]
+            year2 = datestring_raw[5:9]
+            year3 = datestring_raw[10:14]
+            year_value_start = min(int(year1), int(year2), int(year3))
+            yeear_value_end = max(int(year1), int(year2), int(year3))
+            year_string = year1 + ", " + year2 + ", and " + year3
+        else:
+            year1 = datestring_raw[0:4]
+            year2 = datestring_raw[5:9]
+            year_value_start = min(int(year1), int(year2))
+            yeear_value_end = max(int(year1), int(year2))
+            year_string = year1 + " and " + year2
+        if "erscheinungsjahr" in datestring_raw:
+            prefix_0_raw = "erscheinungsjahr"
+            date_aspect = "a"
+        date_precision = "year"    
+
+        
+
+
+    else: # all normal dates
+        if "zwischen " in datestring_raw:  # turns "zwischen XXXX and XXXX" into "XXXX/XXXX"
+#            print("replacing zwischen")
+#            print("former: " + datestring_raw)
+            datestring_raw = datestring_raw.replace("zwischen ", "")
+            datestring_raw = datestring_raw.replace(" und ", "/")
+            datestring_raw = datestring_raw.replace(" u.", "/")
+#            print("later: " + datestring_raw)
+        date_single_parsed = re.match(date_single_pattern, datestring_raw).groups()
+        prefix_0_raw = date_single_parsed[0]        
+        prefix_1_raw = date_single_parsed[1] #elements 2, 3, 5 are not needed
+        prefix_2_raw = date_single_parsed[4]
+        figures_raw = date_single_parsed[6]
+        suffix_raw = date_single_parsed[7]
+        if suffix_raw:
+            suffix_raw = suffix_raw.strip()
+        figures_raw = figures_raw.replace("..", "xx") # sometimes, two dots are used for missing numbers, e.g. 19.. instead of 19XX. This is here changed, since ".." causes troubles
+
+#        print("prefix_0_raw: ")
+#        print(prefix_0_raw)
+#        print("prefix_1_raw: ")
+#        print(prefix_1_raw)
+#        print("prefix_2_raw: ")
+#        print(prefix_2_raw)
+#        print("figures_raw: ")
+#        print(figures_raw)
+#        print("suffix_raw: ")
+#        print(suffix_raw)
+        
+    figures_pattern = r'(v)?([\d\?x]{1,2}\.)?([\d\?x]{1,2}\.)?(v?\d{1,4}[x\?]{0,2}\.?v?|xxxx)(/\d{1,2}\.|/\d{1,4})?' #This pattern should work for most cases, with 
+    figures_divided = re.match(figures_pattern, figures_raw)
+    if figures_divided:
+        BC_string_raw = figures_divided.groups()[0]
+        day_string_raw = figures_divided.groups()[1]
+        month_string_raw = figures_divided.groups()[2]
+        if day_string_raw and not month_string_raw: # If there is onl(um a month given, but no da(um.
+            month_string_raw = day_string_raw
+            day_string_raw = ""
+        year_string_raw = figures_divided.groups()[3]
+        year_end_string_raw = figures_divided.groups()[4]
+        #print("BC_string_raw: ")
+        #print(BC_string_raw)
+        #print("day_string_raw: ")
+        #print(day_string_raw)
+        #print("month_string_raw: " )
+        #print(month_string_raw)
+#        print("year_string_raw: ")
+#        print(year_string_raw)
+#        print(year_string_raw.isnumeric())
+#        print("year_end_string_raw: ")
+#        print(year_end_string_raw)
+        
+        # Days
+        if day_string_raw and (day_string_raw == "0." or day_string_raw == "00."):
+            day_string = ""
+            day_value_start = 1
+            day_value_end = 99
+        elif day_string_raw and day_string_raw[0:-1].isnumeric():
+            day_string = day_string_raw[0:-1].lstrip("0")
+            day_string = day_string + " "
+            day_value_start = int(day_string)
+            day_value_end = int(day_string)
+            date_precision = "day"
+        elif day_string_raw == "1x." or day_string_raw == "2x.":                       
+            day_string = "between " + day_string_raw[0:-2] + "0 and " + day_string_raw[0:-2] + "9 "
+            day_value_start = int(day_string_raw[0:-2] + "0")
+            day_value_end = int(day_string_raw[0:-2] + "9")
+            date_precision = "day - circa"
+            short_date = False
+        elif day_string_raw == "0x.":
+            day_string = "between 1 and 9 "
+            day_value_start = 1
+            day_value_end = 9
+            date_precision = "day - circa"
+            short_date = False
+        elif day_string_raw == "xx.":
+            day_string = ""
+            day_value_start = 1
+            day_value_end = 99
+        else:
+            day_string = ""
+            day_value_start = 1
+            day_value_end = 99 #must be adjusted to the number of days in a month
+
+        # Months
+        if month_string_raw and month_string_raw[0:-1].isnumeric() and month_string_raw[0:-1] != "00":
+            month_string_raw = month_string_raw[0:-1].lstrip("0")
+            if month_string_raw in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
+
+                month_string = month_names[month_string_raw]
+                month_value_start = int(month_string_raw)
+                month_value_end = int(month_string_raw)
+                if date_precision == "":
+                    date_precision = "month"
+            else:
+                month_string = "!!!!!month could not be parsed!!!!!!"
+                month_value_start = 1
+                month_value_end = 12
+        elif month_string_raw == "00." or month_string_raw == "xx." and day_string != "":
+            month_string = "?? "
+            month_value_start = 1
+            month_value_end = 12
+        else: 
+            month_string = ""
+            month_value_start = 1
+            month_value_end = 12
+        # Years
+        if BC_string_raw == "v":
+            BC_indicator = True
+        if suffix_raw == "v.chr." or suffix_raw == "v. chr." or suffix_raw == "jh.v.chr." or suffix_raw == "jh. v.chr." or suffix_raw == "jh. v. chr." or suffix_raw == "jh.v.chr":
+            BC_indicator = True
+        if year_string_raw[0:1] == "v":
+            BC_indicator = True
+            year_string_raw = year_string_raw[1:]
+        if year_string_raw[-1:] == "v":
+            BC_indicator = True
+            year_string_raw = year_string_raw[:-1]
+        #print("BC?")
+        #print(BC_indicator)
+        if year_string_raw and year_string_raw.isnumeric() and (suffix_raw and (suffix_raw[:2] == "jh" or suffix_raw[:5] == "jahrh")):
+            #this is for the common mistake that the century is indicated, but without a dot after the number, e.g. "8 Jh."
+            #it seemed easiest just to add the dot. 
+            year_string_raw = year_string_raw + "."
+            #print("year string_raw with dot added: "+ year_string_raw)
+        if year_string_raw and year_string_raw.isnumeric() and not year_end_string_raw:
+            year_string = year_string_raw
+            year_value_start = int(year_string)
+            year_value_end = int(year_string)
+            if date_precision == "":
+                date_precision = "year"
+        elif year_string_raw and year_string_raw.isnumeric() and year_end_string_raw and year_end_string_raw != ".": #the last condition means that the year_end is not a century
+            if year_end_string_raw[-1] != ".":
+                year_end_string_raw = year_end_string_raw[1:] #removing the leading slash
+                if len(year_end_string_raw) == 1:
+                    year_end_string = year_string_raw[:-1] + year_end_string_raw
+                elif len(year_end_string_raw) == 2:
+                    year_end_string = year_string_raw[:-2] + year_end_string_raw
+                elif len(year_end_string_raw) >= 3: # I assume that in this case there is no abbreviation
+                    year_end_string = year_end_string_raw
+                else:
+                    year_end_string = "!!!!!year_end_string could not be parsed"
+
+
+                year_value_start = int(year_string_raw)
+                if year_end_string.isnumeric(): # if it is not an error message
+                    year_value_end = int(year_end_string)
+#                print("start year: ")
+#                print(year_value_start)
+#                print("end year: ")
+#                print(year_value_end)
+                if year_value_end - year_value_start > 500: # this is the case if the first year is from the Islamic Calendar
+                    year_string = str(year_value_end) + " (" + str(year_value_start) + " AH)"
+                    year_value_start = year_value_end
+                    date_precision = "year"
+                elif year_value_end - year_value_start > 500: # this is the case if the second year is from the Islamic Calendar
+                    year_string = str(year_value_start) + " (" + str(year_value_end) + " AH)"
+                    year_value_end = year_value_start
+                    date_precision = "year"
+                else: 
+                    date_precision = "year - circa"
+                    year_string = "between " + year_string_raw + " and " + year_end_string
+
+                    short_date = False
+                
+        elif year_string_raw and year_string_raw[0:-1].isnumeric() and (year_string_raw[-1] == "x" or year_string_raw[-1] == "?"):
+            if len(year_string_raw) < 5: # if it is more than 5, a final question mark does not mean a missing digit, but rather that it is unclear, e.g., -1750?
+                year_string = "between " + year_string_raw[0:-1] + "0 and " + year_string_raw[0:-1] + "9"
+                if BC_indicator == False:
+                    year_value_start = int(year_string_raw[0:-1] + "0")
+                    year_value_end = int(year_string_raw[0:-1] + "9")
+                else: 
+                    year_value_start = int(year_string_raw[0:-1] + "9")
+                    year_value_end = int(year_string_raw[0:-1] + "1")
+                date_precision = "decade"
+                short_date = False
+            else: # This means the type "1550?"
+                year_string = year_string_raw[:4]
+                date_prefix_2 = "c. "
+                if BC_indicator == False:
+                    year_value_start = int(year_string_raw[:4]) - 5
+                    year_value_end = int(year_string_raw[:4]) + 5
+                else:
+                    year_value_start = int(year_string_raw[:4]) + 5
+                    year_value_end = int(year_string_raw[:4]) -5
+
+        elif year_string_raw and year_string_raw[0:-2].isnumeric() and (year_string_raw[-2:] == "xx" or year_string_raw[-2:] == "??" \
+                                                                        or year_string_raw[-2:] == "x?" or year_string_raw[-2:] == "?x"):                
+            year_string = "between " + year_string_raw[0:-2] + "00 and " + year_string_raw[0:-2] + "99"
+            if BC_indicator == False:
+                year_value_start = int(year_string_raw[0:-2] + "00")
+                year_value_end = int(year_string_raw[0:-2] + "99")
+            else: 
+                year_value_end = int(year_string_raw[0:-2] + "00")
+                year_value_start = int(year_string_raw[0:-2] + "99")
+            date_precision = "century"
+            short_date = False
+        elif year_string_raw and year_string_raw == "xxxx":
+            year_string = "????"
+            year_value_start = 0
+            year_value_end = 0
+        elif year_string_raw and year_string_raw[0:-1].isnumeric() and year_string_raw[-1] == ".": #if it is an indication of centuries          
+            # this is normally followed by an abbrevation such as "Jh.", but the dot alone shows that a century is indicated, and the "Jh." etc. can be ignored for parsing
+            if year_end_string_raw and year_end_string_raw[-1] == ".":
+                century_start_number = year_string_raw[0:-1]
+                century_end_number = year_end_string_raw[1:-1]
+                year_string = "between " + century_start_number + english_ordinal_suffix(century_start_number) + " and " + century_end_number + english_ordinal_suffix(century_end_number) + " century"
+                if BC_indicator == False:
+                    year_value_start = int(str(int(century_start_number)-1) + "01")
+                    year_value_end = int(century_end_number + "00")
+                else:
+                    year_value_start = int(century_start_number + "00")
+                    year_value_end = int(str(int(century_end_number)-1) + "01")
+            else:
+            
+                century_number = year_string_raw[0:-1]           
+                year_string = century_number + english_ordinal_suffix(century_number) + " century"
+                if BC_indicator == False:
+                    year_value_start = int(str(int(century_number)-1) + "01")
+                    year_value_end = year_value_start + 99
+                else:
+                    year_value_start = int(century_number + "00")
+                    year_value_end = year_value_start - 99      
+        else: 
+            year_string = "!!!!year could not be parsed!!!!"
+        if BC_indicator == True:
+            year_string = year_string + " BC"
+            year_value_start = 0 - year_value_start
+            year_value_end = 0 - year_value_end
+            print("year value start BC:")
+            print(year_value_start)
+
+        # The following adjust day_value_end to the last day of the month
+        if day_value_end == 99:
+            match month_value_start:
+                case 1|3|5|7|8|10|12:
+                    day_value_end = 31
+                case 4|6|9|11:
+                    day_value_end = 30
+                case 2:
+                    if year_value_start%4 == 0 and (year_value_start%100 != 0 or year_value_start%400 == 0):
+                        day_value_end = 29
+                    else:
+                        day_value_end = 28
+    
+    if prefix_0_raw:
+        prefix_0_raw = prefix_0_raw.strip()
+        match prefix_0_raw:
+            case "*"|"b."|"geb"|"geb."|"geboren"|"geburtsjahr":
+                date_aspect = "l"
+                date_type = "start"
+            case  "(get.)"|"(getauft)"|"getauft"|"getauft am"|"getauft"|"taufe"|"taufdatum":
+                date_prefix_1 = "baptised "
+                date_aspect = "l"
+                date_type = "start"
+                short_date = False
+            case "lebte":
+                date_aspect = "l"
+            case "aktiv"|"wirkte"|"tätig"|"schrieb"|"active"|"fl"|"fl."|"flor."|"tätig"|"wirkte"|"wirkungsdaten"|"wirkungsdaten:":
+                date_aspect = "a"
+            case "nachweisbar"|"nachgewiesen"|"bezeugt"|"dokumentiert"|"erwähnt"|"erw."|"belegt":
+                date_prefix_1 = "documented "
+                date_aspect = "a"
+            case "veröff."|"veroeff."|"erscheinungsjahr)"|"erscheinungsjahr":
+                date_aspect = "a"
+                date_prefix_1 = "publications from "
+            case "gest."|"gestorben"|"starb"|"tod"|"todesjahr"|"todesdatum":
+                date_aspect = "l"
+                date_type = "end"
+            case "lebte noch": #Here, the separation into prefix_0 and prefix_2 didn't work
+                date_prefix_2 = "after "
+                year_value_end = year_value_end + 10
+                date_type = "end"
+                date_aspect = "l"
+            case "begraben"|"begraben am":
+                date_prefix_1 = "buried "
+                date_aspect = "l"
+                date_type = "end"
+                short_date = False
+            case "erstmals erwähnt":
+                date_aspect = "a"
+                date_type = "start"
+                date_prefix_1 = "first documented "
+            case "letztmals erwähnt":
+                date_aspect = "a"
+                date_type = "end"
+                date_prefix_1 = "last documented "
+
+    if prefix_1_raw:
+        prefix_1_raw = prefix_1_raw.strip()
+#        print("prefix_raw:")
+#        print("#" + prefix_1_raw "+ "#")
+        prefix_1_pattern = r'(in der )?(\d\.|\d |letztes |erste |erstes )(h\.|hälfte|drittel|v\.|viertel)( d\.| des)?'
+        prefix_1_divided = re.match(prefix_1_pattern, prefix_1_raw)
+        if prefix_1_divided:
+            part_number = prefix_1_divided.groups()[1]
+            part_name = prefix_1_divided.groups()[2] # parts 0 and 3 are not relevant
+            date_precision = "century - part"
+            #print("part_number: ")
+            #print(part_number)
+            #print("part_name: ")
+            #print(part_name)
+            match part_name:
+                case "h."|"hälfte":
+                    if part_number == "1." or part_number == "1 " or part_number == "erste ":
+                        date_prefix_2 = "first half "
+                        year_value_end = year_value_end -50
+                    if part_number == "2." or part_number == "2 ":
+                        date_prefix_2 = "second half "
+                        year_value_start = year_value_start +50
+                case "drittel":
+                    if part_number == "1." or part_number == "1 ":
+                        date_prefix_2 = "first third "
+                        year_value_end = year_value_end -67
+                    if part_number == "2." or part_number == "2 ":
+                        date_prefix_2 = "second third "
+                        year_value_start = year_value_start +33
+                        year_value_end = year_value_start + 32
+                    if part_number == "3." or part_number == "3 " or part_number == "letztes ":
+                        date_prefix_2 = "last third "
+                        year_value_start = year_value_start +66
+                case "v."|"viertel":
+                    if part_number == "1." or part_number == "1 " or part_number == "erstes ":
+                        date_prefix_2 = "first quarter "
+                        year_value_end = year_value_start + 24
+                    if part_number == "2." or part_number == "2 ":
+                        date_prefix_2 = "second quarter "
+                        year_value_start = year_value_start +25
+                        year_value_end = year_value_start + 24
+                    if part_number == "3." or part_number == "3 ":
+                        date_prefix_2 = "third quarter "
+                        year_value_start = year_value_start +50
+                        year_value_end = year_value_start + 24
+                    if part_number == "4." or part_number == "letztes ":
+                        date_prefix_2 = "last quarter "
+                        year_value_start = year_value_start +75
+                case _:
+                    pass
+        else:
+            pass
+    if prefix_2_raw:    
+        prefix_2_raw = prefix_2_raw.strip()
+        match prefix_2_raw:
+            case "im": #important information in the suffix
+                pass
+            case "anfang"|"anfang des"|"anfang d."|"ca.anf."|"ca.anfang"|"seit anfang d."|"frühes"|"anf."|"beginn des"|"beginn"|"beginn d.":
+                date_prefix_2 = "early "
+                if BC_indicator == False:
+                    year_value_end = year_value_start + 19
+                else:
+                    year_value_end = year_value_start +20
+            case "mitte"|"mitte des"|"ca mitte"|"ca.mitte":
+                date_prefix_2 ="Mid-"
+                if BC_indicator == False:
+                    year_value_start = year_value_start + 39
+                    year_value_end = year_value_start + 20
+                else: 
+                    year_value_start = year_value_start + 39
+                    year_value_end = year_value_start + 20
+            case "spätes"|"ende"|"ende des"|"ca.ende"|"ausgang"|"ende d.":
+                date_prefix_2 = "late "
+                year_value_start = year_value_start + 80 
+            case "mitte/ende":
+                date_prefix_2 = "Mid- to late"
+                year_value_start = year_value_start + 40 # should mean, from e.g. 1900-1960
+            case "um"|"(um)"|"c"|"c."|"ca"|"ca."|"ca,"|"ca.("|"circa": 
+                date_prefix_2 = "c. "
+                if year_value_start != 0: #this rules out dates such as "ca. unbekannt" that otherwise create error messages
+                    year_value_start = year_value_start - 5
+                    year_value_end = year_value_end + 5
+            case "ca.geboren": #in this case, the division into prefix_0 and prefix_2 doesn't work
+                date_prefix_2 = "c. "
+                year_value_start = year_value_start - 5
+                year_value_end = year_value_end + 5
+                date_aspect = "l"
+                date_type = "start"
+            case "seit ca.":
+                date_prefix_2 = "c. "
+                year_value_start = year_value_start - 5
+                year_value_end = year_value_end + 5
+                date_aspect = "a"
+                date_type = "start"
+            case "(vor)"|"vor)"|"vor"|"vor ca."|"kurz vor"|"vor dem":
+                date_prefix_2 = "before "
+                year_value_start = year_value_start - 10
+            case "(nach)"|"nach)"|"nach"|"nach dem"|"kurz nach"|"post"|"ca.nach":
+                date_prefix_2 = "after "
+                year_value_end = year_value_end + 10
+            case "ab"|"ab dem"|"seit"|"seit d."|"seit dem"|"seit ca."|"seit anfang d.": 
+                date_type = "start"
+            case "umnach":
+                date_prefix_2 = "c. or after"
+                short_date = False
+                year_value_start = year_value_start - 5
+                year_value_end = year_value_end + 10
+            case "(":
+                pass           
+            case _:
+                pass
+                  
+
+    if suffix_raw:
+
+        match suffix_raw:
+            case "v.chr."|"jh.v.chr."|"jh.v.chr":
+                pass # This option has been dealt with earlier
+            case "jh"|"jh."|"jahrhundert"|"jahrhunderts"|"jd."|"jhd."|"jhr."|"jht"|"jht."|"jahrh.":            
+                pass # if the year ends with a full-stop, it is deemed to mean a century
+            case "|":
+                pass # no idea why this is displayed
+            case "(?)"|", ca."|",ca."|"ca."|"(ca."|"?"|"um"|"(um)"|"jh.?"|"jhd.?"|"jht.?":
+                date_prefix_2 = "c. "
+                date_precision = "year - circa"
+                if year_value_start != 0:
+                    year_value_start = year_value_start - 5
+                    year_value_end = year_value_end + 5
+            case "(nach)"|"(post)":
+                date_prefix_2 = "after "
+                year_value_end = year_value_end + 10
+            case "(vor)":
+                date_prefix_2 = "before "
+                year_value_end = year_value_end - 10
+            case "odanach":  # I replace "oder danach" / "oder später" with "odanach" to avoid confusion with two dates separated by "oder"
+                date_suffix = "or later"
+                date_precision = "year - circa"
+                year_value_end = year_value_end + 10
+            case "ofrüher": # I replace "oder früher" with "ofrüher" to avoid confusion with two dates separated by "oder"
+                date_suffix = "or earlier"
+                date_precision = "year - circa"
+                year_value_start = year_value_start - 10
+            case "jahrhundert, anfang biis mitte":
+                date_prefix_2 = "early to Mid-"
+                date_precision = "century - part"
+                year_value_end = year_value_end - 40 # should mean, from e.g. 1900-1960
+            case "jahrhundert, mitte biis ende"|"jh., mitte biis ende":
+                date_prefix_2 = "Mid- to late "
+                date_precision = "century - part"
+                year_value_start = year_value_start + 40 # should mean, from e.g. 1900-1960
+            case "jahrhundert, mitte":                
+                date_prefix_2 ="Mid-"
+                date_precision = "century - part"
+                if BC_indicator == False:
+                    year_value_start = year_value_start + 39
+                    year_value_end = year_value_start + 20
+                else: 
+                    year_value_start = year_value_start + 40
+                    year_value_end = year_value_start + 20              
+            case "er"|"er jahre": # as 1990er
+                year_string = "between " + year_string + " and " + str(int(year_string)+9)
+                year_value_end = year_value_start + 9
+                date_precision = "decade"
+            case "erscheinungsjahr"|"(erscheinungsjahr)"|"erscheinungjahr"|"erscheinungsjahre"|"(erscheinungsjahre)"|"erschienen"|"jh.erscheinungsjahr": 
+                date_aspect = "a"
+                date_prefix_1 = "publications from "
+            case "(wirkungszeit)"|"fl."|"(wirkungsjahr)"|"wirkungsjahr"|"wirkungsjahre"|"erwähnungsjahr"|"jh.(wirkungszeit)":
+                date_aspect = "a"
+            case "nachgewiesen"|"erwähnt"|"(erwähnt)"|"erwähnungsjahr"|"nachweisbar"|"belegt":
+                date_prefix_1 = "documented "
+                date_aspect = "a"
+            case "geb." |"geboren"|"jh.geb.":
+                date_aspect = "l"
+                date_type = "start"
+            case "(= taufdatum)"|"( = taufdatum)"|"(taufe)"|"(getauft)":
+                date_prefix_1 = "baptised "
+                short_date = False
+                date_aspect = "l"
+                date_type = "start"
+            case "(erste erwähnung)":
+                date_aspect = "a"
+                date_type = "start"
+                date_prefix_1 = "first documented "
+            case "gest."|"gestorben"|"gestorb."|"%todesjahr ca."|"todesjahr ca.":
+                date_aspect = "l"
+                date_type = "end"
+            case "jh.ff."|"jh.ff": # used primarily for families
+                date_type = "start"
+            case "h"|"h.s.":
+                date_suffix = "AH (start and end date will not be calculated correctly)"
+            case "ff."|"jh.ff.": # typically used for families
+                date_suffix = "and later"
+                date_type = "start"
+            case _:
+                date_suffix = "!!!!!Suffix_raw could not be parsed!!!!!!!"
+    if year_string[0:7] == "between" and date_prefix_2 == "late ": # Reformatting awkward formulae
+        year_string = year_string[0:8] + "late " + year_string[8:]
+        date_prefix_2 = ""
+    #print("Date as a string: ")
+    #print(date_prefix_1 + " " + date_prefix_2 + " " + day_string + " " + month_string + " " + year_string + " " + date_suffix)
+    #print("day: ")
+    #print(day_value_start)
+    #print(day_value_end)
+    #print("month: ")
+    #print(month_value_start)
+    #print(month_value_end)
+    #print("year: ")
+    #print(year_value_start)
+    #print(year_value_end)
+    year_string = year_string + " " # I do this at the end because there are so many manipulations of year_string
+    if year_value_start: #this is to prvent an error messages
+        date_start = (year_value_start, month_value_start, day_value_start)
+        date_end = (year_value_end, month_value_end, day_value_end)
+    return(date_prefix_1, date_prefix_2, day_string, month_string, year_string, date_suffix, short_date, date_aspect, date_precision, date_type, date_start, date_end)
+
+
+
+
+def date_overall_parsing(datestring, date_comments, date_indicator):
+    date_start_parsed = ""
+    date_end_parsed = ""
+    date_only_parsed = ""
+    start_aspect = ""
+    end_aspect = ""
+    start_prefix_1 = ""
+    start_prefix_2 = ""
+    start_suffix = ""
+    start_alternative_prefix_1 = ""
+    start_alternative_prefix_2 = ""
+    start_alternative_day = ""
+    start_alternative_month = ""
+    start_alternative_year = ""
+    start_alternative_suffix = ""
+    start_alternative_string = ""
+    end_alternative_string = ""
+    only_alternative_type = ""
+    start_alternative_start_date = ()
+    start_alternative_end_date = ()
+    end_alternative_start_date = ()
+    end_alternative_end_date = ()
+    only_alternative_start_date = ()
+    only_alternative_end_date = ()
+
+    end_prefix_1 = ""
+    end_prefix_2 = ""
+    end_suffix = ""
+    start_day = ""
+    start_month = ""
+    start_year = ""
+    end_day = ""
+    end_month = ""
+    end_year = ""
+    only_alternative_string = ""
+    date_type = ""
+    date_string = ""
+    string_replacement = {"–" : "-", "- " : "-", " -" : "-", "  " : " ", ". " : ".", " ." : ".", "–" : "-", "−" : "-", " " : " ", "[" : "", "]" : "", "|": "", "/ " : "/", "/Anf." : "-Anf. ", \
+                          "/Anfang" : "-Anfang", "- Anf." : "-Anfang ", "-Anf.": "-Anfang ", "-ca.Anf." : "-Anfang ", "Anfang bis Mitte" : "Anfang biis Mitte", "Mitte bis Ende" : "Mitte biis Ende",  \
+                          "/1.H." : "-1.H.", "/2.H." : "-2.H.", "/1.Hälfte " : "-1.H.", "/2.Hälfte " : "-2.H.", "Jh./" : "/", "ca.1.H." : "1.H.", "ca.2.H." : "2.H.",\
+                          " bis " : "-", "bis " : "-", "ca.(" : "ca.", "ca.)" : "ca.", "*": "geb.", ", +" : "-", "+" : "gest.", "th century" : ". Jh.", "th cent" : ". Jh", \
+                          ", †" : "-",  "; †" : "-", "†" : "gest." , "um/nach" : "umnach", "oder danach" : "odanach", "oder später" : "odanach", "oder früher" : "ofrüher", \
+                            "Januar " : "01.", "Februar " : "02.", "März " :"03.", "April " : "04.", "Mai " : "05.", "Juni " : "06.", "Juli ":"07.", "August ": "08.", \
+                            "September " : "09.", "Oktober ": "10.", "November " : "11.", "Dezember " : "12.", "Ersch.-Jahr" : "erscheinungsjahr", "Ersch.-jahr" : "erscheinungsjahr", ", gest." : "-", "; gest." : "-", ", gestorben" : "-"}
+    # The replacment of some "bis" with "biis" prevents its replacement in the next step. Some signs such as '*" are replaced here with words to avoid later confusion"
+    for old, new in string_replacement.items():
+        datestring = datestring.replace(old, new)        
+    datestring = datestring.lower()
+    if datestring == "ca. ":
+        datestring = ""
+    if datestring[0] == "%": #some strings start with this
+        datestring = datestring[1:]
+    if re.match(r'ca\.\!\d{8}\w\!', datestring): #exlucdes references to Pica PPN numbers
+        datestring = ""
+    if datestring[0:3] == "ca.": #"ca." can have the meaning "circa", but it is also (today) and obligatory introdcution for any datestring that is freely formulated
+                                # in this case, it has no meaning and it should be removed
+        for x in datestring[3:]:
+            if x in "abcdefghijklmnopqrstuwyz,": # freely formulated datestrings will contain letters, whereas standard datestrings can only contain the letters v(or Christus) and x(unknown digit)
+                datestring = datestring[3:]
+                break
+    if datestring[0:4] == "ca.-":
+        datestring = "-ca." + datestring[4:]
+    missing_dot = re.search(r"\d{2}\.\d{6}", datestring) # Not rarely, there is no dot between the digits for the months and those for the year, e.g. "15.111380". It has to run twice, since the problem can occur twice
+    if missing_dot:
+        print("Missing dot caught")
+        missing_dot_position = missing_dot.start() + 5
+        print("position of dot: " + str(missing_dot_position))
+        datestring = datestring[:missing_dot_position] + "." + datestring[missing_dot_position:]
+    missing_dot = re.search(r"\d{2}\.\d{6}", datestring) 
+    if missing_dot:
+        print("Missing dot caught")
+        missing_dot_position = missing_dot.start() + 5
+        print("position of dot: " + str(missing_dot_position))
+        datestring = datestring[:missing_dot_position] + "." + datestring[missing_dot_position:]
+    um_missing_space = re.search(r"um\d{2}", datestring) # Sometimes, there is no blank after "um"
+    if um_missing_space:
+        um_missing_space_position = um_missing_space.start() + 2
+        datestring = datestring[:um_missing_space_position] + " " + datestring[um_missing_space_position:]
+    vor_missing_space = re.search(r"vor\d{2}", datestring) # Sometimes, there is no blank after "vor"
+    if vor_missing_space:
+        vor_missing_space_position = vor_missing_space.start() + 3
+        datestring = datestring[:vor_missing_space_position] + " " + datestring[vor_missing_space_position:]
+    nach_missing_space = re.search(r"nach\d{2}", datestring) # Sometimes, there is no blank after "nach"
+    if nach_missing_space:
+        nach_missing_space_position = nach_missing_space.start() + 4
+        datestring = datestring[:nach_missing_space_position] + " " + datestring[nach_missing_space_position:]
+
+
+    
+    print("Normalised datestring")
+    print(datestring)
+    # There are the following possibilities: a start date and an end date / a start date only / an end date only / a date that does not specify if it is start or end (e.g., just  rough century)
+    # If there is a start date and an end date, they are separated by a dash. 
+    # If there is only one unspecified date, it comes without a dash. 
+    # Only a start date or only an end date can be written in two ways: either a dash that has on one side a date and on the other side nothing for a placeholder,#
+    # or a single date with a verbal indication that it is a start date or an end date (e.g. "gestorben 1550")
+    if "-" in datestring:
+        #date_only_type = "none" #This would be used if there is only one date given that is neither identified as start or as end date
+        datestring_overall_pattern = r"([^-].*)?(-|--)([^-].*)?"
+        datestring_overall_divided = re.match(datestring_overall_pattern, datestring).groups()
+        print(datestring_overall_divided)
+        if datestring_overall_divided[0] == None or datestring_overall_divided[0] == "" or datestring_overall_divided[0] == "xxxx" or datestring_overall_divided[0] == "xx.xx.xxxx" \
+            or datestring_overall_divided[0] == "?" or datestring_overall_divided[0] == "ca." or datestring_overall_divided[0] == "ca. "or datestring_overall_divided[0] == "ca.?" \
+            or datestring_overall_divided[0] == "(?)" or datestring_overall_divided[0] == "ca.xxxx" or datestring_overall_divided[0] == "1xxx" or datestring_overall_divided[0] == "xx.xx.1xxx":
+            date_type = "end"
+        else:
+            datestring_start_raw = datestring_overall_divided[0]
+            if "bzw." in datestring_start_raw or "oder" in datestring_start_raw or " or" in datestring_start_raw or "od." in datestring_start_raw or "o." in datestring_start_raw: \
+                # "or" needs a blank that it cannot be confused with "vor", but eg. "Jh.or" does not occur, anyway
+                datestring_start_raw_divided = re.match(r"(.*?)(bzw.|oder| or|od.|o.)(.*)", datestring_start_raw).groups()              
+                print("datestring_start divided according to alternatives") 
+                print(datestring_start_raw_divided)
+                date_raw_start_parsed = datestring_start_raw_divided[0].strip()
+                date_raw_start_alternative_parsed = datestring_start_raw_divided[2].strip()
+                date_start_parsed = date_single_parsing(date_raw_start_parsed)
+                date_start_alternative_parsed = date_single_parsing(date_raw_start_alternative_parsed)
+                print("alternative - parsed: ")
+                print(date_start_alternative_parsed)
+                start_alternative_prefix_1 = date_start_alternative_parsed[0]
+                start_alternative_prefix_2 = date_start_alternative_parsed[1]
+                start_alternative_day = date_start_alternative_parsed[2]
+                start_alternative_month = date_start_alternative_parsed[3]
+                start_alternative_year = date_start_alternative_parsed[4]
+                start_alternative_suffix = date_start_alternative_parsed[5]
+                start_alternative_string = "(or " + (start_alternative_prefix_1 + start_alternative_prefix_2 + start_alternative_day + start_alternative_month + start_alternative_year + start_alternative_suffix).strip() + ")"
+                start_alternative_start_date = date_start_alternative_parsed[10]
+                start_alternative_end_date = date_start_alternative_parsed[11]
+                print("start_alternative: " + start_alternative_string)
+                print(start_alternative_start_date)
+                print(start_alternative_end_date)
+            else:
+                date_start_parsed = date_single_parsing(datestring_start_raw)
+            #date_start_string = date_start_parsed[0]
+            #date_start_type = date_start_parsed[1]
+            print("start: ")
+            print(date_start_parsed)
+            start_prefix_1 = date_start_parsed[0]
+            start_prefix_2 = date_start_parsed[1]
+            start_day = date_start_parsed[2]
+            start_month = date_start_parsed[3]
+            start_year = date_start_parsed[4]
+            start_suffix = date_start_parsed[5]
+            start_short = date_start_parsed[6]
+            start_aspect = date_start_parsed[7]
+            start_precision = date_start_parsed[8]
+            start_start_date = date_start_parsed[10]
+            start_end_date = date_start_parsed[11]
+            print("start_start_date")
+            print(start_start_date)
+            if start_alternative_string != "": # If there are alternatives, always use long form of date
+                start_short = False
+
+        if datestring_overall_divided[2] == None or datestring_overall_divided[2] == "" or datestring_overall_divided[2] == "xx.xx.xxxx" or datestring_overall_divided[2] == "xxxx" or \
+            datestring_overall_divided[2] == "?" or datestring_overall_divided[2] == "ca." or datestring_overall_divided[2] == "ca. " or datestring_overall_divided[2] == "ca.?" \
+                or datestring_overall_divided[2] == "(?)" or datestring_overall_divided[2] == "ca.xxxx" or datestring_overall_divided[2] == "1xxx" or datestring_overall_divided[2] == "xx.xx.1xxx":
+            date_type = "start"
+        else:
+            datestring_end_raw = datestring_overall_divided[2]
+            if "bzw." in datestring_end_raw or "oder" in datestring_end_raw or " or" in datestring_end_raw or "od." in datestring_end_raw  or "o." in datestring_end_raw: # "or" needs a blank that it cannot be confused with "vor", but eg. "Jh.or" does not occur, anyway
+                datestring_end_raw_divided = re.match(r"(.*?)(bzw.|oder| or|od.|o.)(.*)", datestring_end_raw).groups()              
+#                print("datestring_end divided according to alternatives") 
+#                print(datestring_end_raw_divided)
+                date_raw_end_parsed = datestring_end_raw_divided[0].strip()
+                date_raw_end_alternative_parsed = datestring_end_raw_divided[2].strip()
+                if date_raw_end_alternative_parsed[0:1] == "-": #If there is a dash at the start of the alternative date ("-1500 oder -1510"), this should only be necessary for the end
+                    date_raw_end_alternative_parsed = date_raw_end_alternative_parsed[1:]
+                date_end_parsed = date_single_parsing(date_raw_end_parsed)
+                date_end_alternative_parsed = date_single_parsing(date_raw_end_alternative_parsed)
+                end_alternative_prefix_1 = date_end_alternative_parsed[0]
+                end_alternative_prefix_2 = date_end_alternative_parsed[1]
+                end_alternative_day = date_end_alternative_parsed[2]
+                end_alternative_month = date_end_alternative_parsed[3]
+                end_alternative_year = date_end_alternative_parsed[4]
+                end_alternative_suffix = date_end_alternative_parsed[5]
+                end_alternative_start_date = date_end_alternative_parsed[10]
+                end_alternative_end_date = date_end_alternative_parsed[11]
+                end_alternative_string = "(or " + (end_alternative_prefix_1 + end_alternative_prefix_2 + end_alternative_day + end_alternative_month + end_alternative_year + end_alternative_suffix).strip() + ")"
+                print("end_alternative: " + end_alternative_string)
+            else:
+                date_end_parsed = date_single_parsing(datestring_end_raw)
+            #date_end_string = date_end_parsed[0]
+            #date_end_type = date_end_parsed[1]
+#            print("end: ")
+#            print(date_end_parsed)
+            end_prefix_1 = date_end_parsed[0]
+            end_prefix_2 = date_end_parsed[1]
+            end_day = date_end_parsed[2]
+            end_month = date_end_parsed[3]
+            end_year = date_end_parsed[4]
+            end_suffix = date_end_parsed[5]
+            end_short = date_end_parsed[6]
+            end_aspect = date_end_parsed[7]
+            end_precision = date_end_parsed[8]
+            end_start_date = date_end_parsed[10]
+            end_end_date = date_end_parsed[11]
+            if end_alternative_string != "": # If there are alternatives, always use long form of date
+                end_short = False
+
+
+    else:
+        #date_start_type = "none"
+        #date_end_type = "none"
+        if "bzw." in datestring or "oder" in datestring or " or" in datestring or "od." in datestring or "o." in datestring: # "or" needs a blank that it cannot be confused with "vor", but eg. "Jh.or" does not occur, anyway
+            datestring_raw_divided = re.match(r"(.*?)(bzw.|oder| or|od.|o.)(.*)", datestring).groups()              
+            print("datestring divided according to alternatives - only") 
+            print(datestring_raw_divided)
+            date_raw_parsed = datestring_raw_divided[0].strip()
+            date_raw_alternative_parsed = datestring_raw_divided[2].strip()
+            date_only_parsed = date_single_parsing(date_raw_parsed)
+            print("date only - main: ")
+            print(date_only_parsed)
+            date_alternative_parsed = date_single_parsing(date_raw_alternative_parsed)
+            print("date only - alternative: ")
+            print(date_alternative_parsed)
+            only_alternative_prefix_1 = date_alternative_parsed[0]
+            only_alternative_prefix_2 = date_alternative_parsed[1]
+            only_alternative_day = date_alternative_parsed[2]
+            only_alternative_month = date_alternative_parsed[3]
+            only_alternative_year = date_alternative_parsed[4]
+            only_alternative_suffix = date_alternative_parsed[5]
+            only_alternative_type = date_alternative_parsed[9]
+            only_alternative_start_date = date_alternative_parsed[10]
+            only_alternative_end_date = date_alternative_parsed[11]
+            only_alternative_string = "(or " + (only_alternative_prefix_1 + only_alternative_prefix_2 + only_alternative_day + only_alternative_month + only_alternative_year + only_alternative_suffix).strip() + ")"
+            print("only alternative_string: ") 
+            print(only_alternative_string)
+        else:
+            date_only_parsed = date_single_parsing(datestring)
+        print("only: ")
+        print(date_only_parsed)
+        date_type = date_only_parsed[9]
+        # The following lines make sure that, if there is no indication of the date type parsed with the date proper but something parsed with the alternative date (e.g. '1550 (1560) geboren'), the latter is used
+        if date_type == "" and only_alternative_type == "start":
+            date_type = "start"
+        if date_type == "" and only_alternative_type == "end":
+            date_type = "end"
+
+
+        match date_type:
+            case "start":                
+                start_prefix_1 = date_only_parsed[0]
+                start_prefix_2 = date_only_parsed[1]
+                start_day = date_only_parsed[2]
+                start_month = date_only_parsed[3]
+                start_year = date_only_parsed[4]
+                start_suffix = date_only_parsed[5]
+                start_short = date_only_parsed[6]
+                start_aspect = date_only_parsed[7]
+                start_precision = date_only_parsed[8]
+                start_start_date = date_only_parsed[10]
+                start_end_date = date_only_parsed[11]
+            case "end":                
+                end_prefix_1 = date_only_parsed[0]
+                end_prefix_2 = date_only_parsed[1]
+                end_day = date_only_parsed[2]
+                end_month = date_only_parsed[3]
+                end_year = date_only_parsed[4]
+                end_suffix = date_only_parsed[5]
+                end_short = date_only_parsed[6]
+                end_aspect = date_only_parsed[7]
+                end_precision = date_only_parsed[8]
+                end_type = date_only_parsed[9]
+                end_start_date = date_only_parsed[10]
+                end_end_date = date_only_parsed[11]
+
+            case "":
+                date_type = "only"
+                only_prefix_1 = date_only_parsed[0]
+                only_prefix_2 = date_only_parsed[1]
+                only_day = date_only_parsed[2]
+                only_month = date_only_parsed[3]
+                only_year = date_only_parsed[4]
+                only_suffix = date_only_parsed[5]
+                only_short = date_only_parsed[6]
+                only_aspect = date_only_parsed[7]
+                only_precision = date_only_parsed[8]
+                only_start_date = date_only_parsed[10]
+                only_end_date = date_only_parsed[11]
+
+
+    if date_start_parsed and date_end_parsed:
+        if start_year.strip() != "" and end_year.strip() != "": # This and the following clauses remove 'pseudo-dates'. 
+            date_type = "both"
+        elif start_year.strip() != "" and end_year.strip() == "":
+            date_type = "start"
+        elif start_year.strip() == "" and end_year.strip() != "":
+            date_type = "end"
+        elif start_year.strip() == "" and end_year.strip() == "":
+            pass # I have to think how I call it if there is no date
+        
+
+
+
+
+    ##### Add here extra material from the comment field
+        
+
+    
+        
+    if date_type == "both":
+        print("Date_type is both")
+        if start_aspect == "": #here, the defaults settings are given, if there is no more specific information available
+            if date_indicator == "datl" or date_indicator == "datx":
+                start_aspect = "l"
+            if date_indicator == "datw" or date_indicator == "datz":
+                start_aspect = "a"
+        if end_aspect == "":
+            end_aspect = start_aspect
+        # The following lines achieve that, if the alternative dates give a larger timespan than the main dates, they are used for the search timespan
+        print(start_alternative_start_date)
+        print(start_start_date)
+        if start_alternative_start_date:
+            if start_alternative_start_date < start_start_date:
+                start_start_date = start_alternative_start_date
+        if end_alternative_end_date:
+            if end_alternative_end_date > end_end_date:
+                end_end_date = end_alternative_end_date
+        
+        
+        if start_start_date[0] > 0 and end_start_date[0] < 0: #This means that onyl the second date is marked as "BC"
+            start_start_date = (0-start_start_date[0], start_start_date[1], start_start_date[2])
+            start_year = start_year + "BC"
+
+
+        if start_short and end_short and (end_aspect == start_aspect or end_aspect == ""):
+            if start_prefix_1 == "" and start_aspect == "a":
+                start_prefix_1 = "active "
+            date_string = start_prefix_1 + start_prefix_2 + start_day + start_month + start_year + start_suffix + "-" + end_prefix_1 + end_prefix_2 + end_day + end_month + end_year + end_suffix
+            date_start = start_start_date
+            date_end = end_end_date
+
+        else: 
+            if start_prefix_1 == "":
+                if start_aspect == "l":
+                    start_prefix_1 = "born "
+                else: #can only be 'life' or 'activity'
+                    start_prefix_1 == "active from "
+            
+            if end_prefix_1 == "":
+                if end_aspect == "l":
+                    end_prefix_1 = ", died "
+                else:
+                    if end_aspect == "a":
+                        if start_aspect == "a":
+                            end_prefix_1 = " to "
+                        else: 
+                            end_prefix_1 = ", active until "
+            else:
+                end_prefix_1 = ", " + end_prefix_1
+            # Add something that, if end date of start later than start date of end or vice versa and one of the two string is a "between ... and ... ", it is changed to an "after ..." or similar
+            if start_year != "" or end_year != "":
+                date_string = (start_prefix_1 + start_prefix_2 + start_day + start_month + start_year + start_suffix + start_alternative_string + end_prefix_1 + end_prefix_2 + end_day + end_month + end_year + end_suffix + end_alternative_string).strip()
+                print("start_start_date again")
+                print(start_start_date)
+                date_start = start_start_date
+                date_end = end_end_date
+            else:
+                date_string = ""
+        date_aspect = start_aspect    
+    if date_type == "start":
+        if not start_aspect: #== "": #here, the defaults settings are given, if there is no more specific information available
+            if date_indicator == "datl" or date_indicator == "datx":
+                start_aspect = "l"
+            if date_indicator == "datw" or date_indicator == "datz":
+                start_aspect = "a"
+        if start_prefix_1 == None or start_prefix_1 == "":
+            print("start_prefix_1 empty")
+            print("start_aspect:")
+            print(start_aspect)
+            if start_aspect == "l":                    
+                start_prefix_1 = "born "
+            else: #can only be 'life' or 'activity'
+                start_prefix_1 = "active from "
+        if start_prefix_1 == "documented ":
+            start_prefix_1 = "documented from "
+        date_string = (start_prefix_1 + start_prefix_2 + start_day + start_month + start_year + start_suffix + start_alternative_string + only_alternative_string).strip()
+        # The following lines achieve that, if the alternative dates give a larger timespan than the main dates, they are used for the search timespan
+        print("start_alternative_start_date:")
+        print(start_alternative_start_date)
+        print("start_start_date: ")
+        print(start_start_date)
+        if start_alternative_start_date:
+            if start_alternative_start_date < start_start_date:
+                start_start_date = start_alternative_start_date
+        if start_alternative_end_date:
+            if start_alternative_end_date > start_end_date:
+                start_end_date = start_alternative_end_date
+
+        date_start = start_start_date
+        date_end = start_end_date
+        date_aspect = start_aspect
+
+    if date_type == "end":
+        if end_aspect == "": #here, the defaults settings are given, if there is no more specific information available
+            if date_indicator == "datl" or date_indicator == "datx":
+                end_aspect = "l"
+            if date_indicator == "datw" or date_indicator == "datz":
+                end_aspect = "a"
+        if end_prefix_1 == "":
+            if end_aspect == "l":                    
+                end_prefix_1 = "died "
+            else: #can only be 'life' or 'activity'
+                end_prefix_1 == "active until "
+        date_string = (end_prefix_1 + end_prefix_2 + end_day + end_month + end_year + end_suffix + end_alternative_string + only_alternative_string).strip()
+        if end_alternative_start_date: # This makes sure that, if the alternative dates give a greater datespan, the latter will be used for searches
+            if end_alternative_start_date < end_start_date:
+                end_start_date = end_alternative_start_date
+        if end_alternative_end_date:
+            if end_alternative_end_date > end_end_date:
+                end_end_date = end_alternative_end_date
+        print("end_alternative_start_date:")
+        print(end_alternative_start_date)
+        print("end_start_date: ")
+        print(end_start_date)
+        print("end_alternative_end_date:")
+        print(end_alternative_end_date)
+        print("end_end_date: ")
+        print(end_end_date)
+
+        date_start = end_start_date
+        date_end = end_end_date
+        date_aspect = end_aspect
+
+
+    if date_type == "only":
+        if only_aspect == "": #here, the defaults settings are given, if there is no more specific information available
+            if date_indicator == "datl" or date_indicator == "datx":
+                only_aspect = "l"
+            if date_indicator == "datw" or date_indicator == "datz":
+                only_aspect = "a"
+        if only_prefix_1 == "":
+            if only_aspect == "a":                    
+                only_prefix_1 = "active "
+            # if it is just a period of life, there is no prefix
+        date_string = (only_prefix_1 + only_prefix_2 + only_day + only_month + only_year + only_suffix + only_alternative_string).strip()
+        if only_alternative_start_date: # This makes sure that, if the alternative dates give a greater datespan, the latter will be used for searches
+            if only_alternative_start_date < only_start_date:
+                only_start_date = only_alternative_start_date
+        if only_alternative_end_date:
+            if only_alternative_end_date > only_end_date:
+                only_end_date = only_alternative_end_date
+        date_start = only_start_date
+        date_end = only_end_date
+        date_aspect = only_aspect
+
+    print("final date_string: ")
+    print(date_string)
+    print(date_start)
+    print(date_end)
+    print(date_aspect)
+    return (date_string, date_start, date_end, date_aspect)
+
+                
+
+
+x = input("Date: ")
+x = x[1:]
+y = input("Date comments: ")
+date_string = date_overall_parsing(x, y, "datl")[0]
+print("#" + x + "$" + date_string)
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    
+#with open(r"C:\Users\berth\bpf_files\gnd_persons\datestest.txt", "r+", encoding="utf-8") as f:
+#    #for line in f:
+#    for counter in range(1,500000):
+#        datestring = f.readline()
+#        if datestring[-1:] == "\n":
+#            datestring = datestring[:-1]
+#        if datestring is None or datestring == "":
+#            continue
+#        x = date_overall_parsing(datestring, "datl")
+#        #print("Date as returned: ")
+#        #print(x)
+#        if not x:
+#            x = ""
+#        datestring_new = "#" + datestring + "$" + x
+#        print("Date as to be written: ")
+#        print(datestring_new)
+#        datestring_new = datestring_new + "\n"
+
+ #       with open(r"C:\Users\berth\bpf_files\gnd_persons\datestestdone.txt", "a") as g:
+ #           g.writelines(datestring_new)
+

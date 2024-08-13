@@ -1218,7 +1218,7 @@ def gnd_place_person_relation(relation_original, sex, relation_type):
 
 
 def gnd_place_org_relation(relation_original, sex, relation_type):
-""" Here, there are so few terms that it does not make sense to parse them, hence I will only parse the main abbreviations """
+    """ Here, there are so few terms that it does not make sense to parse them, hence I will only parse the main abbreviations """
     relation_new = ""
     relation_comment = ""
     if relation_original:
