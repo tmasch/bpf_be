@@ -1,29 +1,35 @@
+#pylint: disable=C0301,C0303
+"""
+\todo
+"""
 import urllib.request
-import requests
 import xml.etree.ElementTree
-from classes import *
-import re
-from db_actions import *
-from dates_parsing import date_overall_parsing
-from dates_parsing import artist_date_parsing
-from dates_parsing import entered_date
+#import re
 import asyncio
-import aiohttp
 import ast
-class InvalidDateException(Exception):
-    pass
+import aiohttp
+import requests
+#from dates_parsing import date_overall_parsing
+from dates_parsing import artist_date_parsing
+from dates_parsing import parse_manually_entered_date
+import db_actions
+import classes
 
-class InvalidMonthException(Exception):
-    pass
 
-class InvalidDayException(Exception):
-    pass
+#class InvalidDateException(Exception):
+#    pass
 
-class InvalidDateStringException(Exception):
-    pass
+#class InvalidMonthException(Exception):
+#    pass
 
-class InvalidDateRangeException(Exception):
-    pass
+#class InvalidDayException(Exception):
+#    pass
+
+#class InvalidDateStringException(Exception):
+#    pass
+
+#class InvalidDateRangeException(Exception):
+#    pass
 
 
 
@@ -41,7 +47,7 @@ role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "
 role_org_type_correspondence = {"aut" : "Author", "edt" : "Author", "prt" : "Printer", "pbl" : "Printer", "col" : "Collection", "art" : "Artist"}
 role_place_type_correspondence = {"pup" : "Town - historical", "mfp" : "Town - historical", "uvp" : "Town - historical", "Place of Making" : "Town - historical"}
 #There is a problem - "Place of Making" could also go with "Region - historical" - I ignore that for the moment. 
-from pymongo import MongoClient
+#from pymongo import MongoClient
 encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"}
 
 
@@ -55,14 +61,17 @@ encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"
 
 
 async def person_identification(person):
-# This function is used for every person named in the bibliographic record (author, editor, printer etc.)
-# It will first search if a record for this person is already in the MongoDB database, and then search in the GND
-# If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
-    candidates = []
+    """
+This function is used for every person named in the bibliographic record (author, editor, printer etc.)
+It will first search if a record for this person is already in the MongoDB database, and then search in the GND
+If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
+    """
+#    candidates = []
     person.internal_id_person_type1_needed =  role_person_type_correspondence[person.role] 
     person.chosen_candidate = 999 # For some reason, I cannot return the form when 'chosen candidate' is empty. Hence, I put this in as a default setting. 
     if person.id:
-        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+#        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+        person_found = db_actions.find_person(person,"external_id")
         if person_found:            
             #print(person_found)
             person.internal_id = person_found["id"]
@@ -73,8 +82,8 @@ async def person_identification(person):
             #The following is a warning that a matching person has the wrong type. 
             if person.internal_id_person_type1_needed not in person.internal_id_person_type1:
                 person_type1_present = ""
-                for type in person.internal_id_person_type1:
-                    person_type1_present = person_type1_present + "' and '" + type + "'"
+                for t in person.internal_id_person_type1:
+                    person_type1_present = person_type1_present + "' and '" + t + "'"
                 person_type1_present = person_type1_present[5:]
                 person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
         else:
@@ -88,9 +97,10 @@ async def person_identification(person):
         person.name = person.name.strip()
         for old, new in encoding_list.items():
             person.name = person.name.replace(old, new)
-        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+#        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+        candidates_result = db_actions.find_person(person,"name_preferred")
         for candidate_result in candidates_result:
-            candidate = PersonImport()   
+            candidate = classes.PersonImport()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
@@ -100,10 +110,11 @@ async def person_identification(person):
             print(candidate.name_preferred)
             print(candidate.internal_id_person_type1)
             person.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
+#        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
+        candidates_result = db_actions.find_person(person,"name_variant")
         #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
-            candidate = PersonImport()
+            candidate = classes.PersonImport()
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
@@ -122,8 +133,8 @@ async def person_identification(person):
             for candidate in person.potential_candidates:
                 if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
                     person_type1_present = ""
-                    for type in candidate.internal_id_person_type1:
-                        person_type1_present = person_type1_present + "' and '" + type + "'"
+                    for t in candidate.internal_id_person_type1:
+                        person_type1_present = person_type1_present + "' and '" + t + "'"
                     person_type1_present = person_type1_present[5:]
                     candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
         if person.internal_id_person_type1_needed != "Artist":
@@ -157,14 +168,19 @@ async def person_identification(person):
                 
 
 def additional_person_identification(new_authority_id, role):
-    # This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
-    # Normally, they are parsed with gnd_parsing_person - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
-    # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
+This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
+Normally, they are parsed with gnd_parsing_person - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
+Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
     new_authority_id = new_authority_id.strip()
     potential_persons_list = []
-    potential_person = PersonImport()
-    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-    if person_found:            
+    potential_person = classes.PersonImport()
+#    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+    person = classes.Person()
+    person.new_authority_id = new_authority_id
+    person_found = db_actions.find_person(person,"GND")
+    if person_found:
         #print(person_found)
         potential_person.internal_id = person_found["id"]
         potential_person.internal_id_person_type1 = person_found["person_type1"]
@@ -172,8 +188,8 @@ def additional_person_identification(new_authority_id, role):
         internal_id_person_type1_needed =  role_person_type_correspondence[role]
         if internal_id_person_type1_needed not in potential_person.internal_id_person_type1: 
             person_type1_present = ""
-            for type in potential_person.internal_id_person_type1:
-                person_type1_present = person_type1_present + "' and '" + type + "'"
+            for t in potential_person.internal_id_person_type1:
+                person_type1_present = person_type1_present + "' and '" + t + "'"
             person_type1_present = person_type1_present[5:]
             potential_person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" \
                 + internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
@@ -184,22 +200,21 @@ def additional_person_identification(new_authority_id, role):
         potential_persons_list = gnd_parsing_person(authority_url)
     #print("added person")
     #print(potential_persons_list)
-    return(potential_persons_list)
-
-
-
-
+    return potential_persons_list
 
 def organisation_identification(organisation):
-# This function is used for every organisation named in the bibliographic record (printer etc.), and in addition for the repository of a book or manuscript
-# It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
-# If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
-    candidates = []
+    """
+This function is used for every organisation named in the bibliographic record (printer etc.), and in addition for the repository of a book or manuscript
+It will first search if a record for this organisation is already in the MongoDB database, and then search in the GND
+If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
+    """
+#    candidates = []
     print("Starting organisatin_identification for repository")
     organisation.internal_id_org_type1_needed = role_org_type_correspondence[organisation.role]
     organisation.chosen_candidate = 999 # For some reason, this must not be empty
     if organisation.id:
-        organisation_found = coll.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
+#        organisation_found = coll.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
+        organisation_found = db_actions.find_organisation(organisation,"external_id")
         if organisation_found:
             organisation.internal_id = organisation_found["id"]
             organisation.internal_id_preview = organisation_found["name_preferred"] + " (in Database)"
@@ -209,8 +224,8 @@ def organisation_identification(organisation):
             #The following is a warning that a matching person has the wrong type. 
             if org_type1_needed not in organisation.internal_id_org_type1:
                 org_type1_present = ""
-                for type in organisation.internal_id_org_type1:
-                    org_type1_present = org_type1_present + "' and '" + type
+                for t in organisation.internal_id_org_type1:
+                    org_type1_present = org_type1_present + "' and '" + t
                     org_type1_present = org_type1_present[5:] + "'"
                 organisation.internal_id_org_type1_comment = "This organisation is currently catalogued as " + org_type1_present + ", but not as '" + org_type1_needed + "'. The latter will be added if this record has been saved. " 
 
@@ -222,10 +237,11 @@ def organisation_identification(organisation):
     else:
         print("No repository ID")
         organisation.name = organisation.name.strip()
-        candidates_result = (coll.find({"name_preferred" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}))
+#        candidates_result = (coll.find({"name_preferred" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}))
+        candidates_result = db_actions.find_organisation(organisation,"name")
         print("Search for repository candidate completed")
         for candidate_result in candidates_result:
-            candidate = OrganisationImport()   
+            candidate = classes.OrganisationImport()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -234,9 +250,10 @@ def organisation_identification(organisation):
             print(candidate.preview)
             print(candidate.internal_id_org_type1)
             organisation.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+#        candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        candidates_result = db_actions.find_organisation(organisation,"name_variant")
         for candidate_result in candidates_result:
-            candidate = OrganisationImport()   
+            candidate = classes.OrganisationImport()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
@@ -261,8 +278,8 @@ def organisation_identification(organisation):
                 print(organisation.internal_id_org_type1_needed)
                 if organisation.internal_id_org_type1_needed not in candidate.internal_id_org_type1:
                     org_type1_present = ""
-                    for type in candidate.internal_id_org_type1:
-                        org_type1_present = org_type1_present + "' and '" + type + "'"
+                    for t in candidate.internal_id_org_type1:
+                        org_type1_present = org_type1_present + "' and '" + t + "'"
                     org_type1_present = org_type1_present[5:]
                     candidate.internal_id_org_type1_comment = "This organisation is currently catalogued as "\
                           + org_type1_present + ", but not as '" + organisation.internal_id_org_type1_needed + "'. The latter will be added if this record has been saved. " 
@@ -292,13 +309,18 @@ def organisation_identification(organisation):
     return organisation
 
 def additional_organisation_identification(new_authority_id, role):
-    # This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
-    # Normally, they are parsed with gnd_parsing_organisation - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
-    # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
+This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
+Normally, they are parsed with gnd_parsing_organisation - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
+Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
     new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
-    potential_org = PersonImport()
-    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
+    potential_org = classes.PersonImport()
+    org = classes.Organisation
+    org.new_authority_id=new_authority_id
+#    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
+    org_found = db_actions.find_organisation(org,"GND")
     if org_found:            
         print(org_found)
         potential_org.internal_id = org_found["id"]
@@ -307,8 +329,8 @@ def additional_organisation_identification(new_authority_id, role):
         internal_id_org_type1_needed =  role_org_type_correspondence[role]
         if internal_id_org_type1_needed not in potential_org.internal_id_org_type1: 
             org_type1_present = ""
-            for type in potential_org.internal_id_org_type1:
-                org_type1_present = org_type1_present + "' and '" + type + "'"
+            for t in potential_org.internal_id_org_type1:
+                org_type1_present = org_type1_present + "' and '" + t + "'"
             org_type1_present = org_type1_present[5:]
             potential_org.internal_id_org_type1_comment = "This organisation is currently catalogued as " + org_type1_present + ", but not as '" \
                 + internal_id_org_type1_needed + "'. The latter will be added if this record has been saved. " 
@@ -319,18 +341,20 @@ def additional_organisation_identification(new_authority_id, role):
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
         potential_orgs_list = gnd_parsing_organisation(authority_url)
 
-    return(potential_orgs_list)
+    return potential_orgs_list
 
 
 
                 
 
 def place_identification(place):
-# This function is used for every place named in the bibliographic record (place of publishing / manufacture)
-# It will first search if a record for this place is already in the MongoDB database, and then search in the GND
-# If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
-# Note that the GND parser combined with it suppresses all records to regions - if this mechanism is later also used for identifying regions, this might need to be changed
-# Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
+    """
+This function is used for every place named in the bibliographic record (place of publishing / manufacture)
+It will first search if a record for this place is already in the MongoDB database, and then search in the GND
+If there is an ID-number (internal or GND, the search is done for the ID-number, otherwise for the name as string, and if this fails, for the name as key-words)
+Note that the GND parser combined with it suppresses all records to regions - if this mechanism is later also used for identifying regions, this might need to be changed
+Since there are often many locations connected toa town (e.g., all villages in its district), I increase the number of hits from the GND to 400 and sort them alphabetically. 
+    """
     if place.role:
         print(place.role)
     else:
@@ -340,7 +364,8 @@ def place_identification(place):
     place.chosen_candidate = 999
     print("Arrived in place_identification")
     if place.id:
-        place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+#        place_found = coll.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+        place_found = db_actions.find_place(place,"external_id")
         if place_found:
             place.internal_id = place_found["id"]
             place.internal_id_preview = place_found["name_preferred"] + " (in Database)"
@@ -352,8 +377,8 @@ def place_identification(place):
             # This option has not been tried out properly since places rarely come with GND numbers
             if place_type1_needed not in place.internal_id_place_type1:
                 place_type1_present = ""
-                for type in place.internal_id_place_type1:
-                    place_type1_present = place_type1_present + "' and '" + type
+                for t in place.internal_id_place_type1:
+                    place_type1_present = place_type1_present + "' and '" + t
                 place_type1_present = place_type1_present[5:] + "'"
 
                 place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" + place_type1_needed + "'. \
@@ -366,17 +391,19 @@ def place_identification(place):
     else:
         print("place name has no ID")
         place.name = place.name.strip()
-        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
+#        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
+        candidates_result = db_actions.find_place(place,"name_preferred")
         for candidate_result in candidates_result:           
-            candidate = PlaceImport()   
+            candidate = classes.PlaceImport()   
             candidate.internal_id = candidate_result["id"]
             print("candidate found through name search in database (preferred name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_place_type1 = candidate_result["place_type1"]
             place.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+#        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        candidates_result = db_actions.find_place(place,"name_variant")
         for candidate_result in candidates_result:
-            candidate = PlaceImport()   
+            candidate = classes.PlaceImport()   
             candidate.internal_id = candidate_result["id"]
             print("candidate found through name search in database (variant name name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -391,8 +418,8 @@ def place_identification(place):
                 print(place.internal_id_place_type1_needed)
                 if place.internal_id_place_type1_needed not in candidate.internal_id_place_type1:
                     place_type1_present = ""
-                    for type in candidate.internal_id_place_type1:
-                        place_type1_present = place_type1_present + "' and '" + type + "'"
+                    for t in candidate.internal_id_place_type1:
+                        place_type1_present = place_type1_present + "' and '" + t + "'"
                     place_type1_present = place_type1_present[5:]
 
 
@@ -432,13 +459,18 @@ def place_identification(place):
 
 
 def additional_place_identification(new_authority_id, role):
-    # This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
-    # Normally, they are parsed with gnd_parsing_place - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
-    # Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
+This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
+Normally, they are parsed with gnd_parsing_place - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
+Currently all records must come from the GND - if other authority files are included, this function has to be changed. 
+    """
     new_authority_id = new_authority_id.strip()
     potential_places_list = []
-    potential_place = PlaceImport()
-    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+    potential_place = classes.PlaceImport()
+#    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+    place=classes.Place
+    place.new_authority_id=new_authority_id
+    place_found = db_actions.find_place(place,"GND")
     if place_found:            
 #        print(place_found)
         potential_place.internal_id = place_found["id"]
@@ -447,8 +479,8 @@ def additional_place_identification(new_authority_id, role):
         internal_id_place_type1_needed =  role_place_type_correspondence[role]
         if internal_id_place_type1_needed not in potential_place.internal_id_place_type1: 
             place_type1_present = ""
-            for type in potential_place.internal_id_place_type1:
-                place_type1_present = place_type1_present + "' and '" + type + "'"
+            for t in potential_place.internal_id_place_type1:
+                place_type1_present = place_type1_present + "' and '" + t + "'"
             place_type1_present = place_type1_present[5:]
             potential_place.internal_id_place_type1_comment = "This place is currently catalogued as " + place_type1_present + ", but not as '" \
                 + internal_id_place_type1_needed + "'. An additional record for " + internal_id_place_type1_needed + " will be produced if this place is selected and the record is saved. "
@@ -460,12 +492,15 @@ def additional_place_identification(new_authority_id, role):
         potential_places_list = gnd_parsing_place(authority_url)
 #        print("Potential places list in additional_place_identification: ")
 #        print(potential_places_list)
-    return(potential_places_list)
+    return potential_places_list
 
 
 
 
 def gnd_parsing_person(authority_url):
+    """
+\todo
+    """
     print("arrived in gnd_parsing_person")
     potential_persons_list = []
     url = urllib.request.urlopen(authority_url)
@@ -475,7 +510,7 @@ def gnd_parsing_person(authority_url):
     
     for record in root[2]:
         print("Parsing person information")
-        pe = PersonImport()
+        pe = classes.PersonImport()
         comment = ""
         date_preview = ""
         ortg_preview = ""
@@ -496,7 +531,7 @@ def gnd_parsing_person(authority_url):
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                pe_id = ExternalId()
+                                pe_id = classes.ExternalId()
                                 pe_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
                                     pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
@@ -566,13 +601,13 @@ def gnd_parsing_person(authority_url):
                     if name_variant:
                         pe.name_variant.append(name_variant)
                 case "500":
-                    conn_pe = ConnectedEntity()
+                    conn_pe = classes.ConnectedEntity()
                     conn_pe.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -598,13 +633,13 @@ def gnd_parsing_person(authority_url):
                             # I want them removed. 
                         pe.connected_persons.append(conn_pe)
                 case "510":
-                    conn_org = ConnectedEntity()
+                    conn_org = classes.ConnectedEntity()
                     conn_org.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -623,7 +658,7 @@ def gnd_parsing_person(authority_url):
                                     conn_org.connection_time = step2.text[2:]
                     pe.connected_organisations.append(conn_org)
                 case "548":
-                    date = DateImport()
+                    date = classes.DateImport()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -653,8 +688,8 @@ def gnd_parsing_person(authority_url):
                                 else:
                                     pe.comments = step2.text
                 case "551":
-                    conn_pl = ConnectedEntity()
-                    conn_id = ExternalId()
+                    conn_pl = classes.ConnectedEntity()
+                    conn_id = classes.ExternalId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
@@ -732,6 +767,9 @@ def gnd_parsing_person(authority_url):
 
 
 def gnd_parsing_organisation(authority_url):
+    """
+\todo
+    """
     potential_organisations_list = []
     print("organisation-authority: " + authority_url)
     url = urllib.request.urlopen(authority_url)
@@ -739,8 +777,8 @@ def gnd_parsing_organisation(authority_url):
     root = tree.getroot()
     record_number = 0
     for record in root[2]:
-        org = OrganisationImport()
-        comment = ""
+        org = classes.OrganisationImport()
+#        comment = ""
         date_preview = ""
         orta_preview = ""
         geow_preview = ""
@@ -764,7 +802,7 @@ def gnd_parsing_organisation(authority_url):
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                org_id = ExternalId()
+                                org_id = classes.ExternalId()
                                 org_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
                                     org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
@@ -818,13 +856,13 @@ def gnd_parsing_organisation(authority_url):
                     if name_variant:
                         org.name_variant.append(name_variant)
                 case "500":
-                    conn_pe = ConnectedEntity()
+                    conn_pe = classes.ConnectedEntity()
                     conn_pe.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -847,13 +885,13 @@ def gnd_parsing_organisation(authority_url):
                                     conn_pe.connection_time = step2.text[2:]
                     org.connected_persons.append(conn_pe)
                 case "510":
-                    conn_org = ConnectedEntity()
+                    conn_org = classes.ConnectedEntity()
                     conn_org.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -876,7 +914,7 @@ def gnd_parsing_organisation(authority_url):
                         nach_preview = ", (successor: " + conn_org.name + ")"
                     org.connected_organisations.append(conn_org)
                 case "548":
-                    date = DateImport()
+                    date = classes.DateImport()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -897,8 +935,8 @@ def gnd_parsing_organisation(authority_url):
                                 else:
                                     org.comments = step2.text
                 case "551":
-                    conn_pl = ConnectedEntity()
-                    conn_id = ExternalId()
+                    conn_pl = classes.ConnectedEntity()
+                    conn_id = classes.ExternalId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
@@ -946,19 +984,22 @@ def gnd_parsing_organisation(authority_url):
             potential_organisations_list.append(org)
     print("This list comes from gnd parsing, thus very early on")    
     print(potential_organisations_list)
-    return(potential_organisations_list)
+    return potential_organisations_list
 
 
-def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places often yields several hundred results. Since the normal search function only downloads 100 results
-    # per bathc, I may need to run it several times, and hence I have to call the search several times. 
-    # In order to do so, I had to divide the function gnd_parsing_place. The function with this name now only launches one or more search options to bring back all results
-    # and later filters out many irrelevant results that I annoyingly cannot exclude from the search. 
-    # The longest part of the function the actual parsing of the XMl results, is moved to this function gnd_parsing_place_part_of_list. 
+def gnd_parsing_place_part_of_list(root): 
+    """
+Unfortunately, the search for places often yields several hundred results. Since the normal search function only downloads 100 results
+per bathc, I may need to run it several times, and hence I have to call the search several times. 
+In order to do so, I had to divide the function gnd_parsing_place. The function with this name now only launches one or more search options to bring back all results
+and later filters out many irrelevant results that I annoyingly cannot exclude from the search. 
+The longest part of the function the actual parsing of the XMl results, is moved to this function gnd_parsing_place_part_of_list. 
+    """
     potential_places_list = []
     for record in root[2]:
 #        print("arrived in parsing record")
-        pl = PlaceImport()
-        comment = ""
+        pl = classes.PlaceImport()
+#        comment = ""
         obpa_preview = ""
         adue_preview = ""
         vorg_preview = ""
@@ -975,7 +1016,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
 #                    pl_id.uri = "GND_intern" + step1.text
 #                    pl.external_id.append(pl_id)                
                 case "024":
-                    pl_id = ExternalId()
+                    pl_id = classes.ExternalId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -986,8 +1027,8 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                             pl_id.uri = "https://sws.geonames.org/" + pl_id.id
                             pl.external_id.append(pl_id)                            
                 case "034":
-                    coordinates = Coordinates()
-                    pl_id = ExternalId()
+                    coordinates = classes.Coordinates()
+                    pl_id = classes.ExternalId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "d": 
@@ -1003,7 +1044,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                pl_id = ExternalId()
+                                pl_id = classes.ExternalId()
                                 pl_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
                                     pl_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.   
@@ -1040,13 +1081,13 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                     if name_variant:
                         pl.name_variant.append(name_variant)
                 case "500":
-                    conn_pe = ConnectedEntity()
+                    conn_pe = classes.ConnectedEntity()
                     conn_pe.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id               
@@ -1072,13 +1113,13 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                             # I want them removed. 
                         pl.connected_persons.append(conn_pe)
                 case "510":
-                    conn_org = ConnectedEntity()
+                    conn_org = classes.ConnectedEntity()
                     conn_org.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = ExternalId()
+                                    conn_id = classes.ExternalId()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -1097,7 +1138,7 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                     conn_org.connection_time = step2.text[2:]
                     pl.connected_organisations.append(conn_org)
                 case "548": #I wonder if this is ever used for places
-                    date = DateImport()
+                    date = classes.DateImport()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -1117,8 +1158,8 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
                                 else:
                                     pl.comments = step2.text
                 case "551":
-                    conn_pl = ConnectedEntity()
-                    conn_id = ExternalId()
+                    conn_pl = classes.ConnectedEntity()
+                    conn_id = classes.ExternalId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
@@ -1173,9 +1214,12 @@ def gnd_parsing_place_part_of_list(root): # Unfortunately, the search for places
             potential_places_list.append(pl)
 #            print("potential places list at the end of gnd_parsing_place_part_of_list: ")
 #            print(potential_places_list)
-    return(potential_places_list)
+    return potential_places_list 
 
 def gnd_parsing_place(authority_url):
+    """
+\todo
+    """
     potential_places_list = []
     potential_places_list_complete = []
     search_term = authority_url[89:-61]
@@ -1216,9 +1260,7 @@ def gnd_parsing_place(authority_url):
             if search_term in place.name_preferred or len(potential_places_list) == 1:
 #                print(place.name_preferred)
                 potential_places_list_complete.append(place)   
-    return(potential_places_list_complete)
-
-
+    return potential_places_list_complete
 
 
 #person = Person()
@@ -1283,10 +1325,12 @@ def dates_parsing(dates_from_source):
 
 
 def artist_record_parsing(artist_record):
+    """
+Currently, this file is also used if an organisation is found at the search for artists. 
+One needs a separate function for parsing organisations. 
+    """
     print("arrived in artists_parsing")
-    # Currently, this file is also used if an organisation is found at the search for artists. 
-    # One needs a separate function for parsing organisations. 
-    pe = PersonImport()
+    pe = classes.PersonImport()
     name_preferred_inversed = ""
     name_variant_preview = ""
     date_preview = ""
@@ -1303,7 +1347,7 @@ def artist_record_parsing(artist_record):
     print(type(artist_record))
     #url = requests.get(authority_url)
     #artist_record = artist_record.json()
-    external_id = ExternalId()
+    external_id = classes.ExternalId()
     external_id.uri = artist_record["id"]
     external_id.name = "ULAN"
     external_id.id = external_id.uri[29:-5]
@@ -1345,7 +1389,7 @@ def artist_record_parsing(artist_record):
                     if any(character.isdigit() for character in biography_statement): # if there is a section with no digits (e.g. ", active in Spain"), it is deleted
                         date_raw = date_raw + biography_statement + ", "
                 date_raw = date_raw[:-2].strip()
-            date_from_source = DateImport()
+            date_from_source = classes.DateImport()
             date_from_source.datestring_raw = date_raw
             pe.dates_from_source.append(date_from_source)
             date_processed = artist_date_parsing(date_raw)
@@ -1364,9 +1408,9 @@ def artist_record_parsing(artist_record):
             for connection in artist_record["la:related_from_by"]:
                 connections_list.append(connection)
         for connection in connections_list:
-            conn_ent = ConnectedEntity()
+            conn_ent = classes.ConnectedEntity()
             conn_ent.external_id = []
-            conn_id = ExternalId()
+            conn_id = classes.ExternalId()
             id_raw = connection["la:relates_to"]["id"]
             conn_id.uri = id_raw
             if "ulan" in id_raw: #should normally happen, but maybe they have some strange connections
@@ -1790,11 +1834,11 @@ def artist_record_parsing(artist_record):
         if "took_place_at" in artist_record["born"]:
             if artist_record["born"]["took_place_at"][0]:
                 for place_raw in artist_record["born"]["took_place_at"]:
-                    conn_place = ConnectedEntity()
+                    conn_place = classes.ConnectedEntity()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortg"
                     place_id_list = []
-                    place_id = ExternalId()
+                    place_id = classes.ExternalId()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
@@ -1805,11 +1849,11 @@ def artist_record_parsing(artist_record):
         if "took_place_at" in artist_record["died"]:
             if artist_record["died"]["took_place_at"][0]:
                 for place_raw in artist_record["died"]["took_place_at"]: # in case several alternative places are given
-                    conn_place = ConnectedEntity()
+                    conn_place = classes.ConnectedEntity()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "orts"
                     place_id_list = []
-                    place_id = ExternalId()
+                    place_id = classes.ExternalId()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
@@ -1826,11 +1870,11 @@ def artist_record_parsing(artist_record):
                 for place_raw in place_list: # I have the feeling, that there is an 'activity' record for every place, but perhaps there may be also sometimes two places linked to one 'activity' record
         #            print("place of activity found")
         #            print(place_raw)
-                    conn_place = ConnectedEntity()
+                    conn_place = classes.ConnectedEntity()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortw"
                     place_id_list = []
-                    place_id = ExternalId()
+                    place_id = classes.ExternalId()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
@@ -1842,13 +1886,12 @@ def artist_record_parsing(artist_record):
 
     pe.preview = pe.name_preferred + " " + date_preview + " " + ortg_preview + ortw_preview + orts_preview + name_variant_preview
     print(pe)
-    return(pe)
-
-
+    return pe
 
 
 async def making_process_identification(making_processes):
-    """This module has bene primarily made for parsing information about the making process of a manuscript or printed book
+    """
+    This module has bene primarily made for parsing information about the making process of a manuscript or printed book
     that had been entered manually during the ingest process. 
     If such information is added when working on individual records, it might be possible to adopt this module, but one would probably rather go directly
     to parsing the individual parts of it. 
@@ -1884,25 +1927,27 @@ async def making_process_identification(making_processes):
             print("Date_found")
             print(date.datestring_raw)
             try:
-                date_new = entered_date(date.datestring_raw)
+                date_new = parse_manually_entered_date(date.datestring_raw)
                 making_process.date = date_new
-            except InvalidDateStringException as d:
+            except classes.InvalidDateStringException as d:
                 print(f"String could not be divided into individual dates: {d}")
-            except InvalidDateException as e:
+            except classes.InvalidDateException as e:
                 print(f"Failed to parse date string {e}")
-            except InvalidMonthException as f:
+            except classes.InvalidMonthException as f:
                 print(f"Failed to parse date string {f}")
-            except InvalidDayException as g:
+            except classes.InvalidDayException as g:
                 print(f"Failed to parse date string {g}")
-            except InvalidDateRangeException as h:
+            except classes.InvalidDateRangeException as h:
                 print(f"{h}")
 
     
-    return(making_processes)
+    return making_processes
 
 
 async def get(session, url): 
-    # This is a short programme I received from Gregor Dick. Together with a gather funciton i
+    """
+This is a short programme I received from Gregor Dick. Together with a gather funciton i
+    """
     async with session.get(url) as response:
         # Wait for the start of the response.
         await response.read()
@@ -1911,6 +1956,9 @@ async def get(session, url):
         
 
 async def ulan_search(person):
+    """
+\todo
+    """
     person_name_search = person.name
     for old, new in url_replacement.items():
         person_name_search = person_name_search.replace(old, new)
@@ -1947,4 +1995,3 @@ async def ulan_search(person):
                 #print("candidate appended, now" + str(len(person.potential_candidates)) + "candidates")
                       
     return person
-

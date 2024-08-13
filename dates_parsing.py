@@ -1,23 +1,4 @@
-import re
-from classes import *
-
-class InvalidDateException(Exception):
-    pass
-
-class InvalidMonthException(Exception):
-    pass
-
-class InvalidDayException(Exception):
-    pass
-
-class InvalidDateStringException(Exception):
-    pass
-
-class InvalidDateRangeException(Exception):
-    pass
-
-
-
+#pylint: disable=C0301,C0303
 """
 In the GND, dates are indicated in a somewhat confusing way. First of all, there can be more than one date statement for an entry, e.g. one can give only years, the other exact days. 
 Each statement consists of the main date expression, a comment field, and a standardised field that has for persons four settings - years of life / exact days of life / years of activity / exact days of activity. 
@@ -27,11 +8,16 @@ It first checks if there is only one date, or if there are two dates as start an
 The resulting information (in a number of individual fields) is then assessed and used to construct a string and dates for start and end of a search as tuples, as well as an indicator if it is a lifespan or an activity span
 Tuples are used instead of standard datetime objects because (a) they allow dates BC without difficulty and (b) there is no need for timedelta functions. 
 """
+import re
+import classes
+
 
 def english_ordinal_suffix(number):
-    #this function returns the suffix transforming an English number into an ordinal
+    """
+This function returns the suffix transforming an English number into an ordinal
+    """
     if len(number) > 1 and number[-2] == "1": #it cannot be longer, but shorter
-                abbreviation = "th"
+        abbreviation = "th"
     else:
         if number[-1] == "1":
             abbreviation = "st"
@@ -41,7 +27,7 @@ def english_ordinal_suffix(number):
             abbreviation = "rd"
         else:
             abbreviation = "th"
-    return(abbreviation)
+    return abbreviation
 
 def date_single_parsing(datestring_raw):
     """ This function parses a single date (e.g., one of a date in a "9999-9999" statement) and returns a number of strings that have to be pieced together for a datestring as well as a start date
@@ -96,13 +82,13 @@ def date_single_parsing(datestring_raw):
             year2 = datestring_raw[5:9]
             year3 = datestring_raw[10:14]
             year_value_start = min(int(year1), int(year2), int(year3))
-            yeear_value_end = max(int(year1), int(year2), int(year3))
+            year_value_end = max(int(year1), int(year2), int(year3))
             year_string = year1 + ", " + year2 + ", and " + year3
         else:
             year1 = datestring_raw[0:4]
             year2 = datestring_raw[5:9]
             year_value_start = min(int(year1), int(year2))
-            yeear_value_end = max(int(year1), int(year2))
+            year_value_end = max(int(year1), int(year2))
             year_string = year1 + " and " + year2
         if "erscheinungsjahr" in datestring_raw:
             prefix_0_raw = "erscheinungsjahr"
@@ -567,6 +553,9 @@ def date_single_parsing(datestring_raw):
 
 
 def date_overall_parsing(datestring, date_comments, date_indicator):
+    """
+\todo
+    """
     date_start_parsed = ""
     date_end_parsed = ""
     date_only_parsed = ""
@@ -958,8 +947,10 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
 
 
 def artist_date_single_parsing(date_raw):
-    # This function is called by artist_date_parsing. It receives an element of the date (the original date statement is broken at commas and dashes into these elements)
-    # it returns a datestring, start and end dates, the date_aspect (life or activity), the date_type (beginning or end), and if it can be used as a 'short date' (e.g., written with dash)
+    """
+This function is called by artist_date_parsing. It receives an element of the date (the original date statement is broken at commas and dashes into these elements)
+it returns a datestring, start and end dates, the date_aspect (life or activity), the date_type (beginning or end), and if it can be used as a 'short date' (e.g., written with dash)
+    """
     prefix_0_raw = ""
     prefix_1_raw = ""
     prefix_1_raw = ""
@@ -1027,13 +1018,13 @@ def artist_date_single_parsing(date_raw):
                 year_end_value_start = -int(year_end_string_raw) * 100
                 year_end_value_end = -(int(year_end_string_raw)-1) * 100 -1
         elif len(year_start_string) > 2 and len(year_end_string_raw) == 1:
-                year_end_string = year_start_string[:-1] + year_end_string_raw
-                year_end_value_start = int(year_end_string)
-                year_end_value_end = int(year_end_string)
+            year_end_string = year_start_string[:-1] + year_end_string_raw
+            year_end_value_start = int(year_end_string)
+            year_end_value_end = int(year_end_string)
         elif len(year_start_string) > 2 and len(year_end_string_raw) == 2:
-                year_end_string = year_start_string[:-2] + year_end_string_raw
-                year_end_value_start = int(year_end_string)
-                year_end_value_end = int(year_end_string)
+            year_end_string = year_start_string[:-2] + year_end_string_raw
+            year_end_value_start = int(year_end_string)
+            year_end_value_end = int(year_end_string)
         else: 
             year_end_string = year_end_string_raw
             if not BC_indicator:
@@ -1194,8 +1185,10 @@ def artist_date_single_parsing(date_raw):
     return(date_string, year_value_start, year_value_end, date_type, date_aspect, short_date)
     
 def artist_date_parsing(date_from_source):
-    # This programme takes the date from source from ULAN (i.e., the short biography text, with all sections between commas that contain no figures cut out)
-    # It returns a date string, start and end dates (only years, since Getty ULAN normally only gives yers, and the aspect - if date of life or of activity)
+    """
+This programme takes the date from source from ULAN (i.e., the short biography text, with all sections between commas that contain no figures cut out)
+It returns a date string, start and end dates (only years, since Getty ULAN normally only gives yers, and the aspect - if date of life or of activity)
+    """
     date_from_source_divided = []
     date_single_start = []
     date_single_end = []
@@ -1411,14 +1404,14 @@ def artist_date_parsing(date_from_source):
                 elif "active until" in datestring:
                     date_start = date_start - 50
             date_processed = (datestring, date_start, date_end, date_aspect)
-    return(date_processed)
-
+    return date_processed
 
 
 def entered_single_date(date_raw, position):
-    """This module is one of two modules for the manual entering of dates. entered_date divides the term in up to four units.  
-        It then hands to this module a single unit and its position. 
-        This module returns a datestring, start and end dates as tuples, as well as indicators if it is the date of activity or the date of death
+    """
+This module is one of two modules for the manual entering of dates. entered_date divides the term in up to four units.  
+It then hands to this module a single unit and its position. 
+This module returns a datestring, start and end dates as tuples, as well as indicators if it is the date of activity or the date of death
     """
     prefix, suffix_1, suffix_2 = "", "", ""
     date_single_active = False
@@ -1432,7 +1425,7 @@ def entered_single_date(date_raw, position):
     date_single_pattern = r'(a|d)?(-)?(\d{1,4})(,\d{0,2})?(,\d{0,2})?([abcemlt]|na|nb|h[12]|q[1-4])?$'
     date_single_divided = re.match(date_single_pattern, date_raw)
     if not date_single_divided:
-        raise InvalidDateException(f"Invalid date {date_raw}")
+        raise classes.InvalidDateException(f"Invalid date {date_raw}")
     date_single_groups = date_single_divided.groups()
 
     month_string = ""
@@ -1444,8 +1437,8 @@ def entered_single_date(date_raw, position):
     month_end = 12
     day_start = 1
     day_end = 31
-    month_indicated = False
-    day_indicated = False
+#    month_indicated = False
+ #   day_indicated = False
     month_list = {1: ' Jan ', 2:' Feb ', 3:' Mar ', 4:' Apr ', 5:' May ', 6:' Jun ', 7:' Jul ', 8:' Aug ', 9:' Sep ', 10:' Oct ', 11:' Nov ', 12:' Dec '}
         
     year_string = date_single_groups[2].strip()
@@ -1478,7 +1471,7 @@ def entered_single_date(date_raw, position):
         if month_number < 13:
             month_name = month_list[month_number]
         else: 
-            raise InvalidMonthException(f"{str(position+1)}: Invalid number of month {month_number}")
+            raise classes.InvalidMonthException(f"{str(position+1)}: Invalid number of month {month_number}")
         month_indicated = True
 
     if date_single_groups[4]:
@@ -1617,15 +1610,15 @@ def entered_single_date(date_raw, position):
     date_ready = prefix + year_string + month_name + day_string + suffix_1 + suffix_2
 
     if (month_start == 4 or month_start == 6 or month_start == 9 or month_start == 11) and day_start > 30: # makes sure that no error occurs if a month but no day is given
-        raise InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
+        raise classes.InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
     if day_start > 31:
-        raise InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
+        raise classes.InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
     if month_end == (4 or 6 or 9 or 11) and day_end > 30: 
-        raise InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_end}")
+        raise classes.InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_end}")
     if month_start == 2 and day_start > 29:
-        raise InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
+        raise classes.InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_start}")
     if month_end == 2 and day_end > 29:
-        raise InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_end}")
+        raise classes.InvalidDayException(f"{str(position+1)}: Invalid number of day: {day_end}")
 
     if date_single_died: # This is only relevant if the year of death is the only thing indicated, otherwise it will be overwritten. 
         daterange_start = (year_start-30, month_start, day_start)
@@ -1635,17 +1628,18 @@ def entered_single_date(date_raw, position):
     return date_ready, date_single_active, date_single_died, daterange_start, daterange_end
 
 
-def entered_date(date_entered):
-    """This module receis a date-string entered manually and (hopefully) following a certain set of rules. 
-    It divides the string into up to four parts, sends them to entered_single_date, and receives the parsed results back
-    It return a datestring and tuples expressing the start and end dates. 
+def parse_manually_entered_date(date_entered):
+    """
+This module receis a date-string entered manually and (hopefully) following a certain set of rules. 
+It divides the string into up to four parts, sends them to entered_single_date, and receives the parsed results back
+It return a datestring and tuples expressing the start and end dates. 
     """
     #In the first step, I divide the string into a number of dates
     #Maximum = 4 (meaning 'born between 1405 and 1406, died between 1450 and 1455)
     date_complete_pattern =  r'(.{0,2}\d[^-:]*)-?(.{0,2}\d[^-:]*)?(?:\:(.{0,2}\d[^-:]*)?-?(.{0,2}\d[^-:]*)?)?$'
     date_analysed = re.match(date_complete_pattern, date_entered)
     if not date_analysed:
-        raise InvalidDateStringException(f"{date_entered}")
+        raise classes.InvalidDateStringException(f"{date_entered}")
     date_divided = date_analysed.groups()
     if date_divided[0]:
         date_0 = date_divided[0]
@@ -1748,9 +1742,9 @@ def entered_date(date_entered):
         daterange_complete_end = date_end_3
 
     if daterange_complete_start > daterange_complete_end:
-            raise InvalidDateRangeException(f"start date: {daterange_complete_start} later than end date: {daterange_complete_end}")
+        raise classes.InvalidDateRangeException(f"start date: {daterange_complete_start} later than end date: {daterange_complete_end}")
 
-    date_new = DateImport()
+    date_new =classes.DateImport()
     date_new.datestring_raw = date_entered
     date_new.datestring = date_complete
     date_new.date_start = daterange_complete_start

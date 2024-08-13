@@ -1,11 +1,18 @@
+#pylint: disable=C0301
+"""
+Module to parse iiif files
+"""
 import re
 from lxml import etree
-from classes import *
+import classes
 import books_parsing_manifests
 import books_parsing_bibliographies
-URI_entered = "abc"
+#URI_entered = "abc"
 
 def bibliography_select (bid_name, bid_id):
+    """
+    \todo documentation
+    """
     if (bid_name == "VD17" or bid_name == "vd17"):
         url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0&operation=searchRetrieve&query=pica.vds=" + bid_id + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
         #bibliographic_information_single = VD17_parsing((book_properties[2][step1])[2])
@@ -16,24 +23,24 @@ def bibliography_select (bid_name, bid_id):
         bibliographic_information_single = books_parsing_bibliographies.VD17_parsing(url_bibliography)
     elif(bid_name == "VD16" or bid_name == "vd16"):
         vd16_complete = bid_id
-        vd16_divided = re.split(" ", vd16_complete)            
-        url_bibliography = r"http://gateway-bayern.de/VD16+" + vd16_divided[0] + "+" + vd16_divided[1]            
-        bibliographic_information_single = books_parsing_bibliographies.VD16_parsing(url_bibliography)            
+        vd16_divided = re.split(" ", vd16_complete)
+        url_bibliography = r"http://gateway-bayern.de/VD16+" + vd16_divided[0] + "+" + vd16_divided[1]
+        bibliographic_information_single = books_parsing_bibliographies.VD16_parsing(url_bibliography)
             #url_bibliography = r''
     elif bid_name == "GW":
-        GW_number = bid_id.lstrip("0")
-        ##Removing leading zeros that are accepted in many cases but not by the ISTC            
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + GW_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography) 
+        gw_number = bid_id.lstrip("0")
+        ##Removing leading zeros that are accepted in many cases but not by the ISTC
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + gw_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
+        bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name  == "ISTC":
-        ISTC_number = bid_id
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + ISTC_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography) 
+        istc_number = bid_id
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + istc_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
+        bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     # the following options (and perhaps more will have to follow) are only used for libraries such as the BnF that do not regularly give ISTC or GW numbers
     elif bid_name == "Goff":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
-        if bibliographic_information_single == None: # Sometimes, ISTC write the Goff number without a hyphen
+        if bibliographic_information_single is None: # Sometimes, ISTC write the Goff number without a hyphen
             bid_id = bid_id.replace("-", "")
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full&style=full'
             print("search string without hyphen: ")
@@ -48,12 +55,12 @@ def bibliography_select (bid_name, bid_id):
     elif bid_name == "HC":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HC ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
-        if bibliographic_information_single == None: # ISTC makes a distinction between "H" (the main part of the work), "HC" (the most common addition) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
+        if bibliographic_information_single is None: # ISTC makes a distinction between "H" (the main part of the work), "HC" (the most common addition) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22H ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
             bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
-        if bibliographic_information_single == None: # ISTC makes a distinction between "HC" (the main part of the work) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
+        if bibliographic_information_single is None: # ISTC makes a distinction between "HC" (the main part of the work) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HCR ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-            bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)       
+            bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
     elif bid_name == "Pell Ms":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Pell Ms ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = books_parsing_bibliographies.ISTC_parsing(url_bibliography)
@@ -63,93 +70,95 @@ def bibliography_select (bid_name, bid_id):
     
 
     #print(bibliographic_information_single)
-    return(bibliographic_information_single)
+    return bibliographic_information_single
 
 
 
-def iiifparse(URI_entered, material):
+def iiif_parse(uri_entered, material):
+    """
+    Main iiif manifestparsing routine
+    """
 
 # Step 1: Information is collected from the IIIF manifest
 
     #if URI_entered == "":
     #        break
-    if "digitale-sammlungen.de" in URI_entered:
-        m = books_parsing_manifests.BSB_parsing(URI_entered)
-    elif "uni-halle.de" in URI_entered:
-        m = books_parsing_manifests.Halle_parsing(URI_entered)
-    elif "staatsbibliothek-berlin" in URI_entered:
-        m = books_parsing_manifests.Berlin_parsing(URI_entered)
-    elif "trin.cam." in URI_entered:
-        m = books_parsing_manifests.Cambridge_Trinity_parsing(URI_entered)
-    elif "Parker" in URI_entered:
-        m = books_parsing_manifests.Cambridge_Corpus_parsing(URI_entered)
-    elif "thulb.uni-jena" in URI_entered:        
-        m = books_parsing_manifests.ThULB_parsing(URI_entered)
-    elif "slub-dresden" in URI_entered:
-        m = books_parsing_manifests.SLUB_parsing(URI_entered)
-    elif "ub.uni-leipzig" in URI_entered:
-        m = books_parsing_manifests.Leipzig_parsing(URI_entered)
-    elif "gallica.bnf.fr" in URI_entered:
-        m = books_parsing_manifests.Gallica_parsing(URI_entered)
-    elif "e-codices.ch" in URI_entered:
-        m = books_parsing_manifests.Ecodices_parsing(URI_entered)
-    elif "e-rara.ch" in URI_entered:
-        m = books_parsing_manifests.Erara_parsing(URI_entered)
-    elif "bodleian.ox.ac.uk" in URI_entered:
-        m = books_parsing_manifests.Bodleian_parsing(URI_entered)
-    elif "digi.ub.uni-heidelberg.de" in URI_entered:
-        m = books_parsing_manifests.Heidelberg_parsing(URI_entered)
-    elif "digi.vatlib.it" in URI_entered:
-        m = books_parsing_manifests.Vaticana_parsing(URI_entered)
-    elif "onb.ac.at" in URI_entered:
-        m = books_parsing_manifests.Vienna_parsing(URI_entered)
-    elif "loc.gov" in URI_entered:
-        m = books_parsing_manifests.Washington_parsing(URI_entered)
-    elif "sub.uni-goettingen" in URI_entered:
-        m = books_parsing_manifests.Goettingen_parsing(URI_entered)
-    elif "figgy.princeton.edu" in URI_entered:
-        m = books_parsing_manifests.Princeton_parsing(URI_entered)
-    elif "library.yale.edu" in URI_entered:
-        m = books_parsing_manifests.Yale_parsing(URI_entered)
-    elif "digitalcommonwealth" in URI_entered:
-        m = books_parsing_manifests.Boston_parsing(URI_entered)
-    elif "manchester.ac.uk" in URI_entered:
-        m = books_parsing_manifests.Manchester_parsing(URI_entered)
-    elif "cudl.lib.cam.ac.uk" in URI_entered:
-        m = books_parsing_manifests.Cambridge_UL_parsing(URI_entered)
-    elif "irht.cnrs.fr" in URI_entered:
-        m = books_parsing_manifests.IRHT_parsing(URI_entered)
-    elif "ub.uni-frankfurt.de" in URI_entered:
-        m = books_parsing_manifests.Frankfurt_parsing(URI_entered)
-    elif "haab-digital" in URI_entered:
-        m = books_parsing_manifests.Weimar_parsing(URI_entered)
-    elif "dibiki.ub.uni-kiel" in URI_entered:
-        m = books_parsing_manifests.Kiel_parsing(URI_entered)
-    elif "sub.uni-hamburg.de" in URI_entered:
-        m = books_parsing_manifests.Hamburg_parsing(URI_entered)
-    elif "rosdok.uni-rostock.de" in URI_entered:
-        m = books_parsing_manifests.Rostock_parsing(URI_entered)
-    elif "online-service.nuernberg.de" in URI_entered:
-        m = books_parsing_manifests.Nuernberg_StB_parsing(URI_entered)
-    elif "manuscriptorium.com" in URI_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
-        m = books_parsing_manifests.Manuscriptorium_parsing(URI_entered)
+    if "digitale-sammlungen.de" in uri_entered:
+        m = books_parsing_manifests.bsb_parsing(uri_entered)
+    elif "uni-halle.de" in uri_entered:
+        m = books_parsing_manifests.halle_parsing(uri_entered)
+    elif "staatsbibliothek-berlin" in uri_entered:
+        m = books_parsing_manifests.berlin_parsing(uri_entered)
+    elif "trin.cam." in uri_entered:
+        m = books_parsing_manifests.cambridge_trinity_parsing(uri_entered)
+    elif "Parker" in uri_entered:
+        m = books_parsing_manifests.cambridge_corpus_parsing(uri_entered)
+    elif "thulb.uni-jena" in uri_entered:
+        m = books_parsing_manifests.thulb_parsing(uri_entered)
+    elif "slub-dresden" in uri_entered:
+        m = books_parsing_manifests.slub_parsing(uri_entered)
+    elif "ub.uni-leipzig" in uri_entered:
+        m = books_parsing_manifests.leipzig_parsing(uri_entered)
+    elif "gallica.bnf.fr" in uri_entered:
+        m = books_parsing_manifests.Gallica_parsing(uri_entered)
+    elif "e-codices.ch" in uri_entered:
+        m = books_parsing_manifests.ecodices_parsing(uri_entered)
+    elif "e-rara.ch" in uri_entered:
+        m = books_parsing_manifests.erara_parsing(uri_entered)
+    elif "bodleian.ox.ac.uk" in uri_entered:
+        m = books_parsing_manifests.bodleian_parsing(uri_entered)
+    elif "digi.ub.uni-heidelberg.de" in uri_entered:
+        m = books_parsing_manifests.heidelberg_parsing(uri_entered)
+    elif "digi.vatlib.it" in uri_entered:
+        m = books_parsing_manifests.vaticana_parsing(uri_entered)
+    elif "onb.ac.at" in uri_entered:
+        m = books_parsing_manifests.Vienna_parsing(uri_entered)
+    elif "loc.gov" in uri_entered:
+        m = books_parsing_manifests.washington_parsing(uri_entered)
+    elif "sub.uni-goettingen" in uri_entered:
+        m = books_parsing_manifests.Goettingen_parsing(uri_entered)
+    elif "figgy.princeton.edu" in uri_entered:
+        m = books_parsing_manifests.Princeton_parsing(uri_entered)
+    elif "library.yale.edu" in uri_entered:
+        m = books_parsing_manifests.Yale_parsing(uri_entered)
+    elif "digitalcommonwealth" in uri_entered:
+        m = books_parsing_manifests.Boston_parsing(uri_entered)
+    elif "manchester.ac.uk" in uri_entered:
+        m = books_parsing_manifests.Manchester_parsing(uri_entered)
+    elif "cudl.lib.cam.ac.uk" in uri_entered:
+        m = books_parsing_manifests.Cambridge_UL_parsing(uri_entered)
+    elif "irht.cnrs.fr" in uri_entered:
+        m = books_parsing_manifests.IRHT_parsing(uri_entered)
+    elif "ub.uni-frankfurt.de" in uri_entered:
+        m = books_parsing_manifests.Frankfurt_parsing(uri_entered)
+    elif "haab-digital" in uri_entered:
+        m = books_parsing_manifests.Weimar_parsing(uri_entered)
+    elif "dibiki.ub.uni-kiel" in uri_entered:
+        m = books_parsing_manifests.Kiel_parsing(uri_entered)
+    elif "sub.uni-hamburg.de" in uri_entered:
+        m = books_parsing_manifests.Hamburg_parsing(uri_entered)
+    elif "rosdok.uni-rostock.de" in uri_entered:
+        m = books_parsing_manifests.Rostock_parsing(uri_entered)
+    elif "online-service.nuernberg.de" in uri_entered:
+        m = books_parsing_manifests.Nuernberg_StB_parsing(uri_entered)
+    elif "manuscriptorium.com" in uri_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
+        m = books_parsing_manifests.Manuscriptorium_parsing(uri_entered)
 
-    # I commented this out since I think I need a more robust system to pass on error messages. 
+    # I commented this out since I think I need a more robust system to pass on error messages.
     #else:
     #    m = Metadata()
     #    m.title = "Either the entered URL does not refer to a IIIF manifest, or it comes from a library that is not yet supported by Iconobase."
     #    return(m)
-    m.iiifUrl = URI_entered
+    m.iiifUrl = uri_entered
     m.material = material
-    
 
-# Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added. 
-
+# Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added.
 
 
-    
+
+
     for step1 in range(len(m.bibliographic_id)):
-        #print(m.bibliographic_id[step1][1])        
+        #print(m.bibliographic_id[step1][1])
         bid_name = (m.bibliographic_id[step1]).name
         bid_id = (m.bibliographic_id[step1]).id
         bibliographic_information_single = bibliography_select(bid_name, bid_id)
@@ -164,7 +173,7 @@ def iiifparse(URI_entered, material):
     if len(m.bibliographic_information) > 1:
         counter1 = 0
         print("counter1: " + str(counter1))
-        
+
         while counter1 < len(m.bibliographic_information) -1:
             bibliography_short = m.bibliographic_information[counter1].bibliographic_id[0].uri + m.bibliographic_information[counter1].bibliographic_id[0].name + m.bibliographic_information[counter1].bibliographic_id[0].id
             print("first record: " + bibliography_short)
@@ -184,7 +193,8 @@ def iiifparse(URI_entered, material):
             print("counter1 after increment" + str(counter1))
 
 
-    """The following lines create - depending on the type of material - 
+    """
+    The following lines create - depending on the type of material - 
     fields for manually entering artist, place, date, and illustrated text. 
     They will later be copied to the individual Artwork records
     For manuscripts, there is one making process, for printed books, there are two (design / making of matrix)
@@ -194,49 +204,49 @@ def iiifparse(URI_entered, material):
     print("Material: ")
     print(material)
     if material == "m": # manuscripts
-        making_process_blank = MakingProcess()
+        making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Painting"
-        person_blank = Person()
+        person_blank = classes.Person()
         person_blank.name = ""
         person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
-        place_blank = Place()
+        place_blank = classes.Place()
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = DateImport()
+        date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
     if material == "b": #Printed books
-        making_process_blank = MakingProcess()
+        making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Design"
-        person_blank = Person()
+        person_blank = classes.Person()
         person_blank.name = ""
         person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
-        place_blank = Place()
+        place_blank = classes.Place()
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = DateImport()
+        date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
-        making_process_blank = MakingProcess()
+        making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 2
         making_process_blank.process_type = "Production of Matrix"
-        person_blank = Person()
+        person_blank = classes.Person()
         person_blank.chosen_candidate = 999
         person_blank.name = ""
         making_process_blank.person = person_blank
-        place_blank = Place()
+        place_blank = classes.Place()
         place_blank.name = ""
         place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
-        date_blank = DateImport()
+        date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
@@ -245,14 +255,14 @@ def iiifparse(URI_entered, material):
 
 
 def supply_bibliographic_information(additional_bid):
-# This function is needed if an IIIF manifest does not include a bibliographic reference. 
-# If a bibliographic reference is known to the editor, he can add it in a second step. 
-# This function parses it and sends the results to the function bibliography_select, and returns the resulting bibliographic data to main.py
+    """
+This function is needed if an IIIF manifest does not include a bibliographic reference.
+If a bibliographic reference is known to the editor, he can add it in a second step.
+This function parses it and sends the results to the function bibliography_select, and returns the resulting bibliographic data to main.py
+    """
     bid_pattern = r'([A-Za-z]{2,4}[\w]{0,2})( )(.*)'
     bid_divided = re.match(bid_pattern, additional_bid)
     bid_name = bid_divided[1]
     bid_id = bid_divided[3]
-    bibliographic_information_single = bibliography_select(bid_name, bid_id)    
+    bibliographic_information_single = bibliography_select(bid_name, bid_id)
     return bibliographic_information_single
-
-

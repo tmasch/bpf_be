@@ -1,11 +1,11 @@
 """"
 This file contains class definitions
 """
+import json
 from typing import Optional
 from pydantic import BaseModel
-import bson
+#import bson
 #from datetime import date
-
 
 
 class Frame(BaseModel):
@@ -13,17 +13,24 @@ class Frame(BaseModel):
     Class frame
     """
     def __str__(self):
-        t="Index: "+str(self.index)+"\n"
-        return t
+        s="Index: "+str(self.index)+"\n"
+        return s
     def to_json(self):
         """ Returns class as json """
-        return json.dumps(self, default=lambda o: o.__dict__,
+        s=json.dumps(self, default=lambda o: o.__dict__,
             sort_keys=True, indent=4)
+        return s
+    ## Database ID of the record
     id : Optional[str] = ""
+    ## Page index of the frame
     index : Optional[int] = ""
+    ## Absolute x position of the left bottom corner of the frame in pixels
     x_abs : Optional[int] = ""
+    ## Absolute y position of the left bottom corner of the frame in pixels
     y_abs : Optional[int] = ""
+    ## Absolute width of the frame in pixels
     w_abs : Optional[int] = ""
+    ## Absolute height of the frame in pixels
     h_abs : Optional[int] = ""
     x_rel : Optional[float] = ""
     y_rel : Optional[float] = ""
@@ -146,6 +153,7 @@ class Person(BaseModel):
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
     potential_candidates : Optional[list[PersonImport]] = []
+    new_authority_id : Optional[str] = ""
 
 class OrganisationImport(BaseModel):
     """
@@ -183,6 +191,7 @@ class Organisation(BaseModel):
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
     potential_candidates : Optional[list[OrganisationImport]] = []
+    new_authority_id : Optional[str] = ""
 
 class Coordinates(BaseModel):
     """
@@ -232,6 +241,7 @@ class Place(BaseModel):
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
     potential_candidates : Optional[list[PlaceImport]] = []
+    new_authority_id : Optional[str] = ""
 
 class BibliographicId(BaseModel):
     """
@@ -605,3 +615,34 @@ from the database
     connected_organisations : Optional[list[ConnectedEntity]] = []
     connected_locations : Optional[list[ConnectedEntity]] = []
     comments : Optional[str] = ""
+
+class InvalidDateException(Exception):
+    pass
+
+class InvalidMonthException(Exception):
+    pass
+
+class InvalidDayException(Exception):
+    pass
+
+class InvalidDateStringException(Exception):
+    pass
+
+class InvalidDateRangeException(Exception):
+    pass
+
+class PersonAgainstDuplication(BaseModel):
+# I have these classes here and not in 'classes' because they are only needed in these functions.
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    person_type1 : Optional[list[str]]  = []
+
+class OrgAgainstDuplication(BaseModel):
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    org_type1 : Optional[list[str]]  = []
+
+class PlaceAgainstDuplication(BaseModel):
+    preview : Optional[str] = ""
+    id : Optional[str] = ""
+    place_type1 : Optional[list[str]]  = []

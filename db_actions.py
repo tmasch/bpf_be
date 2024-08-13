@@ -1,3 +1,4 @@
+#pylint: disable=C0301
 """
 This module contains all functions that contain database actions, like
 creating new records, reading from the DB etc.
@@ -7,11 +8,10 @@ There should be no business logic here.
 
 import json
 import os
-from typing import List
+#from typing import List
 from nanoid import generate
 from pymongo import MongoClient
-from classes import *
-
+import classes
 
 
 
@@ -42,7 +42,7 @@ def get_database():
 #   return client['bpf']
 
 
-def insert_metadata(metadata: Metadata):
+def insert_metadata(metadata: classes.Metadata):
     """
     Method to create a metadata record
     """
@@ -92,7 +92,7 @@ def update_image_with_frames(identifier,i,frames):
 #json.dumps([ob.__dict__ for ob in frames])
     return result
 
-def insert_record_person(person: PersonDb):
+def insert_record_person(person: classes.PersonDb):
     """
 This function inserts a newly created record for a person into the database
 It was made for persons connected to books but probably can be used for any person
@@ -222,7 +222,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
 
-def insert_record_organisation(organisation: OrganisationDb):
+def insert_record_organisation(organisation: classes.OrganisationDb):
     """
 This function inserts a newly created record for an organisation into the database
 It was made for organisations connected to books but probably can be used for any organisation
@@ -241,7 +241,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : organisation_id}, {'$addToSet' : {"org_type1" : organisation_type1}})
 
-def insert_record_place(place: PlaceDb):
+def insert_record_place(place: classes.PlaceDb):
     """
 This function inserts a newly created record for a place into the database
 It was made for places connected to books but probably can be used for any place
@@ -273,7 +273,7 @@ once I have an 'edit' view for authority records.
     return place_id
 
 
-def insert_record_manuscript(manuscript : ManuscriptDb):
+def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     """
     \todo
     """
@@ -283,7 +283,7 @@ def insert_record_manuscript(manuscript : ManuscriptDb):
     collection.insert_one(manuscript.dict())
     return "Hello World"
 
-def insert_record_book(book : BookDb):
+def insert_record_book(book : classes.BookDb):
     """
     \todo
     """
@@ -293,7 +293,7 @@ def insert_record_book(book : BookDb):
     collection.insert_one(book.dict())
     return "Hello World"
 
-def insert_record_pages(pages : PagesDb):
+def insert_record_pages(pages : classes.PagesDb):
     """
     \todo
     """
@@ -310,3 +310,123 @@ def create_image_record():
     print("Creating an image record in the database")
     dbname = get_database()
     collection=dbname['bpf']
+
+
+def find_person(person: classes.Person, parameter: str):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    person = classes.Person()
+    if parameter=="external_id":
+        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+#                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+    elif parameter=="name_preferred":
+        person_found = collection.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+    elif parameter=="name_variant":
+        person_found = collection.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+    elif parameter=="GND":
+        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": person.new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+    elif parameter=="external_id_ingest":
+        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+    elif parameter=="external_id_connected_organisation":
+        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+    elif parameter=="external_id_connected_location":
+        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+
+    return person_found
+
+
+def find_organisation(organisation: classes.Organisation, parameter: str):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    organisation_found = classes.Organisation
+    if parameter=="external_id":
+        organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
+    if parameter=="external_id_ingest":
+        organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.name, "id": organisation.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+    if parameter=="external_id_organisation":
+        organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.name, "id": organisation.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+    if parameter=="name":
+        organisation_found = collection.find({"name_preferred" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1})
+    if parameter=="name_variant":
+        organisation_found = collection.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+    if parameter=="GND":
+        organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": organisation.new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
+    if parameter=="external_id_location":
+        organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.name, "id": organisation.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+
+    return organisation_found
+
+
+def find_place(place: classes.Place, parameter: str):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    place_found = classes.Place
+    if parameter=="external_id":
+        place_found = collection.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+    if parameter=="name_preferred":
+        place_found = collection.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
+    if parameter=="name_variant":
+        place_found = collection.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+    if parameter=="GND":
+        place_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": place.new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
+    if parameter=="external_id_ingest":
+        place_found = collection.find_one({"external_id": {"$elemMatch": {"name": place.name, "id": place.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+    if parameter=="external_id_connected_organisations":
+        place_found = collection.find_one({"external_id": {"$elemMatch": {"name": place.name, "id": place.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+    if parameter=="external_id_connected_locations":
+        place_found = collection.find_one({"external_id": {"$elemMatch": {"name": place.name, "id": place.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+
+    return place_found
+
+
+def find_organisation_viaf(new_record_viaf_id,new_record_gnd_id):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    list_found = list(collection.find({ \
+        "$or": [{"connected_organisations.external_id.name" : "viaf",\
+        "connected_organisations.external_id.id" : new_record_viaf_id},\
+        {"connected_organisations.external_id.name" : "GND",\
+        "connected_organisations.external_id.id" : new_record_gnd_id}]},\
+        {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_organisations" : 1}))
+    return list_found
+
+def find_person_viaf(new_record_viaf_id,new_record_gnd_id):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    list_found = list(collection.find({ \
+        "$or": [{"connected_persons.external_id.name" : "viaf",\
+        "connected_persons.external_id.id" : new_record_viaf_id},\
+        {"connected_persons.external_id.name" : "GND",\
+        "connected_persons.external_id.id" : new_record_gnd_id}]},\
+        {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+    return list_found
+
+
+def find_place_viaf(new_record_viaf_id,new_record_gnd_id):
+    """
+\todo
+    """
+    dbname = get_database()
+    collection = dbname['bpf']
+    list_found = list(collection.find({ \
+        "$or": [{"connected_locations.external_id.name" : "viaf",\
+        "connected_locations.external_id.id" : new_record_viaf_id},\
+        {"connected_locations.external_id.name" : "GND",\
+        "connected_locations.external_id.id" : new_record_gnd_id}]},\
+        {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_locations" : 1}))
+    return list_found

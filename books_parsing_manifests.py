@@ -1,3 +1,4 @@
+#pylint: disable=C0301, C0303, C0116, C0325, C0103
 """
 This module contains a number of function that accept the URI of an IIIF manifest of a manuscript 
 or book and return data, both on the manuscript or book as a whole (book_properties) and on the 
@@ -10,18 +11,20 @@ import json
 import re
 import requests
 from lxml import etree
-from classes import *
+import classes
 import xml.etree.ElementTree
 
 def Canvas_parsing(canvas_list):
-    # Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all. 
-    # Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later. 
+    """
+Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.
+Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later.
+    """
     images = []
     i = 0
     for canvas in canvas_list:
         
         i = i+1
-        im = Image()
+        im = classes.Image()
         im.index = i
         im.label_raw = canvas["label"]
         im.baseurl = canvas["images"][0]["resource"]["service"]["@id"]
@@ -31,17 +34,19 @@ def Canvas_parsing(canvas_list):
     return images
     
 def Canvas_parsing_Yale(canvas_list):
-    # Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all. 
-    # Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later. 
+    """
+Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.
+Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later.
 
-    # This variant is used for books from Yale, where the label is not "label' but ["label"]["none"][0]. I keep it here, 
-    # in case any other library uses a similar strange system
+This variant is used for books from Yale, where the label is not "label' but ["label"]["none"][0]. I keep it here,
+in case any other library uses a similar strange system
+    """
     images = []
     i = 0
     for canvas in canvas_list:
         
         i = i+1
-        im = Image()
+        im = classes.Image()
         im.index = i
         im.label_raw = canvas["label"]["none"][0]
         im.baseurl = canvas["items"][0]["items"][0]["body"]["service"][0]["@id"]
@@ -52,19 +57,19 @@ def Canvas_parsing_Yale(canvas_list):
         
 
 
-def BSB_parsing(URI_entered):
+def bsb_parsing(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    url = urllib.request.urlopen(URI_entered)
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest =  url.read()
     location = ""
     bibliographic_id = []
-    bibliographic_id_url = ""
-    bibliographic_id_name = ""
+#    bibliographic_id_url = ""
+#    bibliographic_id_name = ""
     bibliographic_id_number = ""
     for step1 in metadata:
         label = step1["label"]
@@ -101,9 +106,11 @@ def BSB_parsing(URI_entered):
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             if "https" in bibliographic_id_individual: #if there is a link
+                print(bibliographic_id_individual)
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
+                print(bibliographic_id_divided)
                 bid.uri = bibliographic_id_divided.groups()[1]
                 bid.name = bibliographic_id_divided.groups()[3]
                 bid.id = bibliographic_id_divided.groups()[5]
@@ -146,15 +153,15 @@ def BSB_parsing(URI_entered):
     return m
 
 
-def Halle_parsing(URI_entered):
+def halle_parsing(URI_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
-    m = Metadata()
+    m = classes.Metadata()
     m.manifest = url.read()
-    repository = Organisation()
+    repository = classes.Organisation()
     location = ""
     bibliographic_id = []
     bibliographic_id_number = ""
@@ -194,7 +201,7 @@ def Halle_parsing(URI_entered):
     if bibliographic_id:    
         for step3 in bibliographic_id:
             bibliographic_id_individual = step3
-            bid = BibliographicId()
+            bid = classes.BibliographicId()
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
             if "https" in bibliographic_id_individual: #if there is a link
@@ -237,16 +244,16 @@ def Halle_parsing(URI_entered):
    
     return m
 
-def Berlin_parsing(URI_entered):
+def berlin_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     bibliographic_id = []
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
         if label == "PhysicalLocation":         
             repository.name = step1["value"]
@@ -275,7 +282,7 @@ def Berlin_parsing(URI_entered):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
     if bibliographic_id:      
         for step3 in bibliographic_id:
-            bid = BibliographicId()
+            bid = classes.BibliographicId()
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
@@ -328,15 +335,15 @@ def Berlin_parsing(URI_entered):
     return m
 
 
-def Cambridge_Trinity_parsing(URI_entered):
+def cambridge_trinity_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
     #Step 2: Transforming the extracted fields into database format (here done together with step 1 because it is very little to do)
-    metadata=manifest["metadata"]
-    m = Metadata()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
     m.manifest = url.read()
-    repository = Organisation()
+    repository = classes.Organisation()
     shelfmark = ""
 
     bibliographic_id_transformed = []
@@ -345,7 +352,7 @@ def Cambridge_Trinity_parsing(URI_entered):
     catalogue_address_pattern = r"(<a href=')([^<]*)('>View Record</a>)"
     canvas_prefix = ""
     canvas_label = ""
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
         if label == "Catalogue":
             catalogue_address_long = step1["value"]
@@ -358,13 +365,13 @@ def Cambridge_Trinity_parsing(URI_entered):
             try: 
                 catalogue_text = etree.tostring(tree,encoding=str)
             except TypeError:
-              return
+                return
             bibliography_pattern_list = (r'ESTC, .*?<', r'ISTC, .*?<')
             bibliography_pattern_single = r'([\w]*)(, )([\w]*)(<)'
             for bibliographic_reference in bibliography_pattern_list:
                 bibliography_found = re.findall(bibliographic_reference, catalogue_text)
                 for single_bibliography in bibliography_found:
-                    bid = BibliographicId()
+                    bid = classes.BibliographicId()
                     bibliographic_id_divided = re.match(bibliography_pattern_single, single_bibliography)
                     bid.name = bibliographic_id_divided[1]
                     bid.id = bibliographic_id_divided[3]
@@ -381,7 +388,7 @@ def Cambridge_Trinity_parsing(URI_entered):
     #canvas_id_pattern1 = r'([^%].*)(%)(.*)'
     #canvas_id_pattern2 = r'(https://mss-cat.trin.cam.ac.uk/manuscripts/)(.*)'
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     for im in images:      
@@ -403,13 +410,13 @@ def Cambridge_Trinity_parsing(URI_entered):
     
 
 
-def ThULB_parsing(URI_entered):
+def thulb_parsing(URI_entered):
     # This function is for all JSON-manifests produced by the Jena library, this includes manifests from Erfurt and Gotha. 
 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and bringing them to database format
     # The manifest contains hardly any data. Each individual canvas, however, has its own URN that is part of the label field
@@ -450,7 +457,7 @@ def ThULB_parsing(URI_entered):
 
     if "GW-Nummer:" in catalogue_text or "VD16:" in catalogue_text or "VD17:" in catalogue_text or "VD18:" in catalogue_text:
     #are there ever multiple IDs? If so, one would need a loop
-        bid = BibliographicId()
+        bid =classes.BibliographicId()
         bibliography_long = re.findall(bibliographic_reference_pattern, catalogue_text, re.MULTILINE)[0]
         print(bibliography_long)
         bid.name = bibliography_long[0]
@@ -471,8 +478,8 @@ def ThULB_parsing(URI_entered):
 
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
    
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
+    images = Canvas_parsing(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
          #for the label (page-number) of the canvas
@@ -493,20 +500,23 @@ def ThULB_parsing(URI_entered):
    
     return m
 
-def SLUB_parsing(URI_entered):
+def slub_parsing(uri_entered):
+    """
+\todo
+    """
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    url = urllib.request.urlopen(URI_entered)
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
 
-    for step1 in metadata:
-        bid = BibliographicId()
+    for step1 in classes.Metadata:
+        bid = classes.BibliographicId()
         label = step1["label"]
         if label == "Signatur":
             m.shelfmark = step1["value"]
@@ -547,7 +557,7 @@ def SLUB_parsing(URI_entered):
     canvas_label_pattern = r'(.*?)([(].*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     
@@ -570,12 +580,14 @@ def SLUB_parsing(URI_entered):
    
     return m
 
-def Cambridge_Corpus_parsing(URI_entered):
-    # Since currently no printed books from Corpus have been digitised on this platform, this function deals with manuscripts only. 
-    url = urllib.request.urlopen(URI_entered)
+def cambridge_corpus_parsing(uri_entered):
+    """
+Since currently no printed books from Corpus have been digitised on this platform, this function deals with manuscripts only. 
+    """
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     #Step 1: Extracting relevant fields from the general section of the Manifest
     
@@ -605,8 +617,8 @@ def Cambridge_Corpus_parsing(URI_entered):
     
 
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
+    images = Canvas_parsing(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
         #for the label (page-number) of the canvas
@@ -624,18 +636,21 @@ def Cambridge_Corpus_parsing(URI_entered):
     return m
 
 
-def Leipzig_parsing(URI_entered):
-    url = urllib.request.urlopen(URI_entered)
+def leipzig_parsing(uri_entered):
+    """
+\todo
+    """
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
 
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
-        bid = BibliographicId()
+        bid = classes.BibliographicId()
         if label == "Call number": #sometimes, a German, sometimes an English term isused
             m.shelfmark = step1["value"]
         if label == "Signatur":
@@ -677,7 +692,7 @@ def Leipzig_parsing(URI_entered):
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
 
@@ -706,9 +721,9 @@ def Gallica_parsing(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     shelfmark_pattern = r'([^,.]*)?[,.]?([^,.]*)?[,.]?(.*)'
@@ -716,8 +731,8 @@ def Gallica_parsing(URI_entered):
     bibliographical_references = []
     format = ""
     m.license = manifest["license"]
-    for step1 in metadata:
-        bid = BibliographicId()
+    for step1 in classes.Metadata:
+        bid = classes.BibliographicId()
         label = step1["label"]
         if label == "Shelfmark":
             shelfmark_long = step1["value"]
@@ -774,14 +789,14 @@ def Gallica_parsing(URI_entered):
                     for step2 in step1:
                         record_210 = step2.text
                         if "Hain-Copinger" in record_210:
-                            bid = BibliographicId()
+                            bid = classes.BibliographicId()
                             hc_found = re.search(r'Hain-Copinger, \w*', record_210)
                             if hc_found:
                                 bid.name = "HC"
                                 bid.id = hc_found.group(0)[14:].strip()
                                 m.bibliographic_id.append(bid)
                         if "Pellechet" in record_210:
-                            bid = BibliographicId()
+                            bid = classes.BibliographicId()
                             hc_found = re.search(r'Pellechet, \w*', record_210)
                             if hc_found:
                                 bid.name = "Pell Ms"
@@ -798,7 +813,7 @@ def Gallica_parsing(URI_entered):
                                     print("field 300: " + record_300)
                                     record_300 = record_300.replace("n°", "")
                                     record_300 = record_300.replace("  ", " ")                                    
-                                    bid = BibliographicId()
+                                    bid = classes.BibliographicId()
                                     istc_long_found = re.search(r'https\://data\.cerl\.org/istc/i\w\d{8}', record_300)
                                     if istc_long_found:
                                         print("ISTC URL found in 300")
@@ -843,7 +858,7 @@ def Gallica_parsing(URI_entered):
                                     bibliographical_references.append(step2.text)
         if bibliographical_references:
             for bibref in bibliographical_references:
-                bid = BibliographicId()
+                bid = classes.BibliographicId()
                 bibref = bibref.replace("n°", "")
                 print(bibref)
                 if bibref[0:4] == "ISTC":
@@ -876,7 +891,7 @@ def Gallica_parsing(URI_entered):
                     m.bibliographic_id.append(bid)
 
 
-                if good_record == False: # I check the following only, if I don't have any standard bibliographic ID
+                if good_record is False: # I check the following only, if I don't have any standard bibliographic ID
                     if bibref[0:13] == "Hain-Copinger":
                         bid.name = "HC"
                         bid.id = bibref[13:].strip()
@@ -921,7 +936,7 @@ def Gallica_parsing(URI_entered):
     canvas_label_pattern = r'(.*?)([(].*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     
@@ -945,18 +960,18 @@ def Gallica_parsing(URI_entered):
 
 
 
-def Ecodices_parsing(URI_entered):
+def ecodices_parsing(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    url = urllib.request.urlopen(URI_entered)
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     m.license = manifest["license"]
-    for step1 in metadata:
-        bid = BibliographicId()
+    for step1 in classes.Metadata:
+        bid = classes.BibliographicId()
         label = step1["label"]
         if label == "Location":
             collection_place = step1["value"]
@@ -978,7 +993,7 @@ def Ecodices_parsing(URI_entered):
     canvas_label_pattern = r'(.*?)([(].*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     
@@ -998,21 +1013,24 @@ def Ecodices_parsing(URI_entered):
     return m
 
 
-def Erara_parsing(URI_entered):
+def erara_parsing(uri_entered):
+    """
+\todo
+    """
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    url = urllib.request.urlopen(URI_entered)
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographic_reference_long = ""
     bibliographic_reference_divided = []
     mets_record = ""
     m.manifest = url.read()
     m.license = "Public Domain" # das ist provisorisch, die License ist hier nicht angeben
-    for step1 in metadata:
-        bid = BibliographicId()
+    for step1 in classes.Metadata:
+        bid = classes.BibliographicId()
         label = step1["label"]
         if label == "Besitzende Institution":
             location_long = step1["value"]
@@ -1020,8 +1038,8 @@ def Erara_parsing(URI_entered):
             bibliographic_reference_long = step1["value"]
    
     if  bibliographic_reference_long == "":
-        seeAlso = manifest["seeAlso"]
-        mets_record = seeAlso['@id']
+        see_also = manifest["seeAlso"]
+        mets_record = see_also['@id']
         print("mets-URL: " + mets_record)
 
     if mets_record: #in a few cases the number is only here and not in the manifest. 
@@ -1054,7 +1072,7 @@ def Erara_parsing(URI_entered):
         else:
             bibliographic_reference_divided.append(bibliographic_reference_long)
         for reference in bibliographic_reference_divided:
-            bid = BibliographicId()
+            bid = classes.BibliographicId()
             reference = reference.strip()
             reference = reference.replace("VD ", "VD")
             if "GW" in reference:
@@ -1096,7 +1114,7 @@ def Erara_parsing(URI_entered):
     canvas_label_pattern = r'(\[\d*\])(.*)?'#There is always a counting of canvases, and sometimes a page-number following it
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     
@@ -1120,21 +1138,24 @@ def Erara_parsing(URI_entered):
     return m
 
 
-def Bodleian_parsing(URI_entered):
+def bodleian_parsing(uri_entered):
+    """
+\todo
+    """
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    url = urllib.request.urlopen(URI_entered)
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.manifest = url.read()
     shelfmark_pattern = r'(.*?)(College|Hall|Church)(.*)'
     attribution_pattern = r'(.*?)(https://creativecommons[^>]*)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
     bibliographic_record = ""
-    for step1 in metadata:
-        bid = BibliographicId()
+    for step1 in classes.Metadata:
+        bid = classes.BibliographicId()
         label = step1["label"]
         if label == "Shelfmark":
             shelfmark_long = step1["value"]
@@ -1178,7 +1199,7 @@ def Bodleian_parsing(URI_entered):
         m.repository.append(repository)
 
     if bibliographic_record:
-        bid = BibliographicId()
+        bid =classes.BibliographicId()
         if "Bod-inc." in bibliographic_record:
             bid.name = "Bod-inc"
             bid.id = bibliographic_record[9:].strip()
@@ -1195,7 +1216,7 @@ def Bodleian_parsing(URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     
@@ -1212,18 +1233,18 @@ def Bodleian_parsing(URI_entered):
    
     return m
 
-def Heidelberg_parsing(URI_entered):
-    url = urllib.request.urlopen(URI_entered)
+def heidelberg_parsing(uri_entered):
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
+    classes.Metadata=manifest["classes.Metadata"]
     attribution = manifest["attribution"][0]["@value"]
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographic_information = ""
     m.manifest = url.read()
     m.license = manifest["license"]
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
         if label == "Shelfmark":
             shelfmark = step1["value"][0]
@@ -1245,7 +1266,7 @@ def Heidelberg_parsing(URI_entered):
             record = record_raw.group(0)
         if record:
             record_divided = record.split(" ", maxsplit=1)
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             bid.name = record_divided[0]
             bid.id = record_divided[1]
             m.bibliographic_id.append(bid)
@@ -1256,7 +1277,7 @@ def Heidelberg_parsing(URI_entered):
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
 
@@ -1273,20 +1294,23 @@ def Heidelberg_parsing(URI_entered):
     return m
 
 
-def Vaticana_parsing(URI_entered):
-    url = urllib.request.urlopen(URI_entered)
+def vaticana_parsing(uri_entered):
+    """
+\todo
+    """
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    metadata=manifest["metadata"]
-    m = Metadata()
-    repository = Organisation()
+    classes.Metadata=manifest["classes.Metadata"]
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographic_information = ""
     m.manifest = url.read()
     m.license = manifest["attribution"] # There is no license field, hence I copy the attribution
     bibliographic_information = manifest["seeAlso"][0]
     print("reference to catalogue BAV")
     print(bibliographic_information)
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
         if label == "Shelfmark":
             m.shelfmark = step1["value"]
@@ -1312,7 +1336,7 @@ def Vaticana_parsing(URI_entered):
             print("identified bibliography: ")
             print(record)
             if record:
-                bid = BibliographicId()
+                bid =classes.BibliographicId()
                 bid.name = "ISTC"
                 bid.id = record[5:].strip()
                 m.bibliographic_id.append(bid)
@@ -1324,7 +1348,7 @@ def Vaticana_parsing(URI_entered):
                 print("identified bibliography: ")
                 print(record)
                 if record:
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "GW"
                     bid.id = record[3:].strip()
                     m.bibliographic_id.append(bid)
@@ -1336,7 +1360,7 @@ def Vaticana_parsing(URI_entered):
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
 
@@ -1352,15 +1376,15 @@ def Vaticana_parsing(URI_entered):
     m.images = images
     return m
 
-def Vienna_parsing(URI_entered):
-    url = urllib.request.urlopen(URI_entered)
+def Vienna_parsing(uri_entered):
+    url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
+    m = classes.Metadata()
     m.manifest = url.read()
     
-    repository = Organisation()
+    repository = classes.Organisation()
     bibliographic_information = ""
     attribution = manifest["attribution"]
     for step1 in attribution:
@@ -1369,9 +1393,9 @@ def Vienna_parsing(URI_entered):
             repository.role = "col"
             m.repository.append(repository)
 
-    metadata=manifest["metadata"]
+    classes.Metadata=manifest["classes.Metadata"]
     m.license = manifest["license"] # There is no license field, hence I copy the attribution
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         label = step1["label"]
         for step2 in label:
             if isinstance(step2, dict):
@@ -1405,7 +1429,7 @@ def Vienna_parsing(URI_entered):
                 # In the examples I saw, bibligraphical references for Post-1501 books are in field 24, those for incunables in field 555. I have no clue if this is consistently handled like that. 
                 case "024":
                     print("field with bibliography found in catalogue")
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     for step2 in step1:
                         print("tag of subfield: ")
                         print(step2.get("code"))
@@ -1431,7 +1455,7 @@ def Vienna_parsing(URI_entered):
                                     m.bibliographic_id.append(bid) # Vienna quotes this a lot, so I already inserted that here. 
                                     # I wonder if how to abbreviate it
                 case "555": # I include this although up to now there are no IIIF manifests for incunables. 
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     for step2 in step1:
                         match step2.get("code"):
                             case "d":
@@ -1444,7 +1468,7 @@ def Vienna_parsing(URI_entered):
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
+    canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = Canvas_parsing(canvas_list)    
     m.numberOfImages = len(images)
     # It appears that Vienna does not give any page numbers, and that the numbers such as "page50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
@@ -1453,14 +1477,17 @@ def Vienna_parsing(URI_entered):
 
 
 
-def Washington_parsing(URI_entered): # This section is still untested since I couldn't open the manifest
+def washington_parsing(uri_entered): 
+    """
+This section is still untested since I couldn't open the manifest
+    """
     print("starting LoC")
-    print(URI_entered)
-    url = requests.get(URI_entered) # I have to use here this, since the usual urllib.request returns 'forbidden'. 
+    print(uri_entered)
+    url = requests.get(uri_entered) # I have to use here this, since the usual urllib.request returns 'forbidden'. 
     manifest = url.json()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographic_information = ""
     shelfmark_part1 = ""
     shelfmark_part2 = ""
@@ -1492,7 +1519,7 @@ def Washington_parsing(URI_entered): # This section is still untested since I co
                         case "b":
                             shelfmark_part2 = step2.text
             case "510":
-                bid = BibliographicId()
+                bid =classes.BibliographicId()
                 for step2 in step1:
                     match step2.get("code"):
                         case "a":
@@ -1547,8 +1574,8 @@ def Goettingen_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     record_url = ""
     m.manifest = url.read()
     bibliographical_reference_long = manifest["@id"]
@@ -1565,8 +1592,8 @@ def Goettingen_parsing (URI_entered):
     repository.name = manifest["attribution"]
     repository.role = "col"
     m.repository.append(repository)
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Signatur":
             m.shelfmark = step1["value"]
 
@@ -1596,7 +1623,7 @@ def Goettingen_parsing (URI_entered):
             for step1 in record:
                 match step1.get("tag"):
                     case "024":
-                        bid = BibliographicId()
+                        bid =classes.BibliographicId()
                         for step2 in step1:
                             match step2.get("code"):
                                 case "2":
@@ -1653,8 +1680,8 @@ def Princeton_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     
     m.manifest = url.read()
     repository.name = "Princeton University Library"
@@ -1664,8 +1691,8 @@ def Princeton_parsing (URI_entered):
         m.license = manifest["license"]
     else:
         m.license = "no license information"
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Location":
             m.shelfmark = step1["value"][0]
             if m.shelfmark[0:20] == "Special Collections ":
@@ -1683,7 +1710,7 @@ def Princeton_parsing (URI_entered):
     for step1 in root:
         match step1.get("tag"):
             case "510":
-                bid = BibliographicId()
+                bid =classes.BibliographicId()
                 for step2 in step1:
                     match step2.get("code"):
                         case "a":
@@ -1746,15 +1773,15 @@ def Yale_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographical_references_list = []
     m.manifest = url.read()
     repository.name = manifest["requiredStatement"]["value"]["en"][0]
     repository.role = "col"
     m.repository.append(repository)
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"]["en"][0] == "Call Number":
             m.shelfmark = step1["value"]["none"][0]
         if step1["label"]["en"][0] == "Rights":
@@ -1765,7 +1792,7 @@ def Yale_parsing (URI_entered):
                 bibliographical_references_list.append(reference)
 
     for reference in bibliographical_references_list:
-        bid = BibliographicId()
+        bid =classes.BibliographicId()
         reference_divided = reference.split(",")
         if "Gesamtkatalog" in reference:
             bid.name = "GW"
@@ -1811,14 +1838,14 @@ def Boston_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     rights_list = []
     identifiers_list = []
     
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Location":
             repository.name = step1["value"]
             repository.role = "col"
@@ -1843,13 +1870,13 @@ def Boston_parsing (URI_entered):
         record = url.text
         reference_istc = re.search(r'Incunabula short title catalogue, i\w\d{8}', record)
         if reference_istc:
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             bid.name = "ISTC"
             bid.id = reference_istc.group(0)[34:].strip()
             m.bibliographic_id.append(bid)
         reference_gw = re.search(r'Gesamtkatalog der Wiegendrucke, \w*<', record)
         if reference_gw:
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             bid.name = "GW"
             bid.id = reference_gw.group(0)[32:-1].strip()
                                  
@@ -1871,14 +1898,14 @@ def Manchester_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     license_long = manifest["attribution"]   
     license_long = license_long.replace("<p>", "")
     m.license = license_long.replace("</p>", "")
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Physical Location":
             repository.name = step1["value"]
             repository.role = "col"
@@ -1914,15 +1941,15 @@ def Cambridge_UL_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.license = manifest["attribution"]   
     m.manifest = url.read()
-    metadata = manifest["metadata"]
+    classes.Metadata = manifest["classes.Metadata"]
     #  Sometimes, the field 'Classmark' contains only the shelf mark, in this case one has to take the repository from 'physical location'#
     # which is sometimes a bit awkward. 
     # In other cases, the field 'Classmark' contains 'Cambridge', the collection and the shelf mark, and hence it can be divided. 
-    for step1 in metadata:
+    for step1 in classes.Metadata:
         if step1["label"] == "Physical Location":
             repository_long = step1["value"]
         if step1["label"] == "Classmark":
@@ -1968,15 +1995,15 @@ def IRHT_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.license = manifest["license"]
     repository.name = manifest["attribution"]
     repository.role = "col"
     m.repository.append(repository)
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Cote":
             shelfmark_long = step1["value"]
             shelfmark_long_divided = shelfmark_long.split(",")
@@ -2025,27 +2052,27 @@ def Frankfurt_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.license = manifest["license"]
     repository.name = "Universitätsbibliothek Frankfurt"
     repository.role = "col"
     m.repository.append(repository)
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "Titel":
             shelfmark_long = step1["value"]
             shelfmark_long_divided = shelfmark_long.split(" - ", maxsplit = 1)
             if len(shelfmark_long_divided) > 1:
                 m.shelfmark = shelfmark_long_divided[0].strip()
         if step1["label"] == "VD16":
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             bid.name = "Vd16"
             bid.id = step1["value"]
             m.bibliographic_id.append(bid)
         if step1["label"] == "VD17":
-            bid = BibliographicId()
+            bid =classes.BibliographicId()
             bid.name = "VD17"
             bid.id = step1["value"]
             m.bibliographic_id.append(bid)
@@ -2084,15 +2111,15 @@ def Weimar_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     m.license = manifest["license"]
     repository.name = "Herzogin Anna Amalia Bibliothek, Weimar"
     repository.role = "col"
     m.repository.append(repository)
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         label = step1["label"]
         for step2 in label:
             if isinstance(step2, dict):
@@ -2131,7 +2158,7 @@ def Weimar_parsing (URI_entered):
             for step1 in root[2][0][2][0]:
                 match step1.get('tag'):
                     case "024":
-                        bid = BibliographicId()
+                        bid =classes.BibliographicId()
                         for step2 in step1:
                             match step2.get('code'):
                                 case "2":
@@ -2149,7 +2176,7 @@ def Weimar_parsing (URI_entered):
                             print(bid)
                             m.bibliographic_id.append(bid)
                     case "510":
-                        bid = BibliographicId()
+                        bid =classes.BibliographicId()
                         for step2 in step1:
                             match step2.get('code'):
                                 case "a":
@@ -2211,14 +2238,14 @@ def Kiel_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = manifest["license"]
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         label = step1["label"]
        
         for step2 in label:
@@ -2231,17 +2258,17 @@ def Kiel_parsing (URI_entered):
                     m.repository.append(repository)
                     #At least in some instances, there is a separate field for "VD18 Nummer" - in other cases, the bibliography is given in the description field
                 if step2["@value"] == "VD16 Nummer": 
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD16"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD17"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD18"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
@@ -2257,7 +2284,7 @@ def Kiel_parsing (URI_entered):
         else:
             bibliographical_reference_divided.append(bibliographical_reference)
     for reference in bibliographical_reference_divided:
-        bid = BibliographicId()
+        bid =classes.BibliographicId()
         reference = reference.strip()
         if reference[0:2] == "GW":
             bid.name = "GW"
@@ -2314,8 +2341,8 @@ def Hamburg_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     shelfmark_long = ""
     bibliographical_reference = ""
     bibliographical_reference_divided = []
@@ -2323,8 +2350,8 @@ def Hamburg_parsing (URI_entered):
     ppn_original_long_pattern = r'(\([\w\-]*\))?(\d*)'
     m.license = r'https://creativecommons.org/publicdomain/mark/1.0/' #on the library's website
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         label = step1["label"]
        
         for step2 in label:
@@ -2333,17 +2360,17 @@ def Hamburg_parsing (URI_entered):
                     shelfmark_long = step1["value"]
 
                 if step2["@value"] == "VD16 Nummer": 
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD16"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD17"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     bid.name = "VD18"
                     bid.id = step1["value"]
                     m.bibliographic_id.append(bid)
@@ -2380,7 +2407,7 @@ def Hamburg_parsing (URI_entered):
         for step1 in root[2][0][2][0]:
             match step1.get('tag'):
                 case "024":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "2":
@@ -2396,7 +2423,7 @@ def Hamburg_parsing (URI_entered):
                     if bid.name in ["GW", "ISTC", "VD16", "vd16", "VD17", "vd17", "VD18", "vd18"]:
                         m.bibliographic_id.append(bid)
                 case "510":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
@@ -2459,8 +2486,8 @@ def Rostock_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     repository.name = "Universitätsbibliothek Rostock"
     repository.role = "col"
     m.repository.append(repository)
@@ -2472,8 +2499,8 @@ def Rostock_parsing (URI_entered):
     ppn_original_long_pattern = r'(.*?ppn)(\d*)'
     m.license = r'https://creativecommons.org/publicdomain/mark/1.0/' #on the library's website
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         if step1["label"] == "identifier":
             ppn_original_long = step1["value"]
         if step1["label"] == "title":
@@ -2496,7 +2523,7 @@ def Rostock_parsing (URI_entered):
         for step1 in root[2][0][2][0]:
             match step1.get('tag'):
                 case "024":
-                    bid = BibliographicId()
+                    bid =classes.BibliographicId()
                     for step2 in step1:
                         match step2.get('code'):
                             case "2":
@@ -2552,14 +2579,14 @@ def Nuernberg_StB_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = r'https://creativecommons.org/publicdomain/mark/1.0/' #on the library's website
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         label = step1["label"]
         if isinstance(label, list):
             for step2 in label:
@@ -2589,7 +2616,7 @@ def Nuernberg_StB_parsing (URI_entered):
             bibliographical_reference = bibliographical_reference_divided[1] # suppressing a preliminary '
         else: 
             bibliographical_reference = bibliographical_reference_raw
-        bid = BibliographicId()
+        bid =classes.BibliographicId()
         if bibliographical_reference[0:2] == "VD":
             bid.name = bibliographical_reference[0:4]
             bid.id = bibliographical_reference[5:].strip()
@@ -2630,14 +2657,14 @@ def Manuscriptorium_parsing (URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
-    m = Metadata()
-    repository = Organisation()
+    m = classes.Metadata()
+    repository = classes.Organisation()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = manifest["license"]
     m.manifest = url.read()
-    metadata = manifest["metadata"]
-    for step1 in metadata:
+    classes.Metadata = manifest["classes.Metadata"]
+    for step1 in classes.Metadata:
         label = step1["label"]
         if step1["label"] == "Repository":
             repository.name = step1["value"]
@@ -2670,5 +2697,3 @@ def Manuscriptorium_parsing (URI_entered):
 
     m.images = images
     return m
-
-

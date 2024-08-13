@@ -1,25 +1,26 @@
-# This module contains functions that transform the information taken from several bibliographic resources (in books_parsing manifest, books_parsing_bibliographies and gndparse), 
-# according to the selections made by the user in NewRessource.vue, into a format ready for importing it into Iconobase. 
-# There is normally, depending on the material, either one Manuscript or one Book record. 
-# If there are any persons, organisations (including repositories) and places connected to the book or manuscript that do not yet have an authority record in the database,
-# authority records for them are created first, and then the book or manuscript record is linked to them. 
-# In a future setting, these authority records should not be created automatically, but first displayed to the user to see if anything should be added or corrected. 
-# Furthermore, now the 'secondary' references (e.g., if we have the Place of Birth of a printer) are merely copied into the record. 
-# Later, there should be a search if there are already records for 
+#pylint: disable=C0301,E1101,C0116,C0103,C0303
+"""
+This module contains functions that transform the information taken from several bibliographic resources (in books_parsing manifest, books_parsing_bibliographies and gndparse), 
+according to the selections made by the user in NewRessource.vue, into a format ready for importing it into Iconobase. 
+There is normally, depending on the material, either one Manuscript or one Book record. 
+If there are any persons, organisations (including repositories) and places connected to the book or manuscript that do not yet have an authority record in the database, authority records for them are created first, and then the book or manuscript record is linked to them. 
+In a future setting, these authority records should not be created automatically, but first displayed to the user to see if anything should be added or corrected. 
+Furthermore, now the 'secondary' references (e.g., if we have the Place of Birth of a printer) are merely copied into the record. 
+Later, there should be a search if there are already records for 
+"""
 
-from classes import *
+import re
+import asyncio
 from nanoid import generate
 #import requests
-import db_actions
 from pymongo import MongoClient
-from dates_parsing import date_overall_parsing
-import re
-import person_relations
-import asyncio
 import aiohttp
+from dates_parsing import date_overall_parsing
+import db_actions
+import classes
+import person_relations
 
-
-#dbname = dbactions.get_database()
+#dbname = db_actions.get_database()
 #coll=dbname['bpf']
 
 
@@ -181,11 +182,11 @@ If the 'far record' has better information on the type of connection, its time, 
                 connection_found = True
                 break
 #                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
-        if connection_found == False:
+        if connection_found is False:
             print("step 2b: no connection found, new connection added")
             # This is step 2b: there is no reciprocal connection, it needs to be established
 #                        print("For person " + person_found["name_preferred"] + " no connection has been found")
-            new_connection = ConnectedEntity()
+            new_connection = classes.ConnectedEntity()
             new_connection.id = record_new.id
             new_connection.external_id = record_new.external_id
             new_connection.name = record_new.name_preferred # better use preview including year
@@ -245,20 +246,6 @@ def relationship_parse(main_entity_type, connected_entity_type, connection_comme
 
 
 
-class Person_against_duplication(BaseModel): # I have these classes here and not in 'classes' because they are only needed in these functions.
-    preview : Optional[str] = ""
-    id : Optional[str] = ""
-    person_type1 : Optional[list[str]]  = []
-
-class Org_against_duplication(BaseModel):
-    preview : Optional[str] = ""
-    id : Optional[str] = ""
-    org_type1 : Optional[list[str]]  = []
-
-class Place_against_duplication(BaseModel):
-    preview : Optional[str] = ""
-    id : Optional[str] = ""
-    place_type1 : Optional[list[str]]  = []
 
 
 async def metadata_dissection(metadata):
@@ -275,7 +262,7 @@ async def metadata_dissection(metadata):
     
     
         persons_list = [] # This list exists to make sure that if the same person is mentioned twice in different functions, e.g. as author and publisher, there is only one record created 
-        person_against_duplication = Person_against_duplication()
+        person_against_duplication = classes.PersonAgainstDuplication()
         
         if metadata.bibliographic_information[0].persons:
             for person in metadata.bibliographic_information[0].persons:
@@ -338,7 +325,7 @@ async def metadata_dissection(metadata):
         
         
         orgs_list = [] # This list exists to make sure that if the same organisation is mentioned twice in different functions, e.g. as author and publisher, there is only one record created 
-        org_against_duplication = Org_against_duplication()
+        org_against_duplication = classes.OrgAgainstDuplication()
         
         if metadata.bibliographic_information[0].organisations:
             for org in metadata.bibliographic_information[0].organisations:
@@ -400,7 +387,7 @@ async def metadata_dissection(metadata):
         
         
         places_list = [] # This list exists to make sure that if the same organisation is mentioned twice in different functions, e.g. as author and publisher, there is only one record created 
-        place_against_duplication = Place_against_duplication()
+        place_against_duplication = classes.PlaceAgainstDuplication()
         
         if metadata.bibliographic_information[0].places:
             for place in metadata.bibliographic_information[0].places:
@@ -489,9 +476,9 @@ async def metadata_dissection(metadata):
 
 # Section on Manuscripts
     if metadata.material == "m": # If the item has been identified as a manuscript
-        new_manuscript = ManuscriptDb()
+        new_manuscript = classes.ManuscriptDb()
         new_manuscript.id = generate()
-        new_repository = LinkToRepository()
+        new_repository = classes.LinkToRepository()
         new_repository.place_id = metadata.repository[0].potential_candidates[metadata.repository[0].chosen_candidate].internal_id
         new_repository.id_preferred = metadata.shelfmark
         new_manuscript.repository.append(new_repository)
@@ -502,7 +489,7 @@ async def metadata_dissection(metadata):
 # Section on printed books
     if metadata.material == "b": # If the item has been identified as printed book
         print("adding new book")
-        new_book = BookDb()
+        new_book = classes.BookDb()
         new_book.id = generate()
         new_book.title = metadata.bibliographic_information[0].title
         new_book.volume_number = metadata.bibliographic_information[0].volume_number
@@ -513,12 +500,12 @@ async def metadata_dissection(metadata):
         new_book.date_end = metadata.bibliographic_information[0].date_end
         if metadata.bibliographic_information[0].bibliographic_id:
             for bibliographic_id in metadata.bibliographic_information[0].bibliographic_id:
-                new_bibliographic_id = ExternalId()
+                new_bibliographic_id = classes.ExternalId()
                 new_bibliographic_id = bibliographic_id
                 new_book.bibliographic_id.append(new_bibliographic_id)
         if metadata.bibliographic_information[0].persons:
             for person in metadata.bibliographic_information[0].persons:
-                new_person = BookConnectedEntityDb()
+                new_person = classes.BookConnectedEntityDb()
                 new_person.role = person.role
                 if person.internal_id:
                     new_person.id = person.internal_id
@@ -527,7 +514,7 @@ async def metadata_dissection(metadata):
                 new_book.persons.append(new_person)
         if metadata.bibliographic_information[0].organisations:
             for org in metadata.bibliographic_information[0].organisations:
-                new_org = BookConnectedEntityDb()
+                new_org = classes.BookConnectedEntityDb()
                 new_org.role = org.role
                 if org.internal_id:
                     new_org.id = org.internal_id
@@ -536,7 +523,7 @@ async def metadata_dissection(metadata):
                 new_book.organisations.append(new_org)
         if metadata.bibliographic_information[0].places:
             for place in metadata.bibliographic_information[0].places:
-                new_place = BookConnectedEntityDb()
+                new_place = classes.BookConnectedEntityDb()
                 new_place.role = place.role
                 if place.internal_id:
                     new_place.id = place.internal_id
@@ -557,7 +544,7 @@ async def metadata_dissection(metadata):
 # This class contains the list of individual pages from the IIIF manifest as well as information on repository and shelf marks. 
 # This information will eventually be copied to the individual Artwork and Photo records, once the cropping of images is complete and those records are created.
 # It is not clear if this record will be needed in the long term 
-    new_pages = PagesDb()
+    new_pages = classes.PagesDb()
     new_pages.id = generate()
     new_pages.book_record_id = book_record_id
     if metadata.repository[0].internal_id:
@@ -601,9 +588,9 @@ async def person_ingest(person):
     new_record_viaf_id = ""
     new_record_gnd_id = "" # This can be deleted once VIAF also works for organisations and places
     person_found = {}
-    connection_already_made = False
+#    connection_already_made = False
     person_selected = person.potential_candidates[person.chosen_candidate]   
-    person_new = PersonDb()
+    person_new = classes.PersonDb()
     person_new.id = generate()
     person_new.type = "Person"
     person_new.person_type1.append(role_person_type_correspondence[person.role])
@@ -632,7 +619,7 @@ async def person_ingest(person):
         date_start = date_parsed[1]
         date_end = date_parsed[2]
         date_aspect = date_parsed[3]
-        date = DateImport()
+        date = classes.DateImport()
         date.datestring_raw = date_from_source.datestring_raw
         date.date_comments = date_from_source.date_comments
         date.datetype = date_from_source.datetype
@@ -651,7 +638,8 @@ async def person_ingest(person):
         for connected_person in person_selected.connected_persons:
             connected_person.connection_comment, connected_person.connection_type = relationship_parse("person", "person", connected_person.connection_comment, connected_person.connection_type, person_new.sex)
             for external_id in connected_person.external_id:
-                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+#                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+                person_found = db_actions.find_person(external_id,"external_id")
                 if person_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): person connected to person found")
@@ -676,7 +664,8 @@ async def person_ingest(person):
         for connected_org in person_selected.connected_organisations:
             connected_org.connection_comment, connected_org.connection_type = relationship_parse("person", "organisation", connected_org.connection_comment, connected_org.connection_type, person_new.sex)
             for external_id in connected_org.external_id:
-                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+#                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                org_found = db_actions.find_organisation(external_id,"external_id_ingest")
                 if org_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): org connected to person found")
@@ -715,7 +704,8 @@ async def person_ingest(person):
         for connected_location in person_selected.connected_locations:
             connected_location.connection_comment, connected_location.connection_type = relationship_parse("person", "location", connected_location.connection_comment, connected_location.connection_type, person_new.sex)                    
             for external_id in connected_location.external_id:
-                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+#               location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_persons" : 1})
+                location_found = db_actions.find_place(external_id,"external_id_ingest")
                 if location_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): place connected to person found")
@@ -742,7 +732,7 @@ async def person_ingest(person):
     print(list_of_viaf_ids)
     print(person_new.external_id)
     person_viaf_url = list_of_viaf_ids[person_new.external_id[0].uri]
-    id = ExternalId()
+    id = classes.ExternalId()
     id.name = "viaf"
     id.uri = person_viaf_url
     id.id = person_viaf_url[21:]
@@ -755,7 +745,7 @@ async def person_ingest(person):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = ExternalId()
+                id =classes.ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -767,7 +757,8 @@ async def person_ingest(person):
                 for external_id in connected_person.external_id:
                     if external_id.name != "DNB": # If it is, the connection has been made earlier
                     # This is 'stitching' step 1 for the records that can only be connected through VIAF
-                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+#                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+                        person_found = db_actions.find_person(external_id,"external_id_ingest")
                     if person_found:
                         print("---------------------------------------------")
                         print("step 1 (VIAF): person connected to person found")
@@ -784,7 +775,7 @@ async def person_ingest(person):
                             connected_person.connection_comment = comment_correction
                         break
             
-            new_connected_person = ConnectedEntity()
+            new_connected_person = classes.ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -802,7 +793,7 @@ async def person_ingest(person):
     if person_selected.connected_organisations:
         for connected_organisation in person_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = ConnectedEntity()
+            new_connected_organisation = classes.ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -826,7 +817,7 @@ async def person_ingest(person):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = ConnectedEntity()
+            new_connected_location = classes.ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -844,7 +835,8 @@ async def person_ingest(person):
 #   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
 #    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
 # record with sex
-    list_found = list(coll.find({ "$or": [{"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"connected_persons.external_id.name" : "GND", "connected_persons.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+#    list_found = list(coll.find({ "$or": [{"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"connected_persons.external_id.name" : "GND", "connected_persons.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
+    list_found = db_actions.find_person_viaf(new_record_viaf_id,new_record_gnd_id)
     print("step 3: far records found: ")
     print(list_found)
 
@@ -868,7 +860,7 @@ async def person_ingest(person):
                         print("connected person not yet in new record, needs to be added")
                         far_connection_type = far_connected_person["connection_type"]
                         db_actions.add_connection_id_and_name(far_record["id"], "connected_persons", far_connection_type, far_connected_person["name"], person_new.name_preferred, person_new.id, far_connection_type, far_connected_person["connection_time"], far_connected_person["connection_comment"]) 
-                        new_connection = ConnectedEntity()
+                        new_connection = classes.ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, person_new.sex)
@@ -959,7 +951,7 @@ async def org_ingest(org):
     # Maybe I should adapt this for the dates connected with orgs. 
     org_selected = org.potential_candidates[org.chosen_candidate]               
     new_record_gnd_id = org_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
-    org_new = OrganisationDb()
+    org_new = classes.OrganisationDb()
     org_new.id = generate()
     org_new.type = "Organisation"
     org_new.org_type1.append(role_org_type_correspondence[org.role])
@@ -992,7 +984,8 @@ async def org_ingest(org):
         for connected_person in org_selected.connected_persons: 
             connected_person.connection_comment, connected_person.connection_type = relationship_parse("organisation", "person", connected_person.connection_comment, connected_person.connection_type, "")
             for external_id in connected_person.external_id:
-                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+#                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+                person_found = db_actions.find_person(external_id,"external_id_connected_organisation")
                 if person_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): person connected to org found")
@@ -1009,15 +1002,16 @@ async def org_ingest(org):
                     break # if a connection with one ID is found, the other connections would be the same. 
 
             if not person_found and connected_person.external_id:
-                    list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
-                    # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
+                list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+                # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
     if org_selected.connected_organisations:    
         print("the following organisations are connected to the new record: ")
         print(org_selected.connected_organisations)
         for connected_org in org_selected.connected_organisations:
             connected_org.connection_comment, connected_org.connection_type = relationship_parse("organisation", "organisation", connected_org.connection_comment, connected_org.connection_type, "")
             for external_id in connected_org.external_id:
-                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+#                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+                org_found = db_actions.find_organisation(external_id,"external_id_organisation")
                 if org_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): org connected to org found")
@@ -1040,7 +1034,8 @@ async def org_ingest(org):
             connected_location.connection_comment, connected_location.connection_type = relationship_parse("organisation", "location", connected_location.connection_comment, connected_location.connection_type, "")                    
             for external_id in connected_location.external_id:
                 # I must introduce distinction between historical and modern locations! 
-                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+#                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_organisations" : 1})
+                location_found = db_actions.find_place(external_id,"external_id_connected_organisations")
                 if location_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): place connected to org found")
@@ -1079,7 +1074,7 @@ async def org_ingest(org):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = ExternalId()
+                id = classes.ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -1093,7 +1088,8 @@ async def org_ingest(org):
                 for external_id in connected_person.external_id:
                     if external_id.id != "DNB": # If it is, the connection has been made earlier
                     # This is 'stitching' step 1 for the records that can only be connected through VIAF
-                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+#                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+                        person_found = db_actions.find_person(external_id,"external_id_connected_organisation")
                     if person_found:
                         print("---------------------------------------------")
                         print("step 1 (VIAF): person connected to org found")
@@ -1113,7 +1109,7 @@ async def org_ingest(org):
 
 # Similar features have to be added for connected organisations and places, once this is possible.             
 
-            new_connected_person = ConnectedEntity()
+            new_connected_person = classes.ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -1129,7 +1125,7 @@ async def org_ingest(org):
     if org_selected.connected_organisations:
         for connected_organisation in org_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = ConnectedEntity()
+            new_connected_organisation = classes.ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -1154,7 +1150,7 @@ async def org_ingest(org):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = ConnectedEntity()
+            new_connected_location = classes.ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -1171,7 +1167,8 @@ async def org_ingest(org):
 #   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
 #    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
 # record with sex
-    list_found = list(coll.find({ "$or": [{"connected_organisations.external_id.name" : "viaf", "connected_organisations.external_id.id" : new_record_viaf_id}, {"connected_organisations.external_id.name" : "GND", "connected_organisations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_organisations" : 1}))
+#    list_found = list(coll.find({ "$or": [{"connected_organisations.external_id.name" : "viaf", "connected_organisations.external_id.id" : new_record_viaf_id}, {"connected_organisations.external_id.name" : "GND", "connected_organisations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_organisations" : 1}))
+    list_found = db_actions.find_organisation_viaf(new_record_viaf_id,new_record_gnd_id)
     print("------------------------------------------")
     print("step 3: far records found: ")
     print("searching for: ")
@@ -1199,7 +1196,7 @@ async def org_ingest(org):
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_org["connection_type"]
                         db_actions.add_connection_id_and_name(far_record["id"], "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"])                 
-                        new_connection = ConnectedEntity()
+                        new_connection = classes.ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
@@ -1292,7 +1289,7 @@ async def place_ingest(place):
         new_record_gnd_id = place_selected.external_id[1].id # I need this only as long as I cannot get VIAF to work for organisations. Normally, the GND ID is listed second. 
     else:
         new_record_gnd_id = place_selected.external_id[0].id
-    place_new = PlaceDb()
+    place_new = classes.PlaceDb()
     place_new.id = generate()
     place_new.type = "Place"
     print("----------------------------------")
@@ -1315,7 +1312,8 @@ async def place_ingest(place):
         for connected_place in place_selected.connected_persons:
             connected_place.connection_comment, connected_person.connection_type = relationship_parse("location", "person", connected_person.connection_comment, connected_person.connection_type, "")
             for external_id in connected_person.external_id:
-                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+#                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+                person_found = db_actions.find.person(external_id,"external_id_connected_location")
                 if person_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): person connected to place found")
@@ -1337,7 +1335,8 @@ async def place_ingest(place):
         for connected_org in place_selected.connected_organisations:
             connected_org.connection_comment, connected_org.connection_type = relationship_parse("location", "organisation", connected_org.connection_comment, connected_org.connection_type, "")
             for external_id in connected_org.external_id:
-                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+#                org_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+                org_found = db_actions.find_organisation(external_id,"external_id_location")
                 if org_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): org connected to place found")
@@ -1359,7 +1358,8 @@ async def place_ingest(place):
         for connected_location in place_selected.connected_locations:
             connected_location.connection_comment, connected_location.connection_type = relationship_parse("location", "location", connected_location.connection_comment, connected_location.connection_type, "")                    
             for external_id in connected_location.external_id:
-                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+#                location_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "connected_locations" : 1})
+                location_found = db_actions.find_place(external_id,"external_id_connected_locations")
                 if location_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): place connected to place found")
@@ -1397,7 +1397,7 @@ async def place_ingest(place):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                id = ExternalId()
+                id = classes.ExternalId()
                 id.name = "viaf"
                 id.uri = person_viaf_url
                 id.id = person_viaf_url[21:]
@@ -1411,7 +1411,8 @@ async def place_ingest(place):
                 for external_id in connected_person.external_id:
                     if external_id.name != "DNB": # If it is, the connection has been made earlier
                     # This is 'stitching' step 1 for the records that can only be connected through VIAF
-                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+#                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+                        person_found = db_actions.find_person(external_id,"external_id_connected_location")
                     if person_found:
                         connected_person.id = person_found["id"]
                         connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
@@ -1423,7 +1424,7 @@ async def place_ingest(place):
                         break
             
 
-            new_connected_person = ConnectedEntity()
+            new_connected_person = classes.ConnectedEntity()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -1437,7 +1438,7 @@ async def place_ingest(place):
     if place_selected.connected_organisations:
         for connected_organisation in place_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = ConnectedEntity()
+            new_connected_organisation = classes.ConnectedEntity()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -1461,7 +1462,7 @@ async def place_ingest(place):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = ConnectedEntity()
+            new_connected_location = classes.ConnectedEntity()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -1479,7 +1480,8 @@ async def place_ingest(place):
 #   The following line should be reinstated once every goes via VIAF, the line afterwards is a stopgap to work with both VIAF and GND
 #    person_found = list(coll.find({"connected_persons.external_id.name" : "viaf", "connected_persons.external_id.id" : new_record_viaf_id}, {"id": 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
 # record with sex
-    list_found = list(coll.find({ "$or": [{"connected_locations.external_id.name" : "viaf", "connected_locations.external_id.id" : new_record_viaf_id}, {"connected_locations.external_id.name" : "GND", "connected_locations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_locations" : 1}))
+#    list_found = list(coll.find({ "$or": [{"connected_locations.external_id.name" : "viaf", "connected_locations.external_id.id" : new_record_viaf_id}, {"connected_locations.external_id.name" : "GND", "connected_locations.external_id.id" : new_record_gnd_id}]}, {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_locations" : 1}))
+    list_found = db_actions.find_place_viaf(new_record_viaf_id,new_record_gnd_id)
     print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
     print("new_record_viaf_id: ")
     print(new_record_viaf_id)
@@ -1506,7 +1508,7 @@ async def place_ingest(place):
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_place["connection_type"]
                         db_actions.add_connection_id_and_name(far_record["id"], "connected_locations", far_connection_type, far_connected_place["name"], place_new.name_preferred, place_new.id, far_connected_place["connection_type"], far_connected_place["connection_time"], far_connected_place["connection_comment"]) 
-                        new_connection = ConnectedEntity()
+                        new_connection = classes.ConnectedEntity()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")
@@ -1624,15 +1626,3 @@ async def place_ingest(place):
 
 #person_treated = person_ingest(person)
 #print(person_treated)
-
-
-
-
-
-
-
-        
-
-
-
-        

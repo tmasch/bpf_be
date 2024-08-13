@@ -1,5 +1,7 @@
-# This module contains functions for displaying (and later perhaps also editing) records from the database
-
+#pylint: disable=C0301
+"""
+This module contains functions for displaying (and later perhaps also editing) records from the database
+"""
 import db_actions
 from classes import *
 

@@ -1,23 +1,27 @@
+#pylint: disable=C0301,E1101,C0116,C0103
+"""
+This module contains routines to find and save images in resources.
+"""
 import random as rng
 import requests
 import numpy as np
-from cv2 import *
-from classes import *
-from db_actions import *
+import cv2
+import classes
+import db_actions
 
 
 
-def find_images(id):
+def find_images(identifier):
     """
     This routine runs the image finding process
     """
     print("finding images")
-    print(id)
-    r=get_resource_from_db(id)
+    print(identifier)
+    r=db_actions.get_resource_from_db(identifier)
     print(r["images"][0])
     i=r["images"][0]
     frames=process_image(i)
-    update_image_with_frames(id,0,frames)
+    db_actions.update_image_with_frames(identifier,0,frames)
     print("finding images done")
     r={"val" : "finding images done"}
     return r
@@ -31,7 +35,7 @@ def fetch_image_from_web(image):
     print(url)
 #    filename="14.jpg"
     print("fetching image from web")
-    response = requests.get(url)
+    response = requests.get(url,timeout=10)
     jpg=response.content
     image = np.asarray(bytearray(jpg), dtype="uint8")
     print("decoding")
@@ -127,7 +131,7 @@ def strategy1(image):
             color=(255,255,0)
             lw=30
             print(i,bound_rect[i],hierarchy[0][i])
-            f=Frame()
+            f=classes.Frame()
             f.index=i
             f.x_abs=x
             f.y_abs=y
@@ -163,7 +167,7 @@ and saves an image file in the local file system
 
     """
     print("Saving an image file")
-    r=get_resource_from_db(coords.id)
+    r=db_actions.get_resource_from_db(coords.id)
     i=r["images"][coords.index]
     image=fetch_image_from_web(i)
     print("y1: ",coords.y_abs)

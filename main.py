@@ -1,20 +1,22 @@
+#pylint: disable=C0301
 """
 \todo refactor to follow naming conventions!
 
 """
 #import urllib.request
-import json
+#import json
 import os
-from pydantic_settings import BaseSettings
+from typing import List
+#from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 from nanoid import generate
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import iiifparse
+import iiif_parse
 import db_actions
-from classes import *
-from image_actions import *
+import classes
+import image_actions
 import gndparse
 import book_ingest_create_records
 import displayRecords
@@ -37,7 +39,7 @@ load_dotenv()
 #print(settings.dict())
 #print(settings.MONGODB_PORT)
 
-print(get_database())
+print(db_actions.get_database())
 #getAllRessourcesFromDb()
 
 app = FastAPI()
@@ -72,9 +74,9 @@ async def get_metadata(iiif_url, material):
     """
     Method returning metadata for a given iiif url
     """
-    print("iiifURL: ")
-    print(iiif_url)
-    m = iiifparse.iiifparse(iiif_url, material)
+    print("iiif URL: "+iiif_url)
+    print("material: "+material)
+    m = iiif_parse.iiif_parse(iiif_url, material)
     #m.material = material
 #    print(iiifUrl)
 #    url = urllib.request.urlopen(iiifUrl)
@@ -101,6 +103,7 @@ async def get_metadata(iiif_url, material):
         repository.role = "col"
         # Normally, this role depends on the bibliographical data -
         # in this case, it has to be set here.
+
     m.id=generate()
 #    print("List of places to be sent to FE")
 #    print(m.bibliographic_information[0].places)
@@ -111,7 +114,7 @@ async def supply_biblio_information(additional_bid):
     """
     Method returning additional bibliographic information
     """
-    bi = iiifparse.supply_bibliographic_information(additional_bid)
+    bi = iiif_parse.supply_bibliographic_information(additional_bid)
     for person in bi.persons:
         person = await gndparse.person_identification(person)
     for organisation in bi.organisations:
@@ -119,7 +122,7 @@ async def supply_biblio_information(additional_bid):
     for place in bi.places:
         place = gndparse.place_identification(place)
 
-    print(BibliographicId)
+#    print(BibliographicId)
     print(bi)
     return bi
 
@@ -186,7 +189,7 @@ async def load_new_repository_authority_record(new_authority_id_rep):
     return potential_organisation
 
 @app.post("/submitAdditionalInformation")
-async def submit_additional_information(making_processes: list[MakingProcess]):
+async def submit_additional_information(making_processes: list[classes.MakingProcess]):
     """
     Endpoint 
     """
@@ -197,17 +200,17 @@ async def submit_additional_information(making_processes: list[MakingProcess]):
     return making_processes
 
 @app.post("/createNewResource")
-async def create_new_resource(metadata: Metadata):
+async def create_new_resource(metadata: classes.Metadata):
     """
     Endpoint to create a new resource in the database
     """
     m = metadata
-    insert_metadata(m)
+    db_actions.insert_metadata(m)
     return m
 
 
 @app.post("/createImageRecord")
-async def create_image_record_endpoint(coords: Frame):
+async def create_image_record_endpoint(coords: classes.Frame):
     """
     Endpoint for creating a new image record in the database given the coordinates
     """
@@ -217,12 +220,12 @@ async def create_image_record_endpoint(coords: Frame):
     print("width",coords.w_abs)
     print("height",coords.h_abs)
     print("Saving image as file")
-    save_image_file(coords)
+    image_actions.save_image_file(coords)
     db_actions.create_image_record()
     return
 
 @app.post("/saveConnectedRecords")
-async def save_connected_records(metadata: Metadata):
+async def save_connected_records(metadata: classes.Metadata):
     """
     \todo not quite clear what connected records should be
     """
@@ -232,18 +235,18 @@ async def save_connected_records(metadata: Metadata):
     print(m.repository)
     ingest_result = await book_ingest_create_records.metadata_dissection(m)
     #print(m)
-    return m
+    return ingest_result
 
-@app.get("/allResources", response_model=List[PreviewListDb])
+@app.get("/allResources", response_model=List[classes.PreviewListDb])
 async def get_all_resources():
     """
     Endpoint to get all resources from the database
     """
-    r=get_all_resources_from_db()
+    r=db_actions.get_all_resources_from_db()
     print(r)
     return r
 
-@app.get("/resource", response_model=Metadata)
+@app.get("/resource", response_model=classes.Metadata)
 async def get_resource(identifier: str):
     """
     Endpoint to get a specific ressource from the database
@@ -251,7 +254,7 @@ async def get_resource(identifier: str):
     """
     print("Getting resource")
     print(identifier)
-    r=get_resource_from_db(identifier)
+    r=db_actions.get_resource_from_db(identifier)
     return r
 
 @app.get("/findImages")
@@ -261,11 +264,11 @@ async def find_all_images(identifier: str):
     """
     print(identifier)
     print("starting")
-    r=find_images(identifier)
+    r=image_actions.find_images(identifier)
     print(r)
     return
 
-@app.get("/getBookRecord", response_model = BookDbDisplay)
+@app.get("/getBookRecord", response_model = classes.BookDbDisplay)
 async def get_book_record(identifier: str):
     """
     \todo move to get_resource
@@ -275,7 +278,7 @@ async def get_book_record(identifier: str):
     print(book_record)
     return book_record
 
-@app.get("/getManuscriptRecord", response_model = ManuscriptDbDisplay)
+@app.get("/getManuscriptRecord", response_model = classes.ManuscriptDbDisplay)
 async def get_manuscript_record(identifier: str):
     """
     \todo move to get_resource    
@@ -286,7 +289,7 @@ async def get_manuscript_record(identifier: str):
     return manuscript_record
 
 
-@app.get("/getPersonRecord", response_model = PersonDbDisplay)
+@app.get("/getPersonRecord", response_model = classes.PersonDbDisplay)
 async def get_person_record(identifier: str):
     """
     \todo move to get_resource    
@@ -296,7 +299,7 @@ async def get_person_record(identifier: str):
     print("Person record sent off from BFF")
     return person_record
 
-@app.get("/getOrgRecord", response_model = OrgDbDisplay)
+@app.get("/getOrgRecord", response_model = classes.OrgDbDisplay)
 async def get_org_record(identifier: str):
     """
     \todo move to get_resource    
@@ -306,7 +309,7 @@ async def get_org_record(identifier: str):
     print("Person record sent off from BFF")
     return org_record
 
-@app.get("/getPlaceRecord", response_model = PlaceDbDisplay)
+@app.get("/getPlaceRecord", response_model = classes.PlaceDbDisplay)
 async def get_place_record(identifier: str):
     """
     \todo move to get_resource  
