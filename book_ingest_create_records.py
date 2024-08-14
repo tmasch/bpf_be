@@ -629,6 +629,44 @@ async def metadata_dissection(metadata):
         new_pages.preview = metadata.repository[0].name + ", " + metadata.shelfmark
     if metadata.material == "b": 
         new_pages.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].printing_date + ")"
+    if metadata.making_processes:
+        for making_process in metadata.making_processes:
+            print("adding making process: ")
+            print(making_process)
+            if making_process.person.name == "" and making_process.place.name == "" and making_process.date.datestring_raw == "":
+                pass
+            else:
+                making_process_db = classes.MakingProcessDb()
+                making_process_db.process_type = making_process.process_type
+                if making_process.person.internal_id:
+                    person = classes.ConnectedEntity()
+                    person.id = making_process.person.internal_id # is apparently always there, if a person has been chosen
+#                    print("role of person")
+#                    print(making_process.person.role)
+                    person.connection_type = making_process.person.role
+#                    print("role of person inserted: ")
+#                    print(person.connection_type)
+                    person.name = making_process.person.potential_candidates[making_process.person.chosen_candidate].name_preferred # later to be replaced wth preview                 
+                    making_process_db.person = person
+#                    print("complete making process")
+#                    print(making_process_db)
+                if making_process.place.internal_id:
+                    print("Place as entered in making_processs")
+                    print(making_process.place)
+                    place = classes.ConnectedEntity()
+                    place.id = making_process.place.internal_id # is apparently always there, if a place has been chosen
+#                    print("role of person")
+#                    print(making_process.person.role)
+                    place.connection_type = making_process.place.role
+#                    print("role of person inserted: ")
+#                    print(person.connection_type)
+                    place.name = making_process.place.potential_candidates[making_process.place.chosen_candidate].name_preferred # later to be replaced wth preview                 
+                    making_process_db.place = place
+#                    print("complete making process")
+#                    print(making_process_db)
+
+            new_pages.making_processes.append(making_process_db)
+
     db_actions.insert_record_pages(new_pages)
 
 
@@ -658,6 +696,8 @@ async def person_ingest(person):
     new_record_viaf_id = ""
     new_record_gnd_id = "" # This can be deleted once VIAF also works for organisations and places
     person_found = {}
+    org_found = {}
+    location_found = {}
 #    connection_already_made = False
     person_selected = person.potential_candidates[person.chosen_candidate]   
     person_new = classes.PersonDb()
