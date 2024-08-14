@@ -759,29 +759,29 @@ def istc_parsing(url_bibliography):
                     printing_date_raw = printing_date_raw.replace("]", "")
                 print("printing_date_raw"+printing_date_raw)
                 print( re.match(date_pattern, printing_date_raw))
-                printing_date_divided = ""
+                printing_date_divided = printing_date_raw
                 if  re.match(date_pattern, printing_date_raw):
                     printing_date_divided = re.match(date_pattern, printing_date_raw).groups()
-                date_prefix = ""
-                if printing_date_divided[0]:
-                    date_prefix = printing_date_divided[0]
-                if printing_date_divided[1]:
-                    date_day = printing_date_divided[1]
-                if printing_date_divided[2]:
-                    date_month = printing_date_divided[2]
-                if printing_date_divided[3]:
-                    date_year = printing_date_divided[3]
-                if printing_date_divided[4]:
-                    date_year_to = printing_date_divided[4]
-                if printing_date_divided[5]:
-                    date_between_indicator = printing_date_divided[5]
+                    date_prefix = ""
+                    if printing_date_divided[0]:
+                        date_prefix = printing_date_divided[0]
+                    if printing_date_divided[1]:
+                        date_day = printing_date_divided[1]
+                    if printing_date_divided[2]:
+                        date_month = printing_date_divided[2]
+                    if printing_date_divided[3]:
+                        date_year = printing_date_divided[3]
+                    if printing_date_divided[4]:
+                        date_year_to = printing_date_divided[4]
+                    if printing_date_divided[5]:
+                        date_between_indicator = printing_date_divided[5]
                     # I wonder if I even need it - probably not.
-                if printing_date_divided[6]:
-                    date_between_day = printing_date_divided[6]
-                if printing_date_divided[7]:
-                    date_between_month = printing_date_divided[7]
-                if printing_date_divided[8]:
-                    date_between_year = printing_date_divided[8]
+                    if printing_date_divided[6]:
+                        date_between_day = printing_date_divided[6]
+                    if printing_date_divided[7]:
+                        date_between_month = printing_date_divided[7]
+                    if printing_date_divided[8]:
+                        date_between_year = printing_date_divided[8]
 
                 print("Raw date: ")
                 print(printing_date_raw)

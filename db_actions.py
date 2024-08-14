@@ -31,7 +31,7 @@ async def initialise_beanie():
     await init_beanie(database=DATABASE, document_models=[classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb])
 
 
-async def get_database():
+def get_database():
     """
     Method to get the database connection
     """

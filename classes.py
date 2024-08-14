@@ -505,7 +505,7 @@ This class is for displaying (and perhaps later also for editing) book records f
     # This preview is to be shown in lists of titles
     # - I am not sure if it will be needed long-term
 
-class PagesDb(BaseModel):
+class PagesDb(Document):
     """
 This class is for entering a record that contains information that will be later 
 needed for the individual Artwork and Photograph records
