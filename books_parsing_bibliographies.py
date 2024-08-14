@@ -1,3 +1,4 @@
+#pylint: disable=C0302
 """
 This module contains a number of functions for extracting bibliographical information 
 from standard bibliographies such as the VD16. 
@@ -702,6 +703,7 @@ def istc_parsing(url_bibliography):
     print("URL for search in ISTC: " + url_bibliography)
     istc_record_raw = requests.get(url_bibliography, timeout = 10)
     istc_record_full = (istc_record_raw).json()
+    print(istc_record_full)
 
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")
@@ -755,7 +757,12 @@ def istc_parsing(url_bibliography):
                 if "[" in printing_date_raw or "]" in printing_date_raw:
                     printing_date_raw = printing_date_raw.replace("[", "")
                     printing_date_raw = printing_date_raw.replace("]", "")
-                printing_date_divided = re.match(date_pattern, printing_date_raw).groups()
+                print("printing_date_raw"+printing_date_raw)
+                print( re.match(date_pattern, printing_date_raw))
+                printing_date_divided = ""
+                if  re.match(date_pattern, printing_date_raw):
+                    printing_date_divided = re.match(date_pattern, printing_date_raw).groups()
+                date_prefix = ""
                 if printing_date_divided[0]:
                     date_prefix = printing_date_divided[0]
                 if printing_date_divided[1]:

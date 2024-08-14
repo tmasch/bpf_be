@@ -11,31 +11,45 @@ import os
 #from typing import List
 from nanoid import generate
 from pymongo import MongoClient
+from beanie import Document, Indexed, init_beanie
+import motor.motor_asyncio
 import classes
 
 
 
 
-client=None
+mongo_client=None
 
-def get_database():
+async def initialise_beanie():
+    MONGO_DB_DATABASE_NAME = "bpf"
+    mongo_host = os.getenv('MONGODB_HOST', '')
+    mongo_port = int(os.getenv('MONGODB_PORT', ''))
+    endpoint = 'mongodb://{0}'.format(mongo_host)
+    MOTOR_CLIENT = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
+    DATABASE = MOTOR_CLIENT[MONGO_DB_DATABASE_NAME]
+    document_models = [classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb]
+    await init_beanie(database=DATABASE, document_models=[classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb])
+
+
+async def get_database():
     """
     Method to get the database connection
     """
-    global client
-    if bool(client):
-        return client['bpf']
-    host = os.getenv('MONGODB_HOST', '')
-    print("host",host)
+    global mongo_client
+    if bool(mongo_client):
+        return mongo_client['bpf']
+    mongo_host = os.getenv('MONGODB_HOST', '')
+    print("host",mongo_host)
     print(os.getenv('MONGODB_PORT', ''))
-    port = int(os.getenv('MONGODB_PORT', ''))
-    print("port",port)
-    endpoint = 'mongodb://{0}'.format(host)
+    mongo_port = int(os.getenv('MONGODB_PORT', ''))
+    print("port",mongo_port)
+    endpoint = 'mongodb://{0}'.format(mongo_host)
     print("endpoint",endpoint)
-    client = MongoClient(host=endpoint,port=port,connectTimeoutMS=1000,timeoutMS=1200)
-    print(client)
-    print("databases",client.list_database_names())
-    return client['bpf']
+    mongo_client = MongoClient(host=endpoint,port=mongo_port,connectTimeoutMS=1000,timeoutMS=1200)
+    print(mongo_client)
+    print("databases",mongo_client.list_database_names())
+#    await init_beanie(database=mongo_client.bpf, document_models=[classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb])
+    return mongo_client['bpf']
     # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
     # client = MongoClient('localhost', 27017)
     # Create the database for our example (we will use the same database throughout the tutorial
@@ -62,8 +76,8 @@ def get_all_resources_from_db():
 #    print(".")
     collection = dbname['bpf']
 # the next line is not working for me :-(
-    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
-#    r=list(collection.find())
+#    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
+    r=list(collection.find())
     print(r)
     return r
 
@@ -76,7 +90,7 @@ def get_resource_from_db(identifier):
     collection = dbname['bpf']
     r=collection.find({"id" : identifier })
     print("search done")
-#    print(r[0])
+    print(r[0])
 #    for rr in r:
 #        print(rr)
     return r[0]

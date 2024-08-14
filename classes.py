@@ -4,8 +4,13 @@ This file contains class definitions
 import json
 from typing import Optional
 from pydantic import BaseModel
+#from pydantic.dataclasses import dataclass
+from beanie import Document, Indexed, init_beanie
+#from dataclasses import dataclass
 #import bson
+
 #from datetime import date
+
 
 
 class Frame(BaseModel):
@@ -80,6 +85,19 @@ class ConnectedEntity(BaseModel):
     connection_comment : Optional[str] = ""
     connection_time : Optional[str] = ""
 
+
+
+class ConnectedEntityDbDisplay(BaseModel):
+    """
+This class is for the links of persons, organisations and places to book records
+    """
+    id : Optional[str] = ""
+    role : Optional[str] = ""
+    preview : Optional[str] = ""
+
+
+
+
 class DateImport(BaseModel):
     """
 This class is used for the import of dates of life or activity of persons. 
@@ -127,7 +145,6 @@ class PersonImport(BaseModel):
     connected_locations : Optional[list[ConnectedEntity]] = []
     comments : Optional[str] = ""
     preview : Optional[str] = ""
-
 
 class Person(BaseModel):
     """
@@ -282,7 +299,7 @@ class MakingProcess(BaseModel):
     place : Optional[Place] = None
     date : Optional[DateImport] = None
 
-class Metadata(BaseModel):
+class Metadata(Document):
     """
     Metadata
     """
@@ -299,7 +316,9 @@ class Metadata(BaseModel):
     type : Optional[str] = "Manifest"
     id : Optional[str] = ""
     material : Optional[str] = ""
-    repository : Optional[list[Organisation]] = []
+#    repository : Optional(dataclass.field(default_factory=list))
+
+    repository: Optional[list[Organisation]] = []
     shelfmark : Optional[str] = ""
     license : Optional[str] = ""
     bibliographic_id : Optional[list[ExternalId]] = []
@@ -314,8 +333,8 @@ class Metadata(BaseModel):
     making_processes : Optional[list[MakingProcess]] = []
 
 
-
-class PersonDb(BaseModel):
+#@dataclass
+class PersonDb(Document):
     """
 This class is for entering Person authority records into the database. 
 It contains all needed fields (or better, will do so), so many will remain empty. 
@@ -348,7 +367,7 @@ If not, one should probably have different classes for different
 
 
 
-class OrganisationDb(BaseModel):
+class OrganisationDb(Document):
     """
 This class is for entering Organisation authority records into the database. 
     """
@@ -371,7 +390,7 @@ This class is for entering Organisation authority records into the database.
     comments : Optional[str] = ""
 
 
-class PlaceDb(BaseModel):
+class PlaceDb(Document):
     """
 This class is for entering Place authority records into the database
     """
@@ -395,7 +414,10 @@ This class is for entering Place authority records into the database
     comments : Optional[str] = ""
 
 
-class Making_process_db(BaseModel):
+class MakingProcessDb(BaseModel):
+    """
+    \todo
+    """
     process_number : Optional[int] = 0
     process_type : Optional[str] = ""
     process_qualifier : Optional[str] = ""
@@ -405,8 +427,10 @@ class Making_process_db(BaseModel):
 
 
 class LinkToRepository(BaseModel):
-    # This class is used for entering the link between manuscripts and repositories into the database. 
-    # It can probably be later also used for the link between artworks and repositories
+    """
+    This class is used for entering the link between manuscripts and repositories into the database. 
+It can probably be later also used for the link between artworks and repositories
+    """
     number : Optional[int] = 0 #This is only needed if several former locations are added later so that they can show in a sensible order (probably back in time)
     place_id : Optional[str] = ""
     current : Optional[bool] = True
@@ -439,7 +463,7 @@ This class is for the links of persons, organisations and places to book records
     name : Optional[str] = "" # This field is only a stopgap measure, if
 
 
-class BookDb(BaseModel):
+class BookDb(Document):
     """
 This class is for entering Book records into the database
     """
@@ -460,6 +484,26 @@ This class is for entering Book records into the database
     # This preview is to be shown in lists of titles
     # - I am not sure if it will be needed long-term
 
+class BookDbDisplay(BaseModel):
+    """
+This class is for displaying (and perhaps later also for editing) book records from the database
+    """
+    id : Optional[str] = ""
+    type : Optional[str] = "Book"
+    bibliographic_id : Optional[list[ExternalId]] = []
+    persons : Optional[list [ConnectedEntityDbDisplay]] = []
+    organisations : Optional[list [ConnectedEntityDbDisplay]] = []
+    places : Optional[list [ConnectedEntityDbDisplay]] = []
+    title: Optional[str] = ""
+    volume_number : Optional[str] = ""
+    part_title : Optional[str] = ""
+    printing_date : Optional[str] = "" # Has to be later replaced with a date object
+    date_string : Optional[str] = ""
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
+    preview : Optional[str] = ""
+    # This preview is to be shown in lists of titles
+    # - I am not sure if it will be needed long-term
 
 class PagesDb(BaseModel):
     """
@@ -488,36 +532,6 @@ be used to access all manuscripts and books still in the ingest process
     preview : Optional[str] = ""
 
 
-
-class ConnectedEntityDbDisplay(BaseModel):
-    """
-This class is for the links of persons, organisations and places to book records
-    """
-    id : Optional[str] = ""
-    role : Optional[str] = ""
-    preview : Optional[str] = ""
-
-
-class BookDbDisplay(BaseModel):
-    """
-This class is for displaying (and perhaps later also for editing) book records from the database
-    """
-    id : Optional[str] = ""
-    type : Optional[str] = "Book"
-    bibliographic_id : Optional[list[ExternalId]] = []
-    persons : Optional[list [ConnectedEntityDbDisplay]] = []
-    organisations : Optional[list [ConnectedEntityDbDisplay]] = []
-    places : Optional[list [ConnectedEntityDbDisplay]] = []
-    title: Optional[str] = ""
-    volume_number : Optional[str] = ""
-    part_title : Optional[str] = ""
-    printing_date : Optional[str] = "" # Has to be later replaced with a date object
-    date_string : Optional[str] = ""
-    date_start : Optional[tuple] = ()
-    date_end : Optional[tuple] = ()
-    preview : Optional[str] = ""
-    # This preview is to be shown in lists of titles
-    # - I am not sure if it will be needed long-term
 
 class LinkToRepositoryDisplay(BaseModel):
     """
@@ -622,32 +636,69 @@ from the database
     comments : Optional[str] = ""
 
 class InvalidDateException(Exception):
+    """
+    \todo
+    """
     pass
 
 class InvalidMonthException(Exception):
+    """
+    \todo
+    """
     pass
 
 class InvalidDayException(Exception):
+    """
+    \todo
+    """
     pass
 
 class InvalidDateStringException(Exception):
+    """
+    \todo
+    """
     pass
 
 class InvalidDateRangeException(Exception):
+    """
+    \todo
+    """
     pass
 
 class PersonAgainstDuplication(BaseModel):
+    """
+    \todo
+    """
 # I have these classes here and not in 'classes' because they are only needed in these functions.
     preview : Optional[str] = ""
     id : Optional[str] = ""
     person_type1 : Optional[list[str]]  = []
 
 class OrgAgainstDuplication(BaseModel):
+    """
+    \todo
+    """
     preview : Optional[str] = ""
     id : Optional[str] = ""
     org_type1 : Optional[list[str]]  = []
 
 class PlaceAgainstDuplication(BaseModel):
+    """
+    \todo
+    """
     preview : Optional[str] = ""
     id : Optional[str] = ""
     place_type1 : Optional[list[str]]  = []
+
+class Record(BaseModel):
+    """
+\todo
+    """
+    type : str = ""
+    identifier : str = ""
+    metadata : Optional[Metadata] = ""
+    book : Optional[BookDb] = ""
+    organisation : Optional[OrganisationDb] = ""
+    person : Optional[Person] = ""
+    pages : Optional[PagesDb] = ""
+    place : Optional[PlaceDb] = ""

@@ -1,3 +1,4 @@
+#pylint: disable=C0301,C0303
 """
 This module contains a number of simple functions that standardise information about relationships taken from authority records. 
 """

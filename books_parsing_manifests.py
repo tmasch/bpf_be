@@ -9,10 +9,11 @@ there has to be a separate function for each library.
 import urllib.request
 import json
 import re
+import xml.etree.ElementTree
 import requests
 from lxml import etree
 import classes
-import xml.etree.ElementTree
+import db_actions
 
 def Canvas_parsing(canvas_list):
     """
@@ -59,13 +60,17 @@ in case any other library uses a similar strange system
 
 def bsb_parsing(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
+    print("url"+uri_entered)
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
+    print("initialising beanie")
+#    c=db_actions.get_database()
     m = classes.Metadata()
     repository = classes.Organisation()
     m.manifest =  url.read()
+    print("url"+uri_entered)
     location = ""
     bibliographic_id = []
 #    bibliographic_id_url = ""

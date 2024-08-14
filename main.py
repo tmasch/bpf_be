@@ -23,6 +23,8 @@ import displayRecords
 
 load_dotenv()
 
+
+
 #class Settings(BaseSettings):
 #    class Config:
 #        env_file = '.env'
@@ -39,7 +41,6 @@ load_dotenv()
 #print(settings.dict())
 #print(settings.MONGODB_PORT)
 
-print(db_actions.get_database())
 #getAllRessourcesFromDb()
 
 app = FastAPI()
@@ -60,6 +61,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def start_beanie():
+    await db_actions.initialise_beanie()
 
 
 @app.get("/")
@@ -244,7 +248,7 @@ async def get_all_resources():
     print(r)
     return r
 
-@app.get("/resource", response_model=classes.Metadata)
+@app.get("/resource", response_model=classes.Record)
 async def get_resource(identifier: str):
     """
     Endpoint to get a specific ressource from the database
@@ -253,7 +257,29 @@ async def get_resource(identifier: str):
     print("Getting resource")
     print(identifier)
     r=db_actions.get_resource_from_db(identifier)
-    return r
+    del r["_id"]
+    print(type(r))
+    response=classes.Record()
+    if r["type"]=="Manifest":
+        response.type="Manifest"
+        response.metadata=r
+    if r["type"]=="Person":
+        response.type="Person"
+        response.person=r
+    if r["type"]=="Place":
+        response.type="Place"
+        response.place=r
+    if r["type"]=="Organisation":
+        response.type="Organisation"
+        response.organisation=r
+    if r["type"]=="Book":
+        response.type="Book"
+        response.book=r
+    print("what I got from the database")
+    print(r)
+    print("what I am sending")
+    print(response.model_dump())
+    return response
 
 @app.get("/findImages")
 async def find_all_images(identifier: str):

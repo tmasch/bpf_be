@@ -1,4 +1,4 @@
-#pylint: disable=C0301,E1101,C0116,C0103,C0303
+#pylint: disable=C0301,E1101,C0116,C0103,C0303,C0302
 """
 This module contains functions that transform the information taken from several bibliographic resources (in books_parsing manifest, books_parsing_bibliographies and gndparse), 
 according to the selections made by the user in NewRessource.vue, into a format ready for importing it into Iconobase. 
@@ -281,17 +281,26 @@ def relationship_parse(main_entity_type, connected_entity_type, connection_comme
 
 
 
-class Person_against_duplication(BaseModel): # I have these classes here and not in 'classes' because they are only needed in these functions.
+class Person_against_duplication(BaseModel): 
+    """
+    I have these classes here and not in 'classes' because they are only needed in these functions.
+    """
     preview : Optional[str] = ""
     id : Optional[str] = ""
     person_type1 : Optional[list[str]]  = []
 
 class Org_against_duplication(BaseModel):
+    """
+\todo
+    """
     preview : Optional[str] = ""
     id : Optional[str] = ""
     org_type1 : Optional[list[str]]  = []
 
 class Place_against_duplication(BaseModel):
+    """
+\todo
+    """
     preview : Optional[str] = ""
     id : Optional[str] = ""
     place_type1 : Optional[list[str]]  = []

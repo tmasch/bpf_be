@@ -1,3 +1,6 @@
+"""
+\todo
+"""
 import re
 import urllib.request
 import xml.etree.ElementTree
@@ -23,16 +26,16 @@ while start_number < 310000:
         record_proper = record[2][0]
         for step1 in record_proper:
             match step1.get('tag'):
-                    case "011@":
-                        print("Date found")
-                        for step2 in step1:
-                            match step2.get('code'):
-                                    case "n":
-                                        year = step2.text
-                                        print(year)
-                                        year_checked = re.match(year_pattern, year)
-                                        if not year_checked:
-                                            year_list.append(year)
+                case "011@":
+                    print("Date found")
+                    for step2 in step1:
+                        match step2.get('code'):
+                            case "n":
+                                year = step2.text
+                                print(year)
+                                year_checked = re.match(year_pattern, year)
+                                if not year_checked:
+                                    year_list.append(year)
     print(year_list)
     print(start_number)
     print(len(year_list))
