@@ -44,14 +44,14 @@ def getManuscriptRecord(id):
     return result
 
 
-#def getRecord(id):
+def getRecord(id):
     # this function downloads a record with a given ID from the database
-#    dbname = db_actions.get_database()
-#    collection=dbname['bpf']
-#    result = collection.find_one({"id": id})
+    dbname = db_actions.get_database()
+    collection=dbname['bpf']
+    result = collection.find_one({"id": id})
     #pipeline = [{"$match" :{"id" : id}}]  #, {"$lookup" :{"from": collection, "local_field": "connected_persons.id", "foreign_field": "id", "as":"connected_persons_details"}}]
     #results = collection.aggregate(pipeline)
 #    for record in results: 
 #        print("Here is record from PyMongo: ")
 #        print(record)
-#    return(result)
+    return(result)

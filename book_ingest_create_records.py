@@ -330,7 +330,7 @@ async def metadata_dissection(metadata):
 @classes.func_logger
 async def metadata_persons(metadata):
 
-    if metadata.bibliographic_information:
+    if metadata.bibliographic_information or metadata.making_processes:
         # Section on Person
         # There are three constellations
         # (a): A person that is already in Iconobase was identified via an ID. In this case, there is no list of potential candidates. 
@@ -355,12 +355,13 @@ async def metadata_persons(metadata):
             print("--------------------------------------")
             print("Making_processes in metadata: ")
             print(metadata.making_processes)
-        for making_process in metadata.making_processes:
-            if making_process.person.name:
-                persons_entered_list.append(making_process.person)
-#                print("--------------------------------------")
-#                print("Persons in metadata.bibliographic_information[0] after adding making_process to persons_list: ")
-#                print(metadata.bibliographic_information[0].persons)
+        if metadata.making_processes:
+            for making_process in metadata.making_processes:
+                if making_process.person.name:
+                    persons_entered_list.append(making_process.person)
+    #                print("--------------------------------------")
+    #                print("Persons in metadata.bibliographic_information[0] after adding making_process to persons_list: ")
+    #                print(metadata.bibliographic_information[0].persons)
         
         if len(persons_entered_list) > 0:
             for person in persons_entered_list:
@@ -477,7 +478,7 @@ async def metadata_organisations(metadata):
 
 @classes.func_logger
 async def metadata_place(metadata):
-    if metadata.bibliographic_information:
+    if metadata.bibliographic_information or metadata.making_processes:
     # Section on Places
         # There are three constellations
         # (a): A place that is already in Iconobase was identified via an ID. In this case, there is no list of potential candidates. 
@@ -490,11 +491,19 @@ async def metadata_place(metadata):
         # records (NB: 'Region - historical' would appear extremely rarely, only with a handful of incunables, so I leave it out here)
         
         
+        places_entered_list = [] # This list contains both places from the bibliographical record and places of making
         places_list = [] # This list exists to make sure that if the same organisation is mentioned twice in different functions, e.g. as author and publisher, there is only one record created 
         place_against_duplication = classes.PlaceAgainstDuplication()
         
         if metadata.bibliographic_information[0].places:
             for place in metadata.bibliographic_information[0].places:
+                places_entered_list.append(place)
+        if metadata.making_processes:
+            for making_process in metadata.making_processes:
+                if making_process.place.name:
+                    places_entered_list.append(making_process.place)
+        if len(places_entered_list) > 0:
+            for place in places_entered_list:
                 print("Number of candidates for this place: ")
                 print(len(place.potential_candidates))
                 print("Number of chosen candidate: ")
@@ -716,8 +725,16 @@ async def metadata_pages(metadata,book_record_id,org):
 #                    print(person.connection_type)
                     place.name = making_process.place.potential_candidates[making_process.place.chosen_candidate].name_preferred # later to be replaced wth preview                 
                     making_process_db.place = place
-#                    print("complete making process")
-#                    print(making_process_db)
+                    print("complete making process")
+                    print(making_process_db)
+                if making_process.date.datestring:
+                    date = classes.Date()
+                    date.date_string = making_process.date.datestring
+                    print(making_process.date.datestring)
+                    print(date.date_string)
+                    date.date_start = making_process.date.date_start
+                    date.date_end = making_process.date.date_end
+                    making_process_db.date = date
                 new_pages.making_processes.append(making_process_db)
 
     db_actions.insert_record_pages(new_pages)
@@ -1622,7 +1639,7 @@ async def place_ingest(place):
         if connected_location.external_id:
             if connected_location.external_id[0].uri in list_of_viaf_ids:
                 location_viaf_url = list_of_viaf_ids[connected_location.external_id[0].uri]
-                place_id = classes.External_id
+                place_id = classes.ExternalId
                 place_id.name = "viaf"
                 place_id.uri = location_viaf_url
                 place_id.id = location_viaf_url[21:]

@@ -85,7 +85,7 @@ def get_all_resources_from_db():
 # the next line is not working for me :-(
 #    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
     r=list(collection.find())
-    print(r)
+#    print(r)
     return r
 
 @classes.func_logger

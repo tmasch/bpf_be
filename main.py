@@ -262,7 +262,7 @@ async def get_all_resources():
     """
     logger.info("INFO allResources get_all_resources")
     r=db_actions.get_all_resources_from_db()
-    print(r)
+#    print(r)
     return r
 
 @app.get("/resource", response_model=classes.Record)

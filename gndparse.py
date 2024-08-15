@@ -399,6 +399,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
         for candidate_result in candidates_result:           
             candidate = classes.PlaceImport()   
             candidate.internal_id = candidate_result["id"]
+            candidate.name_preferred = candidate_result["name_preferred"] # I need this to create previews for places of making
             print("candidate found through name search in database (preferred name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
             candidate.internal_id_place_type1 = candidate_result["place_type1"]

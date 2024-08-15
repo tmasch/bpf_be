@@ -530,7 +530,7 @@ needed for the individual Artwork and Photograph records
     numberOfImages : Optional[int] = 0
     images : Optional[list[Image]] = []
     preview : Optional[str] = ""
-    making_processes : Optional[list[MakingProcess]] = []
+    making_processes : Optional[list[MakingProcessDb]] = []
 
 class PreviewListDb(BaseModel):
     """
