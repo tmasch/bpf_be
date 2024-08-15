@@ -20,6 +20,7 @@ import classes
 
 mongo_client=None
 
+@classes.func_logger
 async def initialise_beanie():
     MONGO_DB_DATABASE_NAME = "bpf"
     mongo_host = os.getenv('MONGODB_HOST', '')
@@ -35,7 +36,7 @@ async def initialise_beanie():
                                                         classes.PlaceDb,\
                                                         classes.PagesDb])
 
-
+@classes.func_logger
 def get_database():
     """
     Method to get the database connection
@@ -60,7 +61,7 @@ def get_database():
     # Create the database for our example (we will use the same database throughout the tutorial
 #   return client['bpf']
 
-
+@classes.func_logger
 def insert_metadata(metadata: classes.Metadata):
     """
     Method to create a metadata record
@@ -71,6 +72,7 @@ def insert_metadata(metadata: classes.Metadata):
     collection.insert_one(metadata.dict())
     return "Hello World"
 
+@classes.func_logger
 def get_all_resources_from_db():
     """
     Method to get all ressources from the database
@@ -86,6 +88,7 @@ def get_all_resources_from_db():
     print(r)
     return r
 
+@classes.func_logger
 def get_resource_from_db(identifier):
     """
     Method to get a single record from the database given its id
@@ -100,6 +103,7 @@ def get_resource_from_db(identifier):
 #        print(rr)
     return r[0]
 
+@classes.func_logger
 def update_image_with_frames(identifier,i,frames):
     """
     does something
@@ -111,6 +115,7 @@ def update_image_with_frames(identifier,i,frames):
 #json.dumps([ob.__dict__ for ob in frames])
     return result
 
+@classes.func_logger
 def insert_record_person(person: classes.PersonDb):
     """
 This function inserts a newly created record for a person into the database
@@ -146,6 +151,7 @@ It was made for persons connected to books but probably can be used for any pers
 #    result = collection.update_one({"id" : record_id, mongo_term1 : name},
 # {'$set' : {mongo_term2 : new_internal_id}})
 
+@classes.func_logger
 def add_connection_id_and_name(record_id, connected_entity_type, far_connection_type, name, name_replacement, new_internal_id, connection_type, connection_time, connection_comments):
     """
 This function is used to go to a specific record, find there a connected_person with a specific name, and add an internal ID to this connection and replaces the name with the name connected to the internal ID
@@ -218,6 +224,7 @@ Later, the name connected to the internal ID should be a preview with dates
     print(changed_record)
     return
 
+@classes.func_logger
 def add_connection(record_id, connected_entity_type, new_connection):
     """
 This function is used to go to a specific record that has not yet a reciprocal connection, and inserts it
@@ -233,6 +240,7 @@ This function is used to go to a specific record that has not yet a reciprocal c
     print(record)
     return
 
+@classes.func_logger
 def add_person_type(person_id, person_type1):
     """
 This function is used to add another person type (e.g., Author, Artist etc.) to a person record
@@ -241,6 +249,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
 
+@classes.func_logger
 def insert_record_organisation(organisation: classes.OrganisationDb):
     """
 This function inserts a newly created record for an organisation into the database
@@ -252,6 +261,7 @@ It was made for organisations connected to books but probably can be used for an
     collection.insert_one(organisation.dict())
     return "Hello World"
 
+@classes.func_logger
 def add_organisation_type(organisation_id, organisation_type1):
     """
 This function is used to add another person type (e.g., Author, Artist etc.) to a person record
@@ -260,6 +270,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : organisation_id}, {'$addToSet' : {"org_type1" : organisation_type1}})
 
+@classes.func_logger
 def insert_record_place(place: classes.PlaceDb):
     """
 This function inserts a newly created record for a place into the database
@@ -271,6 +282,7 @@ It was made for places connected to books but probably can be used for any place
     collection.insert_one(place.dict())
     return "Hello World"
 
+@classes.func_logger
 def copy_place_record(place_id, place_type):
     """
 Different from person and organisation records, places only have one 'type', e.g. a person can be "author" and "depicted person"
@@ -291,7 +303,7 @@ once I have an 'edit' view for authority records.
     collection.insert_one(place)
     return place_id
 
-
+@classes.func_logger
 def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     """
     \todo
@@ -302,6 +314,7 @@ def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     collection.insert_one(manuscript.dict())
     return "Hello World"
 
+@classes.func_logger
 def insert_record_book(book : classes.BookDb):
     """
     \todo
@@ -312,6 +325,7 @@ def insert_record_book(book : classes.BookDb):
     collection.insert_one(book.dict())
     return "Hello World"
 
+@classes.func_logger
 def insert_record_pages(pages : classes.PagesDb):
     """
     \todo
@@ -322,6 +336,7 @@ def insert_record_pages(pages : classes.PagesDb):
     collection.insert_one(pages.dict())
     return "Hello World"
 
+@classes.func_logger
 def create_image_record():
     """
     \todo
@@ -330,7 +345,7 @@ def create_image_record():
     dbname = get_database()
     collection=dbname['bpf']
 
-
+@classes.func_logger
 def find_person(person: classes.Person, parameter: str):
     """
 \todo
@@ -356,7 +371,7 @@ def find_person(person: classes.Person, parameter: str):
 
     return person_found
 
-
+@classes.func_logger
 def find_organisation(organisation: classes.Organisation, parameter: str):
     """
 \todo
@@ -381,7 +396,7 @@ def find_organisation(organisation: classes.Organisation, parameter: str):
 
     return organisation_found
 
-
+@classes.func_logger
 def find_place(place: classes.Place, parameter: str):
     """
 \todo
@@ -407,6 +422,7 @@ def find_place(place: classes.Place, parameter: str):
     return place_found
 
 
+@classes.func_logger
 def find_organisation_viaf(new_record_viaf_id,new_record_gnd_id):
     """
 \todo
@@ -421,6 +437,7 @@ def find_organisation_viaf(new_record_viaf_id,new_record_gnd_id):
         {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_organisations" : 1}))
     return list_found
 
+@classes.func_logger
 def find_person_viaf(new_record_viaf_id,new_record_gnd_id):
     """
 \todo
@@ -435,7 +452,7 @@ def find_person_viaf(new_record_viaf_id,new_record_gnd_id):
         {"id": 1, "type" : 1, "name_preferred" : 1, "sex": 1, "connected_persons" : 1}))
     return list_found
 
-
+@classes.func_logger
 def find_place_viaf(new_record_viaf_id,new_record_gnd_id):
     """
 \todo

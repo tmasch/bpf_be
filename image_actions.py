@@ -10,7 +10,7 @@ import classes
 import db_actions
 
 
-
+@classes.func_logger
 def find_images(identifier):
     """
     This routine runs the image finding process
@@ -26,6 +26,7 @@ def find_images(identifier):
     r={"val" : "finding images done"}
     return r
 
+@classes.func_logger
 def fetch_image_from_web(image):
     """
     This function fetches images from the web and returns an decoded image
@@ -43,6 +44,7 @@ def fetch_image_from_web(image):
     print("writing")
     return image
 
+@classes.func_logger
 def process_image(image):
     """
     \todo doc
@@ -54,7 +56,7 @@ def process_image(image):
 #    print(response.content)
     return frames
 
-
+@classes.func_logger
 def strategy1(image):
     """
     \todo doc
@@ -155,7 +157,7 @@ def strategy1(image):
     return frames
 
 
-
+@classes.func_logger
 def save_image_file(coords):
     """
 This function extracts a single image from a page in a book, given the coordinates, 

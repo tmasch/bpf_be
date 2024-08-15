@@ -43,6 +43,7 @@ connection_comment_pattern = r'([^,\(]*)([,\()])(.*)'
 vague_connection = ["professional relation to", "related to", "other relationship to", "affiliated to"] # this are very general terms of connections that are to be replaced by more precise ones, if possible
 
 
+@classes.func_logger
 async def get(session, url): 
     # This is a short programme I received from Gregor Dick. Together with a gather funciton i
 #    async with session.head(url, allow_redirects=False) as response:
@@ -57,6 +58,7 @@ async def get(session, url):
             return ""
 
 
+@classes.func_logger
 async def get_viaf_from_authority(url_list):
     # This function the URL of an authority file (currently GND and ULAN) and returns an External_id object
     # It will be used numerous times for 'stitching' records together
@@ -116,7 +118,7 @@ def transform_gnd_id_with_hyphen(id_with_hyphen):
                     
 
 
-
+@classes.func_logger
 def add_relationship_in_far_record(record_found, record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
     """
 This module is used for the 'stitching' together of records; it checks, if an already extant record ('far record') already has a connection with the new record.
@@ -242,7 +244,8 @@ If the 'far record' has better information on the type of connection, its time, 
         print(comment_correction)
         print(type(comment_correction))
     return connection_correction, time_correction, comment_correction
-                    
+
+@classes.func_logger
 def relationship_parse(main_entity_type, connected_entity_type, connection_comment, connection_type, person_new_sex):
 # This module is a transmission for the terms that describe a relationship - it does some preliminary parsing and then calls a function in person_relations, that contains lists of the relevant translations
     connection_type_raw = ""
@@ -305,7 +308,7 @@ class Place_against_duplication(BaseModel):
     id : Optional[str] = ""
     place_type1 : Optional[list[str]]  = []
 
-
+@classes.func_logger
 async def metadata_dissection(metadata):
     print("creating metadata records")
     persons_list = await metadata_persons(metadata)
@@ -324,6 +327,7 @@ async def metadata_dissection(metadata):
 
     return 1
 
+@classes.func_logger
 async def metadata_persons(metadata):
 
     if metadata.bibliographic_information:
@@ -406,6 +410,7 @@ async def metadata_persons(metadata):
     #                       print(person_against_duplication)
     return persons_list
 
+@classes.func_logger
 async def metadata_organisations(metadata):
     print("Organisation")
     if metadata.bibliographic_information:
@@ -470,6 +475,7 @@ async def metadata_organisations(metadata):
                         print(org_against_duplication)
     return orgs_list
 
+@classes.func_logger
 async def metadata_place(metadata):
     if metadata.bibliographic_information:
     # Section on Places
@@ -539,6 +545,7 @@ async def metadata_place(metadata):
                         print(place_against_duplication)
     return places_list
 
+@classes.func_logger
 async def metadata_repositories(metadata):
     # Section on Repositories
         # Repositories are also organisations, however, there is only one repository per book. Furthermore, it is not part of the bibliographical
@@ -571,7 +578,7 @@ async def metadata_repositories(metadata):
             org.potential_candidates[org.chosen_candidate].internal_id = await org_ingest(org)
     return org
 
-
+@classes.func_logger
 async def metadata_manuscripts(metadata):
 # Section on Manuscripts
     print("checking manuscript")
@@ -591,6 +598,7 @@ async def metadata_manuscripts(metadata):
     print(book_record_id)
     return book_record_id
 
+@classes.func_logger
 async def metadata_books(metadata):
 # Section on printed books
     book_record_id=""
@@ -651,7 +659,7 @@ async def metadata_books(metadata):
     print(book_record_id)
     return book_record_id
 
-
+@classes.func_logger
 async def metadata_pages(metadata,book_record_id,org):
 # Section on individual pages. 
 # This class contains the list of individual pages from the IIIF manifest as well as information on repository and shelf marks. 
@@ -718,7 +726,7 @@ async def metadata_pages(metadata,book_record_id,org):
     return 1
 
 
-
+@classes.func_logger
 async def person_ingest(person):
     # This function is about translating the imported information of a person into the information record used for the database. 
     # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
@@ -1088,7 +1096,7 @@ async def person_ingest(person):
 
 
 
-
+@classes.func_logger
 async def org_ingest(org):
     # This function is about translating the imported information of a organisation into the information record used for the database. 
     # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
@@ -1426,7 +1434,7 @@ async def org_ingest(org):
 
 
 
-
+@classes.func_logger
 async def place_ingest(place):
     list_of_ids_to_check = []
     new_record_viaf_id = ""

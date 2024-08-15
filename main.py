@@ -24,6 +24,7 @@ import displayRecords
 load_dotenv()
 
 # for testing
+# https://www.digitale-sammlungen.de/en/view/bsb00027407?page=,1
 # manifest https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest
 # image baseurl https://api.digitale-sammlungen.de/iiif/image/v2/bsb00027407_00013
 

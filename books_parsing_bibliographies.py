@@ -11,9 +11,11 @@ import xml.etree.ElementTree
 import re
 from lxml import etree
 import requests
-from classes import BibliographicInformation, BibliographicId, Person, Organisation, Place
+import classes
+#from classes import BibliographicInformation, BibliographicId, Person, Organisation, Place, func_logger
 #from  datetime import datetime
 
+@classes.func_logger
 def roman_numerals(roman_number):
     """This function translates a Roman numeral written according to rules 
      (permitting two "I", "X" or "C" left of a higher value) into Arabic numbers"""
@@ -89,12 +91,12 @@ def roman_numerals(roman_number):
 
 
 
-
+@classes.func_logger
 def vd17_parsing(url_bibliography):
     """This function can be used for parsing both the VD17 and the VD18"""
     print(url_bibliography)
     printing_information_pattern = r'(.*)(: )(.*)'
-    bi = BibliographicInformation()
+    bi = classes.BibliographicInformation()
     #url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0\
     # &operation=searchRetrieve&query=pica.vds=" + \
     # bibliographic_id_number + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
@@ -114,7 +116,7 @@ def vd17_parsing(url_bibliography):
             field = step1
             match field.get('tag'):
                 case "024": #for the VD17 number
-                    bid = BibliographicId()
+                    bid = classes.BibliographicId()
                     for step2 in field:
                         match(step2.get("code")):
                             case "a":
@@ -143,7 +145,7 @@ def vd17_parsing(url_bibliography):
                     print(bid)
 
                 case "100": #for the author
-                    pe = Person()
+                    pe = classes.Person()
                     for step2 in field:
                         match(step2.get("code")):
                             case "a":
@@ -180,7 +182,7 @@ def vd17_parsing(url_bibliography):
                                 re.match(printing_information_pattern, step2.text)
                             bi.printing_information = printing_information_divided[3]
                 case "700": #for printers and publishers
-                    pe = Person()
+                    pe = classes.Person()
                     for step2 in field:
                         match(step2.get("code")):
                             case "a":
@@ -204,7 +206,7 @@ def vd17_parsing(url_bibliography):
 #                        single_person = (person_name, person_id, person_role)
                         bi.persons.append(pe)
                 case "710":
-                    org = Organisation()
+                    org = classes.Organisation()
                     for step2 in field:
                         match(step2.get("code")):
                             case "a":
@@ -228,7 +230,7 @@ def vd17_parsing(url_bibliography):
                 case "751": #for the places of printing and publishing
 #                        place_id = ""
 #                        place_role = ""
-                    pl = Place()
+                    pl = classes.Place()
                     for step2 in field:
                         match(step2.get("code")):
                             case "a":
@@ -369,7 +371,8 @@ def vd17_parsing(url_bibliography):
         print("bibliographic information from VD17:")
         print(bi)
         return bi
-
+    
+@classes.func_logger
 def vd16_parsing(url_bibliography):
     """This version parses the VD16, the catalogue of German 16th-century printed books
     # NB: currently, this data is only available as HTML.
@@ -385,7 +388,7 @@ def vd16_parsing(url_bibliography):
     printing_date_long = ""
     printing_date_divided = []
 
-    bi = BibliographicInformation()
+    bi = classes.BibliographicInformation()
     try:
         record_text = etree.tostring(tree,encoding=str)
     except TypeError:
@@ -410,7 +413,7 @@ def vd16_parsing(url_bibliography):
     #parsing the individual values
     bibliographic_id = record_structured["Normnummer"]
     bibliographic_id_pattern = r'(....)(\s)([A-Z]{1,2}\s[0-9]{1,5})(.*)'
-    bid = BibliographicId()
+    bid = classes.BibliographicId()
     bid.name = re.match(bibliographic_id_pattern, bibliographic_id)[1]
     bid.id = re.match(bibliographic_id_pattern, bibliographic_id)[3]
 #    bibliographic_id_single = (bibliographic_id_name, bibliographic_id_number)
@@ -425,7 +428,7 @@ def vd16_parsing(url_bibliography):
     ###currently, the system only reads the last author or contributor,
     # and it does not read his bibliographic ID number.
     if "Verfasser" in record_structured:
-        pe = Person()
+        pe = classes.Person()
         author = record_structured["Verfasser"]
         print("Author found")
         print(author)
@@ -440,7 +443,7 @@ def vd16_parsing(url_bibliography):
         weitere_pers_list = record_structured["Weitere Pers."]
         weitere_pers_list_divided = re.findall(person_list_pattern, weitere_pers_list)
         for step4 in weitere_pers_list_divided:
-            pe = Person()
+            pe = classes.Person()
             weitere_pers_single_divided = re.match(person_single_pattern, step4)
             pe.name = weitere_pers_single_divided[2]
             pe.id = weitere_pers_single_divided[4]
@@ -454,12 +457,12 @@ def vd16_parsing(url_bibliography):
         impressum = record_structured["Impressum"]
         impressum_pattern = r'([^:]*)(: )?([^;]*)?(; )?([^:]*)?(: )?(.*)?(, )([^,]*)'
         impressum_divided = re.match(impressum_pattern, impressum)
-        pl = Place()
+        pl = classes.Place()
         pl.name = impressum_divided[1]
         pl.role = "mfp"
         bi.places.append(pl)
         if impressum_divided[5]:
-            pl = Place()
+            pl = classes.Place()
             pl.name = impressum_divided[5]
             pl.role = "pup"
             bi.places.append(pl)
@@ -469,7 +472,7 @@ def vd16_parsing(url_bibliography):
             #is only given in section 1 and not repeated in section 5.
             # However, it needs to entered twice into the database,
             # as place of publishing and as place of printing.
-            pl = Place()
+            pl = classes.Place()
             pl.name = impressum_divided[1]
             pl.role = "pup"
             bi.places.append(pl)
@@ -479,14 +482,14 @@ def vd16_parsing(url_bibliography):
             #they are separated by "und" (at least, if there are two,
             # I don't know what happens with three, and this is extremely rare)
             for step2 in impressum_single_person1:
-                pe = Person()
+                pe = classes.Person()
                 pe.name = step2
                 pe.role = "prt"
                 bi.persons.append(pe)
         if impressum_divided[7]:
             impressum_single_person2 = re.split(" und ", impressum_divided[7])
             for step3 in impressum_single_person2:
-                pe = Person()
+                pe = classes.Person()
                 pe.name = step3
                 pe.role = "pbl"
                 bi.persons.append(pe)
@@ -549,7 +552,7 @@ def istc_parsing_alt(url_bibliography):
     # two different "imprints" (because there is some uncertainty).
     # Oddly, the API only downloads the first of them and ignores all the others.
     # If several can be downloaded, one needs a loop to parse all of them one by one.
-    bi = BibliographicInformation()
+    bi = classes.BibliographicInformation()
     istc_record_raw = requests.get(url_bibliography, timeout = 10)
     istc_record_full = (istc_record_raw).json()
 
@@ -558,7 +561,7 @@ def istc_parsing_alt(url_bibliography):
         return
 
     istc_record_short = (istc_record_full["rows"])[0]
-    bid = BibliographicId()
+    bid = classes.BibliographicId()
     bid.id = istc_record_short["id"]
     bid.name = "ISTC"
     bid.uri = r"https://data.cerl.org/istc/"+bid.id
@@ -567,7 +570,7 @@ def istc_parsing_alt(url_bibliography):
     #bibliographic_id_list.append(bibliographic_id_single_1)
     for step1 in istc_record_short['references']:
         if step1[0:3] == "GW ":
-            bid = BibliographicId()
+            bid = classes.BibliographicId()
             bid.id = step1[3:]
             bid.name = "GW"
 #            bid.uri = This will need more work!
@@ -577,7 +580,7 @@ def istc_parsing_alt(url_bibliography):
 
 
     if "author" in istc_record_short:
-        pe = Person()
+        pe = classes.Person()
         pe.name = istc_record_short["author"]
         pe.role = "aut"
         #author_single = (author, "", "aut")
@@ -591,7 +594,7 @@ def istc_parsing_alt(url_bibliography):
         printing_information = printing_information.replace(r"]", "")
         printing_information_pattern =  r"([^:]*)(: .*)?(, [^,]*)$"
         printing_information_divided = re.match(printing_information_pattern, printing_information)
-        pl = Place()
+        pl = classes.Place()
         pl.name = (printing_information_divided[1]).strip()
         pl.role = "mfp"
         bi.places.append(pl)
@@ -604,7 +607,7 @@ def istc_parsing_alt(url_bibliography):
             printer_divided = re.split(", for ", printer_raw)
             printer_only = printer_divided[0]
             publisher_only = printer_divided[1]
-            pl = Place()
+            pl = classes.Place()
             pl.name = (printing_information_divided[1]).strip()
             pl.role = "pup"
             bi.places.append(pl)
@@ -612,18 +615,18 @@ def istc_parsing_alt(url_bibliography):
             #place_list.append(place_single)
             if " and " in publisher_only:
                 publisher_divided = re.split(" and ", publisher_only)
-                pe = Person()
+                pe = classes.Person()
                 pe.name = publisher_divided[0]
                 pe.role = "pbl"
                 bi.persons.append(pe)
                 #person_list.append(person_single)
-                pe = Person()
+                pe = classes.Person()
                 pe.name = publisher_divided[1]
                 pe.role = "pbl"
                 bi.persons.append(pe)
                 #person_list.append(person_single)
             else:
-                pe = Person()
+                pe = classes.Person()
                 pe.name = publisher_only
                 pe.role = "pbl"
                 bi.persons.append(pe)
@@ -634,17 +637,17 @@ def istc_parsing_alt(url_bibliography):
             # the entry reads "John and Paul Smith", leading to the two printers
             # "JOhn" ad "Paul Smith". This happens very rarely and should be corrected manually.
             printer_divided = re.split(" and ", printer_only)
-            pe = Person()
+            pe = classes.Person()
             pe.name = printer_divided[0]
             pe.role = "prt"
             bi.persons.append(pe)
             #person_list.append(person_single)
-            pe = Person()
+            pe = classes.Person()
             pe.name = printer_divided[1]
             pe.role = "prt"
             bi.persons.append(pe)
         else:
-            pe = Person()
+            pe = classes.Person()
             pe.name = printer_only
             pe.role = "prt"
             bi.persons.append(pe)
@@ -657,7 +660,7 @@ def istc_parsing_alt(url_bibliography):
     # title, "", "", printing_date, printing_information)
 
 
-
+@classes.func_logger
 def istc_parsing(url_bibliography):
     """This parses the istc records that can be downloaded in JSON. 
     Since the Imprint is normally one line only, some string processing is necessary"""
@@ -699,7 +702,7 @@ def istc_parsing(url_bibliography):
     end_year = 0
 
 
-    bi = BibliographicInformation()
+    bi = classes.BibliographicInformation()
     print("URL for search in ISTC: " + url_bibliography)
     istc_record_raw = requests.get(url_bibliography, timeout = 10)
     istc_record_full = (istc_record_raw).json()
@@ -710,7 +713,7 @@ def istc_parsing(url_bibliography):
         return
 
     istc_record_short = istc_record_full["rows"][0]
-    bid = BibliographicId()
+    bid = classes.BibliographicId()
     bid.id = istc_record_short["id"]
     bid.name = "ISTC"
     bid.uri = r"https://data.cerl.org/istc/"+bid.id
@@ -718,7 +721,7 @@ def istc_parsing(url_bibliography):
     for step1 in istc_record_short['references']:
         #print("step1: " + step1)
         if step1["reference_name"] == "GW":
-            bid = BibliographicId()
+            bid = classes.BibliographicId()
             if isinstance(step1["reference_location_in_source"], int):
                 # Sometimes, this is a mere number - a problem not occurring with ISTC,
                 # VD16 and VD17, but perhaps with VD18
@@ -731,7 +734,7 @@ def istc_parsing(url_bibliography):
 
 
     if "author" in istc_record_short:
-        pe = Person()
+        pe = classes.Person()
         pe.name = istc_record_short["author"]
         pe.role = "aut"
         bi.persons.append(pe)
@@ -746,7 +749,7 @@ def istc_parsing(url_bibliography):
             if "imprint_name" in step1:
                 imprint_name_long = step1["imprint_name"].strip("[]")
             if "imprint_place" in step1:
-                pl = Place()
+                pl = classes.Place()
                 pl.name = step1["imprint_place"].strip("[]")
                 pl.role = "mfp"
                 bi.places.append(pl)
@@ -1004,7 +1007,7 @@ def istc_parsing(url_bibliography):
                     printer_name_long = imprint_name_long_divided[0]
                     publisher_name_long = imprint_name_long_divided[1]
                     printer_name_long = printer_name_long.strip(",")
-                    pl_duplicate = Place()
+                    pl_duplicate = classes.Place()
                     pl_duplicate.name = bi.places[0].name
                     pl_duplicate.role = "pup"
                     bi.places.append(pl_duplicate)
@@ -1024,7 +1027,7 @@ def istc_parsing(url_bibliography):
                         printer_name_long_divided = printer_name_long.split(" and ")
                         printer_counter = 0
                         while printer_counter < len(printer_name_long_divided):
-                            pe = Person()
+                            pe = classes.Person()
                             printer_name = printer_name_long_divided[printer_counter]
                             printer_name = printer_name.strip(" [],")
                             if " " in printer_name:
@@ -1049,7 +1052,7 @@ def istc_parsing(url_bibliography):
                             bi.persons.append(pe)
                             printer_counter = printer_counter + 1
                     else: #If there is only one printer
-                        pe = Person()
+                        pe = classes.Person()
                         pe.name = printer_name_long
                         pe.role = "prt"
                         bi.persons.append(pe)
@@ -1061,7 +1064,7 @@ def istc_parsing(url_bibliography):
                         print("Two publishers")
                         publisher_counter = 0
                         while publisher_counter < len(publisher_name_long_divided):
-                            pe = Person()
+                            pe = classes.Person()
                             publisher_name = publisher_name_long_divided[publisher_counter]
                             publisher_name = publisher_name.strip(" []")
                             if " " in publisher_name:
@@ -1090,7 +1093,7 @@ def istc_parsing(url_bibliography):
                             bi.persons.append(pe)
                             publisher_counter = publisher_counter + 1
                     else: #If there is only one publisher
-                        pe = Person()
+                        pe = classes.Person()
                         pe.name = publisher_name_long
                         pe.role = "pbl"
                         bi.persons.append(pe)

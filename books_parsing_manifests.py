@@ -60,7 +60,7 @@ in case any other library uses a similar strange system
 
 def bsb_parsing(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    print("url"+uri_entered)
+    print("url "+uri_entered)
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest

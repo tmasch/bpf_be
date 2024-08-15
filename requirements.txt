@@ -4,7 +4,7 @@ fastapi==0.112.0
 lxml==4.9.3
 motor==3.5.1
 nanoid==2.0.0
-numpy==2.0.1
+numpy==1.26.4
 opencv_python==4.9.0.80
 pydantic==2.8.2
 pymongo==4.5.0
@@ -12,3 +12,4 @@ pytest==8.3.2
 python-dotenv==1.0.1
 Requests==2.32.3
 responses==0.25.3
+uvicorn==0.30.6

@@ -9,6 +9,7 @@ import books_parsing_manifests
 import books_parsing_bibliographies
 #URI_entered = "abc"
 
+@classes.func_logger
 def bibliography_select (bid_name, bid_id):
     """
     \todo documentation
@@ -74,6 +75,7 @@ def bibliography_select (bid_name, bid_id):
 
 
 
+@classes.func_logger
 def iiif_parse(uri_entered, material):
     """
     Main iiif manifestparsing routine
@@ -254,6 +256,7 @@ def iiif_parse(uri_entered, material):
     return m
 
 
+@classes.func_logger
 def supply_bibliographic_information(additional_bid):
     """
 This function is needed if an IIIF manifest does not include a bibliographic reference.

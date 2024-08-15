@@ -44,3 +44,198 @@ INFO:classes:DEBUG Call func place_identification
 INFO:classes:DEBUG Call func gnd_parsing_organisation
 INFO:classes:DEBUG Call func gnd_parsing_organisation
 INFO:classes:DEBUG Call func organisation_identification
+INFO:main:INFO createNewResource create_new_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/image/v2/bsb00027407_00013/full/full/0/default.jpg HTTP/1.1" 200 1693037
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/image/v2/bsb00027407_00013/full/full/0/default.jpg HTTP/1.1" 200 1693037
+INFO:main:INFO /getMetadata - get_metadata
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%2012268%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/1.1" 200 24942
+INFO:classes:DEBUG Call func person_identification
+INFO:classes:DEBUG Call func gnd_parsing_person
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func place_identification
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func organisation_identification
+INFO:main:INFO createNewResource create_new_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/image/v2/bsb00027407_00013/full/full/0/default.jpg HTTP/1.1" 200 1693037
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+INFO:main:INFO allResources get_all_resources
+INFO:main:INFO resource get_resource
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/image/v2/bsb00027407_00013/full/full/0/default.jpg HTTP/1.1" 200 1693037
+INFO:main:INFO /getMetadata - get_metadata
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:main:INFO /getMetadata - get_metadata
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:main:INFO /getMetadata - get_metadata
+INFO:main:INFO /getMetadata - get_metadata
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%2012268%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/1.1" 200 24942
+INFO:classes:DEBUG Call func istc_parsing
+INFO:classes:DEBUG Call func bibliography_select
+INFO:classes:DEBUG Call func iiif_parse
+INFO:classes:DEBUG Call func person_identification
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func gnd_parsing_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func place_identification
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_organisation
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_organisation
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func organisation_identification
+INFO:classes:DEBUG Call func metadata_dissection
+INFO:classes:DEBUG Call func metadata_persons
+INFO:classes:DEBUG Call func person_ingest
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func get_viaf_from_authority
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person_viaf
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func insert_record_person
+INFO:classes:DEBUG Call func metadata_organisations
+INFO:classes:DEBUG Call func metadata_place
+INFO:classes:DEBUG Call func place_ingest
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:main:INFO /getMetadata - get_metadata
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%2012268%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/1.1" 200 24942
+INFO:classes:DEBUG Call func istc_parsing
+INFO:classes:DEBUG Call func bibliography_select
+INFO:classes:DEBUG Call func iiif_parse
+INFO:classes:DEBUG Call func person_identification
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func gnd_parsing_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func place_identification
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_organisation
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_organisation
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func gnd_parsing_organisation
+INFO:classes:DEBUG Call func organisation_identification
+INFO:main:INFO createNewResource create_new_resource
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func insert_metadata
+INFO:classes:DEBUG Call func metadata_dissection
+INFO:classes:DEBUG Call func metadata_persons
+INFO:classes:DEBUG Call func person_ingest
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func relationship_parse
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func get_viaf_from_authority
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person_viaf
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func insert_record_person
+INFO:classes:DEBUG Call func metadata_organisations
+INFO:classes:DEBUG Call func metadata_place
+INFO:classes:DEBUG Call func place_ingest
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:classes:DEBUG Call func initialise_beanie
+INFO:main:INFO /getMetadata - get_metadata
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%2012268%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/11" 200 24942
+INFO:classes:DEBUG Call func istc_parsing
+INFO:classes:DEBUG Call func bibliography_select
+INFO:classes:DEBUG Call func iiif_parse
+INFO:classes:DEBUG Call func person_identification
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_person
+INFO:classes:DEBUG Call func gnd_parsing_person
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func get_database
+INFO:classes:DEBUG Call func find_place
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
+INFO:classes:DEBUG Call func gnd_parsing_place_part_of_list
