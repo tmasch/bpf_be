@@ -5,13 +5,24 @@ import json
 from typing import Optional
 from pydantic import BaseModel
 #from pydantic.dataclasses import dataclass
-from beanie import Document, Indexed, init_beanie
+from beanie import Document
 #from dataclasses import dataclass
 #import bson
-
+import logging
 #from datetime import date
 
+logging.basicConfig(filename="general.log",level=logging.DEBUG)
+logging.getLogger().addHandler(logging.StreamHandler())
+logger = logging.getLogger(__name__)
 
+
+def func_logger(func):
+    def inner(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        logger.info(f'DEBUG Call func {func.__name__}')
+        # with {args, kwargs} returns {ret}
+        return ret
+    return inner
 
 class Frame(BaseModel):
     """
@@ -702,3 +713,6 @@ class Record(BaseModel):
     person : Optional[Person] = ""
     pages : Optional[PagesDb] = ""
     place : Optional[PlaceDb] = ""
+
+
+

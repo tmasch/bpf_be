@@ -10,7 +10,7 @@ from typing import List
 #from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 from nanoid import generate
-
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import iiif_parse
@@ -23,7 +23,9 @@ import displayRecords
 
 load_dotenv()
 
-
+# for testing
+# manifest https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest
+# image baseurl https://api.digitale-sammlungen.de/iiif/image/v2/bsb00027407_00013
 
 #class Settings(BaseSettings):
 #    class Config:
@@ -61,9 +63,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+logger = logging.getLogger(__name__)
+
 @app.on_event("startup")
-async def start_beanie():
+async def startup():
+    """
+Initialising database 
+    """
     await db_actions.initialise_beanie()
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger().addHandler(logging.StreamHandler())
 
 
 @app.get("/")
@@ -78,6 +88,7 @@ async def get_metadata(iiif_url, material):
     """
     Method returning metadata for a given iiif url
     """
+    logger.info("INFO /getMetadata - get_metadata")
     print("iiif URL: "+iiif_url)
     print("material: "+material)
     m = iiif_parse.iiif_parse(iiif_url, material)
@@ -118,6 +129,7 @@ async def supply_biblio_information(additional_bid):
     """
     Method returning additional bibliographic information
     """
+    logger.info("INFO callAdditionalBibliographicInformation supply_biblio_information")
     bi = iiif_parse.supply_bibliographic_information(additional_bid)
     for person in bi.persons:
         person = await gndparse.person_identification(person)
@@ -135,6 +147,7 @@ async def load_new_person_authority_record(new_authority_id, new_person_role):
     """"
     Method to find???
     """
+    logger.info("INFO loadNewPersonAuthorityRecord load_new_person_authority_record")
     print(new_authority_id)
     print(new_person_role)
 #    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&
@@ -150,6 +163,7 @@ async def load_new_organisation_authority_record(new_authority_id_org, new_organ
     """
     Endpoint
     """
+
 #    print(new_authority_id_org)
 #    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&
 # operation=searchRetrieve&query=NID%3D'
@@ -206,6 +220,7 @@ async def create_new_resource(metadata: classes.Metadata):
     """
     Endpoint to create a new resource in the database
     """
+    logger.info("INFO createNewResource create_new_resource")
     m = metadata
     db_actions.insert_metadata(m)
     return m
@@ -244,6 +259,7 @@ async def get_all_resources():
     """
     Endpoint to get all resources from the database
     """
+    logger.info("INFO allResources get_all_resources")
     r=db_actions.get_all_resources_from_db()
     print(r)
     return r
@@ -254,6 +270,7 @@ async def get_resource(identifier: str):
     Endpoint to get a specific ressource from the database
     \todo use this endpoint together with a qualifier to get any record!
     """
+    logger.info("INFO resource get_resource")
     print("Getting resource")
     print(identifier)
     r=db_actions.get_resource_from_db(identifier)

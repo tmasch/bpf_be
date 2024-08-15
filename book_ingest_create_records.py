@@ -13,8 +13,8 @@ import re
 import asyncio
 from typing import Optional
 import xml.etree.ElementTree
-from nanoid import generate
 import urllib.request
+from nanoid import generate
 #import requests
 import aiohttp
 from pydantic import BaseModel
@@ -307,6 +307,24 @@ class Place_against_duplication(BaseModel):
 
 
 async def metadata_dissection(metadata):
+    print("creating metadata records")
+    persons_list = await metadata_persons(metadata)
+    print("-------------------------------------- organisations")
+    orgs_list = await metadata_organisations(metadata)
+    print("-------------------------------------- places")
+    places_list = await metadata_place(metadata)
+    print("-------------------------------------- repositories")
+    org = await metadata_repositories(metadata)
+    print("-------------------------------------- manuscript")
+    book_record_id = await metadata_manuscripts(metadata)
+    print("-------------------------------------- book")
+    book_record_id = await metadata_books(metadata)
+    print("--------------------------------------")
+    result = await metadata_pages(metadata,book_record_id,org)
+
+    return 1
+
+async def metadata_persons(metadata):
 
     if metadata.bibliographic_information:
         # Section on Person
@@ -386,10 +404,11 @@ async def metadata_dissection(metadata):
                         persons_list.append(person_against_duplication)
     #                       print("record against duplication: ")
     #                       print(person_against_duplication)
+    return persons_list
 
-
-
-
+async def metadata_organisations(metadata):
+    print("Organisation")
+    if metadata.bibliographic_information:
     # Section on Organisations
         # There are three constellations
         # (a): An organisation that is already in Iconobase was identified via an ID. In this case, there is no list of potential candidates. 
@@ -449,7 +468,10 @@ async def metadata_dissection(metadata):
                         orgs_list.append(org_against_duplication)
     #                        print("record against duplication: ")
                         print(org_against_duplication)
+    return orgs_list
 
+async def metadata_place(metadata):
+    if metadata.bibliographic_information:
     # Section on Places
         # There are three constellations
         # (a): A place that is already in Iconobase was identified via an ID. In this case, there is no list of potential candidates. 
@@ -515,8 +537,9 @@ async def metadata_dissection(metadata):
                         places_list.append(place_against_duplication)
                         print("record against duplication: ")
                         print(place_against_duplication)
+    return places_list
 
-
+async def metadata_repositories(metadata):
     # Section on Repositories
         # Repositories are also organisations, however, there is only one repository per book. Furthermore, it is not part of the bibliographical
         # information as all other links to authority records are. 
@@ -546,14 +569,18 @@ async def metadata_dissection(metadata):
         else: 
             print("new repository")
             org.potential_candidates[org.chosen_candidate].internal_id = await org_ingest(org)
+    return org
 
 
-
-
+async def metadata_manuscripts(metadata):
 # Section on Manuscripts
+    print("checking manuscript")
+    book_record_id=""
     if metadata.material == "m": # If the item has been identified as a manuscript
+        print("creating manuscript record")
         new_manuscript = classes.ManuscriptDb()
         new_manuscript.id = generate()
+        print(new_manuscript.id)
         new_repository = classes.LinkToRepository()
         new_repository.place_id = metadata.repository[0].potential_candidates[metadata.repository[0].chosen_candidate].internal_id
         new_repository.id_preferred = metadata.shelfmark
@@ -561,8 +588,12 @@ async def metadata_dissection(metadata):
         new_manuscript.preview = metadata.repository[0].name + ", " + metadata.shelfmark
         book_record_id = new_manuscript.id # I need that one later
         db_actions.insert_record_manuscript(new_manuscript)
+    print(book_record_id)
+    return book_record_id
 
+async def metadata_books(metadata):
 # Section on printed books
+    book_record_id=""
     if metadata.material == "b": # If the item has been identified as printed book
         print("adding new book")
         new_book = classes.BookDb()
@@ -616,14 +647,20 @@ async def metadata_dissection(metadata):
 #        print("New book record: ")
 #        print(new_book)
         db_actions.insert_record_book(new_book)
+    print("insert book done")
+    print(book_record_id)
+    return book_record_id
 
-                
-                
+
+async def metadata_pages(metadata,book_record_id,org):
 # Section on individual pages. 
 # This class contains the list of individual pages from the IIIF manifest as well as information on repository and shelf marks. 
 # This information will eventually be copied to the individual Artwork and Photo records, once the cropping of images is complete and those records are created.
-# It is not clear if this record will be needed in the long term 
+# It is not clear if this record will be needed in the long term
+    print("creating pages record")
+    stuff = classes.BookDb()
     new_pages = classes.PagesDb()
+#    classes.PagesDb()
     new_pages.id = generate()
     new_pages.book_record_id = book_record_id
     if metadata.repository[0].internal_id:
@@ -673,13 +710,12 @@ async def metadata_dissection(metadata):
                     making_process_db.place = place
 #                    print("complete making process")
 #                    print(making_process_db)
-
-            new_pages.making_processes.append(making_process_db)
+                new_pages.making_processes.append(making_process_db)
 
     db_actions.insert_record_pages(new_pages)
 
 
-    return metadata
+    return 1
 
 
 

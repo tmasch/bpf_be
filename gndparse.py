@@ -59,7 +59,7 @@ encoding_list = {"Ö": "Ö", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é"
 #dbname =  get_database()
 #coll=dbname['bpf']
 
-
+@classes.func_logger
 async def person_identification(person):
     """
 This function is used for every person named in the bibliographic record (author, editor, printer etc.)
@@ -163,10 +163,10 @@ If there is an ID-number (internal or GND, the search is done for the ID-number,
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
     print("new person record")
-    print(person)
+#    print(person)
     return person         
                 
-
+@classes.func_logger
 def additional_person_identification(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
@@ -202,6 +202,7 @@ Currently all records must come from the GND - if other authority files are incl
     #print(potential_persons_list)
     return potential_persons_list
 
+@classes.func_logger
 def organisation_identification(organisation):
     """
 This function is used for every organisation named in the bibliographic record (printer etc.), and in addition for the repository of a book or manuscript
@@ -308,6 +309,7 @@ If there is an ID-number (internal or GND, the search is done for the ID-number,
         
     return organisation
 
+@classes.func_logger
 def additional_organisation_identification(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
@@ -347,6 +349,7 @@ Currently all records must come from the GND - if other authority files are incl
 
                 
 
+@classes.func_logger
 def place_identification(place):
     """
 This function is used for every place named in the bibliographic record (place of publishing / manufacture)
@@ -458,6 +461,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
     return place
 
 
+@classes.func_logger
 def additional_place_identification(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications for organisations connected to a book.
@@ -497,6 +501,7 @@ Currently all records must come from the GND - if other authority files are incl
 
 
 
+@classes.func_logger
 def gnd_parsing_person(authority_url):
     """
 \todo
@@ -766,6 +771,7 @@ def gnd_parsing_person(authority_url):
 
 
 
+@classes.func_logger
 def gnd_parsing_organisation(authority_url):
     """
 \todo
@@ -987,6 +993,7 @@ def gnd_parsing_organisation(authority_url):
     return potential_organisations_list
 
 
+@classes.func_logger
 def gnd_parsing_place_part_of_list(root): 
     """
 Unfortunately, the search for places often yields several hundred results. Since the normal search function only downloads 100 results
@@ -1004,6 +1011,8 @@ The longest part of the function the actual parsing of the XMl results, is moved
         adue_preview = ""
         vorg_preview = ""
         nach_preview = ""
+        date_preview = ""
+        name_number = ""
         name_variant_preview = ""
         comments_preview = ""
         entity_list = []
@@ -1298,6 +1307,7 @@ def gnd_parsing_place(authority_url):
 #print(x)
 
 
+@classes.func_logger
 def dates_parsing(dates_from_source):
     """
     I don't think that this module is in use. 
@@ -1326,6 +1336,7 @@ def dates_parsing(dates_from_source):
 
 
 
+@classes.func_logger
 def artist_record_parsing(artist_record):
     """
 Currently, this file is also used if an organisation is found at the search for artists. 
@@ -1895,7 +1906,7 @@ One needs a separate function for parsing organisations.
     print(pe)
     return pe
 
-
+@classes.func_logger
 async def making_process_identification(making_processes):
     """
     This module has bene primarily made for parsing information about the making process of a manuscript or printed book
@@ -1951,6 +1962,7 @@ async def making_process_identification(making_processes):
     return making_processes
 
 
+@classes.func_logger
 async def get(session, url): 
     """
 This is a short programme I received from Gregor Dick. Together with a gather funciton i
@@ -1962,6 +1974,7 @@ This is a short programme I received from Gregor Dick. Together with a gather fu
         return await response.text()
         
 
+@classes.func_logger
 async def ulan_search(person):
     """
 \todo

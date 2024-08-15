@@ -13,7 +13,7 @@ import xml.etree.ElementTree
 import requests
 from lxml import etree
 import classes
-import db_actions
+#import db_actions
 
 def Canvas_parsing(canvas_list):
     """

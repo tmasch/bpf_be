@@ -11,7 +11,7 @@ import os
 #from typing import List
 from nanoid import generate
 from pymongo import MongoClient
-from beanie import Document, Indexed, init_beanie
+from beanie import init_beanie
 import motor.motor_asyncio
 import classes
 
@@ -28,7 +28,12 @@ async def initialise_beanie():
     MOTOR_CLIENT = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
     DATABASE = MOTOR_CLIENT[MONGO_DB_DATABASE_NAME]
     document_models = [classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb]
-    await init_beanie(database=DATABASE, document_models=[classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb])
+    await init_beanie(database=DATABASE, document_models=[classes.Metadata,\
+                                                        classes.PersonDb,\
+                                                        classes.OrganisationDb,\
+                                                        classes.BookDb,\
+                                                        classes.PlaceDb,\
+                                                        classes.PagesDb])
 
 
 def get_database():
@@ -111,7 +116,7 @@ def insert_record_person(person: classes.PersonDb):
 This function inserts a newly created record for a person into the database
 It was made for persons connected to books but probably can be used for any person
     """
-    print("Inserting metadata in database")
+    print("Inserting person metadata in database")
     dbname = get_database()
     collection=dbname['bpf']
     collection.insert_one(person.dict())
@@ -301,7 +306,7 @@ def insert_record_book(book : classes.BookDb):
     """
     \todo
     """
-    print("Inserting metadata in database")
+    print("Inserting book metadata in database")
     dbname = get_database()
     collection=dbname['bpf']
     collection.insert_one(book.dict())
@@ -311,7 +316,7 @@ def insert_record_pages(pages : classes.PagesDb):
     """
     \todo
     """
-    print("Inserting metadata in database")
+    print("Inserting pages metadata in database")
     dbname = get_database()
     collection=dbname['bpf']
     collection.insert_one(pages.dict())
