@@ -3,55 +3,64 @@
 This module contains functions for displaying (and later perhaps also editing) records from the database
 """
 import db_actions
-from classes import *
+#import classes
 
-def getBookRecord(id):
-    # this function displays all elements links to a printed book record
+def get_book_record(identifier):
+    """
+This function displays all elements links to a printed book record
+    """
     dbname = db_actions.get_database()
     collection=dbname['bpf']
-    result = collection.find_one({"id": id})
+    result = collection.find_one({"id": identifier})
+    print("result from db search")
+    print(result)
     if result["persons"]:
         for person in result["persons"]:
-            id = person["id"]
-            person_record = collection.find_one({"id" : id}, {"name_preferred" : 1})
+            identifier = person["id"]
+            person_record = collection.find_one({"id" : identifier}, {"name_preferred" : 1})
             person["preview"] = person_record["name_preferred"]
     if result["organisations"]:
         for organisation in result["organisations"]:
-            id = organisation["id"]
-            organisation_record = collection.find_one({"id" : id}, {"name_preferred" : 1})
+            identifier = organisation["id"]
+            organisation_record = collection.find_one({"id" : identifier}, {"name_preferred" : 1})
             organisation["preview"] = organisation_record["name_preferred"]
     if result["places"]:
+        print("found associated places")
         for place in result["places"]:
-            id = place["id"]
-            place_record = collection.find_one({"id" : id}, {"name_preferred" : 1})
+            identifier = place["id"]
+            place_record = collection.find_one({"id" : identifier}, {"name_preferred" : 1})
             place["preview"] = place_record["name_preferred"]
     print("result form search in database: ")
     print(result)
     return result
 
-def getManuscriptRecord(id):
-    # this function displays all elements links to a printed book record
+def get_manuscript_record(identifier):
+    """
+This function displays all elements links to a printed book record
+    """
     dbname = db_actions.get_database()
     collection=dbname['bpf']
-    result = collection.find_one({"id": id})
+    result = collection.find_one({"id": identifier})
     if result["repository"]:
         for repository in result["repository"]:
-            id = repository["place_id"]
-            repository_record = collection.find_one({"id" : id}, {"name_preferred" : 1})
+            identifier = repository["place_id"]
+            repository_record = collection.find_one({"id" : identifier}, {"name_preferred" : 1})
             repository["preview"] = repository_record["name_preferred"]
     print("result form search in database: ")
     print(result)
     return result
 
 
-def getRecord(id):
-    # this function downloads a record with a given ID from the database
+def get_record(identifier):
+    """
+This function downloads a record with a given ID from the database
+    """
     dbname = db_actions.get_database()
     collection=dbname['bpf']
-    result = collection.find_one({"id": id})
+    result = collection.find_one({"id": identifier})
     #pipeline = [{"$match" :{"id" : id}}]  #, {"$lookup" :{"from": collection, "local_field": "connected_persons.id", "foreign_field": "id", "as":"connected_persons_details"}}]
     #results = collection.aggregate(pipeline)
-#    for record in results: 
+#    for record in results:
 #        print("Here is record from PyMongo: ")
 #        print(record)
-    return(result)
+    return result

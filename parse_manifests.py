@@ -13,64 +13,19 @@ import xml.etree.ElementTree
 import requests
 from lxml import etree
 import classes
-#import db_actions
+from parse_canvas import parse_canvas, parse_canvas_yale
 
-def Canvas_parsing(canvas_list):
-    """
-Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.
-Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later.
-    """
-    images = []
-    i = 0
-    for canvas in canvas_list:
-        
-        i = i+1
-        im = classes.Image()
-        im.index = i
-        im.label_raw = canvas["label"]
-        im.baseurl = canvas["images"][0]["resource"]["service"]["@id"]
-        im.width = canvas["images"][0]["resource"]["width"]
-        im.height = canvas["images"][0]["resource"]["height"]
-        images.append(im)
-    return images
-    
-def Canvas_parsing_Yale(canvas_list):
-    """
-Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.
-Only the label of the canvas can hold different kinds of information and hence has to be dissected individually later.
-
-This variant is used for books from Yale, where the label is not "label' but ["label"]["none"][0]. I keep it here,
-in case any other library uses a similar strange system
-    """
-    images = []
-    i = 0
-    for canvas in canvas_list:
-        
-        i = i+1
-        im = classes.Image()
-        im.index = i
-        im.label_raw = canvas["label"]["none"][0]
-        im.baseurl = canvas["items"][0]["items"][0]["body"]["service"][0]["@id"]
-        im.width = canvas["items"][0]["items"][0]["body"]["width"]
-        im.height = canvas["items"][0]["items"][0]["body"]["height"]
-        images.append(im)
-    return images
-        
-
-
-def bsb_parsing(uri_entered):
+def parse_manifests_bsb(manifest):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
-    print("url "+uri_entered)
-    url = urllib.request.urlopen(uri_entered)
-    manifest = json.load(url)
+
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
-    print("initialising beanie")
+#    print("initialising beanie")
 #    c=db_actions.get_database()
     m = classes.Metadata()
     repository = classes.Organisation()
-    m.manifest =  url.read()
-    print("url"+uri_entered)
+#    m.manifest =  url.read()
+ #   print("url"+uri_entered)
     location = ""
     bibliographic_id = []
 #    bibliographic_id_url = ""
@@ -138,7 +93,7 @@ def bsb_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     ###from here onward new function
-    images = Canvas_parsing(canvas_list)
+    images = parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
     for im in images:
@@ -158,7 +113,7 @@ def bsb_parsing(uri_entered):
     return m
 
 
-def halle_parsing(URI_entered):
+def parse_manifest_halle(URI_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -230,7 +185,7 @@ def halle_parsing(URI_entered):
     #roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)
+    images = parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
 
@@ -249,7 +204,7 @@ def halle_parsing(URI_entered):
    
     return m
 
-def berlin_parsing(URI_entered):
+def parse_manifest_berlin(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
@@ -315,7 +270,7 @@ def berlin_parsing(URI_entered):
     canvas_label_pattern = r'(.*?)(\[.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)
+    images = parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
 
@@ -340,7 +295,7 @@ def berlin_parsing(URI_entered):
     return m
 
 
-def cambridge_trinity_parsing(URI_entered):
+def parse_manifest_cambridge_trinity(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1: Extracting relevant fields from the general section of the Manifest
@@ -394,7 +349,7 @@ def cambridge_trinity_parsing(URI_entered):
     #canvas_id_pattern2 = r'(https://mss-cat.trin.cam.ac.uk/manuscripts/)(.*)'
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     for im in images:      
         #for the ID number of the canvas
@@ -415,7 +370,7 @@ def cambridge_trinity_parsing(URI_entered):
     
 
 
-def thulb_parsing(URI_entered):
+def parse_manifest_thulb(URI_entered):
     # This function is for all JSON-manifests produced by the Jena library, this includes manifests from Erfurt and Gotha. 
 
     url = urllib.request.urlopen(URI_entered)
@@ -484,7 +439,7 @@ def thulb_parsing(URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
    
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)
+    images = parse_canvas(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
          #for the label (page-number) of the canvas
@@ -505,7 +460,7 @@ def thulb_parsing(URI_entered):
    
     return m
 
-def slub_parsing(uri_entered):
+def parse_manifest_slub(uri_entered):
     """
 \todo
     """
@@ -563,7 +518,7 @@ def slub_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -585,7 +540,7 @@ def slub_parsing(uri_entered):
    
     return m
 
-def cambridge_corpus_parsing(uri_entered):
+def parse_manifest_cambridge_corpus(uri_entered):
     """
 Since currently no printed books from Corpus have been digitised on this platform, this function deals with manuscripts only. 
     """
@@ -623,7 +578,7 @@ Since currently no printed books from Corpus have been digitised on this platfor
 
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)
+    images = parse_canvas(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
         #for the label (page-number) of the canvas
@@ -641,7 +596,7 @@ Since currently no printed books from Corpus have been digitised on this platfor
     return m
 
 
-def leipzig_parsing(uri_entered):
+def parse_manifest_leipzig(uri_entered):
     """
 \todo
     """
@@ -698,7 +653,7 @@ def leipzig_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -718,7 +673,7 @@ def leipzig_parsing(uri_entered):
     return m
 
 
-def Gallica_parsing(URI_entered):
+def parse_manifest_gallica(URI_entered):
     # This function works only on the manifests from Gallica proper, not on external manifests shown here (hence it works on the BnF, Arsenal, and very few other libraries)
     # Unfortunately, references to bibliographical reportories are not really standardised in Gallica, they can appear in at least four different places. 
     # Hence, this section is messy,a nd it probably needs a number of additions. 
@@ -942,7 +897,7 @@ def Gallica_parsing(URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -965,7 +920,7 @@ def Gallica_parsing(URI_entered):
 
 
 
-def ecodices_parsing(uri_entered):
+def parse_manifest_ecodices(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
@@ -999,7 +954,7 @@ def ecodices_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1013,12 +968,10 @@ def ecodices_parsing(uri_entered):
         elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
-
-   
     return m
 
 
-def erara_parsing(uri_entered):
+def parse_manifest_erara(uri_entered):
     """
 \todo
     """
@@ -1120,7 +1073,7 @@ def erara_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1143,7 +1096,7 @@ def erara_parsing(uri_entered):
     return m
 
 
-def bodleian_parsing(uri_entered):
+def parse_manifest_bodleian(uri_entered):
     """
 \todo
     """
@@ -1222,7 +1175,7 @@ def bodleian_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1238,7 +1191,7 @@ def bodleian_parsing(uri_entered):
    
     return m
 
-def heidelberg_parsing(uri_entered):
+def parse_manifest_heidelberg(uri_entered):
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -1283,7 +1236,7 @@ def heidelberg_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -1299,7 +1252,7 @@ def heidelberg_parsing(uri_entered):
     return m
 
 
-def vaticana_parsing(uri_entered):
+def parse_manifest_vaticana(uri_entered):
     """
 \todo
     """
@@ -1366,7 +1319,7 @@ def vaticana_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -1381,7 +1334,7 @@ def vaticana_parsing(uri_entered):
     m.images = images
     return m
 
-def Vienna_parsing(uri_entered):
+def parse_manifest_vienna(uri_entered):
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     
@@ -1474,7 +1427,7 @@ def Vienna_parsing(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     # It appears that Vienna does not give any page numbers, and that the numbers such as "page50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
     m.images = images
@@ -1482,7 +1435,7 @@ def Vienna_parsing(uri_entered):
 
 
 
-def washington_parsing(uri_entered): 
+def parse_manifest_washington(uri_entered): 
     """
 This section is still untested since I couldn't open the manifest
     """
@@ -1567,7 +1520,7 @@ This section is still untested since I couldn't open the manifest
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     # It appears that LoC does not give any page numbers, and that the numbers such as "page 50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
     m.images = images
@@ -1575,7 +1528,7 @@ This section is still untested since I couldn't open the manifest
 
 
 
-def Goettingen_parsing (URI_entered): 
+def parse_manifest_goettingen (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -1663,7 +1616,7 @@ def Goettingen_parsing (URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1681,7 +1634,7 @@ def Goettingen_parsing (URI_entered):
 
 
 
-def Princeton_parsing (URI_entered): 
+def parse_manifest_princeton (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -1748,7 +1701,7 @@ def Princeton_parsing (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1774,7 +1727,7 @@ def Princeton_parsing (URI_entered):
     return m
 
 
-def Yale_parsing (URI_entered): 
+def parse_manifest_yale (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -1818,7 +1771,7 @@ def Yale_parsing (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
     canvas_list = (manifest["items"])
-    images = Canvas_parsing_Yale(canvas_list)    
+    images = parse_canvas_yale(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1839,7 +1792,7 @@ def Yale_parsing (URI_entered):
 
 
 
-def Boston_parsing (URI_entered): 
+def parse_manifest_boston (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -1890,7 +1843,7 @@ def Boston_parsing (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     # Apparently, the BPL does not use page numbers
@@ -1898,7 +1851,7 @@ def Boston_parsing (URI_entered):
     return m
 
 
-def Manchester_parsing (URI_entered): 
+def parse_manifest_manchester (URI_entered): 
     # As of 2023, Manchester seems to have onle two digitised incunables - hence, this modules is only geared at manuscripts. 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1924,7 +1877,7 @@ def Manchester_parsing (URI_entered):
     
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1941,7 +1894,7 @@ def Manchester_parsing (URI_entered):
     return m
 
 
-def Cambridge_UL_parsing (URI_entered): 
+def parse_manifest_cambridge_ul (URI_entered): 
     # As of 2023, Cambridge has virtually only catalogued manuscripts, hence there is no function for printed books
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1976,7 +1929,7 @@ def Cambridge_UL_parsing (URI_entered):
     
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1995,7 +1948,7 @@ def Cambridge_UL_parsing (URI_entered):
 
 
 
-def IRHT_parsing (URI_entered): 
+def parse_manifests_irht (URI_entered): 
     # This repository only contains manuscripts
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2021,7 +1974,7 @@ def IRHT_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2053,7 +2006,7 @@ def IRHT_parsing (URI_entered):
 
 
 
-def Frankfurt_parsing (URI_entered): 
+def parse_manifest_frankfurt (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -2090,7 +2043,7 @@ def Frankfurt_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2112,7 +2065,7 @@ def Frankfurt_parsing (URI_entered):
 
 
 
-def Weimar_parsing (URI_entered): 
+def parse_manifest_weimar (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -2213,7 +2166,7 @@ def Weimar_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2238,7 +2191,7 @@ def Weimar_parsing (URI_entered):
 
 
 
-def Kiel_parsing (URI_entered): 
+def parse_manifest_kiel (URI_entered): 
     print("Start parsing Kiel")
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2320,7 +2273,7 @@ def Kiel_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2342,7 +2295,7 @@ def Kiel_parsing (URI_entered):
 
 
 
-def Hamburg_parsing (URI_entered): 
+def parse_manifest_hamburg (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -2466,7 +2419,7 @@ def Hamburg_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2487,7 +2440,7 @@ def Hamburg_parsing (URI_entered):
 
 
 
-def Rostock_parsing (URI_entered): 
+def parse_manifest_rostock (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -2558,7 +2511,7 @@ def Rostock_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2580,7 +2533,7 @@ def Rostock_parsing (URI_entered):
 
 
 
-def Nuernberg_StB_parsing (URI_entered): 
+def parse_manifest_nuernberg_stb (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
@@ -2637,7 +2590,7 @@ def Nuernberg_StB_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2657,7 +2610,7 @@ def Nuernberg_StB_parsing (URI_entered):
     return m
 
 
-def Manuscriptorium_parsing (URI_entered): 
+def parse_manifest_manuscriptorium (URI_entered): 
     # This database seems to contain only manuscripts, hence there is no provision for printed books here
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2684,7 +2637,7 @@ def Manuscriptorium_parsing (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = Canvas_parsing(canvas_list)    
+    images = parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     

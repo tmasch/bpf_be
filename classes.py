@@ -2,13 +2,14 @@
 This file contains class definitions
 """
 import json
-from typing import Optional
+from typing import Optional, List
+import logging
+import sys
 from pydantic import BaseModel
 #from pydantic.dataclasses import dataclass
 from beanie import Document
 #from dataclasses import dataclass
 #import bson
-import logging
 #from datetime import date
 
 logging.basicConfig(filename="general.log",level=logging.DEBUG)
@@ -17,9 +18,15 @@ logger = logging.getLogger(__name__)
 
 
 def func_logger(func):
+    """
+Logger for all function calls
+Place as annotation befor function definition
+    """
     def inner(*args, **kwargs):
         ret = func(*args, **kwargs)
-        logger.info(f'DEBUG Call func {func.__name__}')
+        caller = sys._getframe(1)
+        caller_name=caller.f_globals['__name__']
+        logger.info(f'DEBUG Call func {func.__name__} from {caller_name}')
         # with {args, kwargs} returns {ret}
         return ret
     return inner
@@ -336,7 +343,7 @@ class Metadata(Document):
     bibliographic_information : Optional[list[BibliographicInformation]] = []
     location : Optional[str] = ""
     markxml : Optional[str] = ""
-    numberOfImages : Optional[int] = ""
+    numberOfImages : Optional[int] = None
     iiifUrl : Optional[str] = ""
     manifest : Optional[str] = ""
     images : Optional[list[Image]] = []
@@ -713,6 +720,3 @@ class Record(BaseModel):
     person : Optional[Person] = ""
     pages : Optional[PagesDb] = ""
     place : Optional[PlaceDb] = ""
-
-
-

@@ -12,88 +12,13 @@ import re
 from lxml import etree
 import requests
 import classes
-#from classes import BibliographicInformation, BibliographicId, Person, Organisation, Place, func_logger
-#from  datetime import datetime
+from parsing_helpers import convert_roman_numerals
 
 @classes.func_logger
-def roman_numerals(roman_number):
-    """This function translates a Roman numeral written according to rules 
-     (permitting two "I", "X" or "C" left of a higher value) into Arabic numbers"""
-    roman_number = roman_number.upper()
-    roman_number = roman_number.replace(".", "")
-    roman_number = roman_number.replace(" ", "")
-    roman_number = roman_number.replace("J", "I")
-    l = len(roman_number)
-    print("length: " + str(l))
-    result = 0
-    for x in range(0, l):
-        match roman_number[x]:
-            case "M":
-                result = result + 1000
-            case "D":
-                result = result + 500
-            case "C":
-                if l-x > 2: # if there are at least four characters following
-                    if roman_number[x+1] == "M" or (roman_number[x+1] == "C" \
-                        and roman_number[x+2] == "M"):
-                        result = result - 100
-                    elif roman_number[x+1] == "D" or (roman_number[x+1] == "C" \
-                        and roman_number[x+2] == "D"):
-                        result = result - 100
-                    else:
-                        result = result + 100
-                elif l-x == 2: #if it is the penultima charachter
-                    if roman_number[x+1] == "M" or roman_number[x+1] == "D":
-                        result = result - 100
-                    else:
-                        result = result + 100
-                else: #if it is the ultimate character
-                    result = result + 100
-            case "L":
-                result = result + 50
-            case "X":
-                if l-x > 2: # if there are at least four characters following
-                    if roman_number[x+1] == "C" or (roman_number[x+1] == "X" \
-                            and roman_number[x+2] == "C"):
-                        result = result - 10
-                    elif roman_number[x+1] == "L" or (roman_number[x+1] == "X" \
-                            and roman_number[x+2] == "L"):
-                        result = result - 10
-                    else:
-                        result = result + 10
-                elif l-x == 2: #if it is the penultima charachter
-                    if roman_number[x+1] == "C" or roman_number[x+1] == "L":
-                        result = result - 10
-                    else:
-                        result = result + 10
-                else:
-                    result = result + 10
-            case "V":
-                result = result + 5
-            case "I":
-                if l-x > 2: # if there are at least four characters following
-                    if roman_number[x+1] == "X" or (roman_number[x+1] == "I" \
-                        and roman_number[x+2] == "X"):
-                        result = result - 1
-                    elif roman_number[x+1] == "V" or (roman_number[x+1] == "I" \
-                        and roman_number[x+2] == "V"):
-                        result = result - 1
-                    else:
-                        result = result + 1
-                elif l-x == 2: #if it is the penultima charachter
-                    if roman_number[x+1] == "X" or roman_number[x+1] == "V":
-                        result = result - 1
-                    else:
-                        result = result + 1
-                else:
-                    result = result + 1
-    return str(result)
-
-
-
-@classes.func_logger
-def vd17_parsing(url_bibliography):
-    """This function can be used for parsing both the VD17 and the VD18"""
+def parse_vd17(url_bibliography):
+    """
+This function can be used for parsing both the VD17 and the VD18
+    """
     print(url_bibliography)
     printing_information_pattern = r'(.*)(: )(.*)'
     bi = classes.BibliographicInformation()
@@ -278,7 +203,7 @@ def vd17_parsing(url_bibliography):
                     start_year = int(year_string)
                     end_year = int(year_string)
                 elif printing_date_divided[2]:
-                    year_string = roman_numerals(printing_date_divided[2])
+                    year_string = convert_roman_numerals(printing_date_divided[2])
                     bi.date_string = year_string
                     start_year = int(year_string)
                     end_year = int(year_string)
@@ -343,7 +268,7 @@ def vd17_parsing(url_bibliography):
                     end_year = int(year_string)
                 if re.search(year_pattern_roman_in_text, printing_date_raw):
                     # This means that there is a string in Roman numerals starting with "M"
-                    year_string = roman_numerals(re.search(year_pattern_roman_in_text, \
+                    year_string = convert_roman_numerals(re.search(year_pattern_roman_in_text, \
                         printing_date_raw).groups()[0])
                     bi.date_string = year_string
                     print("Year in Roman numerals:")
@@ -371,9 +296,9 @@ def vd17_parsing(url_bibliography):
         print("bibliographic information from VD17:")
         print(bi)
         return bi
-    
+
 @classes.func_logger
-def vd16_parsing(url_bibliography):
+def parse_vd16(url_bibliography):
     """This version parses the VD16, the catalogue of German 16th-century printed books
     # NB: currently, this data is only available as HTML.
     # I built this code for the original version,
@@ -661,7 +586,7 @@ def istc_parsing_alt(url_bibliography):
 
 
 @classes.func_logger
-def istc_parsing(url_bibliography):
+def parse_istc(url_bibliography):
     """This parses the istc records that can be downloaded in JSON. 
     Since the Imprint is normally one line only, some string processing is necessary"""
     # A small problem: if there are several imprints, I take the

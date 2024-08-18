@@ -10,26 +10,10 @@ Tuples are used instead of standard datetime objects because (a) they allow date
 """
 import re
 import classes
+from parsing_helpers import convert_english_ordinal_suffix
 
 
-def english_ordinal_suffix(number):
-    """
-This function returns the suffix transforming an English number into an ordinal
-    """
-    if len(number) > 1 and number[-2] == "1": #it cannot be longer, but shorter
-        abbreviation = "th"
-    else:
-        if number[-1] == "1":
-            abbreviation = "st"
-        elif number[-1] == "2":
-            abbreviation = "nd"
-        elif number[-1] == "3":
-            abbreviation = "rd"
-        else:
-            abbreviation = "th"
-    return abbreviation
-
-def date_single_parsing(datestring_raw):
+def parse_single_date(datestring_raw):
     """ This function parses a single date (e.g., one of a date in a "9999-9999" statement) and returns a number of strings that have to be pieced together for a datestring as well as a start date
         and an end date as tuples
     """
@@ -37,7 +21,7 @@ def date_single_parsing(datestring_raw):
     date_aspect = "" # for determination whether it is dates of life or dates of activity
     date_type = "" # states if there is an indication that it is a start date or an end date    
     short_date = True #This field indicates if the date is simple so that it can be written in the fortm "X-Y" instead of "born X, died Y"
-    BC_indicator = False
+    bc_indicator = False
     day_string_raw = ""
     month_string_raw = ""
     year_string_raw = ""
@@ -116,7 +100,7 @@ def date_single_parsing(datestring_raw):
     figures_pattern = r'(v)?([\d\?x]{1,2}\.)?([\d\?x]{1,2}\.)?(v?\d{1,4}[x\?]{0,2}\.?v?|xxxx)(/\d{1,2}\.|/\d{1,4})?' #This pattern should work for most cases, with 
     figures_divided = re.match(figures_pattern, figures_raw)
     if figures_divided:
-        BC_string_raw = figures_divided.groups()[0]
+        bc_string_raw = figures_divided.groups()[0]
         day_string_raw = figures_divided.groups()[1]
         month_string_raw = figures_divided.groups()[2]
         if day_string_raw and not month_string_raw: # If there is onl(um a month given, but no da(um.
@@ -180,15 +164,15 @@ def date_single_parsing(datestring_raw):
             month_value_start = 1
             month_value_end = 12
         # Years
-        if BC_string_raw == "v":
-            BC_indicator = True
+        if bc_string_raw == "v":
+            bc_indicator = True
         if suffix_raw == "v.chr." or suffix_raw == "v. chr." or suffix_raw == "jh.v.chr." or suffix_raw == "jh. v.chr." or suffix_raw == "jh. v. chr." or suffix_raw == "jh.v.chr":
-            BC_indicator = True
+            bc_indicator = True
         if year_string_raw[0:1] == "v":
-            BC_indicator = True
+            bc_indicator = True
             year_string_raw = year_string_raw[1:]
         if year_string_raw[-1:] == "v":
-            BC_indicator = True
+            bc_indicator = True
             year_string_raw = year_string_raw[:-1]
         if year_string_raw and year_string_raw.isnumeric() and (suffix_raw and (suffix_raw[:2] == "jh" or suffix_raw[:5] == "jahrh")):
             #this is for the common mistake that the century is indicated, but without a dot after the number, e.g. "8 Jh."
@@ -233,7 +217,7 @@ def date_single_parsing(datestring_raw):
         elif year_string_raw and year_string_raw[0:-1].isnumeric() and (year_string_raw[-1] == "x" or year_string_raw[-1] == "?"):
             if len(year_string_raw) < 5: # if it is more than 5, a final question mark does not mean a missing digit, but rather that it is unclear, e.g., -1750?
                 year_string = "between " + year_string_raw[0:-1] + "0 and " + year_string_raw[0:-1] + "9"
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_start = int(year_string_raw[0:-1] + "0")
                     year_value_end = int(year_string_raw[0:-1] + "9")
                 else: 
@@ -244,7 +228,7 @@ def date_single_parsing(datestring_raw):
             else: # This means the type "1550?"
                 year_string = year_string_raw[:4]
                 date_prefix_2 = "c. "
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_start = int(year_string_raw[:4]) - 5
                     year_value_end = int(year_string_raw[:4]) + 5
                 else:
@@ -254,7 +238,7 @@ def date_single_parsing(datestring_raw):
         elif year_string_raw and year_string_raw[0:-2].isnumeric() and (year_string_raw[-2:] == "xx" or year_string_raw[-2:] == "??" \
                                                                         or year_string_raw[-2:] == "x?" or year_string_raw[-2:] == "?x"):                
             year_string = "between " + year_string_raw[0:-2] + "00 and " + year_string_raw[0:-2] + "99"
-            if BC_indicator == False:
+            if bc_indicator is False:
                 year_value_start = int(year_string_raw[0:-2] + "00")
                 year_value_end = int(year_string_raw[0:-2] + "99")
             else: 
@@ -271,8 +255,8 @@ def date_single_parsing(datestring_raw):
             if year_end_string_raw and year_end_string_raw[-1] == ".":
                 century_start_number = year_string_raw[0:-1]
                 century_end_number = year_end_string_raw[1:-1]
-                year_string = "between " + century_start_number + english_ordinal_suffix(century_start_number) + " and " + century_end_number + english_ordinal_suffix(century_end_number) + " century"
-                if BC_indicator == False:
+                year_string = "between " + century_start_number + convert_english_ordinal_suffix(century_start_number) + " and " + century_end_number + convert_english_ordinal_suffix(century_end_number) + " century"
+                if bc_indicator is False:
                     year_value_start = int(str(int(century_start_number)-1) + "01")
                     year_value_end = int(century_end_number + "00")
                 else:
@@ -281,8 +265,8 @@ def date_single_parsing(datestring_raw):
             else:
             
                 century_number = year_string_raw[0:-1]           
-                year_string = century_number + english_ordinal_suffix(century_number) + " century"
-                if BC_indicator == False:
+                year_string = century_number + convert_english_ordinal_suffix(century_number) + " century"
+                if bc_indicator is False:
                     year_value_start = int(str(int(century_number)-1) + "01")
                     year_value_end = year_value_start + 99
                 else:
@@ -290,7 +274,7 @@ def date_single_parsing(datestring_raw):
                     year_value_end = year_value_start - 99      
         else: 
             year_string = "!!!!year could not be parsed!!!!"
-        if BC_indicator == True:
+        if bc_indicator is True:
             year_string = year_string + " BC"
             year_value_start = 0 - year_value_start
             year_value_end = 0 - year_value_end
@@ -404,13 +388,13 @@ def date_single_parsing(datestring_raw):
                 pass
             case "anfang"|"anfang des"|"anfang d."|"ca.anf."|"ca.anfang"|"seit anfang d."|"frühes"|"anf."|"beginn des"|"beginn"|"beginn d.":
                 date_prefix_2 = "early "
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_end = year_value_start + 19
                 else:
                     year_value_end = year_value_start +20
             case "mitte"|"mitte des"|"ca mitte"|"ca.mitte":
                 date_prefix_2 ="Mid-"
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_start = year_value_start + 39
                     year_value_end = year_value_start + 20
                 else: 
@@ -498,7 +482,7 @@ def date_single_parsing(datestring_raw):
             case "jahrhundert, mitte":                
                 date_prefix_2 ="Mid-"
                 date_precision = "century - part"
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_start = year_value_start + 39
                     year_value_end = year_value_start + 20
                 else: 
@@ -552,7 +536,7 @@ def date_single_parsing(datestring_raw):
 
 
 
-def date_overall_parsing(datestring, date_comments, date_indicator):
+def parse_date_overall(datestring, date_comments, date_indicator):
     """
 \todo
     """
@@ -649,7 +633,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
         #date_only_type = "none" #This would be used if there is only one date given that is neither identified as start or as end date
         datestring_overall_pattern = r"([^-].*)?(-|--)([^-].*)?"
         datestring_overall_divided = re.match(datestring_overall_pattern, datestring).groups()
-        if datestring_overall_divided[0] == None or datestring_overall_divided[0] == "" or datestring_overall_divided[0] == "xxxx" or datestring_overall_divided[0] == "xx.xx.xxxx" \
+        if datestring_overall_divided[0] is None or datestring_overall_divided[0] == "" or datestring_overall_divided[0] == "xxxx" or datestring_overall_divided[0] == "xx.xx.xxxx" \
             or datestring_overall_divided[0] == "?" or datestring_overall_divided[0] == "ca." or datestring_overall_divided[0] == "ca. "or datestring_overall_divided[0] == "ca.?" \
             or datestring_overall_divided[0] == "(?)" or datestring_overall_divided[0] == "ca.xxxx" or datestring_overall_divided[0] == "1xxx" or datestring_overall_divided[0] == "xx.xx.1xxx":
             date_type = "end"
@@ -660,8 +644,8 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
                 datestring_start_raw_divided = re.match(r"(.*?)(bzw.|oder| or|od.|o.)(.*)", datestring_start_raw).groups()              
                 date_raw_start_parsed = datestring_start_raw_divided[0].strip()
                 date_raw_start_alternative_parsed = datestring_start_raw_divided[2].strip()
-                date_start_parsed = date_single_parsing(date_raw_start_parsed)
-                date_start_alternative_parsed = date_single_parsing(date_raw_start_alternative_parsed)
+                date_start_parsed = parse_single_date(date_raw_start_parsed)
+                date_start_alternative_parsed = parse_single_date(date_raw_start_alternative_parsed)
                 start_alternative_prefix_1 = date_start_alternative_parsed[0]
                 start_alternative_prefix_2 = date_start_alternative_parsed[1]
                 start_alternative_day = date_start_alternative_parsed[2]
@@ -672,7 +656,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
                 start_alternative_start_date = date_start_alternative_parsed[10]
                 start_alternative_end_date = date_start_alternative_parsed[11]
             else:
-                date_start_parsed = date_single_parsing(datestring_start_raw)
+                date_start_parsed = parse_single_date(datestring_start_raw)
             start_prefix_1 = date_start_parsed[0]
             start_prefix_2 = date_start_parsed[1]
             start_day = date_start_parsed[2]
@@ -687,7 +671,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
             if start_alternative_string != "": # If there are alternatives, always use long form of date
                 start_short = False
 
-        if datestring_overall_divided[2] == None or datestring_overall_divided[2] == "" or datestring_overall_divided[2] == "xx.xx.xxxx" or datestring_overall_divided[2] == "xxxx" or \
+        if datestring_overall_divided[2] is None or datestring_overall_divided[2] == "" or datestring_overall_divided[2] == "xx.xx.xxxx" or datestring_overall_divided[2] == "xxxx" or \
             datestring_overall_divided[2] == "?" or datestring_overall_divided[2] == "ca." or datestring_overall_divided[2] == "ca. " or datestring_overall_divided[2] == "ca.?" \
                 or datestring_overall_divided[2] == "(?)" or datestring_overall_divided[2] == "ca.xxxx" or datestring_overall_divided[2] == "1xxx" or datestring_overall_divided[2] == "xx.xx.1xxx":
             date_type = "start"
@@ -699,8 +683,8 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
                 date_raw_end_alternative_parsed = datestring_end_raw_divided[2].strip()
                 if date_raw_end_alternative_parsed[0:1] == "-": #If there is a dash at the start of the alternative date ("-1500 oder -1510"), this should only be necessary for the end
                     date_raw_end_alternative_parsed = date_raw_end_alternative_parsed[1:]
-                date_end_parsed = date_single_parsing(date_raw_end_parsed)
-                date_end_alternative_parsed = date_single_parsing(date_raw_end_alternative_parsed)
+                date_end_parsed = parse_single_date(date_raw_end_parsed)
+                date_end_alternative_parsed = parse_single_date(date_raw_end_alternative_parsed)
                 end_alternative_prefix_1 = date_end_alternative_parsed[0]
                 end_alternative_prefix_2 = date_end_alternative_parsed[1]
                 end_alternative_day = date_end_alternative_parsed[2]
@@ -711,7 +695,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
                 end_alternative_end_date = date_end_alternative_parsed[11]
                 end_alternative_string = "(or " + (end_alternative_prefix_1 + end_alternative_prefix_2 + end_alternative_day + end_alternative_month + end_alternative_year + end_alternative_suffix).strip() + ")"
             else:
-                date_end_parsed = date_single_parsing(datestring_end_raw)
+                date_end_parsed = parse_single_date(datestring_end_raw)
             end_prefix_1 = date_end_parsed[0]
             end_prefix_2 = date_end_parsed[1]
             end_day = date_end_parsed[2]
@@ -732,8 +716,8 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
             datestring_raw_divided = re.match(r"(.*?)(bzw.|oder| or|od.|o.)(.*)", datestring).groups()              
             date_raw_parsed = datestring_raw_divided[0].strip()
             date_raw_alternative_parsed = datestring_raw_divided[2].strip()
-            date_only_parsed = date_single_parsing(date_raw_parsed)
-            date_alternative_parsed = date_single_parsing(date_raw_alternative_parsed)
+            date_only_parsed = parse_single_date(date_raw_parsed)
+            date_alternative_parsed = parse_single_date(date_raw_alternative_parsed)
             only_alternative_prefix_1 = date_alternative_parsed[0]
             only_alternative_prefix_2 = date_alternative_parsed[1]
             only_alternative_day = date_alternative_parsed[2]
@@ -745,7 +729,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
             only_alternative_end_date = date_alternative_parsed[11]
             only_alternative_string = "(or " + (only_alternative_prefix_1 + only_alternative_prefix_2 + only_alternative_day + only_alternative_month + only_alternative_year + only_alternative_suffix).strip() + ")"
         else:
-            date_only_parsed = date_single_parsing(datestring)
+            date_only_parsed = parse_single_date(datestring)
         date_type = date_only_parsed[9]
         # The following lines make sure that, if there is no indication of the date type parsed with the date proper but something parsed with the alternative date (e.g. '1550 (1560) geboren'), the latter is used
         if date_type == "" and only_alternative_type == "start":
@@ -876,7 +860,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
                 start_aspect = "l"
             if date_indicator == "datw" or date_indicator == "datz":
                 start_aspect = "a"
-        if start_prefix_1 == None or start_prefix_1 == "":
+        if start_prefix_1 is None or start_prefix_1 == "":
             if start_aspect == "l":                    
                 start_prefix_1 = "born "
             else: #can only be 'life' or 'activity'
@@ -946,7 +930,7 @@ def date_overall_parsing(datestring, date_comments, date_indicator):
 
 
 
-def artist_date_single_parsing(date_raw):
+def parse_single_artist_date(date_raw):
     """
 This function is called by artist_date_parsing. It receives an element of the date (the original date statement is broken at commas and dashes into these elements)
 it returns a datestring, start and end dates, the date_aspect (life or activity), the date_type (beginning or end), and if it can be used as a 'short date' (e.g., written with dash)
@@ -966,7 +950,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
     year_end_string = ""
     year_value_start = 0
     year_value_end = 0
-    BC_indicator = False
+    bc_indicator = False
     date_aspect = ""
     date_type = ""
     short_date = True
@@ -986,13 +970,13 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
     bc_string_raw = date_single_parsed[8]
         
     if bc_string_raw == " bc":
-        BC_indicator = True
+        bc_indicator = True
     if centuries_ordinal_raw:
         if figures_combination_raw: # if there is something like "15th or 16th century, the word 'century is not repeated"
             year_start_string = year_string_raw + centuries_ordinal_raw 
         else:
             year_start_string = year_string_raw + centuries_ordinal_raw + " century"
-        if not BC_indicator:
+        if not bc_indicator:
             year_start_value_start = (int(year_string_raw)-1) * 100 + 1
             year_start_value_end = int(year_string_raw) * 100
         else: 
@@ -1000,7 +984,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
             year_start_value_end = -(int(year_string_raw)-1) * 100 -1
     else:
         year_start_string = year_string_raw
-        if not BC_indicator:
+        if not bc_indicator:
             year_start_value_start = int(year_string_raw)
             year_start_value_end = int(year_string_raw)
         else: 
@@ -1011,7 +995,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
     if year_end_string_raw:
         if centuries_end_ordinal_raw: # if it is a century
             year_end_string = year_end_string_raw + centuries_end_ordinal_raw + " century"
-            if not BC_indicator:
+            if not bc_indicator:
                 year_end_value_start = (int(year_end_string_raw)-1) * 100 + 1
                 year_end_value_end = int(year_end_string_raw) * 100
             else: 
@@ -1027,7 +1011,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
             year_end_value_end = int(year_end_string)
         else: 
             year_end_string = year_end_string_raw
-            if not BC_indicator:
+            if not bc_indicator:
                 year_end_value_start = int(year_end_string_raw)
                 year_end_value_end = int(year_end_string_raw)
             else: 
@@ -1058,7 +1042,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
         year_value_start = year_start_value_start
         year_value_end = year_start_value_end
 
-    if BC_indicator:
+    if bc_indicator:
         year_string = year_string + " BC"
         
             
@@ -1153,13 +1137,13 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
                 year_value_start = year_value_start +75
             case "early":
                 date_prefix_2 = "early "
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_end = year_value_start + 19
                 else:
                     year_value_end = year_value_start +20
             case "mid":
                 date_prefix_2 ="Mid-"
-                if BC_indicator == False:
+                if bc_indicator is False:
                     year_value_start = year_value_start + 39
                     year_value_end = year_value_start + 20
                 else: 
@@ -1184,7 +1168,7 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
 
     return(date_string, year_value_start, year_value_end, date_type, date_aspect, short_date)
     
-def artist_date_parsing(date_from_source):
+def parse_artist_date(date_from_source):
     """
 This programme takes the date from source from ULAN (i.e., the short biography text, with all sections between commas that contain no figures cut out)
 It returns a date string, start and end dates (only years, since Getty ULAN normally only gives yers, and the aspect - if date of life or of activity)
@@ -1234,7 +1218,7 @@ It returns a date string, start and end dates (only years, since Getty ULAN norm
             except AttributeError:
                 return(("xxx", 0, 0, ""))
             if date_raw_divided[0] and date_raw_divided[0] != "xxx":
-                date_single_start = artist_date_single_parsing(date_raw_divided[0].strip())
+                date_single_start = parse_single_artist_date(date_raw_divided[0].strip())
                 start_datestring = date_single_start[0]
                 start_start = date_single_start[1]
                 start_end = date_single_start[2]
@@ -1242,7 +1226,7 @@ It returns a date string, start and end dates (only years, since Getty ULAN norm
                 start_aspect = date_single_start[4]
                 start_short = date_single_start[5]
             if date_raw_divided[2] and date_raw_divided[2] != "xxx":
-                date_single_end = artist_date_single_parsing(date_raw_divided[2].strip())
+                date_single_end = parse_single_artist_date(date_raw_divided[2].strip())
                 end_datestring = date_single_end[0]
                 end_start = date_single_end[1]
                 end_end = date_single_end[2]
@@ -1327,7 +1311,7 @@ It returns a date string, start and end dates (only years, since Getty ULAN norm
                 date_aspect = "l"
             
         else:
-            date_single = artist_date_single_parsing(date_raw)
+            date_single = parse_single_artist_date(date_raw)
             if date_single[0] != "xxx": # that is invalid date
                 single_datestring = date_single[0]
                 single_start = date_single[1]
@@ -1407,7 +1391,7 @@ It returns a date string, start and end dates (only years, since Getty ULAN norm
     return date_processed
 
 
-def entered_single_date(date_raw, position):
+def parse_entered_single_date(date_raw, position):
     """
 This module is one of two modules for the manual entering of dates. entered_date divides the term in up to four units.  
 It then hands to this module a single unit and its position. 
@@ -1643,23 +1627,23 @@ It return a datestring and tuples expressing the start and end dates.
     date_divided = date_analysed.groups()
     if date_divided[0]:
         date_0 = date_divided[0]
-        date_result_0  = entered_single_date(date_0, 0)
+        date_result_0  = parse_entered_single_date(date_0, 0)
         date_formatted_0, date_active_0, date_died_0, date_start_0, date_end_0 = date_result_0
     if date_divided[1]:
         date_1 = date_divided[1]
-        date_result_1 = entered_single_date(date_1, 1)
+        date_result_1 = parse_entered_single_date(date_1, 1)
         date_formatted_1, date_active_1, date_died_1, date_start_1, date_end_1 = date_result_1
     else:
         date_formatted_1 = ""
     if date_divided[2]:
         date_2 = date_divided[2]
-        date_result_2 = entered_single_date(date_2, 2)
+        date_result_2 = parse_entered_single_date(date_2, 2)
         date_formatted_2, date_active_2, date_died_2, date_start_2, date_end_2 = date_result_2
     else:
         date_formatted_2 = ""
     if date_divided[3]:
         date_3 = date_divided[3]
-        date_result_3 =  entered_single_date(date_3, 3)
+        date_result_3 =  parse_entered_single_date(date_3, 3)
         date_formatted_3, date_active_3, date_died_3, date_start_3, date_end_3 = date_result_3
     else:
         date_formatted_3 = ""
@@ -1751,3 +1735,30 @@ It return a datestring and tuples expressing the start and end dates.
     date_new.date_end = daterange_complete_end
     print(date_new)
     return date_new
+
+
+@classes.func_logger
+def dates_parsing(dates_from_source):
+    """
+    I don't think that this module is in use. 
+    """
+# This module chooses the most relevant datestring and turns it into a standardised date, consisting of a (standardised) datestring, a logical field determining if it is dates of life or dates of activity,
+    # and datetime objects for start and end. 
+    # Unfortunately, there is a large number of variants of dates used in the GND - hence, a large number of cases has to be defined (for the start only a few)
+# for the moment, I ignore entries with "datu" and "rela" - the former seems to be in most cases an additional date, the 
+    if len(dates_from_source) == 1:
+        if dates_from_source[0].datetype == "datl" or dates_from_source[0].datetype == "datx": # normally, the latter does not appear alone, but maybe it does sometimes
+            datetype = "lived"
+            date_raw = dates_from_source[0].datestring
+        elif dates_from_source[0].datetype == "datw" or dates_from_source[0].datetype == "datz": # normally, the latter does not appear alone, but maybe it does sometimes
+            datetype = "active"
+            date_raw = dates_from_source[0].datestring
+    if len(dates_from_source) == 2:
+        if dates_from_source[0].datetype == "datl" or dates_from_source[1].datetype == "datx":
+            datetype = "lived"
+            date_raw = dates_from_source[0].datestring
+            # this is only provisional - there are - alas - cases in which the datx field contains one exact date, and the datl field both 
+            # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
+
+
+    return datetype, date_raw

@@ -1,4 +1,4 @@
 """
 Test of iiif parsing
 """
-import iiif_parse
+import parse_iiif
