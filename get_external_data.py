@@ -16,7 +16,7 @@ from parse_artist_record import parse_artist_record
 from parsing_helpers import url_replacement
 
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 
 @classes.func_logger
@@ -124,7 +124,7 @@ def transform_gnd_id_with_hyphen(id_with_hyphen):
         + id_with_hyphen
         + r"&recordSchema=MARC21-xml&maximumRecords=100"
     )
-    logger.info("Calling " + authority_url)
+    classes.logger.info("Calling " + authority_url)
     url = urllib.request.urlopen(authority_url)
     tree = xml.etree.ElementTree.parse(url)
     root = tree.getroot()

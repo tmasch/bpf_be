@@ -24,7 +24,7 @@ def func_logger(func):
 Logger for all function calls
 Place as annotation befor function definition
     """
-    async def inner(*args, **kwargs):
+    def inner(*args, **kwargs):
         caller = sys._getframe(1)
         caller_name=caller.f_globals['__name__']
         logger.debug('       DEBUG Call func %s from %s',func.__name__,caller_name)

@@ -24,7 +24,7 @@ import parsing_helpers
 #dbname = db_actions.get_database()
 #coll=dbname['bpf']
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 
 

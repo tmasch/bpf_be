@@ -640,6 +640,8 @@ async def parse_istc(url_bibliography):
 #    print(istc_record_full)
     istc_record_full = await get_external_data.get_web_data_as_json(url_bibliography)
 #    print(istc_record_full2)
+    print(url_bibliography)
+    print((istc_record_full))
 
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")

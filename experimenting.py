@@ -10,8 +10,10 @@ import orjson
 import os
 import pickle
 import pprint 
-import logging
+#import logging
 import aiohttp
+import pytest
+import pytest_asyncio
 import re
 from dotenv import load_dotenv
 from pydantic_core import from_json
@@ -28,19 +30,21 @@ import test_get_external_data
 import parse_date_1
 import parse_date
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
+#@pytest.mark.asyncio
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 
 @classes.func_logger
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 async def main():
-    logging.basicConfig(level=logging.INFO)
+    classes.logger.debug(" DEBUG   Hello world")
 #    os.environ["MONGODB_HOST"] = "localhost"
 #    os.environ["MONGODB_PORT"] = "27017"
     
-#    await db_actions.initialise_beanie()
+    await db_actions.initialise_beanie()
 #    external_id = classes.ExternalId()
 #    external_id.name = "viaf"
 #    external_id.id = "128386719"
@@ -75,10 +79,17 @@ async def main():
 #    print(p)
 #    pp = await ingest_person.ingest_person(p)
 
+    x=classes.Metadata()
+
+    uri_entered="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
+    r= await parse_iiif.parse_iiif(uri_entered,"b")
 
 
 #    uri_entered="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
 #    m= await get_external_data.get_web_data_as_json(uri_entered)
+#    f = open("herbarius_metadata.json","w")
+#    json.dump(m,f)
+#    f.close()
 #    await parse_iiif.parse_iiif(uri_entered,"b")
 #    m=classes.Metadata()
 #§    m=await app.get_metadata(uri_entered,"b")
@@ -86,9 +97,6 @@ async def main():
 #    m.model_dump_json()
 #    print(m.model_dump_json())
 #    json.dumps(m)
-#    f = open("herbarius_metadata.json","w")
-#    json.dump(m,f)
-#    f.close()
 #    print(type(m))
 
 #    f = open("herbarius_metadata.json","r")
@@ -135,7 +143,7 @@ async def main():
 # #            r=parse_date.parse_date_range(d)
 #     print(dd,end="\n")
 # #           
-    if 1==1:
+    if 1==2:
 
         f = open("date_results.txt","w")
 
@@ -158,18 +166,26 @@ async def main():
 
                 r=parse_date_1.parse_date_range(d)
 #                print(dd,end=" ")
+#                print(type(str(ddd)))
                 if(r.state=="FAIL"):
                     print("Line ",end=" ")
                     print(l,end=" ")
                     print(d)
-                    print(ddd)
+                    print(str(ddd))
                     print(r)
                 
-                f.write(d)
-                f.write(" ")
-                f.write("\n")
-                f.write(r.model_dump_json())
-                f.write("\n")
+                if(r.state=="FAIL" or r.start.state=="FAIL" or r.end.state=="FAIL"):
+                    f.write(d)
+                    f.write(" ")
+                    f.write("\n")
+                    f.write(r.start.model_dump_json())
+                    f.write("\n")
+                    f.write(r.end.model_dump_json())
+                    f.write("\n")
+                    f.write(r.model_dump_json())
+                    f.write("\n")
+                    f.write(str(ddd))
+                    f.write("\n")
                 if r.state == "SUCCESS":
                     if r.start.state == "SUCCESS":
                         succ_indiv=succ_indiv+1
@@ -192,10 +208,14 @@ async def main():
  #   d="1. Drittel 20. Jh."
  #   d="ca. 20. - 21. Jh."
     d="2. h. 17. Jh."
+    d="* ?.?.1797-29.04.1868"
+#    d="*x.x.1234"
+#    d="10. Jh.-"
+#    print(parse_date_1.replace_substring(d,"[*]","asdf"))
 #    print(d)
     #d="1234-1234"
 #    print(d)
-    r=parse_date_1.parse_date_range(d)
+#    r=parse_date_1.parse_date_range(d)
 #    print(r)
 
 #    r=parse_date.parse_date_overall(d,"","")
