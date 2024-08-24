@@ -11,6 +11,8 @@ def test_empty_date():
 def test_four_digit_date():
     d="1234"
     r=parse_date_1.parse_date(d)
+    assert r.day == ""
+    assert r.month == ""
     assert r.year == "1234"
 
 def test_mm_dd_yyyy():
@@ -76,15 +78,6 @@ def test_xx_xx_xxxx():
     assert r.year == ""
     assert r.state == "SUCCESS"
 
-def test_qq_qq_qqqq():
-    d="??.??.????"
-    r=parse_date_1.parse_date(d)
-    print(r)
-    assert r.day == ""
-    assert r.month == ""
-    assert r.year == ""
-    assert r.state == "SUCCESS"
-
 
 def test_d_mm_yyyyy():
     d="1.12.1234"
@@ -117,7 +110,7 @@ def test_q_qq_yyyy():
     d="?.??.1234"
     r=parse_date_1.parse_date(d)
     print(r)
-    assert r.day == "" 
+    assert r.day == ""
     assert r.month == ""
     assert r.year == "1234"
     assert r.state == "SUCCESS"
@@ -150,14 +143,6 @@ def test_q_m_yyyy():
     assert r.year == "1234"
     assert r.state == "SUCCESS"
 
-def test_q_m_yyyy():
-    d="?.2.1234"
-    r=parse_date_1.parse_date(d)
-    print(r)
-    assert r.day == ""
-    assert r.month == "02"
-    assert r.year == "1234"
-    assert r.state == "SUCCESS"
 
 
 def test_x_m_yyyy():
@@ -169,7 +154,34 @@ def test_x_m_yyyy():
     assert r.year == "1234"
     assert r.state == "SUCCESS"
 
+def test_q_q_yyyy():
+    d="?.?.1234"
+    r=parse_date_1.parse_date(d)
+    print(r)
+    assert r.day == ""
+    assert r.month == ""
+    assert r.year == "1234"
+    assert r.state == "SUCCESS"
 
+def test_x_x_yyyy():
+    d="x.x.1234"
+    r=parse_date_1.parse_date(d)
+    print(r)
+    assert r.day == ""
+    assert r.month == ""
+    assert r.year == "1234"
+    assert r.state == "SUCCESS"
+
+def test_x_x_yyyy_born():
+    d="*x.x.1234"
+    r=parse_date_1.parse_date(d)
+    print(r)
+    assert r.day == ""
+    assert r.month == ""
+    assert r.year == "1234"
+    assert r.state == "SUCCESS"
+
+#?.?.1797-29.04.1868
 def test_mm_yyyy():
     d="12.1234"
     r=parse_date_1.parse_date(d)
@@ -213,6 +225,13 @@ def test_nnjh():
 
 def test_nintynine_century():
     d="99./99. Jh.."
+    r=parse_date_1.parse_date_range(d)
+    print(r)
+    assert r.state == "SUCCESS"
+
+def test_nine_half_ninetinyne_century():
+    d="ca. 9. H. 99. Jh."
+#    d="?.?.1797-29.04.1868"
     r=parse_date_1.parse_date_range(d)
     print(r)
     assert r.state == "SUCCESS"

@@ -14,7 +14,7 @@ from beanie import Document, UnionDoc, Link
 #import bson
 #from datetime import date
 
-logging.basicConfig(filename="general.log",level=logging.INFO)
+logging.basicConfig(filename="general.log",level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def func_logger(func):
 Logger for all function calls
 Place as annotation befor function definition
     """
-    def inner(*args, **kwargs):
+    async def inner(*args, **kwargs):
         caller = sys._getframe(1)
         caller_name=caller.f_globals['__name__']
         logger.debug('       DEBUG Call func %s from %s',func.__name__,caller_name)

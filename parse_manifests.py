@@ -23,6 +23,7 @@ def parse_manifests_bsb(manifest):
     metadata=manifest["metadata"]
 #    print("initialising beanie")
 #    c=db_actions.get_database()
+    #print(metadata)
     m = classes.Metadata()
     repository = classes.Organisation()
 #    m.manifest =  url.read()

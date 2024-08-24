@@ -12,21 +12,21 @@ import pytest
 import pytest_asyncio
 from beanie import Document, Link
 from dotenv import load_dotenv
+#import logging
+
 
 import get_external_data
 import parse_iiif
-import logging
 import classes
 import db_actions
 import test_get_external_data
 
-
-#@classes.func_logger
 @mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
+#@classes.func_logger
 async def test_parse_iiif(self):
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger().addHandler(logging.StreamHandler())
+#    logging.basicConfig(level=logging.DEBUG)
+#    logging.getLogger().addHandler(logging.StreamHandler())
 
     await db_actions.initialise_beanie()
 

@@ -82,13 +82,14 @@ async def select_bibliography (bid_name, bid_id):
 @classes.func_logger
 async def parse_iiif(uri_entered, material):
     """
-    Main iiif manifestparsing routine
+    Main iiif manifest parsing routine
     """
 
 # Step 1: Information is collected from the IIIF manifest
     print("getting manifest from url")
     manifest= await get_external_data.get_web_data_as_json(uri_entered)
 
+#    print(manifest)
 
     #if URI_entered == "":
     #        break

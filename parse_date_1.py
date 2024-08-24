@@ -5,14 +5,15 @@ import re
 
 @classes.func_logger
 def parse_date(ds):
-
-    messages=[]
+#    print(ds)
+    messages=["date parsing"]
     state = "FAIL"
     d=classes.Dt()
     day = ""
     month = ""
     year = ""
 
+    messages.append(ds)
 
 
 #if "zwischen " in datestring_raw:  # turns "zwischen _X and _X" into "_X/_X"
@@ -31,6 +32,23 @@ def parse_date(ds):
     ds=ds.replace("()","")
 #    print("parse_date input:")
 #    print(ds)
+
+    if re.match(r"\?", ds) and len(ds) == 1:
+        state="SUCCESS"
+        messages.append("No date known")
+
+    if len(ds) == 1:
+        state="SUCCESS"
+        messages.append("No valid input")
+
+    if len(ds) == 2:
+        state="SUCCESS"
+        messages.append("No valid input")
+
+    if ds == "99xx-":
+        state="SUCCESS"
+        messages.append("No valid input")
+    
 
 
     # Date is four-digit year, e.g. 1234
@@ -154,6 +172,16 @@ def parse_date(ds):
         messages.append('Date in D.M.YYYY format')
         state="SUCCESS"
 
+    # Date is DD.M.YYYY
+    if re.match(r"\d{2}\.\d{1}\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        day=t[0]
+        month="0"+t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in D.M.YYYY format')
+        state="SUCCESS"
+
 
     # Date is X.M.YYYY
     if re.match(r"x\.\d{1}\.\d{4}", ds) and len(ds) == 8:
@@ -174,7 +202,25 @@ def parse_date(ds):
         messages.append('Date in DD.MM.YYYY format')
         state="SUCCESS"
 
-    
+    # Date is ?.?.YYYY
+    if re.match(r"\?\.\?\.\d{4}", ds) and len(ds) == 8:
+        t=ds.split(".")
+        day=""
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in DD.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is X.X.YYYY
+    if re.match(r"x\.x\.\d{4}", ds) and len(ds) == 8:
+        t=ds.split(".")
+        day=""
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in DD.MM.YYYY format')
+        state="SUCCESS"
+
+
     # Date is MM.YYYY
     if re.match(r"\d{2}\.\d{4}", ds) and len(ds) == 7:
         t=ds.split(".")
@@ -219,6 +265,11 @@ def parse_date(ds):
         messages.append('Date in ???? format ')
         state="SUCCESS"
 
+    if year=="9999":
+        day=""
+        month="" 
+        year=""
+        messages.append("No valid input")
 
     d.day=day
     d.month=month
@@ -248,17 +299,23 @@ REPLACEMENTS = {
 "MID" : "_MID_",
 "CENTURY" : "_CENTURY_",
 "ABOUT" : "_ABOUT_",
-"BEFORE" : "_BEFORE_"
+"BEFORE" : "_BEFORE_",
+"BC_INDICATOR" : "_BC_INDICATOR_",
+"BURIED" : "_BURIED_"
 }
 
 
 def replace_substring(s,substring,constant):
 #    print(s)
+#    print("substring")
 #    print(substring)
 #    print(re.search(substring, s))
     if bool(re.search(substring, s)) == True:
-        ss=s.replace(substring,constant)
+#        ss=s.replace(substring,constant)   
+#        ss=s
+        ss=re.sub(substring,constant,s)
 #        print("found substring "+substring+" "+constant+s+" "+ss)
+#        print(ss)
         s=ss
 #    print(s)
     return s
@@ -274,9 +331,10 @@ def remove_tags(input):
 
 @classes.func_logger
 def get_date_aspect(ds):
-#    replace_substring(ds,"geb.",REPLACEMENTS["BORN"])
-    pattern=""
-
+    replace_substring(ds,"geb.",REPLACEMENTS["BORN"])
+#    pattern=""
+    ds=ds.replace("[","")
+    ds=ds.replace("[","")
 
     ds=ds.replace("januar","01.")
     ds=ds.replace("februar","02.")
@@ -294,17 +352,24 @@ def get_date_aspect(ds):
     ds=ds.replace("erste","1.")
     ds=ds.replace("zweite","2.")
 
+    #ds = replace_substring(ds,"[?]",REPLACEMENTS["BORN"])
 
     ds=ds.replace("geb.","geboren")
-
+#    print(ds)
+    ds = replace_substring(ds,"[*]",REPLACEMENTS["BORN"])
+#    print(ds)
     ds = replace_substring(ds,"geboren",REPLACEMENTS["BORN"])
     ds = replace_substring(ds,"geburtsjahr",REPLACEMENTS["BORN"])
 
+    ds = replace_substring(ds,"getauft am",REPLACEMENTS["BAPTISED"])
     ds = replace_substring(ds,"getauft",REPLACEMENTS["BAPTISED"])
     ds = replace_substring(ds,"taufe",REPLACEMENTS["BAPTISED"])
     ds = replace_substring(ds,"getauft am",REPLACEMENTS["BAPTISED"])
     ds = replace_substring(ds,"taufdatum",REPLACEMENTS["BAPTISED"])
     ds = replace_substring(ds,"get.",REPLACEMENTS["BAPTISED"])
+
+
+    ds = replace_substring(ds,"wirkungszeit",REPLACEMENTS["ACTIVE"])
 
 
     ds = replace_substring(ds,"aktiv",REPLACEMENTS["ACTIVE"])
@@ -321,6 +386,9 @@ def get_date_aspect(ds):
     ds = replace_substring(ds,"erw",REPLACEMENTS["DOCUMENTED"])
     ds = replace_substring(ds,"belegt",REPLACEMENTS["DOCUMENTED"])
 
+    ds = replace_substring(ds,"begraben am",REPLACEMENTS["BURIED"])
+
+
 
     ds = replace_substring(ds,"erstmals erwähnt",REPLACEMENTS["FIRST_DOCUMENTED"])
 
@@ -328,6 +396,13 @@ def get_date_aspect(ds):
 
     ds=ds.replace("anf.","anfang")
     ds = replace_substring(ds,"seit anfang",REPLACEMENTS["START"])
+    ds = replace_substring(ds,"ab dem",REPLACEMENTS["START"])
+    ds = replace_substring(ds,"ab",REPLACEMENTS["START"])
+    ds = replace_substring(ds,"seit",REPLACEMENTS["START"])
+
+    ds = replace_substring(ds,"v. chr.",REPLACEMENTS["BC_INDICATOR"])
+    ds = replace_substring(ds,"v.chr.",REPLACEMENTS["BC_INDICATOR"])
+
 
 
     ds=ds.replace("jahrhunderts","jahrhundert")
@@ -353,6 +428,7 @@ def get_date_aspect(ds):
     ds = replace_substring(ds,"viertel",REPLACEMENTS["QUARTER"])
 
 
+#    ds = replace_substring(ds,"[(?)]",REPLACEMENTS["ABOUT"])
     ds = replace_substring(ds,"ca.",REPLACEMENTS["ABOUT"])
     ds = replace_substring(ds,"um",REPLACEMENTS["ABOUT"])
 #    replace_substring(ds,"jahrhundert",REPLACEMENTS["CENTURY"])
@@ -366,84 +442,15 @@ def get_date_aspect(ds):
     ds = replace_substring(ds,"anfang",REPLACEMENTS["BEGIN"])
     ds = replace_substring(ds,"mitte",REPLACEMENTS["MID"])
 
+
+    ds = ds.replace("(_","_")
+    ds = ds.replace("_)","_")
     return ds
 
 
-@classes.func_logger
-def clean_day(d):
 
 
-#    d=d.lower()
-    day_string_raw=d
 
-    day_string = ""
-    day_value_start = 1
-    day_value_end = 99 #must be adjusted to the number of days in a month
-
-    if day_string_raw and (day_string_raw == "0." or day_string_raw == "00."):
-        day_string = ""
-        day_value_start = 1
-        day_value_end = 99
-    elif day_string_raw and day_string_raw[0:-1].isnumeric():
-        day_string = day_string_raw[0:-1].lstrip("0")
-        day_string = day_string + " "
-        day_value_start = int(day_string)
-        day_value_end = int(day_string)
-        date_precision = "day"
-    elif day_string_raw == "1x." or day_string_raw == "2x.":
-        day_string = "between " + day_string_raw[0:-2] + "0 and " + day_string_raw[0:-2] + "9 "
-        day_value_start = int(day_string_raw[0:-2] + "0")
-        day_value_end = int(day_string_raw[0:-2] + "9")
-        date_precision = "day - circa"
-        short_date = False
-    elif day_string_raw == "0x.":
-        day_string = "between 1 and 9 "
-        day_value_start = 1
-        day_value_end = 9
-        date_precision = "day - circa"
-        short_date = False
-    elif day_string_raw == "xx.":
-        day_string = ""
-        day_value_start = 1
-        day_value_end = 99
-
-        # The following adjust day_value_end to the last day of the month
-    if day_value_end == 99:
-        match month_value_start:
-            case 1|3|5|7|8|10|12:
-                day_value_end = 31
-            case 4|6|9|11:
-                day_value_end = 30
-            case 2:
-                if year_value_start%4 == 0 and (year_value_start%100 != 0 or year_value_start%400 == 0):
-                    day_value_end = 29
-                else:
-                    day_value_end = 28
-
-
-def clean_month(month_string_raw):
-        # Months
-    if month_string_raw and month_string_raw[0:-1].isnumeric() and month_string_raw[0:-1] != "00":
-        month_string_raw = month_string_raw[0:-1].lstrip("0")
-        if month_string_raw in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
-
-            month_string = month_names[month_string_raw]
-            month_value_start = int(month_string_raw)
-            month_value_end = int(month_string_raw)
-            if date_precision == "":
-                date_precision = "month"
-        else:
-            month_string = "!!!!!month could not be parsed!!!!!!"
-            month_value_start = 1
-            month_value_end = 12
-    elif month_string_raw == "00." or month_string_raw == "xx." and day_string != "":
-        month_string = "?? "
-        month_value_start = 1
-        month_value_end = 12
-    else:
-        month_string = ""
-        month_value_start = 1
-        month_value_end = 12
 
 @classes.func_logger
 def parse_century(ds):
@@ -451,7 +458,7 @@ def parse_century(ds):
     d=classes.DateRange()
     d.start=classes.Dt()
     d.end=classes.Dt()
-    d.messages=[]
+    d.messages=["century parsing"]
     d.state="FAIL"
     # case there is nothing
     if len(ds) == 0:
@@ -472,6 +479,15 @@ def parse_century(ds):
 
     if re.match(REPLACEMENTS["MID"],ds):
         ds = ds.replace(REPLACEMENTS["MID"],"")
+
+    if re.match(REPLACEMENTS["ACTIVE"],ds):
+        ds = ds.replace(REPLACEMENTS["ACTIVE"],"")
+
+    if re.match(REPLACEMENTS["START"],ds):
+        ds = ds.replace(REPLACEMENTS["START"],"")
+
+    if re.match(REPLACEMENTS["BC_INDICATOR"],ds):
+        ds = ds.replace(REPLACEMENTS["BC_INDICATOR"],"")
 
 
     if re.search("/",ds):
@@ -513,6 +529,7 @@ def parse_century(ds):
         d.end.state="SUCCESS"
         d.start.state="SUCCESS"
         d.state="SUCCESS"
+
     # simple case nn. CENTURY
     if len(ds) == 3 and re.match(r"\d{2}\.",ds):
         x=int(ds[0:2])
@@ -551,6 +568,11 @@ def parse_century(ds):
             d.end.state="SUCCESS"
             d.start.state="SUCCESS"
             d.state="SUCCESS"
+        if x==9 and c==99:
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+
 
     if re.search(REPLACEMENTS["THIRD"],ds):
         #ds=ds.replace(REPLACEMENTS["HALF"],"")
@@ -658,11 +680,6 @@ def parse_date_range(ds):
         ds=ds[3::]
     ds=re.sub("%"," ",ds)
     ds=re.sub(" des "," ",ds)
-#    if datestring[0:3] == "ca.": #"ca." can have the meaning "circa", but it is also (today) and obligatory introdcution for any datestring that is freely formulated
-#                                # in this case, it has no meaning and it should be removed
-#        if x in "abcdefghijklmnopqrstuwyz,": # freely formulated datestrings will contain letters, whereas standard datestrings can only contain the letters v(or Christus) and x(unknown digit)
-#        if bool(re.search("[a..z]", datestring[3:])) == True:
-#                datestring = datestring[3:]
 
 #    ds=re.sub("biis","bis",ds)
 #    ds=re.sub("bis","-",ds)

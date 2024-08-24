@@ -598,7 +598,6 @@ def parse_date_overall(datestring, date_comments, date_indicator):
     only_year=""
     only_start_date=""
     only_end_date=""
-    only_aspec=""
 
 
     string_replacement = {"–" : "-", "- " : "-", " -" : "-", "  " : " ", ". " : ".", " ." : ".", "–" : "-", "−" : "-", " " : " ", "[" : "", "]" : "", "|": "", "/ " : "/", "/Anf." : "-Anf. ", \
