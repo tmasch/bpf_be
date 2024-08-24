@@ -12,7 +12,7 @@ import re
 import classes
 from parsing_helpers import convert_english_ordinal_suffix
 
-
+@classes.func_logger
 def parse_single_date(datestring_raw):
     """ This function parses a single date (e.g., one of a date in a "9999-9999" statement) and returns a number of strings that have to be pieced together for a datestring as well as a start date
         and an end date as tuples
@@ -38,6 +38,12 @@ def parse_single_date(datestring_raw):
     prefix_1_raw = ""
     prefix_2_raw = ""
     year_value_start = 0
+
+    date_start=""
+    date_end=""
+
+    if len(datestring_raw) == 0:
+        return
 
     month_names = {"1" : "January ", "2" : "February ", "3": "March ", "4" : "April ", "5" : "May ", "6" : "June ", "7" : "July ", \
                    "8" : "August ", "9" : "September ", "10" : "October ", "11" : "November ", "12" : "December "}
@@ -93,6 +99,7 @@ def parse_single_date(datestring_raw):
         prefix_2_raw = date_single_parsed[4]
         figures_raw = date_single_parsed[6]
         suffix_raw = date_single_parsed[7]
+
         if suffix_raw:
             suffix_raw = suffix_raw.strip()
         figures_raw = figures_raw.replace("..", "xx") # sometimes, two dots are used for missing numbers, e.g. 19.. instead of 19XX. This is here changed, since ".." causes troubles
@@ -535,7 +542,7 @@ def parse_single_date(datestring_raw):
 
 
 
-
+@classes.func_logger
 def parse_date_overall(datestring, date_comments, date_indicator):
     """
 \todo
@@ -576,6 +583,24 @@ def parse_date_overall(datestring, date_comments, date_indicator):
     only_alternative_string = ""
     date_type = ""
     date_string = ""
+
+    start_start_date=""
+    date_start=""
+    start_end_date=""
+    date_end=""
+    date_aspect=""
+    only_prefix_1=""
+    only_aspect=""
+    only_prefix_2=""
+    only_day=""
+    only_month=""
+    only_suffix=""
+    only_year=""
+    only_start_date=""
+    only_end_date=""
+    only_aspec=""
+
+
     string_replacement = {"–" : "-", "- " : "-", " -" : "-", "  " : " ", ". " : ".", " ." : ".", "–" : "-", "−" : "-", " " : " ", "[" : "", "]" : "", "|": "", "/ " : "/", "/Anf." : "-Anf. ", \
                           "/Anfang" : "-Anfang", "- Anf." : "-Anfang ", "-Anf.": "-Anfang ", "-ca.Anf." : "-Anfang ", "Anfang bis Mitte" : "Anfang biis Mitte", "Mitte bis Ende" : "Mitte biis Ende",  \
                           "/1.H." : "-1.H.", "/2.H." : "-2.H.", "/1.Hälfte " : "-1.H.", "/2.Hälfte " : "-2.H.", "Jh./" : "/", "ca.1.H." : "1.H.", "ca.2.H." : "2.H.",\
@@ -666,7 +691,8 @@ def parse_date_overall(datestring, date_comments, date_indicator):
             start_short = date_start_parsed[6]
             start_aspect = date_start_parsed[7]
             start_precision = date_start_parsed[8]
-            start_start_date = date_start_parsed[10]
+            if len(date_start_parsed[10])>0:
+                start_start_date = date_start_parsed[10]
             start_end_date = date_start_parsed[11]
             if start_alternative_string != "": # If there are alternatives, always use long form of date
                 start_short = False
@@ -730,7 +756,8 @@ def parse_date_overall(datestring, date_comments, date_indicator):
             only_alternative_string = "(or " + (only_alternative_prefix_1 + only_alternative_prefix_2 + only_alternative_day + only_alternative_month + only_alternative_year + only_alternative_suffix).strip() + ")"
         else:
             date_only_parsed = parse_single_date(datestring)
-        date_type = date_only_parsed[9]
+        if date_only_parsed and date_only_parsed[9]:
+            date_type = date_only_parsed[9]
         # The following lines make sure that, if there is no indication of the date type parsed with the date proper but something parsed with the alternative date (e.g. '1550 (1560) geboren'), the latter is used
         if date_type == "" and only_alternative_type == "start":
             date_type = "start"
@@ -749,7 +776,8 @@ def parse_date_overall(datestring, date_comments, date_indicator):
                 start_short = date_only_parsed[6]
                 start_aspect = date_only_parsed[7]
                 start_precision = date_only_parsed[8]
-                start_start_date = date_only_parsed[10]
+                if len(date_only_parsed[10]) > 0:
+                    start_start_date = date_only_parsed[10]
                 start_end_date = date_only_parsed[11]
             case "end":                
                 end_prefix_1 = date_only_parsed[0]
@@ -767,17 +795,18 @@ def parse_date_overall(datestring, date_comments, date_indicator):
 
             case "":
                 date_type = "only"
-                only_prefix_1 = date_only_parsed[0]
-                only_prefix_2 = date_only_parsed[1]
-                only_day = date_only_parsed[2]
-                only_month = date_only_parsed[3]
-                only_year = date_only_parsed[4]
-                only_suffix = date_only_parsed[5]
-                only_short = date_only_parsed[6]
-                only_aspect = date_only_parsed[7]
-                only_precision = date_only_parsed[8]
-                only_start_date = date_only_parsed[10]
-                only_end_date = date_only_parsed[11]
+                if date_only_parsed:
+                    only_prefix_1 = date_only_parsed[0]
+                    only_prefix_2 = date_only_parsed[1]
+                    only_day = date_only_parsed[2]
+                    only_month = date_only_parsed[3]
+                    only_year = date_only_parsed[4]
+                    only_suffix = date_only_parsed[5]
+                    only_short = date_only_parsed[6]
+                    only_aspect = date_only_parsed[7]
+                    only_precision = date_only_parsed[8]
+                    only_start_date = date_only_parsed[10]
+                    only_end_date = date_only_parsed[11]
 
 
     if date_start_parsed and date_end_parsed:
@@ -816,7 +845,7 @@ def parse_date_overall(datestring, date_comments, date_indicator):
                 end_end_date = end_alternative_end_date
         
         
-        if start_start_date[0] > 0 and end_start_date[0] < 0: #This means that onyl the second date is marked as "BC"
+        if start_start_date and start_start_date[0] > 0 and end_start_date and end_start_date[0] < 0: #This means that onyl the second date is marked as "BC"
             start_start_date = (0-start_start_date[0], start_start_date[1], start_start_date[2])
             start_year = start_year + "BC"
 
@@ -876,8 +905,10 @@ def parse_date_overall(datestring, date_comments, date_indicator):
             if start_alternative_end_date > start_end_date:
                 start_end_date = start_alternative_end_date
 
-        date_start = start_start_date
-        date_end = start_end_date
+        if start_start_date: 
+            date_start = start_start_date
+        if start_end_date:
+            date_end = start_end_date
         date_aspect = start_aspect
 
     if date_type == "end":
@@ -921,15 +952,18 @@ def parse_date_overall(datestring, date_comments, date_indicator):
         if only_alternative_end_date:
             if only_alternative_end_date > only_end_date:
                 only_end_date = only_alternative_end_date
-        date_start = only_start_date
-        date_end = only_end_date
-        date_aspect = only_aspect
+        if only_start_date:
+            date_start = only_start_date
+        if only_end_date:
+            date_end = only_end_date
+        if only_aspect:
+            date_aspect = only_aspect
     # question: should one have fictive end dates for start dates only given? e.g. for life + 70, for active + 50? ditto for fictive start dates?
     return (date_string, date_start, date_end, date_aspect)
 
 
 
-
+@classes.func_logger
 def parse_single_artist_date(date_raw):
     """
 This function is called by artist_date_parsing. It receives an element of the date (the original date statement is broken at commas and dashes into these elements)
@@ -1168,6 +1202,8 @@ it returns a datestring, start and end dates, the date_aspect (life or activity)
 
     return(date_string, year_value_start, year_value_end, date_type, date_aspect, short_date)
     
+
+@classes.func_logger
 def parse_artist_date(date_from_source):
     """
 This programme takes the date from source from ULAN (i.e., the short biography text, with all sections between commas that contain no figures cut out)
@@ -1391,6 +1427,7 @@ It returns a date string, start and end dates (only years, since Getty ULAN norm
     return date_processed
 
 
+@classes.func_logger
 def parse_entered_single_date(date_raw, position):
     """
 This module is one of two modules for the manual entering of dates. entered_date divides the term in up to four units.  
@@ -1612,6 +1649,7 @@ This module returns a datestring, start and end dates as tuples, as well as indi
     return date_ready, date_single_active, date_single_died, daterange_start, daterange_end
 
 
+@classes.func_logger
 def parse_manually_entered_date(date_entered):
     """
 This module receis a date-string entered manually and (hopefully) following a certain set of rules. 
@@ -1737,28 +1775,28 @@ It return a datestring and tuples expressing the start and end dates.
     return date_new
 
 
-@classes.func_logger
-def dates_parsing(dates_from_source):
-    """
-    I don't think that this module is in use. 
-    """
-# This module chooses the most relevant datestring and turns it into a standardised date, consisting of a (standardised) datestring, a logical field determining if it is dates of life or dates of activity,
-    # and datetime objects for start and end. 
-    # Unfortunately, there is a large number of variants of dates used in the GND - hence, a large number of cases has to be defined (for the start only a few)
-# for the moment, I ignore entries with "datu" and "rela" - the former seems to be in most cases an additional date, the 
-    if len(dates_from_source) == 1:
-        if dates_from_source[0].datetype == "datl" or dates_from_source[0].datetype == "datx": # normally, the latter does not appear alone, but maybe it does sometimes
-            datetype = "lived"
-            date_raw = dates_from_source[0].datestring
-        elif dates_from_source[0].datetype == "datw" or dates_from_source[0].datetype == "datz": # normally, the latter does not appear alone, but maybe it does sometimes
-            datetype = "active"
-            date_raw = dates_from_source[0].datestring
-    if len(dates_from_source) == 2:
-        if dates_from_source[0].datetype == "datl" or dates_from_source[1].datetype == "datx":
-            datetype = "lived"
-            date_raw = dates_from_source[0].datestring
-            # this is only provisional - there are - alas - cases in which the datx field contains one exact date, and the datl field both 
-            # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
+# @classes.func_logger
+# def dates_parsing(dates_from_source):
+#     """
+#     I don't think that this module is in use. 
+#     """
+# # This module chooses the most relevant datestring and turns it into a standardised date, consisting of a (standardised) datestring, a logical field determining if it is dates of life or dates of activity,
+#     # and datetime objects for start and end. 
+#     # Unfortunately, there is a large number of variants of dates used in the GND - hence, a large number of cases has to be defined (for the start only a few)
+# # for the moment, I ignore entries with "datu" and "rela" - the former seems to be in most cases an additional date, the 
+#     if len(dates_from_source) == 1:
+#         if dates_from_source[0].datetype == "datl" or dates_from_source[0].datetype == "datx": # normally, the latter does not appear alone, but maybe it does sometimes
+#             datetype = "lived"
+#             date_raw = dates_from_source[0].datestring
+#         elif dates_from_source[0].datetype == "datw" or dates_from_source[0].datetype == "datz": # normally, the latter does not appear alone, but maybe it does sometimes
+#             datetype = "active"
+#             date_raw = dates_from_source[0].datestring
+#     if len(dates_from_source) == 2:
+#         if dates_from_source[0].datetype == "datl" or dates_from_source[1].datetype == "datx":
+#             datetype = "lived"
+#             date_raw = dates_from_source[0].datestring
+#             # this is only provisional - there are - alas - cases in which the datx field contains one exact date, and the datl field both 
+#             # I should perhaps do it rather differently, saving and parsing all dates and combining them - oh dear!
 
 
-    return datetype, date_raw
+#     return datetype, date_raw

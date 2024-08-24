@@ -2,7 +2,7 @@
 
 import classes
 
-
+@classes.func_logger
 def parse_canvas(canvas_list):
     """
 Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.
@@ -22,7 +22,7 @@ Only the label of the canvas can hold different kinds of information and hence h
         images.append(im)
     return images
 
-
+@classes.func_logger
 def parse_canvas_yale(canvas_list):
     """
 Most on the information about the individual canvases is standardised, so there can be a module used to extract it from all.

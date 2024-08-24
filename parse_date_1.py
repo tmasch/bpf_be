@@ -1,0 +1,712 @@
+#pylint: disable=C0114,C0304,C0116
+import classes
+import re
+
+
+@classes.func_logger
+def parse_date(ds):
+
+    messages=[]
+    state = "FAIL"
+    d=classes.Dt()
+    day = ""
+    month = ""
+    year = ""
+
+
+
+#if "zwischen " in datestring_raw:  # turns "zwischen _X and _X" into "_X/_X"
+#    ds = ds.replace("zwischen", "")
+#    ds = ds.replace("und", "/")
+#    ds = ds.replace("u.", "/")
+
+#    print(ds)
+    # case there is nothing
+    if len(ds) == 0:
+        messages.append("No input")
+        state="SUCCESS"
+
+    ds=remove_tags(ds)
+    ds=ds.replace(" ","")
+    ds=ds.replace("()","")
+#    print("parse_date input:")
+#    print(ds)
+
+
+    # Date is four-digit year, e.g. 1234
+    if len(ds) == 3 and re.match(r"\d{3}",ds):
+        year="0"+ds
+        messages.append('Success')
+        messages.append('Only year')
+        state="SUCCESS"
+
+
+
+    # Date is DD.MM.YYYY
+    if re.match(r"\d{2}\.\d{2}\.\d{4}", ds) and len(ds) == 10:
+        t=ds.split(".")
+        day=t[0]
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in DD.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ??.MM.YYYY
+    if re.match(r"\?\?\.\d{2}\.\d{4}", ds) and len(ds) == 10:
+        t=ds.split(".")
+        day=""
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ??.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is XX.MM.YYYY
+    if re.match(r"xx\.\d{2}\.\d{4}", ds) and len(ds) == 10:
+        t=ds.split(".")
+        day=""
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ??.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ??.??.YYYY
+    if re.match(r"\?\?\.\?\?\.\d{4}", ds) and len(ds) == 10:
+        t=ds.split(".")
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ??.??.YYYY format')
+        state="SUCCESS"
+
+    # Date is XX.XX.YYYY
+    if re.match(r"xx\.xx\.\d{4}", ds) and len(ds) == 10:
+        t=ds.split(".")
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ??.??.YYYY format')
+        state="SUCCESS"
+
+    # Date is ??.??.????
+    if re.match(r"\?\?\.\?\?\.\?\?\?\?", ds) and len(ds) == 10:
+        messages.append('Success')
+        messages.append('Date in ??.??.???? format')
+        state="SUCCESS"
+
+    # Date is XX.XX.XXXX
+    if re.match(r"xx\.xx\.xxxx", ds) and len(ds) == 10:
+        messages.append('Success')
+        messages.append('Date in ??.??.???? format')
+        state="SUCCESS"
+
+    # Date is D.MM.YYYY
+    if re.match(r"\d{1}\.\d{2}\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        day="0"+t[0]
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in D.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ?.MM.YYYY
+    if re.match(r"\?\.\d{2}\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ?.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is X.MM.YYYY
+    if re.match(r"x\.\d{2}\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        month=t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ?.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ?.??.YYYY
+    if re.match(r"\?\.\?\?\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ?.??.YYYY format')
+        state="SUCCESS"
+
+    # Date is X.XX.YYYY
+    if re.match(r"x\.xx\.\d{4}", ds) and len(ds) == 9:
+        t=ds.split(".")
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in ?.??.YYYY format')
+        state="SUCCESS"
+
+    # Date is D.M.YYYY
+    if re.match(r"\d{1}\.\d{1}\.\d{4}", ds) and len(ds) == 8:
+        t=ds.split(".")
+        day="0"+t[0]
+        month="0"+t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in D.M.YYYY format')
+        state="SUCCESS"
+
+
+    # Date is X.M.YYYY
+    if re.match(r"x\.\d{1}\.\d{4}", ds) and len(ds) == 8:
+        t=ds.split(".")
+        month="0"+t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in X.MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ?.M.YYYY
+    if re.match(r"\?\.\d{1}\.\d{4}", ds) and len(ds) == 8:
+        t=ds.split(".")
+        day=""
+        month="0"+t[1]
+        year=t[2]
+        messages.append('Success')
+        messages.append('Date in DD.MM.YYYY format')
+        state="SUCCESS"
+
+    
+    # Date is MM.YYYY
+    if re.match(r"\d{2}\.\d{4}", ds) and len(ds) == 7:
+        t=ds.split(".")
+        month=t[0]
+        year=t[1]
+        messages.append('Success')
+        messages.append('Date in MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is ??.YYYY
+    if re.match(r"\?\?\.\d{4}", ds) and len(ds) == 7:
+        t=ds.split(".")
+        year=t[1]
+        messages.append('Success')
+        messages.append('Date in MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is XX.YYYY
+    if re.match(r"xx\.\d{4}", ds) and len(ds) == 7:
+        t=ds.split(".")
+        year=t[1]
+        messages.append('Success')
+        messages.append('Date in MM.YYYY format')
+        state="SUCCESS"
+
+    # Date is four-digit year, e.g. 1234
+    if len(ds) == 4 and re.match(r"\d{4}",ds):
+        year=ds
+        messages.append('Success')
+        messages.append('Date in YYYY format')
+        state="SUCCESS"
+
+    if len(ds) == 4 and re.match(r"\?\?\?\?",ds):
+        year=ds
+        messages.append('Success')
+        messages.append('Date in ???? format ')
+        state="SUCCESS"
+
+    if len(ds) == 4 and re.match(r"xxxx",ds):
+        year=ds
+        messages.append('Success')
+        messages.append('Date in ???? format ')
+        state="SUCCESS"
+
+
+    d.day=day
+    d.month=month
+    d.year=year
+    d.messages=messages
+    d.state=state
+#    logger.debug(d)
+    return d
+
+
+REPLACEMENTS = {
+"BORN" : "_BORN_",
+"BAPTISED" : "_BAPTISED_",
+"ACTIVE" : "_ACTIVE_",
+"DOCUMENTED" : "_DOCUMENTED_",
+"BURIED" : "_BURIED_",
+"FIRST_DOCUMENTED" : "_FIRST_DOCUMENTED_",
+"PUBLICATIONS_FROM" : "_PUBLICATIONS_FROM_",
+"LAST_DOCUMENTED" : "_LAST_DOCUMENTED_",
+"START" : "_START_",
+"HALF" : "_HALF_",
+"THIRD" : "_THIRD_",
+"QUARTER" : "_QUARTER_",
+"BEGIN" : "_BEGIN_",
+"END" : "_END_",
+"UNTIL" : "_UNTIL_",
+"MID" : "_MID_",
+"CENTURY" : "_CENTURY_",
+"ABOUT" : "_ABOUT_",
+"BEFORE" : "_BEFORE_"
+}
+
+
+def replace_substring(s,substring,constant):
+#    print(s)
+#    print(substring)
+#    print(re.search(substring, s))
+    if bool(re.search(substring, s)) == True:
+        ss=s.replace(substring,constant)
+#        print("found substring "+substring+" "+constant+s+" "+ss)
+        s=ss
+#    print(s)
+    return s
+
+
+def remove_tags(input):
+
+    for key in REPLACEMENTS:
+        input=input.replace(REPLACEMENTS[key],"")
+
+    return input
+
+
+@classes.func_logger
+def get_date_aspect(ds):
+#    replace_substring(ds,"geb.",REPLACEMENTS["BORN"])
+    pattern=""
+
+
+    ds=ds.replace("januar","01.")
+    ds=ds.replace("februar","02.")
+    ds=ds.replace("märz","03.")
+    ds=ds.replace("april","04.")
+    ds=ds.replace("mai","05.")
+    ds=ds.replace("juni","06.")
+    ds=ds.replace("juli","07.")
+    ds=ds.replace("august","08.")
+    ds=ds.replace("september","09.")
+    ds=ds.replace("oktober","10.")
+    ds=ds.replace("november","11.")
+    ds=ds.replace("dezember","12.")
+
+    ds=ds.replace("erste","1.")
+    ds=ds.replace("zweite","2.")
+
+
+    ds=ds.replace("geb.","geboren")
+
+    ds = replace_substring(ds,"geboren",REPLACEMENTS["BORN"])
+    ds = replace_substring(ds,"geburtsjahr",REPLACEMENTS["BORN"])
+
+    ds = replace_substring(ds,"getauft",REPLACEMENTS["BAPTISED"])
+    ds = replace_substring(ds,"taufe",REPLACEMENTS["BAPTISED"])
+    ds = replace_substring(ds,"getauft am",REPLACEMENTS["BAPTISED"])
+    ds = replace_substring(ds,"taufdatum",REPLACEMENTS["BAPTISED"])
+    ds = replace_substring(ds,"get.",REPLACEMENTS["BAPTISED"])
+
+
+    ds = replace_substring(ds,"aktiv",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"tätig",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"schrieb",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"fl.",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"flor.",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"wirkte",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"wirkungsdaten",REPLACEMENTS["ACTIVE"])
+    ds = replace_substring(ds,"nachweisbar",REPLACEMENTS["DOCUMENTED"])
+    ds = replace_substring(ds,"nachgewiesen",REPLACEMENTS["DOCUMENTED"])
+    ds = replace_substring(ds,"bezeugt",REPLACEMENTS["DOCUMENTED"])
+    ds = replace_substring(ds,"erwähnt",REPLACEMENTS["DOCUMENTED"])
+    ds = replace_substring(ds,"erw",REPLACEMENTS["DOCUMENTED"])
+    ds = replace_substring(ds,"belegt",REPLACEMENTS["DOCUMENTED"])
+
+
+    ds = replace_substring(ds,"erstmals erwähnt",REPLACEMENTS["FIRST_DOCUMENTED"])
+
+    ds = replace_substring(ds,"letztmals erwähnt",REPLACEMENTS["LAST_DOCUMENTED"])
+
+    ds=ds.replace("anf.","anfang")
+    ds = replace_substring(ds,"seit anfang",REPLACEMENTS["START"])
+
+
+    ds=ds.replace("jahrhunderts","jahrhundert")
+    ds=ds.replace("jhd.","jahrhundert")
+    ds=ds.replace("jht.","jahrhundert")
+    ds=ds.replace("jh.","jahrhundert")
+
+    ds = replace_substring(ds,"jahrhundert",REPLACEMENTS["CENTURY"])
+#    ds = replace_substring(ds,"jh",REPLACEMENTS["CENTURY"])
+#    ds = replace_substring(ds,"century",REPLACEMENTS["CENTURY"])
+
+    ds = replace_substring(ds,"hälfte des",REPLACEMENTS["HALF"])
+    ds = replace_substring(ds,"hälfte d.",REPLACEMENTS["HALF"])
+    ds = replace_substring(ds,"hälfte",REPLACEMENTS["HALF"])
+    ds = replace_substring(ds,"hl.",REPLACEMENTS["HALF"])
+    ds = replace_substring(ds,"h.",REPLACEMENTS["HALF"])
+
+    ds = replace_substring(ds,"drittel des",REPLACEMENTS["THIRD"])
+    ds = replace_substring(ds,"drittel d. ",REPLACEMENTS["THIRD"])
+    ds = replace_substring(ds,"drittel",REPLACEMENTS["THIRD"])
+    ds = replace_substring(ds,"viertel des",REPLACEMENTS["QUARTER"])
+    ds = replace_substring(ds,"viertel d.",REPLACEMENTS["QUARTER"])
+    ds = replace_substring(ds,"viertel",REPLACEMENTS["QUARTER"])
+
+
+    ds = replace_substring(ds,"ca.",REPLACEMENTS["ABOUT"])
+    ds = replace_substring(ds,"um",REPLACEMENTS["ABOUT"])
+#    replace_substring(ds,"jahrhundert",REPLACEMENTS["CENTURY"])
+
+    ds = replace_substring(ds,"vor dem",REPLACEMENTS["BEFORE"])
+    ds = replace_substring(ds,"vor",REPLACEMENTS["BEFORE"])
+    ds = replace_substring(ds,"ende",REPLACEMENTS["END"])
+
+#    ds = replace_substring(ds,"bis",REPLACEMENTS["BEGIN"])
+
+    ds = replace_substring(ds,"anfang",REPLACEMENTS["BEGIN"])
+    ds = replace_substring(ds,"mitte",REPLACEMENTS["MID"])
+
+    return ds
+
+
+@classes.func_logger
+def clean_day(d):
+
+
+#    d=d.lower()
+    day_string_raw=d
+
+    day_string = ""
+    day_value_start = 1
+    day_value_end = 99 #must be adjusted to the number of days in a month
+
+    if day_string_raw and (day_string_raw == "0." or day_string_raw == "00."):
+        day_string = ""
+        day_value_start = 1
+        day_value_end = 99
+    elif day_string_raw and day_string_raw[0:-1].isnumeric():
+        day_string = day_string_raw[0:-1].lstrip("0")
+        day_string = day_string + " "
+        day_value_start = int(day_string)
+        day_value_end = int(day_string)
+        date_precision = "day"
+    elif day_string_raw == "1x." or day_string_raw == "2x.":
+        day_string = "between " + day_string_raw[0:-2] + "0 and " + day_string_raw[0:-2] + "9 "
+        day_value_start = int(day_string_raw[0:-2] + "0")
+        day_value_end = int(day_string_raw[0:-2] + "9")
+        date_precision = "day - circa"
+        short_date = False
+    elif day_string_raw == "0x.":
+        day_string = "between 1 and 9 "
+        day_value_start = 1
+        day_value_end = 9
+        date_precision = "day - circa"
+        short_date = False
+    elif day_string_raw == "xx.":
+        day_string = ""
+        day_value_start = 1
+        day_value_end = 99
+
+        # The following adjust day_value_end to the last day of the month
+    if day_value_end == 99:
+        match month_value_start:
+            case 1|3|5|7|8|10|12:
+                day_value_end = 31
+            case 4|6|9|11:
+                day_value_end = 30
+            case 2:
+                if year_value_start%4 == 0 and (year_value_start%100 != 0 or year_value_start%400 == 0):
+                    day_value_end = 29
+                else:
+                    day_value_end = 28
+
+
+def clean_month(month_string_raw):
+        # Months
+    if month_string_raw and month_string_raw[0:-1].isnumeric() and month_string_raw[0:-1] != "00":
+        month_string_raw = month_string_raw[0:-1].lstrip("0")
+        if month_string_raw in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
+
+            month_string = month_names[month_string_raw]
+            month_value_start = int(month_string_raw)
+            month_value_end = int(month_string_raw)
+            if date_precision == "":
+                date_precision = "month"
+        else:
+            month_string = "!!!!!month could not be parsed!!!!!!"
+            month_value_start = 1
+            month_value_end = 12
+    elif month_string_raw == "00." or month_string_raw == "xx." and day_string != "":
+        month_string = "?? "
+        month_value_start = 1
+        month_value_end = 12
+    else:
+        month_string = ""
+        month_value_start = 1
+        month_value_end = 12
+
+@classes.func_logger
+def parse_century(ds):
+#    print("Parsing century")
+    d=classes.DateRange()
+    d.start=classes.Dt()
+    d.end=classes.Dt()
+    d.messages=[]
+    d.state="FAIL"
+    # case there is nothing
+    if len(ds) == 0:
+        d.messages.append("No input")
+        d.state="SUCCESS"
+
+    ds = ds.replace(REPLACEMENTS["CENTURY"],"")
+    ds = ds.replace(" ","")
+
+    if re.match(REPLACEMENTS["ABOUT"],ds):
+        ds = ds.replace(REPLACEMENTS["ABOUT"],"")
+
+    if re.match(REPLACEMENTS["BEFORE"],ds):
+        ds = ds.replace(REPLACEMENTS["BEFORE"],"")
+
+    if re.match(REPLACEMENTS["BEGIN"],ds):
+        ds = ds.replace(REPLACEMENTS["BEGIN"],"")
+
+    if re.match(REPLACEMENTS["MID"],ds):
+        ds = ds.replace(REPLACEMENTS["MID"],"")
+
+
+    if re.search("/",ds):
+        ds=ds.replace(".","")
+        t=ds.split("/")
+        d.start.year=t[0]
+        d.end.year=t[1]
+        d.start.state="SUCCESS"
+        d.end.state="SUCCESS"
+        d.state="SUCCESS"
+
+
+#    print(ds)
+    # simple case n. CENTURY
+    if len(ds) == 2 and re.match(r"\d{1}\.",ds):
+#        print("simple century")
+#        print(ds)
+        x=int(ds[0:1])
+        start=(x-1)*100
+        end=start+99
+        d.start.year=str(start)
+        d.end.year= str(end)
+        d.messages.append('Success')
+        d.messages.append('Only year from century')
+        d.start.state="SUCCESS"
+        d.end.state="SUCCESS"
+        d.state="SUCCESS"
+
+
+
+    if len(ds) == 2 and ds.isnumeric():
+        x=int(ds[0:2])
+        start=(x-1)*100
+        end=start+99
+        d.start.year=str(start)
+        d.end.year= str(end)
+        d.messages.append('Success')
+        d.messages.append('Only year from century')
+        d.end.state="SUCCESS"
+        d.start.state="SUCCESS"
+        d.state="SUCCESS"
+    # simple case nn. CENTURY
+    if len(ds) == 3 and re.match(r"\d{2}\.",ds):
+        x=int(ds[0:2])
+        start=(x-1)*100
+        end=start+99
+        d.start.year=str(start)
+        d.end.year= str(end)
+        d.messages.append('Success')
+        d.messages.append('Only year from century')
+        d.end.state="SUCCESS"
+        d.start.state="SUCCESS"
+        d.state="SUCCESS"
+
+    if re.search(REPLACEMENTS["HALF"],ds):
+        #ds=ds.replace(REPLACEMENTS["HALF"],"")
+        ds=ds.replace(".","")
+        t=ds.split(REPLACEMENTS["HALF"])
+        x=0
+        if t[0].isnumeric():
+            x=int(t[0])
+#        print("half")
+#        print(x)
+        c = 0
+        if t[1].isnumeric():
+            c=int(t[1])
+#        print(c)
+        if x == 1 and c != 0:
+            d.start.year=(c-1)*100
+            d.end.year=d.start.year+49
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+50
+            d.end.year=d.start.year+49
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+
+    if re.search(REPLACEMENTS["THIRD"],ds):
+        #ds=ds.replace(REPLACEMENTS["HALF"],"")
+        ds=ds.replace(".","")
+        t=ds.split(REPLACEMENTS["THIRD"])
+        x=0
+        if t[0].isnumeric():
+            x=int(t[0])
+#        print("half")
+#        print(x)
+        c = 0
+        if t[1].isnumeric():
+            c=int(t[1])
+#        print(c)
+        if x == 1 and c != 0:
+            d.start.year=(c-1)*100
+            d.end.year=d.start.year+32
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+33
+            d.end.year=d.start.year+32
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+66
+            d.end.year=d.start.year+32
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+
+    if re.search(REPLACEMENTS["QUARTER"],ds):
+        #ds=ds.replace(REPLACEMENTS["HALF"],"")
+        ds=ds.replace(".","")
+        t=ds.split(REPLACEMENTS["QUARTER"])
+        x=0
+        if t[0].isnumeric():
+            x=int(t[0])
+#        print("half")
+#        print(x)
+        c = 0
+        if t[1].isnumeric():
+            c=int(t[1])
+#        print(c)
+        if x == 1 and c != 0:
+            d.start.year=(c-1)*100
+            d.end.year=d.start.year+24
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+25
+            d.end.year=d.start.year+24
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+50
+            d.end.year=d.start.year+24
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+        if x == 2 and c != 0:
+            d.start.year=(c-1)*100+75
+            d.end.year=d.start.year+24
+            d.end.state="SUCCESS"
+            d.start.state="SUCCESS"
+            d.state="SUCCESS"
+
+    if re.search("99\./99\.",ds):
+        d.start.state="SUCCESS"
+        d.end.state="SUCCESS"
+        d.state="SUCCESS"
+
+
+#    print(d)
+
+    return d
+
+
+
+@classes.func_logger
+def parse_date_range(ds):
+
+#    print("parse_date_range input:")
+#    print(ds)
+
+    messages = []
+    state = " "
+    d=classes.DateRange()
+    start=classes.Dt()
+    end=classes.Dt()
+    set_result=True
+
+    # case there is nothing
+    if len(ds) == 0:
+        messages.append("No input")
+        state="FAIL"
+
+    # clean string
+    ds=re.sub("--","-",ds)
+    if len(ds)>=3 and ds[0:3] == "ca.":
+        ds=ds[3::]
+    ds=re.sub("%"," ",ds)
+    ds=re.sub(" des "," ",ds)
+#    if datestring[0:3] == "ca.": #"ca." can have the meaning "circa", but it is also (today) and obligatory introdcution for any datestring that is freely formulated
+#                                # in this case, it has no meaning and it should be removed
+#        if x in "abcdefghijklmnopqrstuwyz,": # freely formulated datestrings will contain letters, whereas standard datestrings can only contain the letters v(or Christus) and x(unknown digit)
+#        if bool(re.search("[a..z]", datestring[3:])) == True:
+#                datestring = datestring[3:]
+
+#    ds=re.sub("biis","bis",ds)
+#    ds=re.sub("bis","-",ds)
+#    print("cleaned string")
+#    print(ds)
+    ds=ds.lower()
+    ds=get_date_aspect(ds)
+    messages.append(ds)
+
+#    print(ds)
+#    print(REPLACEMENTS["CENTURY"])
+#    if re.search(REPLACEMENTS["CENTURY"],ds):
+#        print("asdgsadf")
+#        d = parse_century(ds)
+
+#    else:
+    dates = ds.split("-")
+    if len(dates) >2:
+        messages.append("ADDITIONAL DATE RANGE")
+
+
+    if len(dates) == 1 and re.search(REPLACEMENTS["CENTURY"],ds):
+#        print("asdgsadf")
+        d = parse_century(ds)
+        d.messages.append(ds)
+        set_result=False
+
+
+    if len(dates) >= 1 :
+        start = parse_date(dates[0])
+        if(start.state=="SUCCESS"):
+            state="SUCCESS"
+    if len(dates) == 2:
+#        print("parsing end")
+        end = parse_date(dates[1])
+        if(end.state=="SUCCESS"):
+            state="SUCCESS"
+
+    if set_result:
+#        print("setting result")
+        d.start=start
+        d.end=end
+        d.messages=messages
+        d.state=state
+#        print(d)
+
+    return d

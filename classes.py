@@ -1,18 +1,20 @@
+#pylint: disable=C0115,C0303
 """"
 This file contains class definitions
 """
 import json
-from typing import Optional, List
+from typing import Optional
 import logging
 import sys
+#from beanie import
 from pydantic import BaseModel
 #from pydantic.dataclasses import dataclass
-from beanie import Document
+from beanie import Document, UnionDoc, Link
 #from dataclasses import dataclass
 #import bson
 #from datetime import date
 
-logging.basicConfig(filename="general.log",level=logging.DEBUG)
+logging.basicConfig(filename="general.log",level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler())
 logger = logging.getLogger(__name__)
 
@@ -23,13 +25,20 @@ Logger for all function calls
 Place as annotation befor function definition
     """
     def inner(*args, **kwargs):
-        ret = func(*args, **kwargs)
         caller = sys._getframe(1)
         caller_name=caller.f_globals['__name__']
-        logger.info(f'DEBUG Call func {func.__name__} from {caller_name}')
+        logger.debug('       DEBUG Call func %s from %s',func.__name__,caller_name)
+        ret = func(*args, **kwargs)
         # with {args, kwargs} returns {ret}
+        logger.debug('       DEBUG  %s from %s done',func.__name__,caller_name)
         return ret
     return inner
+
+
+class Union(UnionDoc):
+    class Settings:
+        name = "all_collections"
+        class_id = "_class_id"
 
 class Frame(BaseModel):
     """
@@ -79,6 +88,29 @@ class Image(BaseModel):
     label : Optional[str] = ""
     frames : Optional[list[Frame]] = []
 
+
+class Coordinates(BaseModel):
+    """
+This class is used for importing coordinates from the GND, it may be usable more 
+generally for handling this date
+    """
+    west : Optional[str] = ""
+    east : Optional[str] = ""
+    north : Optional[str] = ""
+    south : Optional[str] = ""
+
+
+class BibliographicId(BaseModel):
+    """
+Here, the name is the name of the repertory (e.g., VD16), the id the id of a book in the repertory
+and the uri the uri of the record of the book in the repertory.
+This class should be superseded everywhere by External_id, I keep it for the moment just to be sure
+    """
+    uri : Optional[str] = ""
+    name : Optional[str] = ""
+    id : Optional[str] = ""
+
+
 class ExternalId(BaseModel):
     """
 This class is used for references to external IDs in bibliographic records and in authority 
@@ -104,7 +136,6 @@ class ConnectedEntity(BaseModel):
     connection_time : Optional[str] = ""
 
 
-
 class ConnectedEntityDbDisplay(BaseModel):
     """
 This class is for the links of persons, organisations and places to book records
@@ -113,8 +144,21 @@ This class is for the links of persons, organisations and places to book records
     role : Optional[str] = ""
     preview : Optional[str] = ""
 
+class Dt(BaseModel):
+
+    day : Optional[str] = None
+    month : Optional[str] = None
+    year : Optional[str] = None
+    datestring : Optional[str] = ""
+    messages : Optional[str] = ""
+    state : Optional[str] = ""
 
 
+class DateRange(BaseModel):
+    start : Optional[Dt] = None
+    end : Optional[Dt] = None
+    messages : Optional[str] = ""
+    state : Optional[str] = ""
 
 class DateImport(BaseModel):
     """
@@ -142,29 +186,29 @@ class Date(BaseModel):
     date_end : Optional[tuple] = ()
 
 
-class PersonImport(BaseModel):
-    """
-    Person class for importing
-    """
-    external_id : Optional[list[ExternalId]] = []
-    internal_id : Optional[str] = ""
-    internal_id_person_type1 : Optional[list[str]] = []
-    internal_id_person_type1_comment : Optional[str] = ""
-    name_preferred : Optional[str] = ""
-    name_variant : Optional[list[str]] = []
-    sex : Optional[str] = ""
-    dates_from_source : Optional[list[DateImport]] = []
-    datestring : Optional[str] = ""
-    date_start : Optional[tuple] = ()
-    date_end : Optional[tuple] = ()
-    date_aspect : Optional[str] = ""
-    connected_persons : Optional[list[ConnectedEntity]] = []
-    connected_organisations : Optional[list[ConnectedEntity]] = []
-    connected_locations : Optional[list[ConnectedEntity]] = []
-    comments : Optional[str] = ""
-    preview : Optional[str] = ""
+# class PersonImport(BaseModel):
+#     """
+#     Person class for importing
+#     """
+#     external_id : Optional[list[ExternalId]] = []
+#     internal_id : Optional[str] = ""
+#     internal_id_person_type1 : Optional[list[str]] = []
+#     internal_id_person_type1_comment : Optional[str] = ""
+#     name_preferred : Optional[str] = ""
+#     name_variant : Optional[list[str]] = []
+#     sex : Optional[str] = ""
+#     dates_from_source : Optional[list[DateImport]] = []
+#     datestring : Optional[str] = ""
+#     date_start : Optional[tuple] = ()
+#     date_end : Optional[tuple] = ()
+#     date_aspect : Optional[str] = ""
+#     connected_persons : Optional[list[ConnectedEntity]] = []
+#     connected_organisations : Optional[list[ConnectedEntity]] = []
+#     connected_locations : Optional[list[ConnectedEntity]] = []
+#     comments : Optional[str] = ""
+#     preview : Optional[str] = ""
 
-class Person(BaseModel):
+class Person(Document):
     """
  This class is used for references to persons in book records. 
  id is the id of the person in authority files (currently, the GND), name the name given in the 
@@ -187,8 +231,106 @@ class Person(BaseModel):
     name : Optional[str] = ""
     role : Optional[str] = ""
     chosen_candidate : Optional[int] = ""
-    potential_candidates : Optional[list[PersonImport]] = []
+#    potential_candidates : Optional[list[Person]] = []
     new_authority_id : Optional[str] = ""
+    external_id : Optional[list[ExternalId]] = []
+    internal_id : Optional[str] = ""
+#    internal_id_person_type1 : Optional[list[str]] = []
+#    internal_id_person_type1_comment : Optional[str] = ""
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    sex : Optional[str] = ""
+    dates_from_source : Optional[list[DateImport]] = []
+    datestring : Optional[str] = ""
+    date_start : Optional[tuple] = ()
+    date_end : Optional[tuple] = ()
+    date_aspect : Optional[str] = ""
+    connected_persons : Optional[list[ConnectedEntity]] = []
+    connected_organisations : Optional[list[ConnectedEntity]] = []
+    connected_locations : Optional[list[ConnectedEntity]] = []
+    comments : Optional[str] = ""
+    preview : Optional[str] = ""
+#    id : Optional[str] = ""
+    type : Optional[str] = "" # Is always 'Person'
+    person_type1 : Optional[list[str]] = []
+    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
+    person_type2 : Optional[list[str]] = []
+    # Type 2 is a subtype only needed if type1 is "depicted Person"
+    person_type3 : Optional[list[str]] = []
+    # Type 3 is a subtype only needed if typ2 is "Saint"
+#    external_id : Optional[list[ExternalId]] = []
+#    name_preferred : Optional[str] = ""
+#    name_variant : Optional[list[str]] = []
+#    sex : Optional[str] = ""
+#    dates_from_source : Optional[list[DateImport]] = []
+    # This is only provisional - there will be some functions to turn the dates
+    # from import into standardised dates
+#    connected_persons : Optional[list[ConnectedEntity]] = []
+#    connected_organisations : Optional[list[ConnectedEntity]] = []
+#    connected_locations : Optional[list[ConnectedEntity]] = []
+#    comments : Optional[str] = ""
+    # At least two fields are still missing, they are not needed at this step but
+    #  will be needed for records of the type1 "depicted Person":
+    # 'Office' and 'Profession' (one would preferably give an office (in the widest sense)
+    #  together with a term, and, if the person held no office, a profession)
+#    id : Optional[str] = ""
+#    type : Optional[str] = "" # Is always 'Person'
+#    person_type1 : Optional[list[str]] = []
+    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
+#    person_type2 : Optional[list[str]] = []
+ #   # Type 2 is a subtype only needed if type1 is "depicted Person"
+ #   person_type3 : Optional[list[str]] = []
+    # Type 3 is a subtype only needed if typ2 is "Saint"
+#    external_id : Optional[list[ExternalId]] = []
+#    name_preferred : Optional[str] = ""
+#    name_variant : Optional[list[str]] = []
+#    sex : Optional[str] = ""
+#    dates_from_source : Optional[list[DateImport]] = []
+    # This is only provisional - there will be some functions to turn the
+    # dates from import into standardised dates
+#    connected_persons : Optional[list[ConnectedEntity]] = []
+#    connected_organisations : Optional[list[ConnectedEntity]] = []
+#    connected_locations : Optional[list[ConnectedEntity]] = []
+#    comments : Optional[str] = ""
+
+    class Settings:
+        union_doc = Union
+
+# #@dataclass
+# class PersonDb(Document):
+#     """
+# This class is for entering Person authority records into the database. 
+# It contains all needed fields (or better, will do so), so many will remain empty. 
+# I hope it will be possible to delete empty fields when turning it into a dict object. 
+# If not, one should probably have different classes for different 
+#     """
+#     id : Optional[str] = ""
+#     type : Optional[str] = "" # Is always 'Person'
+#     person_type1 : Optional[list[str]] = []
+#     # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
+#     person_type2 : Optional[list[str]] = []
+#     # Type 2 is a subtype only needed if type1 is "depicted Person"
+#     person_type3 : Optional[list[str]] = []
+#     # Type 3 is a subtype only needed if typ2 is "Saint"
+#     external_id : Optional[list[ExternalId]] = []
+#     name_preferred : Optional[str] = ""
+#     name_variant : Optional[list[str]] = []
+#     sex : Optional[str] = ""
+#     dates_from_source : Optional[list[DateImport]] = []
+#     # This is only provisional - there will be some functions to turn the dates
+#     # from import into standardised dates
+#     connected_persons : Optional[list[ConnectedEntity]] = []
+#     connected_organisations : Optional[list[ConnectedEntity]] = []
+#     connected_locations : Optional[list[ConnectedEntity]] = []
+#     comments : Optional[str] = ""
+#     # At least two fields are still missing, they are not needed at this step but
+#     #  will be needed for records of the type1 "depicted Person":
+#     # 'Office' and 'Profession' (one would preferably give an office (in the widest sense)
+#     #  together with a term, and, if the person held no office, a profession)
+#     class Settings:
+#         union_doc = Union
+
+
 
 class OrganisationImport(BaseModel):
     """
@@ -228,15 +370,6 @@ class Organisation(BaseModel):
     potential_candidates : Optional[list[OrganisationImport]] = []
     new_authority_id : Optional[str] = ""
 
-class Coordinates(BaseModel):
-    """
-This class is used for importing coordinates from the GND, it may be usable more 
-generally for handling this date
-    """
-    west : Optional[str] = ""
-    east : Optional[str] = ""
-    north : Optional[str] = ""
-    south : Optional[str] = ""
 
 class PlaceImport(BaseModel):
     """
@@ -278,15 +411,6 @@ class Place(BaseModel):
     potential_candidates : Optional[list[PlaceImport]] = []
     new_authority_id : Optional[str] = ""
 
-class BibliographicId(BaseModel):
-    """
-Here, the name is the name of the repertory (e.g., VD16), the id the id of a book in the repertory
-and the uri the uri of the record of the book in the repertory.
-This class should be superseded everywhere by External_id, I keep it for the moment just to be sure
-    """
-    uri : Optional[str] = ""
-    name : Optional[str] = ""
-    id : Optional[str] = ""
 
 class BibliographicInformation(BaseModel):
     """
@@ -351,39 +475,6 @@ class Metadata(Document):
     making_processes : Optional[list[MakingProcess]] = []
 
 
-#@dataclass
-class PersonDb(Document):
-    """
-This class is for entering Person authority records into the database. 
-It contains all needed fields (or better, will do so), so many will remain empty. 
-I hope it will be possible to delete empty fields when turning it into a dict object. 
-If not, one should probably have different classes for different 
-    """
-    id : Optional[str] = ""
-    type : Optional[str] = "" # Is always 'Person'
-    person_type1 : Optional[list[str]] = []
-    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-    person_type2 : Optional[list[str]] = []
-    # Type 2 is a subtype only needed if type1 is "depicted Person"
-    person_type3 : Optional[list[str]] = []
-    # Type 3 is a subtype only needed if typ2 is "Saint"
-    external_id : Optional[list[ExternalId]] = []
-    name_preferred : Optional[str] = ""
-    name_variant : Optional[list[str]] = []
-    sex : Optional[str] = ""
-    dates_from_source : Optional[list[DateImport]] = []
-    # This is only provisional - there will be some functions to turn the dates
-    # from import into standardised dates
-    connected_persons : Optional[list[ConnectedEntity]] = []
-    connected_organisations : Optional[list[ConnectedEntity]] = []
-    connected_locations : Optional[list[ConnectedEntity]] = []
-    comments : Optional[str] = ""
-    # At least two fields are still missing, they are not needed at this step but
-    #  will be needed for records of the type1 "depicted Person":
-    # 'Office' and 'Profession' (one would preferably give an office (in the widest sense)
-    #  together with a term, and, if the person held no office, a profession)
-
-
 
 class OrganisationDb(Document):
     """
@@ -406,6 +497,8 @@ This class is for entering Organisation authority records into the database.
     connected_organisations : Optional[list[ConnectedEntity]] = []
     connected_locations : Optional[list[ConnectedEntity]] = []
     comments : Optional[str] = ""
+    class Settings:
+        union_doc = Union
 
 
 class PlaceDb(Document):
@@ -430,6 +523,8 @@ This class is for entering Place authority records into the database
     connected_organisations : Optional[list[ConnectedEntity]] = []
     connected_locations : Optional[list[ConnectedEntity]] = []
     comments : Optional[str] = ""
+    class Settings:
+        union_doc = Union
 
 
 class MakingProcessDb(BaseModel):
@@ -449,7 +544,9 @@ class LinkToRepository(BaseModel):
     This class is used for entering the link between manuscripts and repositories into the database. 
 It can probably be later also used for the link between artworks and repositories
     """
-    number : Optional[int] = 0 #This is only needed if several former locations are added later so that they can show in a sensible order (probably back in time)
+    number : Optional[int] = 0
+    #This is only needed if several former locations
+    #are added later so that they can show in a sensible order (probably back in time)
     place_id : Optional[str] = ""
     current : Optional[bool] = True
     collection : Optional[bool] = True
@@ -471,6 +568,8 @@ This class is for entering Manuscript records into the database
     preview : Optional[str] = ""
     # This preview is to be shown in lists of titles
     # - I am not sure if it will be needed long-term
+    class Settings:
+        union_doc = Union
 
 class BookConnectedEntityDb(BaseModel):
     """
@@ -489,8 +588,11 @@ This class is for entering Book records into the database
     type : Optional[str] = "Book"
     bibliographic_id : Optional[list[ExternalId]] = []
     persons : Optional[list [BookConnectedEntityDb]] = []
+    persons2 : Optional[list[Link[Person]]] = ""
     organisations : Optional[list [BookConnectedEntityDb]] = []
+    organisations2 : Optional[list[Link[OrganisationDb]]] = ""
     places : Optional[list [BookConnectedEntityDb]] = []
+    places2 : Optional[list[Link[PlaceDb]]] = ""
     title: Optional[str] = ""
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""
@@ -501,6 +603,20 @@ This class is for entering Book records into the database
     preview : Optional[str] = ""
     # This preview is to be shown in lists of titles
     # - I am not sure if it will be needed long-term
+    class Settings:
+        union_doc = Union
+
+class ConnectedRecord(BaseModel):
+    """
+Class for linked Persons, Organsations, Places
+    """
+    id : Optional[str] = ""
+    role : Optional[str] = ""
+    name : Optional[str] = "" # This field is only a stopgap measure, if
+    person : Optional[Link[Person]] = None
+    organisation : Optional[Link[OrganisationDb]] = None
+    place : Optional[Link[PlaceDb]] = None
+
 
 class BookDbDisplay(BaseModel):
     """
@@ -530,6 +646,7 @@ needed for the individual Artwork and Photograph records
     """
     id: Optional[str] = ""
     book_record_id : Optional[str] = ""
+    book : Optional[Link[BookDb]] = ""
     type : Optional[str] = "Pages"
     repository : Optional[str] = ""
     shelfmark : Optional[str] = ""
@@ -538,6 +655,8 @@ needed for the individual Artwork and Photograph records
     images : Optional[list[Image]] = []
     preview : Optional[str] = ""
     making_processes : Optional[list[MakingProcessDb]] = []
+    class Settings:
+        union_doc = Union
 
 class PreviewListDb(BaseModel):
     """
@@ -548,6 +667,8 @@ be used to access all manuscripts and books still in the ingest process
     id : Optional[str] = ""
     type : Optional[str] = ""
     preview : Optional[str] = ""
+    name_preferred : Optional[str] = ""
+    title : Optional[str] = ""
 
 
 
@@ -583,29 +704,29 @@ from the database
     # This preview is to be shown in lists of titles - I am not sure if it will be needed long-term
 
 
-class PersonDbDisplay(BaseModel):
-    """
-This class is for displaying (and perhaps later also for editing) person records from the database
-    """
-    id : Optional[str] = ""
-    type : Optional[str] = "" # Is always 'Person'
-    person_type1 : Optional[list[str]] = []
-    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-    person_type2 : Optional[list[str]] = []
-    # Type 2 is a subtype only needed if type1 is "depicted Person"
-    person_type3 : Optional[list[str]] = []
-    # Type 3 is a subtype only needed if typ2 is "Saint"
-    external_id : Optional[list[ExternalId]] = []
-    name_preferred : Optional[str] = ""
-    name_variant : Optional[list[str]] = []
-    sex : Optional[str] = ""
-    dates_from_source : Optional[list[DateImport]] = []
-    # This is only provisional - there will be some functions to turn the
-    # dates from import into standardised dates
-    connected_persons : Optional[list[ConnectedEntity]] = []
-    connected_organisations : Optional[list[ConnectedEntity]] = []
-    connected_locations : Optional[list[ConnectedEntity]] = []
-    comments : Optional[str] = ""
+# class PersonDbDisplay(BaseModel):
+#     """
+# This class is for displaying (and perhaps later also for editing) person records from the database
+#     """
+#     id : Optional[str] = ""
+#     type : Optional[str] = "" # Is always 'Person'
+#     person_type1 : Optional[list[str]] = []
+#     # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
+#     person_type2 : Optional[list[str]] = []
+#     # Type 2 is a subtype only needed if type1 is "depicted Person"
+#     person_type3 : Optional[list[str]] = []
+#     # Type 3 is a subtype only needed if typ2 is "Saint"
+#     external_id : Optional[list[ExternalId]] = []
+#     name_preferred : Optional[str] = ""
+#     name_variant : Optional[list[str]] = []
+#     sex : Optional[str] = ""
+#     dates_from_source : Optional[list[DateImport]] = []
+#     # This is only provisional - there will be some functions to turn the
+#     # dates from import into standardised dates
+#     connected_persons : Optional[list[ConnectedEntity]] = []
+#     connected_organisations : Optional[list[ConnectedEntity]] = []
+#     connected_locations : Optional[list[ConnectedEntity]] = []
+#     comments : Optional[str] = ""
 
 class OrgDbDisplay(BaseModel):
     """
@@ -657,31 +778,27 @@ class InvalidDateException(Exception):
     """
     \todo
     """
-    pass
+
 
 class InvalidMonthException(Exception):
     """
     \todo
     """
-    pass
 
 class InvalidDayException(Exception):
     """
     \todo
     """
-    pass
 
 class InvalidDateStringException(Exception):
     """
     \todo
     """
-    pass
 
 class InvalidDateRangeException(Exception):
     """
     \todo
     """
-    pass
 
 class PersonAgainstDuplication(BaseModel):
     """

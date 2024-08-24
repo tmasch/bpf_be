@@ -11,7 +11,8 @@ from typing import List
 import logging
 from dotenv import load_dotenv
 from nanoid import generate
-from fastapi import FastAPI
+#from fastapi import FastAPI
+from fastapi import FastAPI,APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import parse_iiif
 import db_actions
@@ -47,6 +48,7 @@ load_dotenv()
 #getAllRessourcesFromDb()
 
 app = FastAPI()
+app_router = APIRouter()
 
 origins = [
     "*",
@@ -75,6 +77,7 @@ Initialising database
     #logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
 #    logging.getLogger().addHandler(logging.StreamHandler())
+    app.include_router(app_router)
 
 
 @app.get("/")
@@ -89,7 +92,7 @@ async def get_metadata(iiif_url, material):
     """
     Method returning metadata for a given iiif url
     """
-    logger.info("INFO /getMetadata - get_metadata")
+    logger.info("       INFO /getMetadata - get_metadata")
     print("iiif URL: "+iiif_url)
     print("material: "+material)
     m = await parse_iiif.parse_iiif(iiif_url, material)
@@ -255,14 +258,15 @@ async def save_connected_records(metadata: classes.Metadata):
     #print(m)
     return ingest_result
 
-@app.get("/allResources", response_model=List[classes.PreviewListDb])
+@app_router.get("/allResources")
 async def get_all_resources():
+#, response_model=List[classes.PreviewListDb])
     """
     Endpoint to get all resources from the database
     """
     logger.info("INFO /allResources get_all_resources")
-    r=db_actions.get_all_resources_from_db()
-#    print(r)
+    r = await db_actions.get_all_resources_from_db()
+    print(r)
     return r
 
 @app.get("/resource", response_model=classes.Record)
@@ -313,16 +317,23 @@ async def find_all_images(identifier: str):
     print(r)
     return
 
-@app.get("/getBookRecord", response_model = classes.BookDbDisplay)
+@app_router.get("/getBookRecord", response_model = classes.BookDb)
 async def get_book_record(identifier: str):
     """
     \todo move to get_resource
     """
     logger.info("INFO getBookRecord get_book_record")
-    print("arrived in get book record")
-    book_record = display_records.get_book_record(identifier)
+    book_record = await display_records.get_book_record(identifier)
     print("bookrecord before returning from main.py: ")
-    print(book_record)
+#    print(await book_record.to_list())
+#    print(book_record)
+#    print(book_record.__dict__)
+    print (type(book_record))
+    if book_record is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Book not found"
+        )
     return book_record
 
 @app.get("/getManuscriptRecord", response_model = classes.ManuscriptDbDisplay)
@@ -336,7 +347,7 @@ async def get_manuscript_record(identifier: str):
     return manuscript_record
 
 
-@app.get("/getPersonRecord", response_model = classes.PersonDbDisplay)
+@app.get("/getPersonRecord", response_model = classes.Person)
 async def get_person_record(identifier: str):
     """
     \todo move to get_resource    

@@ -11,13 +11,16 @@ import get_external_data
 #URI_entered = "abc"
 
 @classes.func_logger
-def select_bibliography (bid_name, bid_id):
+async def select_bibliography (bid_name, bid_id):
     """
     \todo documentation
     """
+    print("select_bibliography")
     if (bid_name == "VD17" or bid_name == "vd17"):
         url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0&operation=searchRetrieve&query=pica.vds=" + bid_id + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
         #bibliographic_information_single = VD17_parsing((book_properties[2][step1])[2])
+        print("getting bibliography")
+        print(url_bibliography)
         bibliographic_information_single = books_parsing_bibliographies.parse_vd17(url_bibliography)
     elif (bid_name == "VD18" or bid_name == "vd18"):
         url_bibliography = r"http://sru.k10plus.de/vd18?version=2.0&operation=searchRetrieve&query=pica.vdt=vd18" + bid_id + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
@@ -33,42 +36,42 @@ def select_bibliography (bid_name, bid_id):
         GW_number = bid_id.lstrip("0")
         ##Removing leading zeros that are accepted in many cases but not by the ISTC            
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + GW_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography) 
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography) 
     elif bid_name  == "ISTC":
         ISTC_number = bid_id
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + ISTC_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography) 
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography) 
     # the following options (and perhaps more will have to follow) are only used for libraries such as the BnF that do not regularly give ISTC or GW numbers
     elif bid_name == "Goff":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
         if bibliographic_information_single is None: # Sometimes, ISTC write the Goff number without a hyphen
             bid_id = bid_id.replace("-", "")
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Goff ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full&style=full'
             print("search string without hyphen: ")
             print(url_bibliography)
-            bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+            bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
     elif bid_name == "CIBN":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22CIBN ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
     elif bid_name == "C":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22C ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await  books_parsing_bibliographies.parse_istc(url_bibliography)
     elif bid_name == "HC":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HC ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
         if bibliographic_information_single is None: # ISTC makes a distinction between "H" (the main part of the work), "HC" (the most common addition) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22H ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-            bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+            bibliographic_information_single =  await books_parsing_bibliographies.parse_istc(url_bibliography)
         if bibliographic_information_single is None: # ISTC makes a distinction between "HC" (the main part of the work) and "HCR" (the appendix), the BnF has them both as Hain-Copinger
             url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22HCR ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-            bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)       
+            bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)       
     elif bid_name == "Pell Ms":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Pell Ms ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
     elif bid_name == "Bod-inc":
         url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22Bod-inc ' + bid_id + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
-        bibliographic_information_single = books_parsing_bibliographies.parse_istc(url_bibliography)
+        bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography)
     
 
     #print(bibliographic_information_single)
@@ -83,6 +86,7 @@ async def parse_iiif(uri_entered, material):
     """
 
 # Step 1: Information is collected from the IIIF manifest
+    print("getting manifest from url")
     manifest= await get_external_data.get_web_data_as_json(uri_entered)
 
 
@@ -161,12 +165,12 @@ async def parse_iiif(uri_entered, material):
 
 
 
-
+    print("getting bibliography")
     for step1 in range(len(m.bibliographic_id)):
         #print(m.bibliographic_id[step1][1])
         bid_name = (m.bibliographic_id[step1]).name
         bid_id = (m.bibliographic_id[step1]).id
-        bibliographic_information_single = select_bibliography(bid_name, bid_id)
+        bibliographic_information_single = await select_bibliography(bid_name, bid_id)
 
 
         if bibliographic_information_single != "": #omit appending if nothing came back from the function (this is the case when the record

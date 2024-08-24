@@ -346,6 +346,6 @@ async def ingest_organisation(org):
                             org_new.connected_locations.append(new_connection)
                         break
 
-    db_actions.insert_record_organisation(org_new)
+    await db_actions.insert_record_organisation(org_new)
 
     return org_new.id

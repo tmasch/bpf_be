@@ -57,12 +57,14 @@ logger = logging.getLogger(__name__)
 async def metadata_dissection(metadata):
     print("creating metadata records")
     persons_list = await metadata_persons(metadata)
+    print(persons_list)
     print("-------------------------------------- organisations")
     orgs_list = await metadata_organisations(metadata)
     print("-------------------------------------- places")
     places_list = await metadata_place(metadata)
     print("-------------------------------------- repositories")
     org = await metadata_repositories(metadata)
+
     print("-------------------------------------- manuscript")
     if metadata.material == "m": # If the item has been identified as a manuscript
         new_manuscript = await populate_manuscript_from_metadata(metadata)
@@ -71,12 +73,14 @@ async def metadata_dissection(metadata):
     print("-------------------------------------- book")
     if metadata.material == "b": # If the item has been identified as printed book
         new_book = await populate_book_from_metadata(metadata)
-        db_actions.insert_record_book(new_book)
+        new_book.persons2=persons_list
+        await db_actions.insert_record_book(new_book)
         record_id=new_book.id
 
     print("--------------------------------------")
     new_pages = await populate_pages_from_metadata(metadata,record_id,org)
-    db_actions.insert_record_pages(new_pages)
+    new_pages.book=new_book
+    await db_actions.insert_record_pages(new_pages)
 
     return 1
 
@@ -102,6 +106,7 @@ async def metadata_persons(metadata):
 #            print("--------------------------------------")
 #            print("Persons in metadata.bibliographic_information[0]: ")
 #            print(metadata.bibliographic_information[0].persons)
+
             print("--------------------------------------")
             print("Making_processes in metadata: ")
             print(metadata.making_processes)
@@ -113,6 +118,7 @@ async def metadata_persons(metadata):
     #                print("Persons in metadata.bibliographic_information[0] after adding making_process to persons_list: ")
     #                print(metadata.bibliographic_information[0].persons)
         
+        ppp=[]
         if len(persons_entered_list) > 0:
             for person in persons_entered_list:
                 no_new_person_chosen_from_list = False
@@ -152,14 +158,16 @@ async def metadata_persons(metadata):
                             break
                     else: 
     #                        print("New person is not a duplicate")
-                        person.internal_id = await ingest_person(person)
+                        pp = await ingest_person(person)
+                        ppp.append(pp)
+                        person.internal_id = pp.id
                         person_against_duplication.preview = person.potential_candidates[person.chosen_candidate].preview
                         person_against_duplication.id = person.internal_id
                         person_against_duplication.person_type1 = parsing_helpers.map_role_to_person_type(person.role)
                         persons_list.append(person_against_duplication)
     #                       print("record against duplication: ")
     #                       print(person_against_duplication)
-    return persons_list
+    return ppp
 
 @classes.func_logger
 async def metadata_organisations(metadata):
@@ -376,6 +384,7 @@ async def populate_book_from_metadata(metadata):
             new_bibliographic_id = classes.ExternalId()
             new_bibliographic_id = bibliographic_id
             new_book.bibliographic_id.append(new_bibliographic_id)
+
     if metadata.bibliographic_information[0].persons:
 #            print("-------------------------------------------------------------------")
 #            print("persons in metadata.bibliographic_information[0].persons at the end of metadata_dissection: ")
@@ -388,6 +397,10 @@ async def populate_book_from_metadata(metadata):
             else:
                 new_person.name = person.name # This is a stopgap measure if a person could not be identified
             new_book.persons.append(new_person)
+
+            np = classes.ConnectedRecord()
+            np.role=new_person.role
+
     if metadata.bibliographic_information[0].organisations:
         for org in metadata.bibliographic_information[0].organisations:
             new_org = classes.BookConnectedEntityDb()
@@ -397,6 +410,7 @@ async def populate_book_from_metadata(metadata):
             else: 
                 new_org.name = org.name # This is a stopgap measure if an organisation could not be identified
             new_book.organisations.append(new_org)
+
     if metadata.bibliographic_information[0].places:
         for place in metadata.bibliographic_information[0].places:
             new_place = classes.BookConnectedEntityDb()
@@ -406,6 +420,7 @@ async def populate_book_from_metadata(metadata):
             else: 
                 new_place.name = place.name # This is a stopgap measure if a place could not be identified
             new_book.places.append(new_place)
+
     new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].date_string + ")"
 
 

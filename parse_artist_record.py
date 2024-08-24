@@ -1,8 +1,10 @@
-import classes
-from parse_date import parse_artist_date
-
+#pylint: disable=C0301, C0303, C0114
 
 import ast
+
+import classes
+import parse_date
+
 
 
 @classes.func_logger
@@ -12,7 +14,7 @@ Currently, this file is also used if an organisation is found at the search for 
 One needs a separate function for parsing organisations. 
     """
     print("arrived in artists_parsing")
-    pe = classes.PersonImport()
+    pe = classes.Person()
     name_preferred_inversed = ""
     name_variant_preview = ""
     date_preview = ""
@@ -74,7 +76,7 @@ One needs a separate function for parsing organisations.
             date_from_source = classes.DateImport()
             date_from_source.datestring_raw = date_raw
             pe.dates_from_source.append(date_from_source)
-            date_processed = parse_artist_date(date_raw)
+            date_processed = parse_date.parse_artist_date(date_raw)
             pe.datestring = date_processed[0]
             pe.date_start = (date_processed[1], 1, 1)
             pe.date_end = (date_processed[2], 12, 31)

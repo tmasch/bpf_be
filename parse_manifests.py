@@ -15,6 +15,7 @@ from lxml import etree
 import classes
 from parse_canvas import parse_canvas, parse_canvas_yale
 
+@classes.func_logger
 def parse_manifests_bsb(manifest):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
 
@@ -112,7 +113,7 @@ def parse_manifests_bsb(manifest):
    
     return m
 
-
+@classes.func_logger
 def parse_manifest_halle(URI_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
     url = urllib.request.urlopen(URI_entered)
@@ -204,6 +205,7 @@ def parse_manifest_halle(URI_entered):
    
     return m
 
+@classes.func_logger
 def parse_manifest_berlin(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -294,7 +296,7 @@ def parse_manifest_berlin(URI_entered):
    
     return m
 
-
+@classes.func_logger
 def parse_manifest_cambridge_trinity(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -369,7 +371,7 @@ def parse_manifest_cambridge_trinity(URI_entered):
     
     
 
-
+@classes.func_logger
 def parse_manifest_thulb(URI_entered):
     # This function is for all JSON-manifests produced by the Jena library, this includes manifests from Erfurt and Gotha. 
 
@@ -460,6 +462,7 @@ def parse_manifest_thulb(URI_entered):
    
     return m
 
+@classes.func_logger
 def parse_manifest_slub(uri_entered):
     """
 \todo
@@ -540,6 +543,7 @@ def parse_manifest_slub(uri_entered):
    
     return m
 
+@classes.func_logger
 def parse_manifest_cambridge_corpus(uri_entered):
     """
 Since currently no printed books from Corpus have been digitised on this platform, this function deals with manuscripts only. 
@@ -596,6 +600,7 @@ Since currently no printed books from Corpus have been digitised on this platfor
     return m
 
 
+@classes.func_logger
 def parse_manifest_leipzig(uri_entered):
     """
 \todo
@@ -672,7 +677,7 @@ def parse_manifest_leipzig(uri_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_gallica(URI_entered):
     # This function works only on the manifests from Gallica proper, not on external manifests shown here (hence it works on the BnF, Arsenal, and very few other libraries)
     # Unfortunately, references to bibliographical reportories are not really standardised in Gallica, they can appear in at least four different places. 
@@ -919,7 +924,7 @@ def parse_manifest_gallica(URI_entered):
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_ecodices(uri_entered):
     #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
     url = urllib.request.urlopen(uri_entered)
@@ -970,7 +975,7 @@ def parse_manifest_ecodices(uri_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_erara(uri_entered):
     """
 \todo
@@ -1096,6 +1101,7 @@ def parse_manifest_erara(uri_entered):
     return m
 
 
+@classes.func_logger
 def parse_manifest_bodleian(uri_entered):
     """
 \todo
@@ -1191,6 +1197,7 @@ def parse_manifest_bodleian(uri_entered):
    
     return m
 
+@classes.func_logger
 def parse_manifest_heidelberg(uri_entered):
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
@@ -1251,7 +1258,7 @@ def parse_manifest_heidelberg(uri_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_vaticana(uri_entered):
     """
 \todo
@@ -1334,6 +1341,7 @@ def parse_manifest_vaticana(uri_entered):
     m.images = images
     return m
 
+@classes.func_logger
 def parse_manifest_vienna(uri_entered):
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
@@ -1434,7 +1442,7 @@ def parse_manifest_vienna(uri_entered):
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_washington(uri_entered): 
     """
 This section is still untested since I couldn't open the manifest
@@ -1527,7 +1535,7 @@ This section is still untested since I couldn't open the manifest
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_goettingen (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1633,7 +1641,7 @@ def parse_manifest_goettingen (URI_entered):
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_princeton (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1726,7 +1734,7 @@ def parse_manifest_princeton (URI_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_yale (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1791,7 +1799,7 @@ def parse_manifest_yale (URI_entered):
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_boston (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -1850,7 +1858,7 @@ def parse_manifest_boston (URI_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_manchester (URI_entered): 
     # As of 2023, Manchester seems to have onle two digitised incunables - hence, this modules is only geared at manuscripts. 
     url = urllib.request.urlopen(URI_entered)
@@ -1893,7 +1901,7 @@ def parse_manifest_manchester (URI_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_cambridge_ul (URI_entered): 
     # As of 2023, Cambridge has virtually only catalogued manuscripts, hence there is no function for printed books
     url = urllib.request.urlopen(URI_entered)
@@ -1947,7 +1955,7 @@ def parse_manifest_cambridge_ul (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifests_irht (URI_entered): 
     # This repository only contains manuscripts
     url = urllib.request.urlopen(URI_entered)
@@ -2005,7 +2013,7 @@ def parse_manifests_irht (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifest_frankfurt (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2064,7 +2072,7 @@ def parse_manifest_frankfurt (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifest_weimar (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2190,7 +2198,7 @@ def parse_manifest_weimar (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifest_kiel (URI_entered): 
     print("Start parsing Kiel")
     url = urllib.request.urlopen(URI_entered)
@@ -2294,7 +2302,7 @@ def parse_manifest_kiel (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifest_hamburg (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2439,7 +2447,7 @@ def parse_manifest_hamburg (URI_entered):
     return m
 
 
-
+@classes.func_logger
 def parse_manifest_rostock (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2532,7 +2540,7 @@ def parse_manifest_rostock (URI_entered):
 
 
 
-
+@classes.func_logger
 def parse_manifest_nuernberg_stb (URI_entered): 
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
@@ -2609,7 +2617,7 @@ def parse_manifest_nuernberg_stb (URI_entered):
     m.images = images
     return m
 
-
+@classes.func_logger
 def parse_manifest_manuscriptorium (URI_entered): 
     # This database seems to contain only manuscripts, hence there is no provision for printed books here
     url = urllib.request.urlopen(URI_entered)

@@ -13,12 +13,14 @@ from lxml import etree
 import requests
 import classes
 from parsing_helpers import convert_roman_numerals
+import get_external_data
 
 @classes.func_logger
 def parse_vd17(url_bibliography):
     """
 This function can be used for parsing both the VD17 and the VD18
     """
+    print("PARSE VD17")
     print(url_bibliography)
     printing_information_pattern = r'(.*)(: )(.*)'
     bi = classes.BibliographicInformation()
@@ -176,126 +178,130 @@ This function can be used for parsing both the VD17 and the VD18
                         bi.places.append(pl)
  #       return bibliographic_id_list, person_list, place_list,
             # title, volume_number, part_title, printing_date, printing_information
-        year_pattern_isolated = r'\d{4}'
-        year_pattern_brackets = r'\[(ca. |ca.|ca |circa |um |vor |nicht vor \
-            |nach |nicht nach |erschienen |erschienen ca. \
-            |erschienen nach |i.e. )?(\d{4})?([MDCLXVI\.]*)?(\?|\? )?(/\d{2}|/\d{4})?\]'
-        year_pattern_arabic_in_text = r'(1\d{3})[\D$]?'
-        # should mean 1XXX, then a non-number or end of string
-        year_pattern_roman_in_text = r'(M[DCLXVI\. ]*)'
-        if printing_date_raw:
-            print("Rohdatum: ")
-            print(printing_date_raw)
-            if re.match(year_pattern_isolated, printing_date_raw):
-                # This means ca. 80% of the cases, when there is just a four-digit year
-                print("Year simple number")
-                bi.date_string = printing_date_raw
-                start_year = int(printing_date_raw)
-                end_year = int(printing_date_raw)
-            elif re.search(year_pattern_brackets, printing_date_raw):
-                # If there is a date given in brackets, it should be the preferred form to use
-                printing_date_divided = re.search(year_pattern_brackets, printing_date_raw).groups()
-                print("Year in square brackets matched")
-                if printing_date_divided[1]:
-                    print("year string: " + printing_date_divided[1])
-                    year_string = printing_date_divided[1]
-                    bi.date_string = year_string
-                    start_year = int(year_string)
-                    end_year = int(year_string)
-                elif printing_date_divided[2]:
-                    year_string = convert_roman_numerals(printing_date_divided[2])
-                    bi.date_string = year_string
-                    start_year = int(year_string)
-                    end_year = int(year_string)
-                if printing_date_divided[4]: #if there is a second year given as end of a period
-                    year_end_string = printing_date_divided[4][1:]
-                    print("Year_end_string found: ")
-                    print(year_end_string)
-                    if len(year_end_string) == 2: #if there are only two digits
-                        year_end_string = "17" + year_end_string
-                    year_string = year_string + " / " + year_end_string
-                    bi.date_string = year_string
-                    end_year = int(year_end_string)
-                if printing_date_divided[0]:
-                    print("Year in square brackets with Prefix")
-                    match printing_date_divided[0]:
-                        case "erschienen ":
-                            bi.date_string = year_string
-                            start_year = int(year_string)
-                            end_year = int(year_string)
-                        case "ca. "|"ca."|"ca "|"circa "|"um "|"erschienen ca. ":
-                            bi.date_string =  "about " + year_string
-                            start_year = int(year_string)- 2
-                            end_year = int(year_string) + 2
-                        case "vor ": # I include the year for 'before' in the string
-                            #since I am not sure if it always means 'before Jan 1st'
-                            bi.date_string =  "before " + year_string
-                            start_year = int(year_string) - 5
-                            end_year = int(year_string)
-                        case "nach "|"erschienen nach ": # cf. comment on "vor "
-                            bi.date_string =  "after " + year_string
-                            start_year = int(year_string)
-                            end_year = int(year_string) + 5
-                        case "nicht vor ":
-                            bi.date_string =  "not before " + year_string
-                            start_year = int(year_string)
-                            end_year = int(year_string) + 5
-                        case "nicht nach ":
-                            bi.date_string =  "not after " + year_string
-                            start_year = int(year_string) - 5
-                            end_year = int(year_string)
-                        case "i.e. ":
-                            bi.date_string = year_string + " (corrected date)"
-                            start_year = int(year_string)
-                            end_year = int(year_string)
-                if printing_date_divided[3] == "?" or printing_date_divided[3] == "? ":
-                    bi.date_string = bi.date_string + "?"
-            else: # This means that there the original datestring
-                #from the book that will hopefully contain a legible date
-                printing_date_raw = printing_date_raw.replace("[", "")
-                printing_date_raw = printing_date_raw.replace("]", "")
-                #date_string = date_string.replace("M D", "MD")
-                #date_string = date_string.replace("D C", "DC")
-
-                if re.search(year_pattern_arabic_in_text, printing_date_raw):
-                    #This means that if there is a four-digit date
-                    # starting with '1' in the text and nothing in square brackets
-                    year_string = re.search(year_pattern_arabic_in_text, \
-                        printing_date_raw).groups()[0]
-                    print("four arabic digits found in text")
-                    bi.date_string = year_string
-                    start_year = int(year_string)
-                    end_year = int(year_string)
-                if re.search(year_pattern_roman_in_text, printing_date_raw):
-                    # This means that there is a string in Roman numerals starting with "M"
-                    year_string = convert_roman_numerals(re.search(year_pattern_roman_in_text, \
-                        printing_date_raw).groups()[0])
-                    bi.date_string = year_string
-                    print("Year in Roman numerals:")
-                    print(bi.date_string)
-                    start_year = int(year_string)
-                    end_year = int(year_string)
-                elif "18. Jh." in printing_date_raw or "18.Jh." in printing_date_raw:
-                    bi.date_string = "18th century"
-                    start_year = 1701
-                    end_year = 1800
-
-                else:
-                    print("year not digested")
-            bi.date_start = (start_year, 1, 1)
-            bi.date_end = (end_year, 12, 31)
-#            bi.date_start = datetime(start_year, 1, 1, 0, 0, 0, 0)
-#           #There are apparently never months or days in standardised format.
-#            bi.date_end = datetime(end_year, 12, 31, 23, 59, 59, 0)
-#            if bi.date_string:
-#                print(bi.date_string)
-#                print(bi.date_start.isoformat())
-#                print(bi.date_end.isoformat())
-#                bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] + \
-#                " - " + bi.date_end.isoformat()[0:10] + ")"
         print("bibliographic information from VD17:")
         print(bi)
-        return bi
+        if printing_date_raw:
+            bi.date_string, bi.date_start, bi.date_end = map_printing_date(printing_date_raw)
+    return bi
+
+@classes.func_logger
+def map_printing_date(printing_date_raw):
+    year_pattern_isolated = r'\d{4}'
+    year_pattern_brackets = r'\[(ca. |ca.|ca |circa |um |vor |nicht vor \
+        |nach |nicht nach |erschienen |erschienen ca. |erschienen|\
+        |erschienen nach |i.e. )?(\d{4})?([MDCLXVI\.]*)?(\?|\? )?(/\d{2}|/\d{4})?\]'
+    year_pattern_arabic_in_text = r'(1\d{3})[\D$]?'
+    # should mean 1XXX, then a non-number or end of string
+    year_pattern_roman_in_text = r'(M[DCLXVI\. ]*)'
+
+    start_year=1000
+    end_year=1000
+    date_string="1000"
+
+    print("Rohdatum: ")
+    print(printing_date_raw)
+    if re.match(year_pattern_isolated, printing_date_raw) and len(printing_date_raw)==4:
+        # This means ca. 80% of the cases, when there is just a four-digit year
+        print("Year simple number")
+        date_string = printing_date_raw
+        start_year = int(printing_date_raw)
+        end_year = int(printing_date_raw)
+    elif re.search(year_pattern_brackets, printing_date_raw):
+        # If there is a date given in brackets, it should be the preferred form to use
+        printing_date_divided = re.search(year_pattern_brackets, printing_date_raw).groups()
+        print("Year in square brackets matched")
+        if printing_date_divided[1]:
+            print("year string: " + printing_date_divided[1])
+            year_string = printing_date_divided[1]
+            date_string = year_string
+            start_year = int(year_string)
+            end_year = int(year_string)
+        elif printing_date_divided[2]:
+            year_string = convert_roman_numerals(printing_date_divided[2])
+            date_string = year_string
+            start_year = int(year_string)
+            end_year = int(year_string)
+        if printing_date_divided[4]: #if there is a second year given as end of a period
+            year_end_string = printing_date_divided[4][1:]
+            print("Year_end_string found: ")
+            print(year_end_string)
+            if len(year_end_string) == 2: #if there are only two digits
+                year_end_string = "17" + year_end_string
+            year_string = year_string + " / " + year_end_string
+            date_string = year_string
+            end_year = int(year_end_string)
+        if printing_date_divided[0]:
+            print("Year in square brackets with Prefix")
+            match printing_date_divided[0]:
+                case "erschienen ":
+                    date_string = year_string
+                    start_year = int(year_string)
+                    end_year = int(year_string)
+                case "ca. "|"ca."|"ca "|"circa "|"um "|"erschienen ca. ":
+                    date_string =  "about " + year_string
+                    start_year = int(year_string)- 2
+                    end_year = int(year_string) + 2
+                case "vor ": # I include the year for 'before' in the string
+                    #since I am not sure if it always means 'before Jan 1st'
+                    date_string =  "before " + year_string
+                    start_year = int(year_string) - 5
+                    end_year = int(year_string)
+                case "nach "|"erschienen nach ": # cf. comment on "vor "
+                    date_string =  "after " + year_string
+                    start_year = int(year_string)
+                    end_year = int(year_string) + 5
+                case "nicht vor ":
+                    date_string =  "not before " + year_string
+                    start_year = int(year_string)
+                    end_year = int(year_string) + 5
+                case "nicht nach ":
+                    date_string =  "not after " + year_string
+                    start_year = int(year_string) - 5
+                    end_year = int(year_string)
+                case "i.e. ":
+                    date_string = year_string + " (corrected date)"
+                    start_year = int(year_string)
+                    end_year = int(year_string)
+        if printing_date_divided[3] == "?" or printing_date_divided[3] == "? ":
+            date_string = date_string + "?"
+    else: # This means that there the original datestring
+        #from the book that will hopefully contain a legible date
+        printing_date_raw = printing_date_raw.replace("[", "")
+        printing_date_raw = printing_date_raw.replace("]", "")
+        #date_string = date_string.replace("M D", "MD")
+        #date_string = date_string.replace("D C", "DC")
+
+        if re.search(year_pattern_arabic_in_text, printing_date_raw):
+            #This means that if there is a four-digit date
+            # starting with '1' in the text and nothing in square brackets
+            year_string = re.search(year_pattern_arabic_in_text, \
+                printing_date_raw).groups()[0]
+            print("four arabic digits found in text")
+            date_string = year_string
+            start_year = int(year_string)
+            end_year = int(year_string)
+        if re.search(year_pattern_roman_in_text, printing_date_raw):
+            # This means that there is a string in Roman numerals starting with "M"
+            year_string = convert_roman_numerals(re.search(year_pattern_roman_in_text, \
+                printing_date_raw).groups()[0])
+            date_string = year_string
+            print("Year in Roman numerals:")
+            print(date_string)
+            start_year = int(year_string)
+            end_year = int(year_string)
+        elif "18. Jh." in printing_date_raw or "18.Jh." in printing_date_raw:
+            date_string = "18th century"
+            start_year = 1701
+            end_year = 1800
+
+        else:
+            print("year not digested")
+
+    date_start = (start_year, 1, 1)
+    date_end = (end_year, 12, 31)
+    return date_string, date_start, date_end
+
+
 
 @classes.func_logger
 def parse_vd16(url_bibliography):
@@ -586,7 +592,7 @@ def istc_parsing_alt(url_bibliography):
 
 
 @classes.func_logger
-def parse_istc(url_bibliography):
+async def parse_istc(url_bibliography):
     """This parses the istc records that can be downloaded in JSON. 
     Since the Imprint is normally one line only, some string processing is necessary"""
     # A small problem: if there are several imprints, I take the
@@ -628,10 +634,12 @@ def parse_istc(url_bibliography):
 
 
     bi = classes.BibliographicInformation()
-    print("URL for search in ISTC: " + url_bibliography)
-    istc_record_raw = requests.get(url_bibliography, timeout = 10)
-    istc_record_full = (istc_record_raw).json()
-    print(istc_record_full)
+#    print("URL for search in ISTC: " + url_bibliography)
+#    istc_record_raw = requests.get(url_bibliography, timeout = 10)
+#    istc_record_full = (istc_record_raw).json()
+#    print(istc_record_full)
+    istc_record_full = await get_external_data.get_web_data_as_json(url_bibliography)
+#    print(istc_record_full2)
 
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")
@@ -940,7 +948,8 @@ def parse_istc(url_bibliography):
                     # I could instead replace the string for the role with a list,
                     # but this is a lot more work, so I have to think
                     # if this is appropriate (I fear it is)
-                else: printer_name_long = imprint_name_long
+                else: 
+                    printer_name_long = imprint_name_long
 
 
                 if printer_name_long:

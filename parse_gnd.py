@@ -5,22 +5,28 @@
 import urllib.request
 import xml.etree.ElementTree
 #import re
+import os
 #from dates_parsing import date_overall_parsing
 from get_external_data import search_ulan
-from parse_date import parse_manually_entered_date
+#from parse_date import parse_manually_entered_date
+import parse_date
 import parsing_helpers
 import db_actions
 import classes
 from parsing_helpers import encoding_list, url_replacement
+from pymongo import MongoClient
 
 
 #This is only for stand-alone execution of functions in this module, in other cases, a connection to the database has already been made. 
-#client = MongoClient("localhost", 27017)
-#db = client.bpf
-#coll = db.bpf
+os.environ["MONGODB_HOST"] = "localhost"
+os.environ["MONGODB_PORT"] = "27017"
 
-#dbname =  get_database()
-#coll=dbname['bpf']
+client = MongoClient("localhost", 27017)
+db = client.bpf
+coll = db.bpf
+
+dbname =  db_actions.get_database()
+coll=dbname['bpf']
 
 @classes.func_logger
 async def identify_person(person):
@@ -35,7 +41,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
     person.chosen_candidate = 999 # For some reason, I cannot return the form when 'chosen candidate' is empty. Hence, I put this in as a default setting. 
     if person.id:
 #        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-        person_found = db_actions.find_person(person,"external_id")
+        person_found = await db_actions.find_person(person,"external_id")
         if person_found:            
             #print(person_found)
             person.internal_id = person_found["id"]
@@ -61,10 +67,10 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
         person.name = person.name.strip()
         for old, new in encoding_list.items():
             person.name = person.name.replace(old, new)
-#        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
-        candidates_result = db_actions.find_person(person,"name_preferred")
+        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+        candidates_result = await db_actions.find_person(person,"name_preferred")
         for candidate_result in candidates_result:
-            candidate = classes.PersonImport()   
+            candidate = classes.Person()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
@@ -74,11 +80,11 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
             print(candidate.name_preferred)
             print(candidate.internal_id_person_type1)
             person.potential_candidates.append(candidate)
-#        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
-        candidates_result = db_actions.find_person(person,"name_variant")
+        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
+#        candidates_result = db_actions.find_person(person,"name_variant")
         #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         for candidate_result in candidates_result:
-            candidate = classes.PersonImport()
+            candidate = classes.Person()
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_person_type1 = candidate_result["person_type1"]
@@ -139,7 +145,7 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_persons_list = []
-    potential_person = classes.PersonImport()
+    potential_person = classes.Person()
 #    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
     person = classes.Person()
     person.new_authority_id = new_authority_id
@@ -284,7 +290,7 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
-    potential_org = classes.PersonImport()
+    potential_org = classes.Person()
     org = classes.Organisation
     org.new_authority_id=new_authority_id
 #    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
@@ -483,7 +489,7 @@ def parse_person_gnd(authority_url):
     
     for record in root[2]:
         print("Parsing person information")
-        pe = classes.PersonImport()
+        pe = classes.Person()
         comment = ""
         date_preview = ""
         ortg_preview = ""
@@ -1314,7 +1320,7 @@ async def identify_making_process(making_processes):
             print("Date_found")
             print(date.datestring_raw)
             try:
-                date_new = parse_manually_entered_date(date.datestring_raw)
+                date_new = parse_date.parse_manually_entered_date(date.datestring_raw)
                 making_process.date = date_new
             except classes.InvalidDateStringException as d:
                 print(f"String could not be divided into individual dates: {d}")

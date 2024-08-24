@@ -25,6 +25,7 @@ def map_role_to_organisation_type(role):
 def map_role_to_person_type(role):
     role_person_type_correspondence = {"aut" : "Author", "edt" : "Author", "rsp" : "Author", "prt" : "Printer", "pbl" : "Printer", "art" : "Artist"}
     person_type=role_person_type_correspondence[role]
+    print("Role: "+role+" Person type: "+person_type)
     return person_type
 
 @classes.func_logger
@@ -154,6 +155,7 @@ def convert_roman_numerals(roman_number):
                     result = result + 1
     return str(result)
 
+@classes.func_logger
 def convert_english_ordinal_suffix(number):
     """
 This function returns the suffix transforming an English number into an ordinal

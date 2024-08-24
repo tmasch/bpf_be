@@ -32,11 +32,12 @@ async def initialise_beanie():
     MOTOR_CLIENT = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
     DATABASE = MOTOR_CLIENT[MONGO_DB_DATABASE_NAME]
     await init_beanie(database=DATABASE, document_models=[classes.Metadata,\
-                                                        classes.PersonDb,\
+                                                        classes.Person,\
                                                         classes.OrganisationDb,\
                                                         classes.BookDb,\
                                                         classes.PlaceDb,\
-                                                        classes.PagesDb])
+                                                        classes.PagesDb, \
+                                                        classes.Union])
 
 @classes.func_logger
 def get_database():
@@ -56,7 +57,7 @@ def get_database():
     mongo_client = MongoClient(host=endpoint,port=mongo_port,connectTimeoutMS=1000,timeoutMS=1200)
     print(mongo_client)
     print("databases",mongo_client.list_database_names())
-#    await init_beanie(database=mongo_client.bpf, document_models=[classes.Metadata,classes.PersonDb,classes.OrganisationDb,classes.BookDb])
+#    await init_beanie(database=mongo_client.bpf, document_models=[classes.Metadata,classes.Person,classes.OrganisationDb,classes.BookDb])
     return mongo_client['bpf']
     # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
     # client = MongoClient('localhost', 27017)
@@ -75,20 +76,24 @@ def insert_metadata(metadata: classes.Metadata):
     return "Hello World"
 
 @classes.func_logger
-def get_all_resources_from_db():
+async def get_all_resources_from_db():
     """
     Method to get all ressources from the database
     """
-    print("Getting all ressources from the database")
-    dbname = get_database()
-    print("Database name:",dbname)
+#    print("Getting all ressources from the database")
+#    dbname = get_database()
+#    print("Database name:",dbname)
 #    print(".")
-    collection = dbname['bpf']
+#    collection = dbname['bpf']
 # the next line is not working for me :-(
 #    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
-    r=list(collection.find())
+#    r=list(collection.find())
+    books = classes.BookDb.find()
+    records = await classes.Union.find().to_list()
+    print(records)
 #    print(r)
-    return r
+    r = await books.to_list()
+    return records
 
 @classes.func_logger
 def get_resource_from_db(identifier):
@@ -118,15 +123,16 @@ def update_image_with_frames(identifier,i,frames):
     return result
 
 @classes.func_logger
-def insert_record_person(person: classes.PersonDb):
+async def insert_record_person(person: classes.Person):
     """
 This function inserts a newly created record for a person into the database
 It was made for persons connected to books but probably can be used for any person
     """
     print("Inserting person metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(person.dict())
+#    dbname = get_database()
+#    collection=dbname['bpf']
+#    collection.insert_one(person.dict())
+    await person.insert()
     return "Hello World"
 
 #def add_external_id(record_id, external_id):
@@ -251,17 +257,6 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
 
-@classes.func_logger
-def insert_record_organisation(organisation: classes.OrganisationDb):
-    """
-This function inserts a newly created record for an organisation into the database
-It was made for organisations connected to books but probably can be used for any organisation
-    """
-    print("Inserting metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(organisation.dict())
-    return "Hello World"
 
 @classes.func_logger
 def add_organisation_type(organisation_id, organisation_type1):
@@ -272,22 +267,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     collection=dbname['bpf']
     result = collection.update_one({"id" : organisation_id}, {'$addToSet' : {"org_type1" : organisation_type1}})
 
-@classes.func_logger
-async def insert_record_place(place: classes.PlaceDb):
-    """
-This function inserts a newly created record for a place into the database
-It was made for places connected to books but probably can be used for any place
-    """
-    print("Inserting place metadata in database")
-    print(place)
-    print(type(place))
-    print("dumping")
-    print (place.model_dump())
-#    await place.insert()
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(place.dict())
-    return "Hello World"
+
 
 @classes.func_logger
 def copy_place_record(place_id, place_type):
@@ -311,6 +291,38 @@ once I have an 'edit' view for authority records.
     return place_id
 
 @classes.func_logger
+async def insert_record_organisation(organisation: classes.OrganisationDb):
+    """
+This function inserts a newly created record for an organisation into the database
+It was made for organisations connected to books but probably can be used for any organisation
+    """
+    print("Inserting metadata in database")
+#    dbname = get_database()
+#    collection=dbname['bpf']
+#    collection.insert_one(organisation.dict())
+    await organisation.insert()
+    return "Hello World"
+
+
+@classes.func_logger
+async def insert_record_place(place: classes.PlaceDb):
+    """
+This function inserts a newly created record for a place into the database
+It was made for places connected to books but probably can be used for any place
+    """
+    print("Inserting place metadata in database")
+#    print(place)
+#    print(type(place))
+#    print("dumping")
+#    print (place.model_dump())
+    await place.insert()
+#    dbname = get_database()
+#    collection=dbname['bpf']
+#    collection.insert_one(place.dict())
+    return "Hello World"
+
+
+@classes.func_logger
 def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     """
     \todo
@@ -322,25 +334,27 @@ def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     return "Hello World"
 
 @classes.func_logger
-def insert_record_book(book : classes.BookDb):
+async def insert_record_book(book : classes.BookDb):
     """
     \todo
     """
     print("Inserting book metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(book.dict())
+#    dbname = get_database()
+#    collection=dbname['bpf']
+#    collection.insert_one(book.dict())
+    await book.insert()
     return "Hello World"
 
 @classes.func_logger
-def insert_record_pages(pages : classes.PagesDb):
+async def insert_record_pages(pages : classes.PagesDb):
     """
     \todo
     """
     print("Inserting pages metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(pages.dict())
+#    dbname = get_database()
+#    collection=dbname['bpf']
+#    collection.insert_one(pages.dict())
+    await pages.insert()
     return "Hello World"
 
 @classes.func_logger
@@ -353,29 +367,41 @@ def create_image_record():
     collection=dbname['bpf']
 
 @classes.func_logger
-def find_person(person: classes.Person, parameter: str):
+async def find_person(person: classes.Person, parameter: str):
     """
 \todo
     """
     dbname = get_database()
     collection = dbname['bpf']
     person = classes.Person()
+    person_found = None
     if parameter=="external_id":
-        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+#        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+        person_found = await classes.Person.find_one(classes.Person.external_id.id == person.id 
+                                            and classes.Person.external_id.name == person.name)
 #                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
     elif parameter=="name_preferred":
+#        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = await classes.Person.find(classes.Person.name_preferred == person.name)
         person_found = collection.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
     elif parameter=="name_variant":
-        person_found = collection.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = collection.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
     elif parameter=="GND":
-        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": person.new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": person.new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
     elif parameter=="external_id_ingest":
-        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
+        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
     elif parameter=="external_id_connected_organisation":
-        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
+        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
     elif parameter=="external_id_connected_location":
-        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
-
+        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
+    print(person_found)
+ #   if person_found:
+#        print("ID "+person_found.id+" NAME "+person_found.name_preferred)
     return person_found
 
 @classes.func_logger
@@ -410,7 +436,7 @@ def find_place(place: classes.Place, parameter: str):
     """
     dbname = get_database()
     collection = dbname['bpf']
-    place_found = classes.Place
+    place_found = classes.PlaceDb
     if parameter=="external_id":
         place_found = collection.find_one({"external_id": {"$elemMatch": {"name": place.id_name, "id": place.id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
     if parameter=="name_preferred":
@@ -476,21 +502,27 @@ def find_place_viaf(new_record_viaf_id,new_record_gnd_id):
 
 
 @classes.func_logger
-def add_relationship_in_far_record(record_found, record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
+def add_relationship_in_far_record(record_found: classes.Person , record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
     """
-This module is used for the 'stitching' together of records; it checks, if an already extant record ('far record') already has a connection with the new record.
-If so, it adds the ID of the new record to the connection; if no, it creates a new connection from scratch
-record_found is the record that will receive the reciprocal connection, record_new is the newly created record, record_new_type indicates, if the connection has to be inserted
+\todo Name should be somehing like "link records"
+
+This module is used for the 'stitching' together of records; it checks, if an already extant record 
+('far record') already has a connection with the new record.
+If so, it adds the ID of the new record to the connection; if no, it creates a new connection from 
+scratch
+record_found is the record that will receive the reciprocal connection, record_new is the newly created
+ record, record_new_type indicates, if the connection has to be inserted
 under "connected_persons", "connected_organisations", or "connected_locations".
-If the 'far record' has better information on the type of connection, its time, or comments, these fields returned to the main module. 
+If the 'far record' has better information on the type of connection, its time, or comments, these 
+fields returned to the main module. 
     """
     expected_connection_type = ""
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     print("step 2: arrived in add_relationship_in_far_record")
     print("record_found:")
-    print(record_found)
+    #print(record_found)
     print("record_new:" )
-    print(record_new)
+    #print(record_new)
     print("connected_person_connection_type: ")
     print(connected_entity_connection_type)
     print("connected_entity_connection_time: ")
@@ -500,6 +532,7 @@ If the 'far record' has better information on the type of connection, its time, 
     comment_correction = ""
     if record_found: # this is for making the reciprocal connection
         far_record = record_found[record_new_type]
+        record_found.t
         print("record_new_type")
         print(record_new_type)
         connection_found = False

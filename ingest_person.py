@@ -7,7 +7,8 @@ from nanoid import generate
 import classes
 import db_actions
 import person_relations
-from parse_date import parse_date_overall
+#from parse_date import parse_date_overall
+import parse_date
 import get_external_data
 import parsing_helpers
 
@@ -16,22 +17,37 @@ import parsing_helpers
 
 
 @classes.func_logger
-async def ingest_person(person):
-    # This function is about translating the imported information of a person into the information record used for the database. 
-    # It directly sends the new records to the function for writing it and only returns its ID to metadata_dissection
+async def ingest_person(person: classes.Person):
+    # This function is about translating the imported information of a person into the
+    #  information record used for the database. 
+    # It directly sends the new records to the function for writing it and only 
+    # returns its ID to metadata_dissection
 
     """
-    One of its roles is to 'stitch' the new entry into the system by creating connections to internal IDs. It does so in different steps.
-        Step 1: Checking the list of connected_entities in the new record, and if one of these entities is already in Iconobase, inserting its ID in the connected_entities record (I check first, if I can do 
-        any stitching already with GND IDs so that I don't have to import VIAF IDs for such records. Hence, I first run this step close to the start, and then a second time after I got all the VIAF IDs. )
-        Step 2: Checking if the identified connected record gives the new connected record as connected_entity. 
-            Step 2a: if yes: adding the internal ID of the new record as connected_entity (+ checking if the connection_types are compatible)
-            Step 2b: if no: adding the connection, with a connection type that is the complement to the one used in the original connection
-        Steps 1 and 2 happen twice: once, if a connection can already made through the default GND records, once, when it is necessary to download the VIAF records. 
-        Step 3: Check if any record already in Iconobase has a connection with the new record, without the new record having a connection with it. 
-            If yes, addition of a connection to the extant record with a complementary connection in the new record. 
+    One of its roles is to 'stitch' the new entry into the system by creating connections
+      to internal IDs. It does so in different steps.
+        Step 1: Checking the list of connected_entities in the new record, and if one of these 
+        entities is already in Iconobase, inserting its ID in the connected_entities record 
+        (I check first, if I can do 
+        any stitching already with GND IDs so that I don't have to import VIAF IDs for such 
+        records. Hence, I first run this step close to the start, and then a second time after 
+        I got all the VIAF IDs. )
+        Step 2: Checking if the identified connected record gives the new connected record as
+          connected_entity. 
+            Step 2a: if yes: adding the internal ID of the new record as connected_entity 
+            (+ checking if the connection_types are compatible)
+            Step 2b: if no: adding the connection, with a connection type that is the complement 
+            to the one used in the original connection
+        Steps 1 and 2 happen twice: once, if a connection can already made through the default GND 
+        records, once, when it is neces§sary to download the VIAF records. 
+        Step 3: Check if any record already in Iconobase has a connection with the new record, 
+        without the new record having a connection with it. 
+            If yes, addition of a connection to the extant record with a complementary 
+            connection in the new record. 
     """
-
+    f = open("export.txt","w")
+    f.write(person.model_dump_json())
+    f.close()
 
     list_of_ids_to_check = []
     list_of_viaf_ids = []
@@ -40,14 +56,28 @@ async def ingest_person(person):
     person_found = {}
     org_found = {}
     location_found = {}
+
+
 #    connection_already_made = False
     person_selected = person.potential_candidates[person.chosen_candidate]
-    person_new = classes.PersonDb()
+    print(type(person_selected))
+#    r = db_actions.find_person
+
+    person_new = classes.Person()
     person_new.id = generate()
     person_new.type = "Person"
     person_new.person_type1.append(parsing_helpers.map_role_to_person_type(person.role))
     person_new.external_id = person_selected.external_id
-    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time        
+    person_new.sex = person_selected.sex
+    person_new.name_preferred = person_selected.name_preferred
+    person_new.name_variant = person_selected.name_variant
+    if person.name not in person_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.
+        # This is necessary because up to now, Iconobase uses a string search for variants and not a word search. 
+        person_new.name_variant.append(person.name)
+
+
+
+
     for person_id in person_new.external_id:
         if person_id.name == "GND":
             new_record_gnd_id = person_id.id
@@ -58,26 +88,20 @@ async def ingest_person(person):
 
     #new_record_gnd_id = person_selected.external_id[0].id # I need this only as long as I cannot get VIAF to work for organisations. 
     #list_of_ids_to_check.append(person_new.external_id[0].uri) # The VIAF IDs added from this list will later be added to the record
-    person_new.name_preferred = person_selected.name_preferred
-    print("----------------------------------")
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    print("----------------------------------")
-    print("NOW PROCESSING PERSON")
+
+
     print(person_new.name_preferred)
     print(person_new.id)
     print(person_new.external_id)
     print(person_selected.connected_persons)
-    person_new.name_variant = person_selected.name_variant
-    if person.name not in person_new.name_variant: # Thus, the name that was used for the search is added as name variant to the iconobase.
-        # This is necessary because up to now, Iconobase uses a string search for variants and not a word search. 
-        person_new.name_variant.append(person.name)
-    person_new.sex = person_selected.sex
+
+
     #Currently, I still use the list of dates_from_source and simply add 
     # the newly parsed datestring and start and end dates to it. 
     #    In a later stage, the entire list will be sent to the parsing function, 
     # and only one date will come back for inclusion into the database 
     for date_from_source in person_selected.dates_from_source:
-        date_parsed = parse_date_overall(date_from_source.datestring_raw, date_from_source.date_comments, date_from_source.datetype)
+        date_parsed = parse_date.parse_date_overall(date_from_source.datestring_raw, date_from_source.date_comments, date_from_source.datetype)
         datestring = date_parsed[0]
         date_start = date_parsed[1]
         date_end = date_parsed[2]
@@ -92,6 +116,8 @@ async def ingest_person(person):
         date.date_aspect = date_aspect
         person_new.dates_from_source.append(date)
 
+
+
     if person_selected.connected_persons:
     # As part of the process of 'stitching' the records of connected persons together with other records already dealing with these persons, I first check if connections can be made via the 
     # GND ID - and if not, I check the VIAF ID. Since donwloading VIAF IDs is a slow process, I try to use get them in one go through async. 
@@ -102,27 +128,37 @@ async def ingest_person(person):
             connected_person.connection_comment, connected_person.connection_type = parsing_helpers.parse_relationship("person", "person", connected_person.connection_comment, connected_person.connection_type, person_new.sex)
             for external_id in connected_person.external_id:
 #                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
-                person_found = db_actions.find_person(external_id,"external_id")
+                person_found = await db_actions.find_person(external_id,"external_id")
                 if person_found:
                     print("---------------------------------------------")
                     print("step 1 (GND): person connected to person found")
-                    print(person_found)
-                    connected_person.id = person_found["id"]
-                    connected_person.name = person_found["name_preferred"] # Here, the year must be added. One should probably rename it as 'preview'. 
+                    print(person_found.id+person_found.name_preferred)
+                    connected_person.id = person_found.id
+                    connected_person.name = person_found.name_preferred # Here, the year must be added. One should probably rename it as 'preview'. 
 
-                    type_correction, time_correction, comment_correction = db_actions.add_relationship_in_far_record(person_found, person_new, "connected_persons", connected_person.connection_type, connected_person.connection_time, connected_person.connection_comment) # This is step 2, the reciprocal connection
-                    if type_correction != "":
-                        connected_person.connection_type = type_correction
-                    if time_correction != "":
-                        connected_person.connection_time = time_correction
-                    if comment_correction != "":
-                        connected_person.connection_comment = comment_correction
+
+                    # type_correction, time_correction, comment_correction = \
+                    #       db_actions.add_relationship_in_far_record(person_found,\
+                    #                                                 person_new,\
+                    #                                                  "connected_persons",\
+                    #                                                 connected_person.connection_type,\
+                    #                                                 connected_person.connection_time,\
+                    #                                                 connected_person.connection_comment) 
+                        # This is step 2, the reciprocal connection
+                    # if type_correction != "":
+                    #     connected_person.connection_type = type_correction
+                    # if time_correction != "":
+                    #     connected_person.connection_time = time_correction
+                    # if comment_correction != "":
+                    #     connected_person.connection_comment = comment_correction
 
                     break # if a connection with one ID is found, the other connections would be the same. 
 
             if not person_found and connected_person.external_id:
                 list_of_ids_to_check.append(connected_person.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
                     # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
+
+
     if person_selected.connected_organisations:
         for connected_org in person_selected.connected_organisations:
             connected_org.connection_comment, connected_org.connection_type = parsing_helpers.parse_relationship("person", "organisation", connected_org.connection_comment, connected_org.connection_type, person_new.sex)
@@ -170,6 +206,8 @@ async def ingest_person(person):
                     list_of_ids_to_check.append(gnd_internal_id.uri)
                 else:
                     list_of_ids_to_check.append(connected_org.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
+
+
 
     if person_selected.connected_locations:
         for connected_location in person_selected.connected_locations:
@@ -229,12 +267,14 @@ async def ingest_person(person):
     for connected_person in person_selected.connected_persons:
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
-                person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
                 person_id =classes.ExternalId()
                 person_id.name = "viaf"
+                person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
                 person_id.uri = person_viaf_url
                 person_id.id = person_viaf_url[21:]
                 connected_person.external_id.append(person_id)
+
+
     for connected_org in person_selected.connected_organisations:
         if connected_org.external_id:
             if connected_org.external_id[0].uri in list_of_viaf_ids:
@@ -244,6 +284,8 @@ async def ingest_person(person):
                 org_id.uri = org_viaf_url
                 org_id.id = org_viaf_url[21:]
                 connected_org.external_id.append(org_id)
+
+
     for connected_location in person_selected.connected_locations:
         if connected_location.external_id:
             if connected_location.external_id[0].uri in list_of_viaf_ids:
@@ -262,7 +304,7 @@ async def ingest_person(person):
                     if external_id.name != "DNB": # If it is, the connection has been made earlier
                     # This is 'stitching' step 1 for the records that can only be connected through VIAF
 #                        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
-                        person_found = db_actions.find_person(external_id,"external_id_ingest")
+                        person_found = await db_actions.find_person(external_id,"external_id_ingest")
                     if person_found:
                         print("---------------------------------------------")
                         print("step 1 (VIAF): person connected to person found")
@@ -283,6 +325,8 @@ async def ingest_person(person):
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
+
+
             # I don't understand the next two lines and have hence commented them out and replaced them with a third line
 #            if connected_person.name == "": # if there is no preview, i.e. no connection found
 #                new_connected_person.name = connected_person.name
@@ -305,6 +349,10 @@ async def ingest_person(person):
             new_connected_organisation.connection_time = connected_organisation.connection_time
             # For connection time see above under new connected person
             person_new.connected_organisations.append(new_connected_organisation)
+
+
+
+    connected_location_comment_is_date = r'(ab|bis|ca.|seit)?(\d \-)' # if the comment for a connection between person and location follows this pattern, it is moved to connection time        
     if person_selected.connected_locations:
         for connected_location in person_selected.connected_locations:
             # in not few cases, dates are written not into the date field but into the comment field of the connection, or they follow the descriptions "Wohnort" or "Wirkungsort"
@@ -380,5 +428,5 @@ async def ingest_person(person):
                         if far_record["type"] == "Place":
                             person_new.connected_locations.append(new_connection)
                         break
-    db_actions.insert_record_person(person_new)
-    return person_new.id
+    await db_actions.insert_record_person(person_new)
+    return person_new
