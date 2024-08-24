@@ -214,10 +214,9 @@ def parse_date(ds):
     # Date is X.X.YYYY
     if re.match(r"x\.x\.\d{4}", ds) and len(ds) == 8:
         t=ds.split(".")
-        day=""
         year=t[2]
         messages.append('Success')
-        messages.append('Date in DD.MM.YYYY format')
+        messages.append('Date in X.X.YYYY format')
         state="SUCCESS"
 
 

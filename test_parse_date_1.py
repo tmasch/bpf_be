@@ -6,7 +6,10 @@ import parse_date_1
 def test_empty_date():
     d=""
     r=parse_date_1.parse_date(d)
-    assert r.messages[0] == "No input"
+    assert r.day == ""
+    assert r.month == ""
+    assert r.year == ""
+    assert r.state == "SUCCESS"
 
 def test_four_digit_date():
     d="1234"
@@ -14,6 +17,7 @@ def test_four_digit_date():
     assert r.day == ""
     assert r.month == ""
     assert r.year == "1234"
+    assert r.state == "SUCCESS"
 
 def test_mm_dd_yyyy():
     d="12.12.1234"
@@ -174,11 +178,14 @@ def test_x_x_yyyy():
 
 def test_x_x_yyyy_born():
     d="*x.x.1234"
-    r=parse_date_1.parse_date(d)
+    r=parse_date_1.parse_date_range(d)
+    print("r")
     print(r)
-    assert r.day == ""
-    assert r.month == ""
-    assert r.year == "1234"
+    assert r.start.day == ""
+    assert r.start.month == ""
+    assert r.start.year == "1234"
+    assert r.start.state == "SUCCESS"
+#    assert r.end.state == "SUCCESS"
     assert r.state == "SUCCESS"
 
 #?.?.1797-29.04.1868

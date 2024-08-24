@@ -7308,3 +7308,229 @@ INFO:classes:DEBUG Call func metadata_pages
 INFO:classes:DEBUG Call func get_database
 INFO:classes:DEBUG Call func insert_record_pages
 INFO:classes:DEBUG Call func initialise_beanie
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_iiif from __main__
+DEBUG:classes:       DEBUG  parse_iiif from __main__ done
+DEBUG:classes:       DEBUG Call func get_web_data_as_json from parse_iiif
+DEBUG:classes:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:classes:       DEBUG Call func parse_manifests_bsb from parse_iiif
+DEBUG:classes:       DEBUG Call func parse_canvas from parse_manifests
+DEBUG:classes:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:classes:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:classes:       DEBUG Call func select_bibliography from parse_iiif
+DEBUG:classes:       DEBUG  select_bibliography from parse_iiif done
+DEBUG:classes:       DEBUG Call func parse_istc from parse_iiif
+DEBUG:classes:       DEBUG  parse_istc from parse_iiif done
+DEBUG:classes:       DEBUG Call func get_web_data_as_json from books_parsing_bibliographies
+DEBUG:classes:       DEBUG  get_web_data_as_json from books_parsing_bibliographies done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
+DEBUG:classes:       DEBUG Call func main from __main__
+DEBUG:classes:       DEBUG  main from __main__ done
+DEBUG:asyncio:Using selector: KqueueSelector
+DEBUG:classes: DEBUG   Hello world
+DEBUG:classes:       DEBUG Call func initialise_beanie from __main__
+DEBUG:classes:       DEBUG  initialise_beanie from __main__ done
+DEBUG:classes:       DEBUG Call func parse_date_range from __main__
+DEBUG:classes:       DEBUG Call func get_date_aspect from parse_date_1
+DEBUG:classes:       DEBUG  get_date_aspect from parse_date_1 done
+DEBUG:classes:       DEBUG Call func parse_date from parse_date_1
+DEBUG:classes:       DEBUG  parse_date from parse_date_1 done
+DEBUG:classes:       DEBUG  parse_date_range from __main__ done
+DEBUG:classes:       DEBUG Call func get_database from parse_gnd
+DEBUG:classes:       DEBUG  get_database from parse_gnd done
+DEBUG:classes:       DEBUG Call func initialise_beanie from main
+DEBUG:classes:       DEBUG  initialise_beanie from main done
