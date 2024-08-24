@@ -24,6 +24,7 @@ async def get_web_data_as_json(url):
     """
     function that does a web call
     """
+    print("Getting web data")
     url = url.replace(" ", "%20")
     print("url " + url)
     url_opened = urllib.request.urlopen(url)
