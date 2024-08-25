@@ -13,7 +13,7 @@ import xml.etree.ElementTree
 import requests
 from lxml import etree
 import classes
-from parse_canvas import parse_canvas, parse_canvas_yale
+import parse_canvas
 
 @classes.func_logger
 def parse_manifests_bsb(manifest):
@@ -95,7 +95,7 @@ def parse_manifests_bsb(manifest):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     ###from here onward new function
-    images = parse_canvas(canvas_list)
+    images = parse_canvas.parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
     for im in images:
@@ -187,7 +187,7 @@ def parse_manifest_halle(URI_entered):
     #roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)
+    images = parse_canvas.parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
 
@@ -273,7 +273,7 @@ def parse_manifest_berlin(URI_entered):
     canvas_label_pattern = r'(.*?)(\[.*)'
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)
+    images =parse_canvas.parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
     m.numberOfImages = len(images)
 
@@ -352,7 +352,7 @@ def parse_manifest_cambridge_trinity(URI_entered):
     #canvas_id_pattern2 = r'(https://mss-cat.trin.cam.ac.uk/manuscripts/)(.*)'
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     for im in images:      
         #for the ID number of the canvas
@@ -442,7 +442,7 @@ def parse_manifest_thulb(URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
    
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)
+    images = parse_canvas.parse_canvas(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
          #for the label (page-number) of the canvas
@@ -522,7 +522,7 @@ def parse_manifest_slub(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -583,7 +583,7 @@ Since currently no printed books from Corpus have been digitised on this platfor
 
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)
+    images = parse_canvas.parse_canvas(canvas_list)
     m.numberOfImages = len(images)
     for im in images:
         #for the label (page-number) of the canvas
@@ -659,7 +659,7 @@ def parse_manifest_leipzig(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -903,7 +903,7 @@ def parse_manifest_gallica(URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -960,7 +960,7 @@ def parse_manifest_ecodices(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1079,7 +1079,7 @@ def parse_manifest_erara(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1182,7 +1182,7 @@ def parse_manifest_bodleian(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     
     for im in images:
@@ -1244,7 +1244,7 @@ def parse_manifest_heidelberg(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -1327,7 +1327,7 @@ def parse_manifest_vaticana(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     for im in images:
@@ -1436,7 +1436,7 @@ def parse_manifest_vienna(uri_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     # It appears that Vienna does not give any page numbers, and that the numbers such as "page50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
     m.images = images
@@ -1529,7 +1529,7 @@ This section is still untested since I couldn't open the manifest
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
     # It appears that LoC does not give any page numbers, and that the numbers such as "page 50" are merely canvas numbers. Hence, I do not do anything to parse these numbers. 
     m.images = images
@@ -1625,7 +1625,7 @@ def parse_manifest_goettingen (URI_entered):
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1710,7 +1710,7 @@ def parse_manifest_princeton (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1780,7 +1780,7 @@ def parse_manifest_yale (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
     canvas_list = (manifest["items"])
-    images = parse_canvas_yale(canvas_list)    
+    images = parse_canvas.parse_canvas_yale(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1852,7 +1852,7 @@ def parse_manifest_boston (URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     # Apparently, the BPL does not use page numbers
@@ -1886,7 +1886,7 @@ def parse_manifest_manchester (URI_entered):
     
     roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1938,7 +1938,7 @@ def parse_manifest_cambridge_ul (URI_entered):
     
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -1983,7 +1983,7 @@ def parse_manifests_irht (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2052,7 +2052,7 @@ def parse_manifest_frankfurt (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2175,7 +2175,7 @@ def parse_manifest_weimar (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2282,7 +2282,7 @@ def parse_manifest_kiel (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2428,7 +2428,7 @@ def parse_manifest_hamburg (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2520,7 +2520,7 @@ def parse_manifest_rostock (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2599,7 +2599,7 @@ def parse_manifest_nuernberg_stb (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     
@@ -2646,7 +2646,7 @@ def parse_manifest_manuscriptorium (URI_entered):
     # out the labels for the individual pages. 
     roman_numerals_plus_brackets = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j", "[", ""}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
-    images = parse_canvas(canvas_list)    
+    images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
 
     

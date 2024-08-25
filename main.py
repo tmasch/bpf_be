@@ -6,7 +6,7 @@
 #import urllib.request
 #import json
 import os
-from typing import List
+#from typing import List
 #from pydantic_settings import BaseSettings
 import logging
 from dotenv import load_dotenv

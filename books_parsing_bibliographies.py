@@ -12,7 +12,7 @@ import re
 from lxml import etree
 import requests
 import classes
-from parsing_helpers import convert_roman_numerals
+import parsing_helpers
 import get_external_data
 
 @classes.func_logger
@@ -217,7 +217,7 @@ def map_printing_date(printing_date_raw):
             start_year = int(year_string)
             end_year = int(year_string)
         elif printing_date_divided[2]:
-            year_string = convert_roman_numerals(printing_date_divided[2])
+            year_string = parsing_helpers.convert_roman_numerals(printing_date_divided[2])
             date_string = year_string
             start_year = int(year_string)
             end_year = int(year_string)
@@ -282,7 +282,7 @@ def map_printing_date(printing_date_raw):
             end_year = int(year_string)
         if re.search(year_pattern_roman_in_text, printing_date_raw):
             # This means that there is a string in Roman numerals starting with "M"
-            year_string = convert_roman_numerals(re.search(year_pattern_roman_in_text, \
+            year_string = parsing_helpers.convert_roman_numerals(re.search(year_pattern_roman_in_text, \
                 printing_date_raw).groups()[0])
             date_string = year_string
             print("Year in Roman numerals:")
@@ -641,7 +641,7 @@ async def parse_istc(url_bibliography):
     istc_record_full = await get_external_data.get_web_data_as_json(url_bibliography)
 #    print(istc_record_full2)
     print(url_bibliography)
-    print(istc_record_full)
+#    print(istc_record_full)
 
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")

@@ -1,15 +1,15 @@
-import requests
-import unittest
+#import requests
+#import unittest
 import json
-from unittest import mock
-import pytest
-import pytest_asyncio
+#from unittest import mock
 import urllib.request
+import pytest
+#import pytest_asyncio
 
-from beanie import Document, Link
+#from beanie import Document, Link
 from dotenv import load_dotenv
 
-import get_external_data
+#import get_external_data
 import parse_iiif
 import logging
 import classes
@@ -31,6 +31,7 @@ async def mock_get_web_data_as_json(*args, **kwargs):
         f.close()
         return mock_json
     else:
+        print("Getting data from the interweb")
         url=args[0]
         url = url.replace(" ", "%20")
         url_opened = urllib.request.urlopen(url)
@@ -44,5 +45,3 @@ async def mock_get_web_data_as_json(*args, **kwargs):
 
 def test_get_web_data_as_json():
     return 1
-
-

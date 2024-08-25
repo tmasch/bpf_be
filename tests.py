@@ -1,5 +1,5 @@
-import responses
-from pytest import *
+#import responses
+#from pytest import *
 
 """
 class Image(BaseModel):
@@ -27,7 +27,7 @@ class Image(BaseModel):
 """
 
 
-image_actions= __import__("imageActions.py")
+#image_actions= __import__("imageActions.py")
 
 
-fetch_image_from_web=imageActions.fetch_image_from_web
+#fetch_image_from_web=imageActions.fetch_image_from_web

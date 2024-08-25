@@ -1,4 +1,4 @@
-#pylint: disable=C0301
+#pylint: disable=C0301,E1101
 """
 This module contains all functions that contain database actions, like
 creating new records, reading from the DB etc.
@@ -8,7 +8,6 @@ There should be no business logic here.
 
 import json
 import os
-#from typing import List
 from nanoid import generate
 from pymongo import MongoClient
 from beanie import init_beanie

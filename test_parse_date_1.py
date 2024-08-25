@@ -1,4 +1,4 @@
-#pylint: disable=C0114,C0304,C0116
+#pylint: disable=C0114,C0116
 import parse_date_1
 
 

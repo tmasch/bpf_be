@@ -9,17 +9,14 @@ Furthermore, now the 'secondary' references (e.g., if we have the Place of Birth
 Later, there should be a search if there are already records for 
 """
 
-#from typing import Optional
 import logging
 from nanoid import generate
-#import requests
-#from pydantic import BaseModel
 
 import db_actions
 import classes
-from ingest_organisation import ingest_organisation
-from ingest_person import ingest_person
-from ingest_place import ingest_place
+import ingest_organisation
+import ingest_person
+import ingest_place
 import parsing_helpers
 #dbname = db_actions.get_database()
 #coll=dbname['bpf']
@@ -158,7 +155,7 @@ async def metadata_persons(metadata):
                             break
                     else: 
     #                        print("New person is not a duplicate")
-                        pp = await ingest_person(person)
+                        pp = await ingest_person.ingest_person(person)
                         ppp.append(pp)
                         person.internal_id = pp.id
                         person_against_duplication.preview = person.potential_candidates[person.chosen_candidate].preview
@@ -225,7 +222,7 @@ async def metadata_organisations(metadata):
                             break
                     else: 
     #                        print("New Organisation is not a duplicate")
-                        org.internal_id = await ingest_organisation(org)
+                        org.internal_id = await ingest_organisation.ingest_organisation(org)
                         org_against_duplication.preview = org.potential_candidates[org.chosen_candidate].preview
                         org_against_duplication.id = org.internal_id
                         org_against_duplication.org_type1 = parsing_helpers.map_role_to_organisation_type(org.role)
@@ -303,7 +300,7 @@ async def metadata_place(metadata):
                 
                     else: 
                         print("New Place is not a duplicate")
-                        place.internal_id = await ingest_place(place)
+                        place.internal_id = await ingest_place.ingest_place(place)
                         place_against_duplication.preview = place.potential_candidates[place.chosen_candidate].preview
                         place_against_duplication.id = place.internal_id
                         place_against_duplication.place_type1 = ["Town - historical"]
@@ -342,7 +339,7 @@ async def metadata_repositories(metadata):
                 db_actions.add_organisation_type(org.potential_candidates[org.chosen_candidate].internal_id, org.internal_id_org_type1_needed)
         else: 
             print("new repository")
-            org.potential_candidates[org.chosen_candidate].internal_id = await ingest_organisation(org)
+            org.potential_candidates[org.chosen_candidate].internal_id = await ingest_organisation.ingest_organisation(org)
     return org
 
 @classes.func_logger

@@ -1,4 +1,4 @@
-#pylint: disable=C0301,C0303
+#pylint: disable=C0302,C0303,C0301
 """
 \todo
 """
@@ -6,18 +6,18 @@ import urllib.request
 import xml.etree.ElementTree
 #import re
 import os
+from pymongo import MongoClient
 #from dates_parsing import date_overall_parsing
-from get_external_data import search_ulan
-#from parse_date import parse_manually_entered_date
+import get_external_data 
 import parse_date
 import parsing_helpers
 import db_actions
 import classes
-from parsing_helpers import encoding_list, url_replacement
-from pymongo import MongoClient
+import parsing_helpers
 
 
-#This is only for stand-alone execution of functions in this module, in other cases, a connection to the database has already been made. 
+#This is only for stand-alone execution of functions in this module, in other cases,
+#  a connection to the database has already been made.
 os.environ["MONGODB_HOST"] = "localhost"
 os.environ["MONGODB_PORT"] = "27017"
 
@@ -38,11 +38,14 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
     """
 #    candidates = []
     person.internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(person.role)
-    person.chosen_candidate = 999 # For some reason, I cannot return the form when 'chosen candidate' is empty. Hence, I put this in as a default setting. 
+    person.chosen_candidate = 999
+    # For some reason, I cannot return the form when
+    #'chosen candidate' is empty. Hence, I put this in as a default setting.
     if person.id:
-#        person_found = coll.find_one({"external_id": {"$elemMatch": {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
+#        person_found = coll.find_one({"external_id": {"$elemMatch":
+# {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
         person_found = await db_actions.find_person(person,"external_id")
-        if person_found:            
+        if person_found:
             #print(person_found)
             person.internal_id = person_found["id"]
             person.internal_id_person_type1 = person_found["person_type1"]
@@ -65,7 +68,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
     else:
 
         person.name = person.name.strip()
-        for old, new in encoding_list.items():
+        for old, new in parsing_helpers.encoding_list.items():
             person.name = person.name.replace(old, new)
         candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
         candidates_result = await db_actions.find_person(person,"name_preferred")
@@ -111,7 +114,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
             if not person.potential_candidates: #if nothing has been found in the database
                 print("No person found")
                 person_name_search = person.name
-                for old, new in url_replacement.items():
+                for old, new in parsing_helpers.url_replacement.items():
                     person_name_search = person_name_search.replace(old, new)
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
                 print(authority_url)
@@ -129,7 +132,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
                 person.potential_candidates = person.potential_candidates + new_potential_candidates
         else:
             if not person.potential_candidates:
-                person = await search_ulan(person)
+                person = await get_external_data.search_ulan(person)
     if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
     print("new person record")
@@ -259,7 +262,7 @@ This function is used for every organisation named in the bibliographic record (
 
         if not organisation.potential_candidates: #if nothing has been found in the database
             organisation_name_search = organisation.name
-            for old, new in url_replacement.items():
+            for old, new in parsing_helpers.url_replacement.items():
                 organisation_name_search = organisation_name_search.replace(old, new)
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Koe%3D' + organisation_name_search + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'          
             organisation.potential_candidates = parse_organisation_gnd(authority_url)        
@@ -406,7 +409,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
         if not place.potential_candidates: #if nothing has been found
             print("Candidate not found in database")
             place_name_search = place.name.strip()
-            for old, new in url_replacement.items():
+            for old, new in parsing_helpers.url_replacement.items():
                 place_name_search = place_name_search.replace(old, new)
                 #print("Search term for place :x" + place_name_search + "x")
             authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Geo%3D' + place_name_search + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'

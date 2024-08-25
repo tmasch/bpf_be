@@ -6,13 +6,8 @@ import json
 from typing import Optional
 import logging
 import sys
-#from beanie import
 from pydantic import BaseModel
-#from pydantic.dataclasses import dataclass
 from beanie import Document, UnionDoc, Link
-#from dataclasses import dataclass
-#import bson
-#from datetime import date
 
 logging.basicConfig(filename="general.log",level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())

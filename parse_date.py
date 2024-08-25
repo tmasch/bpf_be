@@ -10,7 +10,7 @@ Tuples are used instead of standard datetime objects because (a) they allow date
 """
 import re
 import classes
-from parsing_helpers import convert_english_ordinal_suffix
+import parsing_helpers
 
 @classes.func_logger
 def parse_single_date(datestring_raw):
@@ -262,7 +262,7 @@ def parse_single_date(datestring_raw):
             if year_end_string_raw and year_end_string_raw[-1] == ".":
                 century_start_number = year_string_raw[0:-1]
                 century_end_number = year_end_string_raw[1:-1]
-                year_string = "between " + century_start_number + convert_english_ordinal_suffix(century_start_number) + " and " + century_end_number + convert_english_ordinal_suffix(century_end_number) + " century"
+                year_string = "between " + century_start_number + parsing_helpers.convert_english_ordinal_suffix(century_start_number) + " and " + century_end_number + parsing_helpers.convert_english_ordinal_suffix(century_end_number) + " century"
                 if bc_indicator is False:
                     year_value_start = int(str(int(century_start_number)-1) + "01")
                     year_value_end = int(century_end_number + "00")
@@ -272,7 +272,7 @@ def parse_single_date(datestring_raw):
             else:
             
                 century_number = year_string_raw[0:-1]           
-                year_string = century_number + convert_english_ordinal_suffix(century_number) + " century"
+                year_string = century_number + parsing_helpers.convert_english_ordinal_suffix(century_number) + " century"
                 if bc_indicator is False:
                     year_value_start = int(str(int(century_number)-1) + "01")
                     year_value_end = year_value_start + 99

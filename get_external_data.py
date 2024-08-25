@@ -12,8 +12,8 @@ import aiohttp
 import requests
 
 import classes
-from parse_artist_record import parse_artist_record
-from parsing_helpers import url_replacement
+import parse_artist_record
+import  parsing_helpers
 
 
 #logger = logging.getLogger(__name__)
@@ -149,7 +149,7 @@ async def search_ulan(person):
     \todo
     """
     person_name_search = person.name
-    for old, new in url_replacement.items():
+    for old, new in parsing_helpers.url_replacement.items():
         person_name_search = person_name_search.replace(old, new)
     authority_url = (
         r"https://vocab.getty.edu/sparql.json?query=select%20distinct%20%3Fartist_id%20%7B%0A%20%7B%3FSubject%20luc%3Aterm%20%22"
@@ -185,7 +185,7 @@ async def search_ulan(person):
             #                print(results)
             #                print(len(results))
             for result in results:
-                candidate = parse_artist_record(result)
+                candidate = parse_artist_record.parse_artist_record(result)
                 #                print("candidate identified: ")
                 #                print(candidate)
                 # authority_url_list.append(artist_authority_url)

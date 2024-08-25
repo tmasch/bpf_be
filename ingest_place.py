@@ -8,16 +8,16 @@ from nanoid import generate
 
 import classes
 import db_actions
-from get_external_data import get_viaf_from_authority, transform_gnd_id_with_hyphen
+import get_external_data
 import person_relations
-from parsing_helpers import parse_relationship
+import parsing_helpers
 
 @classes.func_logger
 async def add_connected_person_to_place(place_new,connected_persons,list_of_ids_to_check):
     # This is step 1 of the stitching process
     for connected_person in connected_persons:
         connected_person.connection_comment, connected_person.connection_type = (
-            parse_relationship(
+            parsing_helpers.parse_relationship(
                 "location",
                 "person",
                 connected_person.connection_comment,
@@ -66,7 +66,7 @@ async def add_connected_person_to_place(place_new,connected_persons,list_of_ids_
 async def add_connected_organisation_to_place(place_new,connected_organisations,list_of_ids_to_check):
     for connected_org in connected_organisations:
         connected_org.connection_comment, connected_org.connection_type = (
-            parse_relationship(
+            parsing_helpers.parse_relationship(
                 "location",
                 "organisation",
                 connected_org.connection_comment,
@@ -106,7 +106,7 @@ async def add_connected_organisation_to_place(place_new,connected_organisations,
                 break  # if a connection with one ID is found, the other connections would be the same.
         if not org_found and connected_org.external_id:
             if "-" in connected_org.external_id[0].id:
-                gnd_internal_id = transform_gnd_id_with_hyphen(
+                gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(
                     connected_org.external_id[0].id
                 )
                 connected_org.external_id.insert(0, gnd_internal_id)
@@ -170,7 +170,7 @@ This function saves a place in the database
         elif place_id.name == "GND":  # this would normally not be the case.
             new_record_gnd_id = place_id.id
             if "-" in place_id.id:
-                gnd_internal_id = transform_gnd_id_with_hyphen(place_id.id)
+                gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(place_id.id)
                 print("This is the gnd_internal_id produced by the new module: ")
                 print(gnd_internal_id)
                 place_new.external_id.insert(0, gnd_internal_id)
@@ -204,7 +204,7 @@ This function saves a place in the database
             (
                 connected_location.connection_comment,
                 connected_location.connection_type,
-            ) = parse_relationship(
+            ) = parsing_helpers.parse_relationship(
                 "location",
                 "location",
                 connected_location.connection_comment,
@@ -245,7 +245,7 @@ This function saves a place in the database
                     print("location with hyphen found")
                     print("sending id to transform_gnd_id_with_hyphen")
                     print(connected_location.external_id[0].id)
-                    gnd_internal_id = transform_gnd_id_with_hyphen(
+                    gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(
                         connected_location.external_id[0].id
                     )
                     print("This is the gnd_internal_id produced by the new module: ")
@@ -262,7 +262,7 @@ This function saves a place in the database
     #                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
 
     # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF.
-    list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
+    list_of_viaf_ids = await get_external_data.get_viaf_from_authority(list_of_ids_to_check)
     print(list_of_viaf_ids)
 
 

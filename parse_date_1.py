@@ -1,6 +1,6 @@
 #pylint: disable=C0114,C0304,C0116
-import classes
 import re
+import classes
 
 
 @classes.func_logger
@@ -48,7 +48,6 @@ def parse_date(ds):
     if ds == "99xx-":
         state="SUCCESS"
         messages.append("No valid input")
-    
 
 
     # Date is four-digit year, e.g. 1234
@@ -266,7 +265,7 @@ def parse_date(ds):
 
     if year=="9999":
         day=""
-        month="" 
+        month=""
         year=""
         messages.append("No valid input")
 
@@ -300,7 +299,6 @@ REPLACEMENTS = {
 "ABOUT" : "_ABOUT_",
 "BEFORE" : "_BEFORE_",
 "BC_INDICATOR" : "_BC_INDICATOR_",
-"BURIED" : "_BURIED_"
 }
 
 
@@ -309,8 +307,8 @@ def replace_substring(s,substring,constant):
 #    print("substring")
 #    print(substring)
 #    print(re.search(substring, s))
-    if bool(re.search(substring, s)) == True:
-#        ss=s.replace(substring,constant)   
+    if bool(re.search(substring, s)):
+#        ss=s.replace(substring,constant)
 #        ss=s
         ss=re.sub(substring,constant,s)
 #        print("found substring "+substring+" "+constant+s+" "+ss)
@@ -320,12 +318,12 @@ def replace_substring(s,substring,constant):
     return s
 
 
-def remove_tags(input):
+def remove_tags(string):
 
     for key in REPLACEMENTS:
-        input=input.replace(REPLACEMENTS[key],"")
+        string=string.replace(REPLACEMENTS[key],"")
 
-    return input
+    return string
 
 
 @classes.func_logger
@@ -643,7 +641,7 @@ def parse_century(ds):
             d.start.state="SUCCESS"
             d.state="SUCCESS"
 
-    if re.search("99\./99\.",ds):
+    if re.search(r"99\./99\.",ds):
         d.start.state="SUCCESS"
         d.end.state="SUCCESS"
         d.state="SUCCESS"
@@ -709,12 +707,12 @@ def parse_date_range(ds):
 
     if len(dates) >= 1 :
         start = parse_date(dates[0])
-        if(start.state=="SUCCESS"):
+        if start.state=="SUCCESS":
             state="SUCCESS"
     if len(dates) == 2:
 #        print("parsing end")
         end = parse_date(dates[1])
-        if(end.state=="SUCCESS"):
+        if end.state=="SUCCESS":
             state="SUCCESS"
 
     if set_result:

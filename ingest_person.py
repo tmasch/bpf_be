@@ -7,7 +7,6 @@ from nanoid import generate
 import classes
 import db_actions
 import person_relations
-#from parse_date import parse_date_overall
 import parse_date
 import get_external_data
 import parsing_helpers

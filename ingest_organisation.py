@@ -6,7 +6,7 @@ import re
 from nanoid import generate
 import classes
 import db_actions
-from get_external_data import get_viaf_from_authority, transform_gnd_id_with_hyphen
+import get_external_data
 import person_relations
 import parsing_helpers
 
@@ -40,7 +40,7 @@ async def ingest_organisation(org):
         elif org_id.name == "GND":
             new_record_gnd_id = org_id.id
             if "-" in org_id.id:
-                gnd_internal_id = transform_gnd_id_with_hyphen(org_id.id)
+                gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(org_id.id)
                 print("This is the gnd_internal_id produced by the new module: ")
                 print(gnd_internal_id)
                 org_new.external_id.insert(0,gnd_internal_id)
@@ -121,7 +121,7 @@ async def ingest_organisation(org):
                     break # if a connection with one ID is found, the other connections would be the same. 
             if not org_found and connected_org.external_id:
                 if "-" in connected_org.external_id[0].id:
-                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_org.external_id[0].id)
+                    gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(connected_org.external_id[0].id)
                     connected_org.external_id.insert(0,gnd_internal_id)
                     print("This is the gnd_internal_id produced by the new module: ")
                     print(gnd_internal_id)
@@ -158,7 +158,7 @@ async def ingest_organisation(org):
                     print("location with hyphen found")
                     print("sending id to transform_gnd_id_with_hyphen")
                     print(connected_location.external_id[0].id)
-                    gnd_internal_id = transform_gnd_id_with_hyphen(connected_location.external_id[0].id)
+                    gnd_internal_id = get_external_data.transform_gnd_id_with_hyphen(connected_location.external_id[0].id)
                     print("This is the gnd_internal_id produced by the new module: ")
                     print(gnd_internal_id)
                     connected_location.external_id.insert(0,gnd_internal_id)
@@ -172,7 +172,7 @@ async def ingest_organisation(org):
 #                    list_of_ids_to_check.append(connected_location.external_id[0].uri) # I just use the first ID given here, since all IDs should be in VIAF
     # Here, I send the list of all collected IDs for which I need a VIAF ID to the function that contacts VIAF. 
 
-    list_of_viaf_ids = await get_viaf_from_authority(list_of_ids_to_check)
+    list_of_viaf_ids = await get_external_data.get_viaf_from_authority(list_of_ids_to_check)
 #    print(list_of_viaf_ids)
 
 # The following has to be commented out until I can process organisation VIAF IDs

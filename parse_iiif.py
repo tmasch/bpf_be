@@ -33,13 +33,13 @@ async def select_bibliography (bid_name, bid_id):
         bibliographic_information_single = books_parsing_bibliographies.parse_vd16(url_bibliography)            
             #url_bibliography = r''
     elif bid_name == "GW":
-        GW_number = bid_id.lstrip("0")
+        gw_number = bid_id.lstrip("0")
         ##Removing leading zeros that are accepted in many cases but not by the ISTC            
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + GW_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=reference%3A%22GW ' + gw_number + r'%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography) 
     elif bid_name  == "ISTC":
-        ISTC_number = bid_id
-        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + ISTC_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
+        istc_number = bid_id
+        url_bibliography = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + istc_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format&facet=Holding%20country&facet=Publication%20country&nofacets=true&mode=default&aggregations=true&style=full'
         bibliographic_information_single = await books_parsing_bibliographies.parse_istc(url_bibliography) 
     # the following options (and perhaps more will have to follow) are only used for libraries such as the BnF that do not regularly give ISTC or GW numbers
     elif bid_name == "Goff":
