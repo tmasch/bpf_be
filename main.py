@@ -2,6 +2,14 @@
 """
 \todo refactor to follow naming conventions!
 
+\mainpage
+This is the documentation for the BPF backend.
+
+Main routines are:
+
+@ref get_metadata
+
+@ref parse_iiif.parse_iiif
 """
 #import urllib.request
 #import json
