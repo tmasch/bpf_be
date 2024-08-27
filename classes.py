@@ -1,4 +1,4 @@
-#pylint: disable=C0115,C0303
+#pylint: disable=C0115,C0303,W0212
 """"
 This file contains class definitions
 """
@@ -406,6 +406,10 @@ class Place(BaseModel):
     potential_candidates : Optional[list[PlaceImport]] = []
     new_authority_id : Optional[str] = ""
 
+class SelectionCandidate(BaseModel):
+    person : Optional[Person] = None
+    person_candidates : Optional[list[Person]] = []
+
 
 class BibliographicInformation(BaseModel):
     """
@@ -413,7 +417,7 @@ class BibliographicInformation(BaseModel):
     """
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
     bibliographic_id : Optional[list[ExternalId]] = []
-    persons : Optional[list [Person]] = []
+    persons : Optional[list [SelectionCandidate]] = []
     organisations : Optional[list [Organisation]] = []
     places : Optional[list [Place]] = []
     title: Optional[str] = ""
@@ -435,6 +439,8 @@ class MakingProcess(BaseModel):
     person : Optional[Person] = None
     place : Optional[Place] = None
     date : Optional[DateImport] = None
+
+
 
 class Metadata(Document):
     """

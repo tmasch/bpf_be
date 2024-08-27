@@ -13,7 +13,6 @@ import parse_date
 import parsing_helpers
 import db_actions
 import classes
-import parsing_helpers
 
 
 #This is only for stand-alone execution of functions in this module, in other cases,
@@ -29,15 +28,19 @@ dbname =  db_actions.get_database()
 coll=dbname['bpf']
 
 @classes.func_logger
-async def identify_person(person):
+async def identify_person(person_in) -> classes.SelectionCandidate:
     """
 This function is used for every person named in the bibliographic record (author, editor, printer 
 etc.). It will first search if a record for this person is already in the MongoDB database, and 
 then search in the GND. If there is an ID-number (internal or GND, the search is done for the 
 ID-number, otherwise for the name as string, and if this fails, for the name as key-words).
     """
+    person=person_in.person
+
 #    candidates = []
     person.internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(person.role)
+
+
     person.chosen_candidate = 999
     # For some reason, I cannot return the form when
     #'chosen candidate' is empty. Hence, I put this in as a default setting.
@@ -64,14 +67,15 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + person.id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
                 print("url for person search: ")
                 print(authority_url)
-                person.potential_candidates = parse_person_gnd(authority_url)
+                person_in.person_candidates = parse_person_gnd(authority_url)
     else:
 
         person.name = person.name.strip()
         for old, new in parsing_helpers.encoding_list.items():
             person.name = person.name.replace(old, new)
+
         candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
-        candidates_result = await db_actions.find_person(person,"name_preferred")
+#        candidates_result = await db_actions.find_person(person,"name_preferred")
         for candidate_result in candidates_result:
             candidate = classes.Person()   
             candidate.internal_id = candidate_result["id"]
@@ -100,26 +104,33 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
             for extant_candidate in person.potential_candidates:
                 if extant_candidate.name_preferred == candidate.name_preferred:
                     candidate_duplicate = True
-            if not candidate_duplicate:             
-                person.potential_candidates.append(candidate)
+            if not candidate_duplicate:
+                cc=classes.SelectionCandidate()
+                cc.person=candidate          
+                person_in.person_selection.append(cc)
                 #print(person.potential_candidates)
-            for candidate in person.potential_candidates:
+
+
+            for candidate in person_in.person_candidates:
                 if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
                     person_type1_present = ""
                     for t in candidate.internal_id_person_type1:
                         person_type1_present = person_type1_present + "' and '" + t + "'"
                     person_type1_present = person_type1_present[5:]
                     candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
+
+
         if person.internal_id_person_type1_needed != "Artist":
-            if not person.potential_candidates: #if nothing has been found in the database
+            if not person_in.person_candidates: #if nothing has been found in the database
                 print("No person found")
                 person_name_search = person.name
                 for old, new in parsing_helpers.url_replacement.items():
                     person_name_search = person_name_search.replace(old, new)
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
                 print(authority_url)
-                person.potential_candidates = parse_person_gnd(authority_url)
-            if not person.potential_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
+                person_in.person_candidates = parse_person_gnd(authority_url)
+
+            if not person_in.person_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
                 name_divided = person_name_search.split("%20")
                 name_query = ""           
                 for word in name_divided:
@@ -129,15 +140,16 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
                 authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
                 print(authority_url)
                 new_potential_candidates = parse_person_gnd(authority_url)
-                person.potential_candidates = person.potential_candidates + new_potential_candidates
+                person_in.person_candidates = person.person_candidates + new_potential_candidates
         else:
-            if not person.potential_candidates:
+            if not person_in.person_candidates:
                 person = await get_external_data.search_ulan(person)
-    if len(person.potential_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
+    if len(person_in.person_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
         person.chosen_candidate = 0
     print("new person record")
 #    print(person)
-    return person         
+    person_in.person=person
+    return person_in
                 
 @classes.func_logger
 def identify_additional_person(new_authority_id, role):
@@ -479,7 +491,7 @@ Currently all records must come from the GND - if other authority files are incl
 
 
 @classes.func_logger
-def parse_person_gnd(authority_url):
+def parse_person_gnd(authority_url) -> classes.Person:
     """
 \todo
     """

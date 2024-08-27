@@ -1,4 +1,4 @@
-#pylint: disable=C0301
+#pylint: disable=C0301, W1401
 """
 \todo refactor to follow naming conventions!
 

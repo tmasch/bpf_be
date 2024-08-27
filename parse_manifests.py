@@ -62,6 +62,8 @@ def parse_manifests_bsb(manifest):
         m.shelfmark = location_divided.groups()[2].lstrip()
         print(m.repository[0].name)
         print(m.shelfmark)
+
+        
     if bibliographic_id:
         
         for step3 in bibliographic_id:
