@@ -101,7 +101,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
             print(candidate.name_preferred)
             print(candidate.internal_id_person_type1)
             candidate_duplicate = False
-            for extant_candidate in person.potential_candidates:
+            for extant_candidate in person_in.person_candidates:
                 if extant_candidate.name_preferred == candidate.name_preferred:
                     candidate_duplicate = True
             if not candidate_duplicate:
