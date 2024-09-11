@@ -31,7 +31,7 @@ One needs a separate function for parsing organisations.
     print(type(artist_record))
     #url = requests.get(authority_url)
     #artist_record = artist_record.json()
-    external_id = classes.ExternalId()
+    external_id = classes.ExternalReference()
     external_id.uri = artist_record["id"]
     external_id.name = "ULAN"
     external_id.id = external_id.uri[28:]
@@ -92,9 +92,9 @@ One needs a separate function for parsing organisations.
             for connection in artist_record["la:related_from_by"]:
                 connections_list.append(connection)
         for connection in connections_list:
-            conn_ent = classes.ConnectedEntity()
+            conn_ent = classes.EntityConnection()
             conn_ent.external_id = []
-            conn_id = classes.ExternalId()
+            conn_id = classes.ExternalReference()
             id_raw = connection["la:relates_to"]["id"]
             conn_id.uri = id_raw
             if "ulan" in id_raw: #should normally happen, but maybe they have some strange connections
@@ -521,11 +521,11 @@ One needs a separate function for parsing organisations.
         if "took_place_at" in artist_record["born"]:
             if artist_record["born"]["took_place_at"][0]:
                 for place_raw in artist_record["born"]["took_place_at"]:
-                    conn_place = classes.ConnectedEntity()
+                    conn_place = classes.EntityConnection()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortg"
                     place_id_list = []
-                    place_id = classes.ExternalId()
+                    place_id = classes.ExternalReference()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
@@ -536,11 +536,11 @@ One needs a separate function for parsing organisations.
         if "took_place_at" in artist_record["died"]:
             if artist_record["died"]["took_place_at"][0]:
                 for place_raw in artist_record["died"]["took_place_at"]: # in case several alternative places are given
-                    conn_place = classes.ConnectedEntity()
+                    conn_place = classes.EntityConnection()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "orts"
                     place_id_list = []
-                    place_id = classes.ExternalId()
+                    place_id = classes.ExternalReference()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"
@@ -558,11 +558,11 @@ One needs a separate function for parsing organisations.
                 for place_raw in place_list: # I have the feeling, that there is an 'activity' record for every place, but perhaps there may be also sometimes two places linked to one 'activity' record
         #            print("place of activity found")
         #            print(place_raw)
-                    conn_place = classes.ConnectedEntity()
+                    conn_place = classes.EntityConnection()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortw"
                     place_id_list = []
-                    place_id = classes.ExternalId()
+                    place_id = classes.ExternalReference()
                     place_id.uri = place_raw["id"]
                     place_id.id = place_id.uri[27:]
                     place_id.name = "tgn"

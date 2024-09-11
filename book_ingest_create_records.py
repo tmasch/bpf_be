@@ -9,7 +9,7 @@ Furthermore, now the 'secondary' references (e.g., if we have the Place of Birth
 Later, there should be a search if there are already records for 
 """
 
-import logging
+#import logging
 from nanoid import generate
 
 import db_actions
@@ -97,8 +97,8 @@ async def metadata_persons(metadata):
         person_against_duplication = classes.PersonAgainstDuplication()
         
         if metadata.bibliographic_information[0].persons:
-            for person in metadata.bibliographic_information[0].persons:
-                persons_entered_list.append(person)
+            for candidate in metadata.bibliographic_information[0].persons:
+                persons_entered_list.append(candidate)
 #            persons_entered_list = metadata.bibliographic_information[0].persons
 #            print("--------------------------------------")
 #            print("Persons in metadata.bibliographic_information[0]: ")
@@ -117,54 +117,58 @@ async def metadata_persons(metadata):
         
         ppp=[]
         if len(persons_entered_list) > 0:
-            for person in persons_entered_list:
+            for candidate in persons_entered_list:
                 no_new_person_chosen_from_list = False
-                if person.chosen_candidate != 999: # I make this awkward construction to avoid 'out of range' exceptions
+                if candidate.chosen_candidate != -1: # I make this awkward construction to avoid 'out of range' exceptions
     #                print("there is a chosen candidate")
-                    if person.potential_candidates[person.chosen_candidate].internal_id:                        
+
+                    if candidate.person_candidates[candidate.person.chosen_candidate].internal_id:                        
                         no_new_person_chosen_from_list = True
     #            else:
     #                    print("There is no chosen candidate")
 
-                if person.internal_id: #Scenario (a) above - in this case, no record has to be added
-                    if person.internal_id_person_type1_comment: 
+                if candidate.person.internal_id: #Scenario (a) above - in this case, no record has to be added
+                    if candidate.person.internal_id_person_type1_comment: 
                         #If the person is alredy in Iconobase but has an additional person_type1 in the new entry, it has to be added to the person record. 
-                        db_actions.add_person_type(person.internal_id, person.internal_id_person_type1_needed)
+                        db_actions.add_person_type(candidate.person.internal_id, candidate.person.internal_id_person_type1_needed)
                 elif no_new_person_chosen_from_list: # Scenario (b) above
-                    person.internal_id = person.potential_candidates[person.chosen_candidate].internal_id
-                    if person.potential_candidates[person.chosen_candidate].internal_id_person_type1_comment:
+                    candidate.person.internal_id = candidate.person_candidates[candidate.person.chosen_candidate].internal_id
+                    if candidate.person_candidates[candidate.person.chosen_candidate].internal_id_person_type1_comment:
     #                    print("Type1 to be added:")
     #                    print(person.potential_candidates[person.chosen_candidate].internal_id) 
     #                    print(person.internal_id_person_type1_needed)
-                        db_actions.add_person_type(person.potential_candidates[person.chosen_candidate].internal_id, person.internal_id_person_type1_needed)
+                        db_actions.add_person_type(candidate.person_candidates[candidate.person.chosen_candidate].internal_id, candidate.person.internal_id_person_type1_needed)
 
                 else: 
     #                print("new person")
                     for person_against_duplication in persons_list:
     #                    print("in loop for new person")
-                        if person_against_duplication.preview == person.potential_candidates[person.chosen_candidate].preview:
+                        if person_against_duplication.preview == candidate.person_candidates[candidate.person.chosen_candidate].preview:
                             # this means, if a person not yet in the database appears twice in the record, in different roles
-                            person.internal_id = person_against_duplication.id
-                            person_type = parsing_helpers.map_role_to_person_type(person.role)
+                            candidate.person.internal_id = person_against_duplication.id
+                            person_type = parsing_helpers.map_role_to_person_type(candidate.person.role)
                             if  person_type not in person_against_duplication.person_type1: 
                                 # Since the type is created automatically from the role, there can be only one type in person
-                                db_actions.add_person_type(person.internal_id, person_type)
+                                db_actions.add_person_type(candidate.person.internal_id, person_type)
 
 
     #                        print("New Person is a duplicate")
                             break
                     else: 
     #                        print("New person is not a duplicate")
-                        pp = await ingest_person.ingest_person(person)
+                        pp = await ingest_person.ingest_person(candidate.person)
                         ppp.append(pp)
-                        person.internal_id = pp.id
-                        person_against_duplication.preview = person.potential_candidates[person.chosen_candidate].preview
-                        person_against_duplication.id = person.internal_id
-                        person_against_duplication.person_type1 = parsing_helpers.map_role_to_person_type(person.role)
+                        candidate.person.internal_id = pp.id
+                        person_against_duplication.preview = candidate.person_candidates[candidate.person.chosen_candidate].preview
+                        person_against_duplication.id =candidate.person.internal_id
+                        person_against_duplication.person_type1 = parsing_helpers.map_role_to_person_type(candidate.person.role)
                         persons_list.append(person_against_duplication)
     #                       print("record against duplication: ")
     #                       print(person_against_duplication)
     return ppp
+
+
+
 
 @classes.func_logger
 async def metadata_organisations(metadata):
@@ -368,7 +372,7 @@ async def populate_book_from_metadata(metadata):
 #    book_record_id=""
 #        print("adding new book")
     new_book = classes.BookDb()
-    new_book.id = generate()
+#    new_book.id = generate()
     new_book.title = metadata.bibliographic_information[0].title
     new_book.volume_number = metadata.bibliographic_information[0].volume_number
     new_book.part_title = metadata.bibliographic_information[0].part_title
@@ -376,47 +380,49 @@ async def populate_book_from_metadata(metadata):
     new_book.date_string = metadata.bibliographic_information[0].date_string
     new_book.date_start = metadata.bibliographic_information[0].date_start
     new_book.date_end = metadata.bibliographic_information[0].date_end
+ 
     if metadata.bibliographic_information[0].bibliographic_id:
         for bibliographic_id in metadata.bibliographic_information[0].bibliographic_id:
-            new_bibliographic_id = classes.ExternalId()
+            new_bibliographic_id = classes.ExternalReference()
             new_bibliographic_id = bibliographic_id
             new_book.bibliographic_id.append(new_bibliographic_id)
 
-    if metadata.bibliographic_information[0].persons:
-#            print("-------------------------------------------------------------------")
-#            print("persons in metadata.bibliographic_information[0].persons at the end of metadata_dissection: ")
-#            print(metadata.bibliographic_information[0].persons)
-        for person in metadata.bibliographic_information[0].persons:
-            new_person = classes.BookConnectedEntityDb()
-            new_person.role = person.role
-            if person.internal_id:
-                new_person.id = person.internal_id
-            else:
-                new_person.name = person.name # This is a stopgap measure if a person could not be identified
-            new_book.persons.append(new_person)
+    #  if metadata.bibliographic_information[0].persons:
+        #
+# #            print("-------------------------------------------------------------------")
+# #            print("persons in metadata.bibliographic_information[0].persons at the end of metadata_dissection: ")
+# #            print(metadata.bibliographic_information[0].persons)
+#         for person in metadata.bibliographic_information[0].persons:
+#             new_person = classes.BookConnectedEntityDb()
+#             new_person.role = person.role
+#             if person.internal_id:
+#                 new_person.id = person.internal_id
+#             else:
+#                 new_person.name = person.name # This is a stopgap measure if a person could not be identified
+#             new_book.persons.append(new_person)
 
-            np = classes.ConnectedRecord()
-            np.role=new_person.role
+#             np = classes.ConnectedRecord()
+#             np.role=new_person.role
 
-    if metadata.bibliographic_information[0].organisations:
-        for org in metadata.bibliographic_information[0].organisations:
-            new_org = classes.BookConnectedEntityDb()
-            new_org.role = org.role
-            if org.internal_id:
-                new_org.id = org.internal_id
-            else: 
-                new_org.name = org.name # This is a stopgap measure if an organisation could not be identified
-            new_book.organisations.append(new_org)
+    # if metadata.bibliographic_information[0].organisations:
+    #     for org in metadata.bibliographic_information[0].organisations:
+    #         new_org = classes.BookConnectedEntityDb()
+    #         new_org.role = org.role
+    #         if org.internal_id:
+    #             new_org.id = org.internal_id
+    #         else: 
+    #             new_org.name = org.name # This is a stopgap measure if an organisation could not be identified
+    #         new_book.organisations.append(new_org)
 
-    if metadata.bibliographic_information[0].places:
-        for place in metadata.bibliographic_information[0].places:
-            new_place = classes.BookConnectedEntityDb()
-            new_place.role = place.role
-            if place.internal_id:
-                new_place.id = place.internal_id
-            else: 
-                new_place.name = place.name # This is a stopgap measure if a place could not be identified
-            new_book.places.append(new_place)
+    # if metadata.bibliographic_information[0].places:
+    #     for place in metadata.bibliographic_information[0].places:
+    #         new_place = classes.BookConnectedEntityDb()
+    #         new_place.role = place.role
+    #         if place.internal_id:
+    #             new_place.id = place.internal_id
+    #         else: 
+    #             new_place.name = place.name # This is a stopgap measure if a place could not be identified
+    #         new_book.places.append(new_place)
 
     new_book.preview = metadata.bibliographic_information[0].title + " (" + metadata.bibliographic_information[0].date_string + ")"
 
@@ -462,7 +468,7 @@ async def populate_pages_from_metadata(metadata,book_record_id,org):
                 making_process_db = classes.MakingProcessDb()
                 making_process_db.process_type = making_process.process_type
                 if making_process.person.internal_id:
-                    person = classes.ConnectedEntity()
+                    person = classes.EntityConnection()
                     person.id = making_process.person.internal_id # is apparently always there, if a person has been chosen
 #                    print("role of person")
 #                    print(making_process.person.role)
@@ -476,7 +482,7 @@ async def populate_pages_from_metadata(metadata,book_record_id,org):
                 if making_process.place.internal_id:
                     print("Place as entered in making_processs")
                     print(making_process.place)
-                    place = classes.ConnectedEntity()
+                    place = classes.EntityConnection()
                     place.id = making_process.place.internal_id # is apparently always there, if a place has been chosen
 #                    print("role of person")
 #                    print(making_process.person.role)

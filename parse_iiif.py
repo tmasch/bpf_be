@@ -9,10 +9,12 @@ import parse_istc
 import parse_manifests
 import books_parsing_bibliographies
 import get_external_data
+import parse_gnd
+
 #URI_entered = "abc"
 
 @classes.func_logger
-async def select_bibliography (bid_name, bid_id):
+async def get_bibliographic_data (bid_name, bid_id):
     """
     \todo documentation
     """
@@ -87,9 +89,9 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
     """
 
 # Step 1: Information is collected from the IIIF manifest
-    print("getting manifest from url")
+#    print("getting manifest from url")
     manifest= await get_external_data.get_web_data_as_json(uri_entered)
-
+    
 #    print(manifest)
 
     #if URI_entered == "":
@@ -154,7 +156,8 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         m = parse_manifests.parse_manifest_nuernberg_stb(uri_entered)
     elif "manuscriptorium.com" in uri_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
         m = parse_manifests.parse_manifest_manuscriptorium(uri_entered)
-
+#    m.images=[]
+#    print(m)
     # I commented this out since I think I need a more robust system to pass on error messages.
     #else:
     #    m = Metadata()
@@ -162,15 +165,17 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
     #    return(m)
     m.iiifUrl = uri_entered
     m.material = material
+#    m.model_dump()
+#    m.model_validate()
 
 # Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added.
 
-    print("getting bibliography")
+#    print("getting bibliography")
     for step1 in range(len(m.bibliographic_id)):
         #print(m.bibliographic_id[step1][1])
         bid_name = (m.bibliographic_id[step1]).name
-        bid_id = (m.bibliographic_id[step1]).id
-        bibliographic_information_single = await select_bibliography(bid_name, bid_id)
+        bid_id = (m.bibliographic_id[step1]).bib_id
+        bibliographic_information_single = await get_bibliographic_data(bid_name, bid_id)
 
 
         if bibliographic_information_single != "": #omit appending if nothing came back from the function (this is the case when the record
@@ -180,30 +185,31 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
 
 
 
-    # If several bibliographical references are given that refer to the same (e.g., ISTC and GW), there will be duplicate bibliographical records that should be removed
-    # This is a rather awkward way of doing it - but won't do much harm since only in very rare cases there will be more than 2 references
+    # If several bibliographical references are given that refer to the same (e.g., ISTC and GW),
+    #  there will be duplicate bibliographical records that should be removed
+    # This is a rather awkward way of doing it - but won't do much harm since only in 
+    # very rare cases there will be more than 2 references
     if len(m.bibliographic_information) > 1:
         counter1 = 0
-        print("counter1: " + str(counter1))
+#        print("counter1: " + str(counter1))
 
         while counter1 < len(m.bibliographic_information) -1:
             bibliography_short = m.bibliographic_information[counter1].bibliographic_id[0].uri + m.bibliographic_information[counter1].bibliographic_id[0].name + m.bibliographic_information[counter1].bibliographic_id[0].id
-            print("first record: " + bibliography_short)
+#            print("first record: " + bibliography_short)
             counter2 = counter1 + 1
-            print("counter2: " + str(counter2))
+#            print("counter2: " + str(counter2))
             while counter2 < len(m.bibliographic_information):
                 bibliography_short_compare = m.bibliographic_information[counter2].bibliographic_id[0].uri + m.bibliographic_information[counter2].bibliographic_id[0].name + m.bibliographic_information[counter2].bibliographic_id[0].id
-                print("second record: " + bibliography_short_compare)
+#                print("second record: " + bibliography_short_compare)
                 if bibliography_short_compare == bibliography_short:
                     m.bibliographic_information.pop(counter2)
-                    print("found identical")
+#                    print("found identical")
                 else:
                     counter2 = counter2 + 1
-                    print("found not identical")
-                    print("counter2 after increment" + str(counter2))
+#                    print("found not identical")
+#                    print("counter2 after increment" + str(counter2))
             counter1 = counter1 + 1
-            print("counter1 after increment" + str(counter1))
-
+#            print("counter1 after increment" + str(counter1))
 
 #    The following lines create - depending on the type of material - 
 #    fields for manually entering artist, place, date, and illustrated text. 
@@ -211,8 +217,8 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
 #    For manuscripts, there is one making process, for printed books, there are two (design / making of matrix)
 #    The third making process for printed books, the printing, does not appear here, since the relevant information
 #    will be taken automatically from the bibliographic information. 
-    print("Material: ")
-    print(material)
+#    print("Material: ")
+#    print(material)
     if material == "m": # manuscripts
         making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1
@@ -236,11 +242,11 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank.process_type = "Design"
         person_blank = classes.Person()
         person_blank.name = ""
-        person_blank.chosen_candidate = 999
+#        person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
         place_blank = classes.Place()
         place_blank.name = ""
-        place_blank.chosen_candidate = 999
+#        place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
         date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
@@ -250,23 +256,47 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank.process_number = 2
         making_process_blank.process_type = "Production of Matrix"
         person_blank = classes.Person()
-        person_blank.chosen_candidate = 999
+#        person_blank.chosen_candidate = 999
         person_blank.name = ""
         making_process_blank.person = person_blank
         place_blank = classes.Place()
         place_blank.name = ""
-        place_blank.chosen_candidate = 999
+#        place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
         date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
         making_process_blank.date = date_blank
         m.making_processes.append(making_process_blank)
 
+    if m.bibliographic_information:
+        if m.bibliographic_information[0]:
+            #print("m.bibliographic_information: ")
+            #print(m.bibliographic_information)
+            for person in m.bibliographic_information[0].persons:
+                person = await parse_gnd.identify_person(person)
+            #  m.bibliographic_information[0].persons[person_counter] = person
+            # for organisation in m.bibliographic_information[0].organisations:
+            #     organisation = parse_gnd.identify_organisation(organisation)
+            # for place in m.bibliographic_information[0].places:
+            #     place = parse_gnd.identify_place(place)
+    # for repository in m.repository:
+    #     repository = parse_gnd.identify_organisation(repository)
+        # I had to define 'repository' as a list because Pydantic forced me to do so,
+        #  but it only has one member.
+        # repository.role = "col"
+        # Normally, this role depends on the bibliographical data -
+        # in this case, it has to be set here.
+
+    # m.id=generate()
+#    print("List of places to be sent to FE")
+#    print(m.bibliographic_information[0].places)
+#    print(m.model_dump())
+
     return m
 
 
 @classes.func_logger
-def supply_bibliographic_information(additional_bid):
+async def supply_bibliographic_information(additional_bid):
     """
 This function is needed if an IIIF manifest does not include a bibliographic reference.
 If a bibliographic reference is known to the editor, he can add it in a second step.
@@ -276,5 +306,12 @@ This function parses it and sends the results to the function bibliography_selec
     bid_divided = re.match(bid_pattern, additional_bid)
     bid_name = bid_divided[1]
     bid_id = bid_divided[3]
-    bibliographic_information_single = select_bibliography(bid_name, bid_id)
+    bibliographic_information_single = get_bibliographic_data(bid_name, bid_id)
+    for person in bibliographic_information_single.persons:
+        person = await parse_gnd.identify_person(person)
+    for organisation in bibliographic_information_single.organisations:
+        organisation = parse_gnd.identify_organisation(organisation)
+    for place in bibliographic_information_single.places:
+        place = parse_gnd.identify_place(place)
+
     return bibliographic_information_single

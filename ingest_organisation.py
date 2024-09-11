@@ -178,7 +178,7 @@ async def ingest_organisation(org):
 # The following has to be commented out until I can process organisation VIAF IDs
 
     org_viaf_url = list_of_viaf_ids[org_new.external_id[0].uri]
-    org_id = classes.ExternalId()
+    org_id = classes.ExternalReference()
     org_id.name = "viaf"
     org_id.uri = org_viaf_url
     org_id.id = org_viaf_url[21:]
@@ -191,7 +191,7 @@ async def ingest_organisation(org):
         if connected_person.external_id:
             if connected_person.external_id[0].uri in list_of_viaf_ids:
                 person_viaf_url = list_of_viaf_ids[connected_person.external_id[0].uri]
-                person_id = classes.ExternalId()
+                person_id = classes.ExternalReference()
                 person_id.name = "viaf"
                 person_id.uri = person_viaf_url
                 person_id.id = person_viaf_url[21:]
@@ -200,7 +200,7 @@ async def ingest_organisation(org):
         if connected_org.external_id:
             if connected_org.external_id[0].uri in list_of_viaf_ids:
                 org_viaf_url = list_of_viaf_ids[connected_org.external_id[0].uri]
-                org_id = classes.ExternalId()
+                org_id = classes.ExternalReference()
                 org_id.name = "viaf"
                 org_id.uri = org_viaf_url
                 org_id.id = org_viaf_url[21:]
@@ -209,7 +209,7 @@ async def ingest_organisation(org):
         if connected_location.external_id:
             if connected_location.external_id[0].uri in list_of_viaf_ids:
                 location_viaf_url = list_of_viaf_ids[connected_location.external_id[0].uri]
-                place_id = classes.ExternalId()
+                place_id = classes.ExternalReference()
                 place_id.name = "viaf"
                 place_id.uri = location_viaf_url
                 place_id.id = location_viaf_url[21:]
@@ -244,7 +244,7 @@ async def ingest_organisation(org):
 
 # Similar features have to be added for connected organisations and places, once this is possible.             
 
-            new_connected_person = classes.ConnectedEntity()
+            new_connected_person = classes.EntityConnection()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -260,7 +260,7 @@ async def ingest_organisation(org):
     if org_selected.connected_organisations:
         for connected_organisation in org_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = classes.ConnectedEntity()
+            new_connected_organisation = classes.EntityConnection()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -285,7 +285,7 @@ async def ingest_organisation(org):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = classes.ConnectedEntity()
+            new_connected_location = classes.EntityConnection()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -331,7 +331,7 @@ async def ingest_organisation(org):
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_org["connection_type"]
                         db_actions.add_connection_id_and_name(far_record["id"], "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"])
-                        new_connection = classes.ConnectedEntity()
+                        new_connection = classes.EntityConnection()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")

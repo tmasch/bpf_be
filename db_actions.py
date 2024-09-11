@@ -22,21 +22,25 @@ mongo_client=None
 
 @classes.func_logger
 async def initialise_beanie():
-    MONGO_DB_DATABASE_NAME = "bpf"
+    mongo_db_database_name = "bpf"
     mongo_host = os.getenv('MONGODB_HOST', '')
-    print(mongo_host)
-#    mongo_port = int(os.getenv('MONGODB_PORT', ''))
     endpoint = 'mongodb://{0}'.format(mongo_host)
-    print(endpoint)
-    MOTOR_CLIENT = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
-    DATABASE = MOTOR_CLIENT[MONGO_DB_DATABASE_NAME]
-    await init_beanie(database=DATABASE, document_models=[classes.Metadata,\
+    motor_client = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
+    database = motor_client[mongo_db_database_name]
+    await init_beanie(database=database, document_models=[classes.Metadata,\
                                                         classes.Person,\
-                                                        classes.OrganisationDb,\
+                                                        classes.Organisation,\
                                                         classes.BookDb,\
-                                                        classes.PlaceDb,\
+                                                        classes.Place,\
                                                         classes.PagesDb, \
-                                                        classes.Union])
+                                                        classes.EntityConnection, \
+                                                        classes.EntityAndConnections, \
+                                                        classes.Role,\
+                                                        classes.MakingProcess, \
+                                                        classes.BibliographicId, \
+                                                        classes.BibliographicInformation,\
+                                                        classes.Union,
+                                                        classes.webCall])
 
 @classes.func_logger
 def get_database():
@@ -289,36 +293,36 @@ once I have an 'edit' view for authority records.
     collection.insert_one(place)
     return place_id
 
-@classes.func_logger
-async def insert_record_organisation(organisation: classes.OrganisationDb):
-    """
-This function inserts a newly created record for an organisation into the database
-It was made for organisations connected to books but probably can be used for any organisation
-    """
-    print("Inserting metadata in database")
-#    dbname = get_database()
-#    collection=dbname['bpf']
-#    collection.insert_one(organisation.dict())
-    await organisation.insert()
-    return "Hello World"
+# @classes.func_logger
+# async def insert_record_organisation(organisation: classes.OrganisationDb):
+#     """
+# This function inserts a newly created record for an organisation into the database
+# It was made for organisations connected to books but probably can be used for any organisation
+#     """
+#     print("Inserting metadata in database")
+# #    dbname = get_database()
+# #    collection=dbname['bpf']
+# #    collection.insert_one(organisation.dict())
+#     await organisation.insert()
+#     return "Hello World"
 
 
-@classes.func_logger
-async def insert_record_place(place: classes.PlaceDb):
-    """
-This function inserts a newly created record for a place into the database
-It was made for places connected to books but probably can be used for any place
-    """
-    print("Inserting place metadata in database")
-#    print(place)
-#    print(type(place))
-#    print("dumping")
-#    print (place.model_dump())
-    await place.insert()
-#    dbname = get_database()
-#    collection=dbname['bpf']
-#    collection.insert_one(place.dict())
-    return "Hello World"
+# @classes.func_logger
+# async def insert_record_place(place: classes.PlaceDb):
+#     """
+# This function inserts a newly created record for a place into the database
+# It was made for places connected to books but probably can be used for any place
+#     """
+#     print("Inserting place metadata in database")
+# #    print(place)
+# #    print(type(place))
+# #    print("dumping")
+# #    print (place.model_dump())
+#     await place.insert()
+# #    dbname = get_database()
+# #    collection=dbname['bpf']
+# #    collection.insert_one(place.dict())
+#     return "Hello World"
 
 
 @classes.func_logger
@@ -332,17 +336,17 @@ def insert_record_manuscript(manuscript : classes.ManuscriptDb):
     collection.insert_one(manuscript.dict())
     return "Hello World"
 
-@classes.func_logger
-async def insert_record_book(book : classes.BookDb):
-    """
-    \todo
-    """
-    print("Inserting book metadata in database")
-#    dbname = get_database()
-#    collection=dbname['bpf']
-#    collection.insert_one(book.dict())
-    await book.insert()
-    return "Hello World"
+# @classes.func_logger
+# async def insert_record_book(book : classes.BookDb):
+#     """
+#     \todo
+#     """
+#     print("Inserting book metadata in database")
+# #    dbname = get_database()
+# #    collection=dbname['bpf']
+# #    collection.insert_one(book.dict())
+#     await book.insert()
+#     return "Hello World"
 
 @classes.func_logger
 async def insert_record_pages(pages : classes.PagesDb):
@@ -613,7 +617,7 @@ fields returned to the main module.
             print("step 2b: no connection found, new connection added")
             # This is step 2b: there is no reciprocal connection, it needs to be established
 #                        print("For person " + person_found["name_preferred"] + " no connection has been found")
-            new_connection = classes.ConnectedEntity()
+            new_connection = classes.EntityConnection()
             new_connection.id = record_new.id
             new_connection.external_id = record_new.external_id
             new_connection.name = record_new.name_preferred # better use preview including year
@@ -634,3 +638,15 @@ fields returned to the main module.
         print(comment_correction)
         print(type(comment_correction))
     return connection_correction, time_correction, comment_correction
+
+
+@classes.func_logger
+async def save_person(p):
+#    p.id= generate()
+    r = await p.save()
+    return(r)
+
+@classes.func_logger
+async def save_person_and_connections():
+
+    pass

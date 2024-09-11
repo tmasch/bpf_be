@@ -25,8 +25,8 @@ async def mock_get_web_data_as_json(*args, **kwargs):
     print(args[0])
     if args[0] == "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest":
         print("URL: https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest")
-        f = open("herbarius_metadata.json","r")
-        print("Getting data from herbarius_metadata.json")
+        f = open("herbarius_manifest.json","r")
+        print("Getting data from herbarius_manifest.json")
         mock_json=json.load(f)
         f.close()
         return mock_json
@@ -37,7 +37,6 @@ async def mock_get_web_data_as_json(*args, **kwargs):
         url_opened = urllib.request.urlopen(url)
         contents = json.load(url_opened)
         return contents
-
     return (None, 404)
 
 #    print(r)

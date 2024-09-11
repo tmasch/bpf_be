@@ -156,7 +156,7 @@ async def parse_istc(url_bibliography):
                             if " " in printer_name:
                                 #if there is a blank inside the name -
                                 # hence it is more than just a Christian name
-                                person_name = printer_name
+                                    person_name = printer_name
                             else: # If there is only a Christian name
 
                                 if printer_name_long_divided[printer_counter+1]:
@@ -229,12 +229,12 @@ async def parse_istc(url_bibliography):
             bi.title = istc_record_short["title"]
 
     print("BIBLIOGRAPHIC INFORMATION")
-#    print(bi)
+    print(bi)
     print("VALIDATING")
 #    bi.bibliographic_id[0].model_validate()
 
- #   print("bi.bibliographic_id[0]")
- #   print(bi.bibliographic_id[0])
+    print("bi.bibliographic_id[0]")
+    print(bi.bibliographic_id[0])
 #    bi.bibliographic_id[0].model_validate()
 
 #    bi.persons[0].model_validate()

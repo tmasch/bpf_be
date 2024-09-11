@@ -9,7 +9,7 @@ import test_get_external_data
 #import requests
 #import unittest
 #import json
-#import pytest_asyncio
+import pytest_asyncio
 #from beanie import Document, Link
 #from dotenv import load_dotenv
 #import logging
@@ -21,10 +21,10 @@ import parse_iiif
 import db_actions
 #import test_get_external_data
 
-@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_iiif(self):
+async def test_parse_iiif_herbarius():
 #    logging.basicConfig(level=logging.DEBUG)
 #    logging.getLogger().addHandler(logging.StreamHandler())
 

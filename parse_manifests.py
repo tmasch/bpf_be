@@ -1,4 +1,4 @@
-#pylint: disable=C0301, C0303, C0116, C0325, C0103
+#pylint: disable=C0301, C0303, C0116, C0325, C0103, W0612
 """
 This module contains a number of function that accept the URI of an IIIF manifest of a manuscript 
 or book and return data, both on the manuscript or book as a whole (book_properties) and on the 
@@ -25,7 +25,8 @@ def parse_manifests_bsb(manifest):
 #    c=db_actions.get_database()
     #print(metadata)
     m = classes.Metadata()
-    repository = classes.Organisation()
+#    repository.entity_and_connections.organisation.id = generate()
+    
 #    m.manifest =  url.read()
  #   print("url"+uri_entered)
     location = ""
@@ -34,62 +35,78 @@ def parse_manifests_bsb(manifest):
 #    bibliographic_id_name = ""
     bibliographic_id_number = ""
     for step1 in metadata:
-        label = step1["label"]
-        for step2 in label:
+        labels = step1["label"]
+        for step2 in labels:
             label_content = step2
             if label_content["@value"] == "Standort":
                 location = step1["value"]
             if label_content["@value"] == "Identifikator" and ("gesamtkatalog" in step1["value"] or "VD1" in step1["value"]):
                 bibliographic_id_single = step1["value"]
                 bibliographic_id.append(bibliographic_id_single)
+
+#    m.model_dump()
     if not location:    
         print("Location not found")
     if not bibliographic_id:       
         print("Bibliographic ID not found")
     if "license" in manifest:
         m.license = manifest["license"][0]
-        
+    
+#    m.model_dump()
 
     #Step 2: Transforming the extracted fields into database format
     location_pattern = r'(.*)(--)(.*)'
     bibliographic_id_pattern = r'(.*\')(.*)(\'>)([A-Za-z0-9]*)( )(.*)(</a.*)'
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
+
+    repository = classes.Role()
+    repository.chosen_candidate=-1
+    repository.name="Repository"
     if location:
         location_divided = re.match(location_pattern, location)
-        repository.name = location_divided.groups()[0]
+#        repository.model_dump()
+        entity_and_connections= classes.EntityAndConnections()
+#        repository.model_dump()
+        entity_and_connections.organisation = classes.Organisation()
+#        entity_and_connections.model_dump()
+#        print(location_divided.groups()[0])
+        entity_and_connections.organisation.name = location_divided.groups()[0]
+        repository.entity_and_connections=entity_and_connections
         repository.role = "col"
-        m.repository.append(repository)
+#        repository.model_dump()
+        m.repository=repository
         m.shelfmark = location_divided.groups()[2].lstrip()
-        print(m.repository[0].name)
-        print(m.shelfmark)
+#        print(m.repository[0].name)
+#        print(m.shelfmark)
+#    m.model_dump()
 
         
     if bibliographic_id:
-        
         for step3 in bibliographic_id:
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
             bid =classes.BibliographicId()
             if "https" in bibliographic_id_individual: #if there is a link
-                print(bibliographic_id_individual)
+#                print(bibliographic_id_individual)
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
-                print(bibliographic_id_divided)
+#                print(bibliographic_id_divided)
                 bid.uri = bibliographic_id_divided.groups()[1]
                 bid.name = bibliographic_id_divided.groups()[3]
-                bid.id = bibliographic_id_divided.groups()[5]
+                bid.bib_id = bibliographic_id_divided.groups()[5]
             else: #if there is no link
                 bibliographic_id_divided = re.match(bibliographic_id_pattern_reduced, bibliographic_id_individual)                
                 bid.name = bibliographic_id_divided.groups()[0]
-                bid.id = bibliographic_id_divided.groups()[2]              
+                bid.bib_id = bibliographic_id_divided.groups()[2]              
 #            bibliographic_id_together = (bibliographic_id_url, bibliographic_id_name, bibliographic_id_number)
             if bibliographic_id_number[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
                 m.bibliographic_id.append(bid)
-    print(m.license)
-    print(m.repository[0].name)
-    print(m.shelfmark)
+#    print(m.license)
+#    print(m.repository[0].name)
+#    print(m.shelfmark)
     
-    
+#    m.model_dump()
+   
     #book_properties = (repository, shelfmark, bibliographic_id_transformed, license)
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
@@ -111,6 +128,7 @@ def parse_manifests_bsb(manifest):
             im.label_prefix = "fol. "
         else:
             im.label_prefix = ""
+
     m.images = images
     
    
@@ -157,7 +175,7 @@ def parse_manifest_halle(URI_entered):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
     if location:
         location_divided = re.match(location_pattern, location)
-        repository.name = location_divided.groups()[0]
+        repository.organisation.name = location_divided.groups()[0]
         repository.role = "col"
         m.repository.append(repository)
         m.shelfmark = location_divided.groups()[2]
@@ -172,11 +190,11 @@ def parse_manifest_halle(URI_entered):
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
                 bid.uri = bibliographic_id_divided.groups()[1]
                 bid.name = bibliographic_id_divided.groups()[3]
-                bid.id = bibliographic_id_divided.groups()[5]
+                bid.bib_id = bibliographic_id_divided.groups()[5]
             else: #if there is no link
                 bibliographic_id_divided = re.match(bibliographic_id_pattern_reduced, bibliographic_id_individual)                
                 bid.name = bibliographic_id_divided.groups()[0]
-                bid.id = bibliographic_id_divided.groups()[2]              
+                bid.bib_id = bibliographic_id_divided.groups()[2]              
             if bibliographic_id_number[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
                 m.bibliographic_id.append(bid)
 
@@ -255,13 +273,13 @@ def parse_manifest_berlin(URI_entered):
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
                 bid.uri = bibliographic_id_divided.groups()[1]
                 bid.name = bibliographic_id_divided.groups()[3]
-                bid.id = bibliographic_id_divided.groups()[5]
+                bid.bib_id = bibliographic_id_divided.groups()[5]
             else: #if there is no link
                 bibliographic_id_divided = re.match(bibliographic_id_pattern_reduced, bibliographic_id_individual)                
                 bid.name = bibliographic_id_divided.groups()[0]
-                bid.id = bibliographic_id_divided.groups()[2]              
+                bid.bib_id = bibliographic_id_divided.groups()[2]              
             #bibliographic_id_together = (bibliographic_id_url, bibliographic_id_name, bibliographic_id_number)
-            if bid.id[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
+            if bid.bib_id[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
                 print(bid)
                 m.bibliographic_id.append(bid)
 
@@ -339,7 +357,7 @@ def parse_manifest_cambridge_trinity(URI_entered):
                     bid = classes.BibliographicId()
                     bibliographic_id_divided = re.match(bibliography_pattern_single, single_bibliography)
                     bid.name = bibliographic_id_divided[1]
-                    bid.id = bibliographic_id_divided[3]
+                    bid.bib_id = bibliographic_id_divided[3]
                    
                     m.bibliographic_id.append(bid)               
     repository.name = manifest["attribution"]
@@ -426,9 +444,9 @@ def parse_manifest_thulb(URI_entered):
         bibliography_long = re.findall(bibliographic_reference_pattern, catalogue_text, re.MULTILINE)[0]
         print(bibliography_long)
         bid.name = bibliography_long[0]
-        bid.id = bibliography_long[2]
-        if bid.id[0:3] == "VD1": #Sometimes, the 'VD17' or something similar is repeated before the number
-            bid.id = bid.id[5:]
+        bid.bib_id = bibliography_long[2]
+        if bid.bib_id[0:3] == "VD1": #Sometimes, the 'VD17' or something similar is repeated before the number
+            bid.bib_id = bid.bib_id[5:]
     #bibliographic_id_together = ("", bibliographic_id_name, bibliographic_id_number)
     #m.bibliographic_id.append(bid)
     #book_properties = (repository, shelfmark, bibliographic_id_transformed, license)
@@ -493,21 +511,21 @@ def parse_manifest_slub(uri_entered):
         # Bei den wenigen digitalisierten Inkunabeln fehlen anscheinend die GW-Nummern. 
         if label == "VD16-Nummer":
             bid.name = "VD16"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD16":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD16":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         if label == "VD17-Nummer":
             bid.name = "VD17"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD17":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD17":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         if label == "VD18-Nummer":
             bid.name = "VD18"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD18":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD18":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         
     
@@ -630,21 +648,21 @@ def parse_manifest_leipzig(uri_entered):
         # Bei den wenigen digitalisierten Inkunabeln fehlen anscheinend die GW-Nummern. 
         if label == "VD16":
             bid.name = "VD16"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD16":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD16":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         if label == "VD17":
             bid.name = "VD17"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD17":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD17":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         if label == "VD18":
             bid.name = "VD18"
-            bid.id = step1["value"]
-            if bid.id[0:4] == "VD18":
-                bid.id = bid.id[5:]
+            bid.bib_id = step1["value"]
+            if bid.bib_id[0:4] == "VD18":
+                bid.bib_id = bid.bib_id[5:]
             m.bibliographic_id.append(bid)
         m.license = manifest["license"]
         # The field 'owner' is not used for manuscripts. Since apparently all digitised manuscripts in the system are from Leipzig,
@@ -761,14 +779,14 @@ def parse_manifest_gallica(URI_entered):
                             hc_found = re.search(r'Hain-Copinger, \w*', record_210)
                             if hc_found:
                                 bid.name = "HC"
-                                bid.id = hc_found.group(0)[14:].strip()
+                                bid.bib_id = hc_found.group(0)[14:].strip()
                                 m.bibliographic_id.append(bid)
                         if "Pellechet" in record_210:
                             bid = classes.BibliographicId()
                             hc_found = re.search(r'Pellechet, \w*', record_210)
                             if hc_found:
                                 bid.name = "Pell Ms"
-                                bid.id = hc_found.group(0)[10:].strip()
+                                bid.bib_id = hc_found.group(0)[10:].strip()
                                 m.bibliographic_id.append(bid)
                             
 
@@ -786,8 +804,8 @@ def parse_manifest_gallica(URI_entered):
                                     if istc_long_found:
                                         print("ISTC URL found in 300")
                                         bid.name = "ISTC"
-                                        bid.id = istc_long_found.group(0)[27:37]
-                                        print("ISTC found in 300: "+ bid.id)
+                                        bid.bib_id = istc_long_found.group(0)[27:37]
+                                        print("ISTC found in 300: "+ bid.bib_id)
                                         good_record = True
                                         m.bibliographic_id.append(bid)
                                     gw_long_found = re.search(r'https\://www\.gesamtkatalogderwiegendrucke\.de/docs/\w*', record_300)
@@ -795,20 +813,20 @@ def parse_manifest_gallica(URI_entered):
                                         print("GW URL found in 300")
                                         bid.name = "GW"
                                         print(gw_long_found.group(0))
-                                        bid.id = gw_long_found.group(0)[49:]
+                                        bid.bib_id = gw_long_found.group(0)[49:]
                                         good_record = True
                                         m.bibliographic_id.append(bid)
                                     istc_found = re.search(r"ISTC i[a-z]\d{8}", record_300)
                                     if istc_found:
                                         bid.name = "ISTC"
-                                        bid.id = istc_found.group(0)[5:]
+                                        bid.bib_id = istc_found.group(0)[5:]
                                         good_record = True
                                         m.bibliographic_id.append(bid)
                                     gw_found = re.search(r"GW [\w]*", record_300)
                                     if gw_found:
                                         print("GW found in 300")
                                         bid.name = "GW"
-                                        bid.id = gw_found.group(0)[3:]
+                                        bid.bib_id = gw_found.group(0)[3:]
                                         good_record = True
                                         m.bibliographic_id.append(bid)
                                     
@@ -831,66 +849,66 @@ def parse_manifest_gallica(URI_entered):
                 print(bibref)
                 if bibref[0:4] == "ISTC":
                     bid.name = "ISTC"
-                    bid.id = bibref[4:].strip()
+                    bid.bib_id = bibref[4:].strip()
                     m.bibliographic_id.append(bid)
                 if bibref[0:2] == "GW":
                     bid.name = "GW"
-                    bid.id = bibref[3:].strip()
+                    bid.bib_id = bibref[3:].strip()
                     m.bibliographic_id.append(bid)
                 if bibref[0:4] == "VD16": 
                     bid.name = "VD16"
-                    bid.id = bibref[4:].strip()              
+                    bid.bib_id = bibref[4:].strip()              
                     m.bibliographic_id.append(bid)
                 if bibref[0:4] == "VD17": 
                     bid.name = "VD17"
-                    bid.id = bibref[4:].strip()
+                    bid.bib_id = bibref[4:].strip()
                     m.bibliographic_id.append(bid)
                 if bibref[0:4] == "VD18": 
                     bid.name = "VD18"
-                    bid.id = bibref[4:].strip()
+                    bid.bib_id = bibref[4:].strip()
                     m.bibliographic_id.append(bid)
                 if bibref[0:49] == "https://www.gesamtkatalogderwiegendrucke.de/docs/":
                     bid.name = "GW"
-                    bid.id = bibref[49:].strip()
+                    bid.bib_id = bibref[49:].strip()
                     m.bibliographic_id.append(bid)                    
                 if bibref[0:27] == "https://data.cerl.org/istc/im00626000":
                     bid.name = "ISTC"
-                    bid.id = bibref[27:37].strip()
+                    bid.bib_id = bibref[27:37].strip()
                     m.bibliographic_id.append(bid)
 
 
                 if good_record is False: # I check the following only, if I don't have any standard bibliographic ID
                     if bibref[0:13] == "Hain-Copinger":
                         bid.name = "HC"
-                        bid.id = bibref[13:].strip()
+                        bid.bib_id = bibref[13:].strip()
                         m.bibliographic_id.append(bid)
                     if bibref[0:2] == "HC":
                         bid.name = "HC"
-                        bid.id = bibref[2:].strip()
+                        bid.bib_id = bibref[2:].strip()
                         m.bibliographic_id.append(bid)
                     if bibref[0:4] == "Goff":
                         bid.name = "Goff"
-                        bid.id = bibref[4:].strip().replace("-", "", 1)
+                        bid.bib_id = bibref[4:].strip().replace("-", "", 1)
                         m.bibliographic_id.append(bid)
                     if bibref[0:4] == "Pell":
                         bid.name = "Pell Ms"
-                        bid.id = bibref[4:]
+                        bid.bib_id = bibref[4:]
                         m.bibliographic_id.append(bid)
                     if bibref[0:9] == "Pellechet":
                         bid.name = "Pell Ms"
-                        bid.id = bibref[9:]
+                        bid.bib_id = bibref[9:]
                         m.bibliographic_id.append(bid)
                     if bibref[0:4] == "CIBN":
                         bid.name = "CIBN"
-                        bid.id = bibref[4:]
+                        bid.bib_id = bibref[4:]
                         m.bibliographic_id.append(bid)
                     if bibref[0:2] == "C ":
                         bid.name = "C"
-                        bid.id = bibref[2:]
+                        bid.bib_id = bibref[2:]
                         m.bibliographic_id.append(bid)
                     if bibref[0:8] == "Copinger":
                         bid.name = "C"
-                        bid.id = bibref[8:]
+                        bid.bib_id = bibref[8:]
                         m.bibliographic_id.append(bid)
             print(m.bibliographic_id)
                 
@@ -1043,32 +1061,32 @@ def parse_manifest_erara(uri_entered):
             reference = reference.replace("VD ", "VD")
             if "GW" in reference:
                 bid.name = "GW"
-                bid.id = reference[2:].strip()
+                bid.bib_id = reference[2:].strip()
                 m.bibliographic_id.append(bid)
             if "ISTC" in reference:
                 bid.name = "ISTC"
-                bid.id = reference[4:].strip()
+                bid.bib_id = reference[4:].strip()
                 m.bibliographic_id.append(bid)
             if "VD16" in reference:
                 bid.name = "VD16"
-                bid.id = reference[4:].strip()
+                bid.bib_id = reference[4:].strip()
                 m.bibliographic_id.append(bid)
                 print(m.bibliographic_id)
             if "VD17" in reference:
                 bid.name = "VD17"
-                bid.id = reference[4:].strip()                
+                bid.bib_id = reference[4:].strip()                
                 m.bibliographic_id.append(bid)
             if "VD18" in reference:
                 bid.name = "VD18"
-                bid.id = reference[4:].strip()
+                bid.bib_id = reference[4:].strip()
                 m.bibliographic_id.append(bid)
             if "ESTC" in reference:
                 bid.name = "ESTC"
-                bid.id = reference[4:].strip()
+                bid.bib_id = reference[4:].strip()
                 m.bibliographic_id.append(bid)
             if "CNCE" in reference:
                 bid.name = "EDIT16 CNCE"
-                bid.id = reference[4:].strip()
+                bid.bib_id = reference[4:].strip()
                 m.bibliographic_id.append(bid)
 
 
@@ -1169,11 +1187,11 @@ def parse_manifest_bodleian(uri_entered):
         bid =classes.BibliographicId()
         if "Bod-inc." in bibliographic_record:
             bid.name = "Bod-inc"
-            bid.id = bibliographic_record[9:].strip()
+            bid.bib_id = bibliographic_record[9:].strip()
             m.bibliographic_id.append(bid)
         if "ESTC" in bibliographic_record:
             bid.name = "ESTC"
-            bid.id = bibliographic_record[5:].strip()
+            bid.bib_id = bibliographic_record[5:].strip()
             m.bibliographic_id.append(bid)
 
 
@@ -1236,7 +1254,7 @@ def parse_manifest_heidelberg(uri_entered):
             record_divided = record.split(" ", maxsplit=1)
             bid =classes.BibliographicId()
             bid.name = record_divided[0]
-            bid.id = record_divided[1]
+            bid.bib_id = record_divided[1]
             m.bibliographic_id.append(bid)
         
                
@@ -1306,7 +1324,7 @@ def parse_manifest_vaticana(uri_entered):
             if record:
                 bid =classes.BibliographicId()
                 bid.name = "ISTC"
-                bid.id = record[5:].strip()
+                bid.bib_id = record[5:].strip()
                 m.bibliographic_id.append(bid)
         else:
             record_raw = re.search(r'GW \d{1,8}', catalogue_text)
@@ -1318,7 +1336,7 @@ def parse_manifest_vaticana(uri_entered):
                 if record:
                     bid =classes.BibliographicId()
                     bid.name = "GW"
-                    bid.id = record[3:].strip()
+                    bid.bib_id = record[3:].strip()
                     m.bibliographic_id.append(bid)
 
         
@@ -1408,19 +1426,19 @@ def parse_manifest_vienna(uri_entered):
                                 print(step2.text)
                                 if step2.text[0:4] == "VD16":
                                     bid.name = "VD16"
-                                    bid.id = step2.text[4:].strip()
+                                    bid.bib_id = step2.text[4:].strip()
                                     m.bibliographic_id.append(bid)
                                 if step2.text[0:4] == "VD17":
                                     bid.name = "VD17"
-                                    bid.id = step2.text[4:].strip()
+                                    bid.bib_id = step2.text[4:].strip()
                                     m.bibliographic_id.append(bid)
                                 if step2.text[0:4] == "VD18":
                                     bid.name = "VD18"
-                                    bid.id = step2.text[4:].strip()
+                                    bid.bib_id = step2.text[4:].strip()
                                     m.bibliographic_id.append(bid)
                                 if step2.text[0:4] == "CNCE":
                                     bid.name = "EDIT16 CNCE"
-                                    bid.id = step2.text[4:].strip()
+                                    bid.bib_id = step2.text[4:].strip()
                                     m.bibliographic_id.append(bid) # Vienna quotes this a lot, so I already inserted that here. 
                                     # I wonder if how to abbreviate it
                 case "555": # I include this although up to now there are no IIIF manifests for incunables. 
@@ -1430,7 +1448,7 @@ def parse_manifest_vienna(uri_entered):
                             case "d":
                                 if step2.text == "GW":
                                     bid.name = "GW"
-                                    bid.id = step2.text[2:].strip()
+                                    bid.bib_id = step2.text[2:].strip()
                                     m.bibliographic_id.append(bid)                                     
                       
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
@@ -1509,9 +1527,9 @@ This section is still untested since I couldn't open the manifest
                             if "Goff" in step2.text:
                                 bid.name = "Goff"
                         case "c":
-                            bid.id = step2.text
-                            if bid.id[0:4] == "ISTC" or bid.id[0:4] == "VD16" or bid.id[0:4] == "VD17" or bid.id[0:4] == "VD18" or bid.id[0:4] == "ESTC" or bid.id[0:4] == "CNCE":
-                                bid.id = bid.id[4:].strip()
+                            bid.bib_id = step2.text
+                            if bid.bib_id[0:4] == "ISTC" or bid.bib_id[0:4] == "VD16" or bid.bib_id[0:4] == "VD17" or bid.bib_id[0:4] == "VD18" or bid.bib_id[0:4] == "ESTC" or bid.bib_id[0:4] == "CNCE":
+                                bid.bib_id = bid.bib_id[4:].strip()
                 if bid.name:
                     m.bibliographic_id.append(bid) # Only append this if it is one of these references.                         
             case "856":
@@ -1524,7 +1542,7 @@ This section is still untested since I couldn't open the manifest
     m.shelfmark = shelfmark_part1 + shelfmark_part2 + " (" + shelfmark_part3 + ")"
     print("List of bibliographic records: ")
     for record in m.bibliographic_id:
-        print(record.id)
+        print(record.bib_id)
     
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
@@ -1609,17 +1627,17 @@ def parse_manifest_goettingen (URI_entered):
                                     if "EDIT 16" in step2.text or "EDIT16" in step2.text or "CNCE" in step2.text:
                                         bid.name = "EDIT16 CNCE"
                                 case "a":
-                                    bid.id = step2.text
-                                    print("bid.id uncropped: ")
-                                    print(bid.id)
-                                    if bid.id[0:4] == "VD16" or bid.id[0:4] == "VD17" or bid.id[0:4] == "VD18" or bid.id[0:4] == "ESTC" or bid.id[0:4] == "CNCE":
-                                        bid.id = bid.id[4:].strip()
-                                    if bid.id[0:2] == "GW":
-                                        bid.id = bid.id[2:].strip()
+                                    bid.bib_id = step2.text
+                                    print("bid.bib_id uncropped: ")
+                                    print(bid.bib_id)
+                                    if bid.bib_id[0:4] == "VD16" or bid.bib_id[0:4] == "VD17" or bid.bib_id[0:4] == "VD18" or bid.bib_id[0:4] == "ESTC" or bid.bib_id[0:4] == "CNCE":
+                                        bid.bib_id = bid.bib_id[4:].strip()
+                                    if bid.bib_id[0:2] == "GW":
+                                        bid.bib_id = bid.bib_id[2:].strip()
                         if bid.name:
                             print(bid.name)
-                            print("bid.id cropped: ")
-                            print(bid.id)
+                            print("bid.bib_id cropped: ")
+                            print(bid.bib_id)
                             m.bibliographic_id.append(bid) # Only append this if it is one of these references. 
                     
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
@@ -1700,10 +1718,10 @@ def parse_manifest_princeton (URI_entered):
                             if "EDIT 16" in step2.text or "EDIT16" in step2.text or "CNCE" in step2.text:
                                 bid.name = "EDIT16 CNCE"
                         case "c":
-                            bid.id = step2.text
+                            bid.bib_id = step2.text
                 if bid.name:
                     m.bibliographic_id.append(bid)
-                    print(bid.id)
+                    print(bid.bib_id)
                     print(bid.name)
     
 
@@ -1765,15 +1783,15 @@ def parse_manifest_yale (URI_entered):
         reference_divided = reference.split(",")
         if "Gesamtkatalog" in reference:
             bid.name = "GW"
-            bid.id = reference_divided[1].strip()
+            bid.bib_id = reference_divided[1].strip()
             m.bibliographic_id.append(bid)
         if "Incunabula short" in reference:
             bid.name = "ISTC"
-            bid.id = reference_divided[1].strip()
+            bid.bib_id = reference_divided[1].strip()
             m.bibliographic_id.append(bid)
         if "Goff" in reference:
             bid.name = "Goff"
-            bid.id = reference[4:].strip() # this works if it is quoted Goff + number
+            bid.bib_id = reference[4:].strip() # this works if it is quoted Goff + number
             m.bibliographic_id.append(bid)
     
 
@@ -1841,13 +1859,13 @@ def parse_manifest_boston (URI_entered):
         if reference_istc:
             bid =classes.BibliographicId()
             bid.name = "ISTC"
-            bid.id = reference_istc.group(0)[34:].strip()
+            bid.bib_id = reference_istc.group(0)[34:].strip()
             m.bibliographic_id.append(bid)
         reference_gw = re.search(r'Gesamtkatalog der Wiegendrucke, \w*<', record)
         if reference_gw:
             bid =classes.BibliographicId()
             bid.name = "GW"
-            bid.id = reference_gw.group(0)[32:-1].strip()
+            bid.bib_id = reference_gw.group(0)[32:-1].strip()
                                  
     
                  
@@ -2038,12 +2056,12 @@ def parse_manifest_frankfurt (URI_entered):
         if step1["label"] == "VD16":
             bid =classes.BibliographicId()
             bid.name = "Vd16"
-            bid.id = step1["value"]
+            bid.bib_id = step1["value"]
             m.bibliographic_id.append(bid)
         if step1["label"] == "VD17":
             bid =classes.BibliographicId()
             bid.name = "VD17"
-            bid.id = step1["value"]
+            bid.bib_id = step1["value"]
             m.bibliographic_id.append(bid)
 # For incunables, there there are apparently no references to catalogue numbers
     if m.shelfmark == "":
@@ -2133,13 +2151,13 @@ def parse_manifest_weimar (URI_entered):
                                 case "2":
                                     bid.name = step2.text.strip()
                                 case "a":
-                                    bid.id = step2.text
-                                    if bid.id[0:2] == "VD":
-                                        bid.id = bid.id[5:]
-                                    if bid.id[0:2] == "GW": # just in case a reference to the GW also appears here
-                                        bid.id = bid.id[3:]
+                                    bid.bib_id = step2.text
+                                    if bid.bib_id[0:2] == "VD":
+                                        bid.bib_id = bid.bib_id[5:]
+                                    if bid.bib_id[0:2] == "GW": # just in case a reference to the GW also appears here
+                                        bid.bib_id = bid.bib_id[3:]
                         print(bid.name)
-                        print(bid.id)
+                        print(bid.bib_id)
                         if bid.name in ["GW", "ISTC", "VD16", "vd16", "VD17", "vd17", "VD18", "vd18"]:
                             print ("appended:")
                             print(bid)
@@ -2152,23 +2170,23 @@ def parse_manifest_weimar (URI_entered):
                                     bibliographic_reference = step2.text
                                     if bibliographic_reference[0:2] == "GW":
                                         bid.name = "GW"
-                                        bid.id = bibliographic_reference[3:]
+                                        bid.bib_id = bibliographic_reference[3:]
                                         m.bibliographic_id.append(bid)
                                     if bibliographic_reference[0:4] == "ISTC":
                                         bid.name = "ISTC"
-                                        bid.id = bibliographic_reference[5:]
+                                        bid.bib_id = bibliographic_reference[5:]
                                         m.bibliographic_id.append(bid)
                                     if bibliographic_reference[0:4] == "VD16":
                                         bid.name = "VD16"
-                                        bid.id = bibliographic_reference[5:]
+                                        bid.bib_id = bibliographic_reference[5:]
                                         m.bibliographic_id.append(bid)
                                     if bibliographic_reference[0:4] == "VD17":
                                         bid.name = "VD17"
-                                        bid.id = bibliographic_reference[5:]
+                                        bid.bib_id = bibliographic_reference[5:]
                                         m.bibliographic_id.append(bid)
                                     if bibliographic_reference[0:4] == "VD18":
                                         bid.name = "VD18"
-                                        bid.id = bibliographic_reference[5:]
+                                        bid.bib_id = bibliographic_reference[5:]
                                         m.bibliographic_id.append(bid)
                                     
 
@@ -2229,17 +2247,17 @@ def parse_manifest_kiel (URI_entered):
                 if step2["@value"] == "VD16 Nummer": 
                     bid =classes.BibliographicId()
                     bid.name = "VD16"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
                     bid =classes.BibliographicId()
                     bid.name = "VD17"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
                     bid =classes.BibliographicId()
                     bid.name = "VD18"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "Beschreibung":
                     bibliographical_reference = step1["value"]
@@ -2257,23 +2275,23 @@ def parse_manifest_kiel (URI_entered):
         reference = reference.strip()
         if reference[0:2] == "GW":
             bid.name = "GW"
-            bid.id = reference[3:]
+            bid.bib_id = reference[3:]
             m.bibliographic_id.append(bid)
         if reference[0:4] == "ISTC":
             bid.name = "ISTC"
-            bid.id = reference[5:]
+            bid.bib_id = reference[5:]
             m.bibliographic_id.append(bid)
         if reference[0:4] == "VD16":
             bid.name = "VD16"
-            bid.id = reference[5:]
+            bid.bib_id = reference[5:]
             m.bibliographic_id.append(bid)
         if reference[0:4] == "VD17":
             bid.name = "VD17"
-            bid.id = reference[5:]
+            bid.bib_id = reference[5:]
             m.bibliographic_id.append(bid)
         if reference[0:4] == "VD18":
             bid.name = "VD18"
-            bid.id = reference[5:]
+            bid.bib_id = reference[5:]
             m.bibliographic_id.append(bid)
 
     
@@ -2331,17 +2349,17 @@ def parse_manifest_hamburg (URI_entered):
                 if step2["@value"] == "VD16 Nummer": 
                     bid =classes.BibliographicId()
                     bid.name = "VD16"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD17 Nummer":
                     bid =classes.BibliographicId()
                     bid.name = "VD17"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "VD18 Nummer":
                     bid =classes.BibliographicId()
                     bid.name = "VD18"
-                    bid.id = step1["value"]
+                    bid.bib_id = step1["value"]
                     m.bibliographic_id.append(bid)
                 if step2["@value"] == "Beschreibung":
                     bibliographical_reference = step1["value"]
@@ -2382,13 +2400,13 @@ def parse_manifest_hamburg (URI_entered):
                             case "2":
                                 bid.name = step2.text.strip()
                             case "a":
-                                bid.id = step2.text
-                                if bid.id[0:2] == "VD":
-                                    bid.id = bid.id[5:]
-                                if bid.id[0:2] == "GW": # just in case a reference to the GW also appears here
-                                    bid.id = bid.id[3:]
+                                bid.bib_id = step2.text
+                                if bid.bib_id[0:2] == "VD":
+                                    bid.bib_id = bid.bib_id[5:]
+                                if bid.bib_id[0:2] == "GW": # just in case a reference to the GW also appears here
+                                    bid.bib_id = bid.bib_id[3:]
                     print(bid.name)
-                    print(bid.id)
+                    print(bid.bib_id)
                     if bid.name in ["GW", "ISTC", "VD16", "vd16", "VD17", "vd17", "VD18", "vd18"]:
                         m.bibliographic_id.append(bid)
                 case "510":
@@ -2399,23 +2417,23 @@ def parse_manifest_hamburg (URI_entered):
                                 bibliographic_reference = step2.text
                                 if bibliographic_reference[0:2] == "GW":
                                     bid.name = "GW"
-                                    bid.id = bibliographic_reference[3:]
+                                    bid.bib_id = bibliographic_reference[3:]
                                     m.bibliographic_id.append(bid)
                                 if bibliographic_reference[0:4] == "ISTC":
                                     bid.name = "ISTC"
-                                    bid.id = bibliographic_reference[5:]
+                                    bid.bib_id = bibliographic_reference[5:]
                                     m.bibliographic_id.append(bid)
                                 if bibliographic_reference[0:4] == "VD16":
                                     bid.name = "VD16"
-                                    bid.id = bibliographic_reference[5:]
+                                    bid.bib_id = bibliographic_reference[5:]
                                     m.bibliographic_id.append(bid)
                                 if bibliographic_reference[0:4] == "VD17":
                                     bid.name = "VD17"
-                                    bid.id = bibliographic_reference[5:]
+                                    bid.bib_id = bibliographic_reference[5:]
                                     m.bibliographic_id.append(bid)
                                 if bibliographic_reference[0:4] == "VD18":
                                     bid.name = "VD18"
-                                    bid.id = bibliographic_reference[5:]
+                                    bid.bib_id = bibliographic_reference[5:]
                                     m.bibliographic_id.append(bid)
                                 
  
@@ -2498,11 +2516,11 @@ def parse_manifest_rostock (URI_entered):
                             case "2":
                                 bid.name = step2.text
                             case "a":
-                                bid.id = step2.text
-                                if bid.id[0:2] == "VD" or bid.id[0:2] == "vd" or bid.id[0:4] == "ISTC":
-                                    bid.id = bid.id[4:].strip()
-                                if bid.id[0:2] == "GW":
-                                    bid.id = bid.id[2:].strip()
+                                bid.bib_id = step2.text
+                                if bid.bib_id[0:2] == "VD" or bid.bib_id[0:2] == "vd" or bid.bib_id[0:4] == "ISTC":
+                                    bid.bib_id = bid.bib_id[4:].strip()
+                                if bid.bib_id[0:2] == "GW":
+                                    bid.bib_id = bid.bib_id[2:].strip()
                     if bid.name.strip() in ["GW", "ISTC", "VD16", "vd16", "VD17", "vd17", "VD18", "vd18"]:
                         m.bibliographic_id.append(bid)
 
@@ -2588,11 +2606,11 @@ def parse_manifest_nuernberg_stb (URI_entered):
         bid =classes.BibliographicId()
         if bibliographical_reference[0:2] == "VD":
             bid.name = bibliographical_reference[0:4]
-            bid.id = bibliographical_reference[5:].strip()
+            bid.bib_id = bibliographical_reference[5:].strip()
             m.bibliographic_id.append(bid)
         if bibliographical_reference[0:2] == "GW":
             bid.name = bibliographical_reference[0:2]
-            bid.id = bibliographical_reference[3:].strip()
+            bid.bib_id = bibliographical_reference[3:].strip()
             m.bibliographic_id.append(bid)
     
                  

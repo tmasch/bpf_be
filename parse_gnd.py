@@ -8,6 +8,7 @@ import xml.etree.ElementTree
 import os
 from pymongo import MongoClient
 #from dates_parsing import date_overall_parsing
+from lxml import etree
 import get_external_data 
 import parse_date
 import parsing_helpers
@@ -17,142 +18,178 @@ import classes
 
 #This is only for stand-alone execution of functions in this module, in other cases,
 #  a connection to the database has already been made.
-os.environ["MONGODB_HOST"] = "localhost"
-os.environ["MONGODB_PORT"] = "27017"
+#os.environ["MONGODB_HOST"] = "localhost"
+#os.environ["MONGODB_PORT"] = "27017"
 
-client = MongoClient("localhost", 27017)
-db = client.bpf
-coll = db.bpf
+#client = MongoClient("localhost", 27017)
+#db = client.bpf
+#coll = db.bpf
 
-dbname =  db_actions.get_database()
-coll=dbname['bpf']
+#dbname =  db_actions.get_database()
+#coll=dbname['bpf']
 
 @classes.func_logger
-async def identify_person(person_in) -> classes.SelectionCandidate:
+async def identify_person(role_in : classes.Role) -> classes.Role:
     """
 This function is used for every person named in the bibliographic record (author, editor, printer 
 etc.). It will first search if a record for this person is already in the MongoDB database, and 
 then search in the GND. If there is an ID-number (internal or GND, the search is done for the 
 ID-number, otherwise for the name as string, and if this fails, for the name as key-words).
     """
-    person=person_in.person
+    print(role_in.model_dump())
+#    person=role_in.entity_and_connections.person
+#    person
+#    person_in=classes.Role()
 
 #    candidates = []
-    person.internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(person.role)
+    internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(role_in.role)
+
+    found_person=False
+
+    print("     Searching for person in database by GND ID")
+    gnd_id_in=role_in.entity_and_connections.person.gnd_id
+    print(gnd_id_in)
+    xx = classes.Role.find(classes.Role.entity_and_connections.person.gnd_id == gnd_id_in,fetch_links=True)
+    role_in_db = await xx.to_list()
+    print("Search result")
+    print(role_in_db)
 
 
-    person.chosen_candidate = 999
+#    person.chosen_candidate = 999
     # For some reason, I cannot return the form when
     #'chosen candidate' is empty. Hence, I put this in as a default setting.
-    if person.id:
+#    if person.id:
 #        person_found = coll.find_one({"external_id": {"$elemMatch":
 # {"name": person.id_name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-        person_found = await db_actions.find_person(person,"external_id")
-        if person_found:
+#        person_found = await db_actions.find_person(person,"external_id")
+#        if person_found:
             #print(person_found)
-            person.internal_id = person_found["id"]
-            person.internal_id_person_type1 = person_found["person_type1"]
-            person.internal_id_preview = person_found["name_preferred"] + " (in Database)"
+#            person.internal_id = person_found["id"]
+#            person.internal_id_person_type1 = person_found["person_type1"]
+
+#            person.internal_id_preview = person_found["name_preferred"] + " (in Database)"
             # The date should be added, but I first have to write how it is to be parsed
-            
+    if role_in_db:
+#        role_in_db[0].comment="(in Database)"
+        found_person=True
+        print("found person")
+
             #The following is a warning that a matching person has the wrong type. 
-            if person.internal_id_person_type1_needed not in person.internal_id_person_type1:
-                person_type1_present = ""
-                for t in person.internal_id_person_type1:
-                    person_type1_present = person_type1_present + "' and '" + t + "'"
-                person_type1_present = person_type1_present[5:]
-                person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
-        else:
-            if person.id_name == "GND": # I will have to create similar things for other authority files
-                authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + person.id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-                print("url for person search: ")
-                print(authority_url)
-                person_in.person_candidates = parse_person_gnd(authority_url)
-    else:
+    # if role_in.role not i
 
-        person.name = person.name.strip()
-        for old, new in parsing_helpers.encoding_list.items():
-            person.name = person.name.replace(old, new)
-
-        candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
-#        candidates_result = await db_actions.find_person(person,"name_preferred")
-        for candidate_result in candidates_result:
-            candidate = classes.Person()   
-            candidate.internal_id = candidate_result["id"]
-            candidate.name_preferred = candidate_result["name_preferred"]
-            candidate.internal_id_person_type1 = candidate_result["person_type1"]
-            candidate.preview = candidate.name_preferred + " (in Database)" # The years should be added once I have them
-            print("Found as preferred name")
-            print(candidate.internal_id)
-            print(candidate.name_preferred)
-            print(candidate.internal_id_person_type1)
-            person.potential_candidates.append(candidate)
-        candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
-#        candidates_result = db_actions.find_person(person,"name_variant")
-        #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
-        for candidate_result in candidates_result:
-            candidate = classes.Person()
-            candidate.internal_id = candidate_result["id"]
-            candidate.name_preferred = candidate_result["name_preferred"]
-            candidate.internal_id_person_type1 = candidate_result["person_type1"]
-            candidate.preview = candidate.name_preferred + " (in Database)" # Also here, the years should be added
-            print("Found as variant: ")
-            print(candidate.internal_id)
-            print(candidate.name_preferred)
-            print(candidate.internal_id_person_type1)
-            candidate_duplicate = False
-            for extant_candidate in person_in.person_candidates:
-                if extant_candidate.name_preferred == candidate.name_preferred:
-                    candidate_duplicate = True
-            if not candidate_duplicate:
-                cc=classes.SelectionCandidate()
-                cc.person=candidate          
-                person_in.person_selection.append(cc)
-                #print(person.potential_candidates)
+    #         if person.internal_id_person_type1_needed not in person.internal_id_person_type1:
+    #             person_type1_present = ""
+    #             for t in person.internal_id_person_type1:
+    #                 person_type1_present = person_type1_present + "' and '" + t + "'"
+    #             person_type1_present = person_type1_present[5:]
+    #             person.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
 
 
-            for candidate in person_in.person_candidates:
-                if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
-                    person_type1_present = ""
-                    for t in candidate.internal_id_person_type1:
-                        person_type1_present = person_type1_present + "' and '" + t + "'"
-                    person_type1_present = person_type1_present[5:]
-                    candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
+#async def search_for_person_candidates():
+    if not found_person and role_in.entity_and_connections.person.gnd_id:
+        print("Searching in GND by ID")
+        print(role_in.entity_and_connections.person.gnd_id)
+#        else:
+#            if person.id_name == "GND": # I will have to create similar things for other authority files
+        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
+              + role_in.entity_and_connections.person.gnd_id\
+                  + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+        print("url for person search: ")
+        print(authority_url)
+#        role_in.entity_and_connections.connected_persons = await find_and_parse_person_gnd(authority_url)
+        person_found=True
+        print(role_in.model_dump())
+
+#     else:
+
+#         person.name = person.name.strip()
+#         for old, new in parsing_helpers.encoding_list.items():
+#             person.name = person.name.replace(old, new)
+
+#         candidates_result = coll.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+# #        candidates_result = await db_actions.find_person(person,"name_preferred")
+#         for candidate_result in candidates_result:
+#             candidate = classes.Person()   
+#             candidate.internal_id = candidate_result["id"]
+#             candidate.name_preferred = candidate_result["name_preferred"]
+#             candidate.internal_id_person_type1 = candidate_result["person_type1"]
+#             candidate.preview = candidate.name_preferred + " (in Database)" # The years should be added once I have them
+#             print("Found as preferred name")
+#             print(candidate.internal_id)
+#             print(candidate.name_preferred)
+#             print(candidate.internal_id_person_type1)
+#             person_in.person_selection.append(candidate)
+#         candidates_result = coll.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1}) 
+# #        candidates_result = db_actions.find_person(person,"name_variant")
+#         #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+#         for candidate_result in candidates_result:
+#             candidate = classes.Person()
+#             candidate.internal_id = candidate_result["id"]
+#             candidate.name_preferred = candidate_result["name_preferred"]
+#             candidate.internal_id_person_type1 = candidate_result["person_type1"]
+#             candidate.preview = candidate.name_preferred + " (in Database)" # Also here, the years should be added
+#             print("Found as variant: ")
+#             print(candidate.internal_id)
+#             print(candidate.name_preferred)
+#             print(candidate.internal_id_person_type1)
+#             candidate_duplicate = False
+#             for extant_candidate in person_in.person_candidates:
+#                 if extant_candidate.name_preferred == candidate.name_preferred:
+#                     candidate_duplicate = True
+#             if not candidate_duplicate:
+# #                cc=classes.SelectionCandidate()
+# #                cc.person=candidate          
+# #                person_in.person_selection.append(cc)
+#                 print(person.potential_candidates)
 
 
-        if person.internal_id_person_type1_needed != "Artist":
-            if not person_in.person_candidates: #if nothing has been found in the database
-                print("No person found")
-                person_name_search = person.name
-                for old, new in parsing_helpers.url_replacement.items():
-                    person_name_search = person_name_search.replace(old, new)
-                authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-                print(authority_url)
-                person_in.person_candidates = parse_person_gnd(authority_url)
+#             for candidate in person_in.person_candidates:
+#                 if person.internal_id_person_type1_needed not in candidate.internal_id_person_type1:
+#                     person_type1_present = ""
+#                     for t in candidate.internal_id_person_type1:
+#                         person_type1_present = person_type1_present + "' and '" + t + "'"
+#                     person_type1_present = person_type1_present[5:]
+#                     candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
 
-            if not person_in.person_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
-                name_divided = person_name_search.split("%20")
-                name_query = ""           
-                for word in name_divided:
-                    if word != "": #necessary, otherwise there will be error messages
-                        search_phrase = r"Per=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
-                        name_query = name_query + search_phrase
-                authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
-                print(authority_url)
-                new_potential_candidates = parse_person_gnd(authority_url)
-                person_in.person_candidates = person.person_candidates + new_potential_candidates
-        else:
-            if not person_in.person_candidates:
-                person = await get_external_data.search_ulan(person)
-    if len(person_in.person_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
-        person.chosen_candidate = 0
-    print("new person record")
+    if not found_person and role_in.role != "Artist":
+        print("No person found yet")
+        person_name_search = role_in.entity_and_connections.person.name
+        for old, new in parsing_helpers.url_replacement.items():
+            person_name_search = person_name_search.replace(old, new)
+        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+        print(authority_url)
+#        person_in.person_candidates = parse_person_gnd(authority_url)
+
+    if not found_person:
+            # if not person_in.person_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
+        name_divided = person_name_search.split("%20")
+        name_query = ""           
+        for word in name_divided:
+            if word != "": #necessary, otherwise there will be error messages
+                search_phrase = r"Per=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
+                name_query = name_query + search_phrase
+        authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
+        print(authority_url)
+        new_potential_candidates = await find_and_parse_person_gnd(authority_url)
+        role_in.entity_and_connections.connected_persons = new_potential_candidates
+
+#        role_in.entity_and_connections.connected_persons.ap
+#                = new_potential_candidates
+#        person_in.person_candidates = person.person_candidates + new_potential_candidates
+#         else:
+#             if not person_in.person_candidates:
+#                 person = await get_external_data.search_ulan(person)
+#     if len(person_in.person_candidates) == 1: # If there is only one entry for this person, it is by default selected (although the user can also run a new search, once this is established)
+#         person.chosen_candidate = 0
+#     print("new person record")
+# #    print(person)
+#     person_in.person=person
 #    print(person)
-    person_in.person=person
-    return person_in
+    print(role_in.model_dump())
+    return role_in
                 
 @classes.func_logger
-def identify_additional_person(new_authority_id, role):
+async def identify_additional_person(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
 Normally, they are parsed with gnd_parsing_person - but beforehand it is checked if they are already in Iconobase and have not been found for whatever reason. 
@@ -182,7 +219,7 @@ Currently all records must come from the GND - if other authority files are incl
 
     else: 
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D' + new_authority_id + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-        potential_persons_list = parse_person_gnd(authority_url)
+        potential_persons_list = await find_and_parse_person_gnd(authority_url)
     #print("added person")
     #print(potential_persons_list)
     return potential_persons_list
@@ -229,7 +266,7 @@ This function is used for every organisation named in the bibliographic record (
         candidates_result = db_actions.find_organisation(organisation,"name")
         print("Search for repository candidate completed")
         for candidate_result in candidates_result:
-            candidate = classes.OrganisationImport()   
+            candidate = classes.Organisation()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -241,7 +278,7 @@ This function is used for every organisation named in the bibliographic record (
 #        candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_organisation(organisation,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.OrganisationImport()   
+            candidate = classes.Organisation()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
@@ -385,7 +422,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
         candidates_result = db_actions.find_place(place,"name_preferred")
         for candidate_result in candidates_result:           
-            candidate = classes.PlaceImport()   
+            candidate = classes.Place()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"] # I need this to create previews for places of making
             print("candidate found through name search in database (preferred name)" + candidate.internal_id)
@@ -395,7 +432,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_place(place,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.PlaceImport()   
+            candidate = classes.Place()   
             candidate.internal_id = candidate_result["id"]
             print("candidate found through name search in database (variant name name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -459,7 +496,7 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_places_list = []
-    potential_place = classes.PlaceImport()
+    potential_place = classes.Place()
 #    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
     place=classes.Place
     place.new_authority_id=new_authority_id
@@ -491,247 +528,314 @@ Currently all records must come from the GND - if other authority files are incl
 
 
 @classes.func_logger
-def parse_person_gnd(authority_url) -> classes.Person:
+async def find_and_parse_person_gnd(authority_url):
     """
 \todo
     """
     print("arrived in gnd_parsing_person")
     potential_persons_list = []
-    url = urllib.request.urlopen(authority_url)
-    tree = xml.etree.ElementTree.parse(url)
-    root = tree.getroot()
+#    url = urllib.request.urlopen(authority_url)
+#    tree = xml.etree.ElementTree.parse(url)
+#    root = tree.getroot()
+
+    result = []
+    content=await get_external_data.get_web_data(authority_url)
+    print(content)
+    root = etree.XML(content)
+
+    records=root.find("records", namespaces=root.nsmap)
+#    print(records)
+#    print(records.tag)
+#    tag_id='400'
+#    subfield_code="a"
+    for record in records:
+        print("found record")
+
+
     #print(root)
     
-    for record in root[2]:
-        print("Parsing person information")
-        pe = classes.Person()
-        comment = ""
-        date_preview = ""
-        ortg_preview = ""
-        orts_preview = ""
-        ortw_preview = ""
-        name_variant_preview = ""
-        comments_preview = ""
-        for step1 in record[2][0]:
-            match step1.get('tag'):
-#                case "001":
-#                    pe_id = External_id()
-#                    pe_id.name = "GND_intern"
-#                    pe_id.id = step1.text
-#                    pe_id.uri = "GND_intern" + step1.text                    
-#                    pe.external_id.append(pe_id)
+    # for record in root[2]:
+    #     print("Parsing person information")
+    #     pe = classes.Person()
+    #     comment = ""
+    #     date_preview = ""
+    #     ortg_preview = ""
+    #     orts_preview = ""
+    #     ortw_preview = ""
+    #     name_variant_preview = ""
+    #     comments_preview = ""
+#         for step1 in record[2][0]:
+#             match step1.get('tag'):
+# #                case "001":
+# #                    pe_id = External_id()
+# #                    pe_id.name = "GND_intern"
+# #                    pe_id.id = step1.text
+# #                    pe_id.uri = "GND_intern" + step1.text                    
+# #                    pe.external_id.append(pe_id)
 
-                case "035":
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                pe_id = classes.ExternalId()
-                                pe_id.name = "GND"
-                                if step2.text[0:8] == "(DE-588)":
-                                    pe_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
-                                    pe_id.uri = r'https://d-nb.info/gnd/' + pe_id.id
-                                    duplicate_id = False  # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
-                                    for id_duplicate in pe.external_id:
-                                        if id_duplicate.uri == pe_id.uri:
-                                            duplicate_id = True
-                                    if not duplicate_id:
-                                        pe.external_id.append(pe_id)
-#                                    if not pe.external_id: #
-#                                        pe.external_id.append(pe_id)
-                                # Quite often, there are several GND records for one person, and if discovered, they are merged, and all GND IDs but become obsolete.
-                                # However, they are still stored in the record (035z) and are found by the search. 
-                                # Hence, this ID may be different from the person.id I used for the search in the first place.
-                                # Annoyingly, the search also finds IDs from the old database PND. If it is possible that a PND ID is the same as the GND ID of a 
-                                # different record, I have to include a function to delete this record from the results (I am enquiring if this is the case)
-                case "100":
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                pe.name_preferred = step2.text                               
-                            case "b": # The numbering for rulers
-                                pe.name_preferred = pe.name_preferred + " " + step2.text
-                            case "c": # For rulers, comments on Territory, title and time of ruling. However, 
-                                # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
-                                # but I fear it is too messy to make it worthwhile. 
-                                if not ("Kaiser" in step2.text or "König" in step2.text or "Herzog" in step2.text or "Kurfürst" in step2.text or "Markgraf" in step2.text or \
-                                        "Bischof" in step2.text or "Fürstbischof" in step2.text or "Erzbischof" in step2.text or "Fürsterzbischof" in step2.text or "Abt" in step2.text):
-                                    pe.name_preferred = pe.name_preferred + " (" +  step2.text + ")"
-                                else:
-                                    pe.comments = step2.text
+        person_found=classes.Person()
 
-                case "375":
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                if step2.text == "1":
-                                    pe.sex = "male"
-                                if step2.text == "2":
-                                    pe.sex = "female"
-                case "400":
-                    name_number = ""
-                    name_comment = ""
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                name_variant = step2.text
-                            case "b": # The numbering for rulers
-                                name_number =  " " + step2.text
-                            case "c": # For rulers, comments on Territory, title and time of ruling. 
-                                # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
-                                # but I fear it is too messy to make it worthwhile.                                
-                                comment = step2.text
-                                if " von " in comment or " of " in comment or " de " in comment or "," in comment: # This field can contain either an additional epithet or the territory and title of a ruler. The former will be stored
-                                    # as part of the name, the latter will be relegated to the comment field. 
-                                    # As a rough way of discerning both, anything with "von", "of" or "de" or a comma is regarded as belonging to a ruler
-                                    if comment not in pe.comments:
-                                        pe.comments = pe.comments + " / " + comment
-                                else: 
-                                    name_comment = " (" + comment + ")"
-#                                    name_variant = name_variant + name_number + " (" + comment + ")"
-                    name_variant = name_variant + name_number + name_comment
-                    for variant in pe.name_variant:
-                        if name_variant in variant:
-                            name_variant = ""
-                    if name_variant:
-                        pe.name_variant.append(name_variant)
-                case "500":
-                    conn_pe = classes.ConnectedEntity()
-                    conn_pe.external_id = []
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "0":
-                                if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
-                                    conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
-                                    conn_pe.external_id.append(conn_id)
+        x = find_datafields(record,"035")
+        print(x)
+        for y in x:
+            if y.get("a") is not None:
+                external_reference = classes.ExternalReference()
+                external_reference.name="GND"
+                external_reference.external_id=y["a"]
+                person_found.external_id.append(external_reference)
+#                 case "035":
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 pe_id = classes.ExternalReference()
+#                                 pe_id.name = "GND"
+#                                 if step2.text[0:8] == "(DE-588)":
+#                                     pe_id.external_id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+#                                     pe_id.uri = r'https://d-nb.info/gnd/' + pe_id.external_id
+#                                     duplicate_id = False  # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
+#                                     for id_duplicate in pe.external_id:
+#                                         if id_duplicate.uri == pe_id.uri:
+#                                             duplicate_id = True
+#                                     if not duplicate_id:
+#                                         pe.external_id.append(pe_id)
+# #                                    if not pe.external_id: #
+# #                                        pe.external_id.append(pe_id)
+#                                 # Quite often, there are several GND records for one person, and if discovered, they are merged, and all GND IDs but become obsolete.
+#                                 # However, they are still stored in the record (035z) and are found by the search. 
+#                                 # Hence, this ID may be different from the person.id I used for the search in the first place.
+#                                 # Annoyingly, the search also finds IDs from the old database PND. If it is possible that a PND ID is the same as the GND ID of a 
+#                                 # different record, I have to include a function to delete this record from the results (I am enquiring if this is the case)
 
-                            case "a":
-                                conn_pe.name = step2.text
-                            case "b": 
-                                conn_pe.name = conn_pe.name + " " + step2.text
-                            case "c": 
-                                conn_pe.name = conn_pe.name + "(" + step2.text + ")" #in this case I add this to the name
-                            # since it may make clear who the person is. 
-                            case "4":
-                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
-                                    conn_pe.connection_type = step2.text
-                            case "9": 
-                                if step2.text[0:2] == "v:":
-                                    conn_pe.connection_comment = step2.text[2:]
-                                if step2.text[0:2] == "Z:":
-                                    conn_pe.connection_time = step2.text[2:]
-                    if "VD-16 Mitverf." not in conn_pe.connection_comment: 
-                            # someone connected all persons who appear together as authors in the VD16,
-                            # I want them removed. 
-                        pe.connected_persons.append(conn_pe)
-                case "510":
-                    conn_org = classes.ConnectedEntity()
-                    conn_org.external_id = []
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "0":
-                                if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
-                                    conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
-                                    conn_org.external_id.append(conn_id)
-                            case "a": 
-                                conn_org.name = step2.text
-                            case "b": #for sub-units of organisations - no clue if this will ever happen in my circumstances
-                                conn_org.name = conn_org.name + " (" + step2.text + ")"
-                            case "4":
-                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
-                                    conn_org.connection_type = step2.text
-                            case "9": 
-                                if step2.text[0:2] == "v:":
-                                    conn_org.connection_comment = step2.text[2:]
-                                if step2.text[0:2] == "Z:":
-                                    conn_org.connection_time = step2.text[2:]
-                    pe.connected_organisations.append(conn_org)
-                case "548":
-                    date = classes.DateImport()
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                date.datestring_raw = step2.text
-                            case "v":
-                                date.date_comments = step2.text
-                            case "4":
-                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
-                                    date.datetype = step2.text
-                    if date.datetype == "datl":
-                        date_preview = " (" + date.datestring_raw + ")"
-                    if date.datetype == "datw" and date_preview == "": # only shown in the preview if there is no datl
-                        date_preview = " (active: " + date.datestring_raw + ")" 
-                    pe.dates_from_source.append(date)
-                    print("Date as imported from GND: ")
-                    print(pe.dates_from_source)
- #                   pe.dates_from_source.append(date)
-                    # If the GND contains the exact date ("datx"), it also gives the years only ("datl"). 
-                    # The latter should be removed later
-                case "550": #This is used for professions or for general headings. This information is simply displayed in the "comment" field
-                    # so that it can be used to manually create the links I will need. 
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "a":
-                                if pe.comments:
-                                    pe.comments = step2.text + "; " + pe.comments
-                                else:
-                                    pe.comments = step2.text
-                case "551":
-                    conn_pl = classes.ConnectedEntity()
-                    conn_id = classes.ExternalId()
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "0":
-                                if step2.text[0:8] == "(DE-588)":
-                                    conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_pl.external_id.append(conn_id)
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
-                            case "a": 
-                                conn_pl.name = step2.text
-                            case "g": 
-                                conn_pl.name = conn_pl.name + " (" + step2.text + ")"
-                            case "4":
-                                if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
-                                    conn_pl.connection_type = step2.text
-                            case "9": 
-                                if step2.text[0:2] == "v:":
-                                    conn_pl.connection_comment = step2.text[2:]
-                                if step2.text[0:2] == "Z:":
-                                    conn_pl.connection_time = step2.text[2:]
-                    if conn_pl.connection_type == "ortg":
-                        ortg_preview = ", born in " + conn_pl.name
-                    if conn_pl.connection_type == "orts":
-                        orts_preview = ", died in " + conn_pl.name
-                    if conn_pl.connection_type == "ortw":
-                        ortw_preview = ", active in " + conn_pl.name
-                    pe.connected_locations.append(conn_pl)
-                case "678":
-                    for step2 in step1:
-                        match step2.get('code'):
-                            case "b":
-                                if pe.comments:
-                                    pe.comments = step2.text + "; " + pe.comments
-                                else:
-                                    pe.comments = step2.text
-        #if pe.dates_from_source:
-            #pe.dates = dates_parsing(pe.dates_from_source)
-        if pe.comments:                
-            comments_preview = " (" + pe.comments + ")"
-        if pe.name_variant:
-            name_variant_preview = ", also called: "
-            for variant in pe.name_variant:
-                name_variant_preview = name_variant_preview + variant + "; "
-            name_variant_preview = name_variant_preview[:-2]
+
+
+
+#                 case "100":
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 pe.name_preferred = step2.text                               
+#                             case "b": # The numbering for rulers
+#                                 pe.name_preferred = pe.name_preferred + " " + step2.text
+#                             case "c": # For rulers, comments on Territory, title and time of ruling. However, 
+#                                 # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
+#                                 # but I fear it is too messy to make it worthwhile. 
+#                                 if not ("Kaiser" in step2.text or "König" in step2.text or "Herzog" in step2.text or "Kurfürst" in step2.text or "Markgraf" in step2.text or \
+#                                         "Bischof" in step2.text or "Fürstbischof" in step2.text or "Erzbischof" in step2.text or "Fürsterzbischof" in step2.text or "Abt" in step2.text):
+#                                     pe.name_preferred = pe.name_preferred + " (" +  step2.text + ")"
+#                                 else:
+#                                     pe.comments = step2.text
+        name_preferred = ""
+        x = find_datafields(record,"100")
+        y=x[0]
+        if y.get("a") is not None:
+            name_preferred = y["a"]
+            # The numbering for rulers
+        if y.get("b") is not None:
+            name_preferred = name_preferred+ " " + y["b"]
+        if y.get("c") is not None:
+            comments = y["c"]
+            person_found.comments = comments
+        person_found.name_preferred = name_preferred
+
+
+#                 case "375":
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 if step2.text == "1":
+#                                     pe.sex = "male"
+#                                 if step2.text == "2":
+#                                     pe.sex = "female"
+        sex = ""
+        x = find_datafields(record,"375")
+        y=x[0]
+        if y.get("a") is not None:
+            print(y["a"])
+            if y["a"] == 1:
+                sex = "male"
+            if y["a"] == 2:
+                sex = "female"
+            person_found.sex = sex
+
+
+#                 case "400":
+#                     name_number = ""
+#                     name_comment = ""
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 name_variant = step2.text
+#                             case "b": # The numbering for rulers
+#                                 name_number =  " " + step2.text
+#                             case "c": # For rulers, comments on Territory, title and time of ruling. 
+#                                 # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
+#                                 # but I fear it is too messy to make it worthwhile.                                
+#                                 comment = step2.text
+#                                 if " von " in comment or " of " in comment or " de " in comment or "," in comment: # This field can contain either an additional epithet or the territory and title of a ruler. The former will be stored
+#                                     # as part of the name, the latter will be relegated to the comment field. 
+#                                     # As a rough way of discerning both, anything with "von", "of" or "de" or a comma is regarded as belonging to a ruler
+#                                     if comment not in pe.comments:
+#                                         pe.comments = pe.comments + " / " + comment
+#                                 else: 
+#                                     name_comment = " (" + comment + ")"
+# #                                    name_variant = name_variant + name_number + " (" + comment + ")"
+#                     name_variant = name_variant + name_number + name_comment
+#                     for variant in pe.name_variant:
+#                         if name_variant in variant:
+#                             name_variant = ""
+#                     if name_variant:
+#                         pe.name_variant.append(name_variant)
+
+        x = find_datafields(record,"400")
+        y=x[0]
+        if y.get("a") is not None:
+            name_variant=y["a"]
+
+
+
+#                 case "500":
+#                     conn_pe = classes.Person()
+# #                    conn_pe.external_id = []
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "0":
+#                                 if step2.text[0:8] == "(DE-588)":
+#                                     conn_id = classes.ExternalReference()
+#                                     conn_id.name = "GND"
+#                                     conn_id.external_id = step2.text[8:]
+#                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
+#                                     conn_pe.external_id.append(conn_id)
+
+#                             case "a":
+#                                 conn_pe.name = step2.text
+#                             case "b": 
+#                                 conn_pe.name = conn_pe.name + " " + step2.text
+#                             case "c": 
+#                                 conn_pe.name = conn_pe.name + "(" + step2.text + ")" #in this case I add this to the name
+#                             # since it may make clear who the person is. 
+#                             case "4":
+#                                 if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+#                                     conn_pe.connection_type = step2.text
+#                             case "9": 
+#                                 if step2.text[0:2] == "v:":
+#                                     conn_pe.connection_comment = step2.text[2:]
+#                                 if step2.text[0:2] == "Z:":
+#                                     conn_pe.connection_time = step2.text[2:]
+#                     if "VD-16 Mitverf." not in conn_pe.connection_comment: 
+#                             # someone connected all persons who appear together as authors in the VD16,
+#                             # I want them removed. 
+#                         pe.connected_persons.append(conn_pe)
+
+        x = find_datafields(record,"500")
+        for y in x:
+            pp=classes.Person()
+
+#                 case "510":
+#                     conn_org = classes.EntityConnection()
+#                     conn_org.external_id = []
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "0":
+#                                 if step2.text[0:8] == "(DE-588)":
+#                                     conn_id = classes.ExternalReference()
+#                                     conn_id.name = "GND"
+#                                     conn_id.external_id = step2.text[8:]
+#                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
+#                                     conn_org.external_id.append(conn_id)
+#                             case "a": 
+#                                 conn_org.name = step2.text
+#                             case "b": #for sub-units of organisations - no clue if this will ever happen in my circumstances
+#                                 conn_org.name = conn_org.name + " (" + step2.text + ")"
+#                             case "4":
+#                                 if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+#                                     conn_org.connection_type = step2.text
+#                             case "9": 
+#                                 if step2.text[0:2] == "v:":
+#                                     conn_org.connection_comment = step2.text[2:]
+#                                 if step2.text[0:2] == "Z:":
+#                                     conn_org.connection_time = step2.text[2:]
+#                     pe.connected_organisations.append(conn_org)
+#                 case "548":
+#                     date = classes.DateImport()
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 date.datestring_raw = step2.text
+#                             case "v":
+#                                 date.date_comments = step2.text
+#                             case "4":
+#                                 if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+#                                     date.datetype = step2.text
+#                     if date.datetype == "datl":
+#                         date_preview = " (" + date.datestring_raw + ")"
+#                     if date.datetype == "datw" and date_preview == "": # only shown in the preview if there is no datl
+#                         date_preview = " (active: " + date.datestring_raw + ")" 
+#                     pe.dates_from_source.append(date)
+#                     print("Date as imported from GND: ")
+#                     print(pe.dates_from_source)
+#  #                   pe.dates_from_source.append(date)
+#                     # If the GND contains the exact date ("datx"), it also gives the years only ("datl"). 
+#                     # The latter should be removed later
+#                 case "550": #This is used for professions or for general headings. This information is simply displayed in the "comment" field
+#                     # so that it can be used to manually create the links I will need. 
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "a":
+#                                 if pe.comments:
+#                                     pe.comments = step2.text + "; " + pe.comments
+#                                 else:
+#                                     pe.comments = step2.text
+#                 case "551":
+#                     conn_pl = classes.EntityConnection()
+#                     conn_id = classes.ExternalReference()
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "0":
+#                                 if step2.text[0:8] == "(DE-588)":
+#                                     conn_id.name = "GND"
+#                                     conn_id.external_id = step2.text[8:]
+#                                     conn_pl.external_id.append(conn_id)
+#                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
+#                             case "a": 
+#                                 conn_pl.name = step2.text
+#                             case "g": 
+#                                 conn_pl.name = conn_pl.name + " (" + step2.text + ")"
+#                             case "4":
+#                                 if step2.text[0:4] != "http": # in this subfield are both the relation codes and a URI for the relation codes, I don't need the latter
+#                                     conn_pl.connection_type = step2.text
+#                             case "9": 
+#                                 if step2.text[0:2] == "v:":
+#                                     conn_pl.connection_comment = step2.text[2:]
+#                                 if step2.text[0:2] == "Z:":
+#                                     conn_pl.connection_time = step2.text[2:]
+#                     if conn_pl.connection_type == "ortg":
+#                         ortg_preview = ", born in " + conn_pl.name
+#                     if conn_pl.connection_type == "orts":
+#                         orts_preview = ", died in " + conn_pl.name
+#                     if conn_pl.connection_type == "ortw":
+#                         ortw_preview = ", active in " + conn_pl.name
+#                     pe.connected_locations.append(conn_pl)
+#                 case "678":
+#                     for step2 in step1:
+#                         match step2.get('code'):
+#                             case "b":
+#                                 if pe.comments:
+#                                     pe.comments = step2.text + "; " + pe.comments
+#                                 else:
+#                                     pe.comments = step2.text
+#         #if pe.dates_from_source:
+#             #pe.dates = dates_parsing(pe.dates_from_source)
+#         if pe.comments:                
+#             comments_preview = " (" + pe.comments + ")"
+#         if pe.name_variant:
+#             name_variant_preview = ", also called: "
+#             for variant in pe.name_variant:
+#                 name_variant_preview = name_variant_preview + variant + "; "
+#             name_variant_preview = name_variant_preview[:-2]
         
 
-        pe.preview = pe.name_preferred + date_preview + ortg_preview + ortw_preview + orts_preview + name_variant_preview + comments_preview
-        potential_persons_list.append(pe)
+#         pe.preview = pe.name_preferred + date_preview + ortg_preview + ortw_preview + orts_preview + name_variant_preview + comments_preview
+#         potential_persons_list.append(pe)
         #print(potential_persons_list)
 #        print(pe.preview)
                     
@@ -747,6 +851,16 @@ def parse_person_gnd(authority_url) -> classes.Person:
 #        print(pe.connected_locations)
 #        pprint(pe)
 #    print(persons_list)
+#        print(person_found.model_dump())
+        connected_person = classes.EntityConnection()
+        connected_person.connection_type = "Candidate"
+        connected_person.person = person_found
+#        print(connected_person.model_dump())
+#        print(result.model_dump())
+        result.append(connected_person)
+#        print(result.model_dump())
+
+
 
                 
 
@@ -755,7 +869,7 @@ def parse_person_gnd(authority_url) -> classes.Person:
     #record = root[2][0][2][0][0]
     #print(record.text)
     #print("potential persons list made")
-    return potential_persons_list
+    return result
 
 
 
@@ -772,7 +886,7 @@ def parse_organisation_gnd(authority_url):
     root = tree.getroot()
     record_number = 0
     for record in root[2]:
-        org = classes.OrganisationImport()
+        org = classes.Organisation()
 #        comment = ""
         date_preview = ""
         orta_preview = ""
@@ -788,20 +902,20 @@ def parse_organisation_gnd(authority_url):
         for step1 in record[2][0]:
             match step1.get('tag'):
                 case "001":
-                    org_id = classes.ExternalId()
+                    org_id = classes.ExternalReference()
                     org_id.name = "GND_intern"
-                    org_id.id = step1.text
+                    org_id.external_id = step1.text
                     org_id.uri = "GND_intern" + step1.text
                     org.external_id.append(org_id)
                 case "035":
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                org_id = classes.ExternalId()
+                                org_id = classes.ExternalReference()
                                 org_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
-                                    org_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
-                                    org_id.uri = r'https://d-nb.info/gnd/' + org_id.id
+                                    org_id.external_id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.
+                                    org_id.uri = r'https://d-nb.info/gnd/' + org_id.external_id
                                     duplicate_id = False  # Sometimes, the record containing the GND ID appears twice, hence it should not be added a second time. 
                                     for id_duplicate in org.external_id:
                                         if id_duplicate.uri == org_id.uri:
@@ -851,13 +965,13 @@ def parse_organisation_gnd(authority_url):
                     if name_variant:
                         org.name_variant.append(name_variant)
                 case "500":
-                    conn_pe = classes.ConnectedEntity()
+                    conn_pe = classes.EntityConnection()
                     conn_pe.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
+                                    conn_id = classes.ExternalReference()
                                     conn_id.name = "GND"
                                     conn_id.id = step2.text[8:]
                                     conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
@@ -880,16 +994,16 @@ def parse_organisation_gnd(authority_url):
                                     conn_pe.connection_time = step2.text[2:]
                     org.connected_persons.append(conn_pe)
                 case "510":
-                    conn_org = classes.ConnectedEntity()
+                    conn_org = classes.EntityConnection()
                     conn_org.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
+                                    conn_id = classes.ExternalReference()
                                     conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
+                                    conn_id.external_id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
                                     conn_org.external_id.append(conn_id)
                             case "a": 
                                 conn_org.name = step2.text
@@ -930,15 +1044,15 @@ def parse_organisation_gnd(authority_url):
                                 else:
                                     org.comments = step2.text
                 case "551":
-                    conn_pl = classes.ConnectedEntity()
-                    conn_id = classes.ExternalId()
+                    conn_pl = classes.EntityConnection()
+                    conn_id = classes.ExternalReference()
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
                                     conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
+                                    conn_id.external_id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
                                     conn_pl.external_id.append(conn_id)
                             case "a": 
                                 conn_pl.name = step2.text
@@ -994,7 +1108,7 @@ The longest part of the function the actual parsing of the XMl results, is moved
     potential_places_list = []
     for record in root[2]:
 #        print("arrived in parsing record")
-        pl = classes.PlaceImport()
+        pl = classes.Place()
 #        comment = ""
         obpa_preview = ""
         adue_preview = ""
@@ -1008,25 +1122,25 @@ The longest part of the function the actual parsing of the XMl results, is moved
         for step1 in record[2][0]:
             match step1.get('tag'):
                 case "001":
-                    pl_id = classes.ExternalId()
+                    pl_id = classes.ExternalReference()
                     pl_id.name = "GND_intern"
-                    pl_id.id = step1.text
+                    pl_id.external_id = step1.text
                     pl_id.uri = "GND_intern" + step1.text
                     pl.external_id.append(pl_id)                
                 case "024":
-                    pl_id = classes.ExternalId()
+                    pl_id = classes.ExternalReference()
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                pl_id.id = step2.text
+                                pl_id.external_id = step2.text
                             case "2":
                                 pl_id.name = step2.text
                         if pl_id.name == "geonames":
-                            pl_id.uri = "https://sws.geonames.org/" + pl_id.id
+                            pl_id.uri = "https://sws.geonames.org/" + pl_id.external_id
                             pl.external_id.append(pl_id)                            
                 case "034":
                     coordinates = classes.Coordinates()
-                    pl_id = classes.ExternalId()
+                    pl_id = classes.ExternalReference()
                     for step2 in step1:
                         match step2.get('code'):
                             case "d": 
@@ -1042,11 +1156,11 @@ The longest part of the function the actual parsing of the XMl results, is moved
                     for step2 in step1:
                         match step2.get('code'):
                             case "a":
-                                pl_id = classes.ExternalId()
+                                pl_id = classes.ExternalReference()
                                 pl_id.name = "GND"
                                 if step2.text[0:8] == "(DE-588)":
-                                    pl_id.id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.   
-                                    pl_id.uri = r'https://d-nb.info/gnd/' + pl_id.id                          
+                                    pl_id.external_id = step2.text[8:] #The latter cuts out the prefix '(DE-588)'.   
+                                    pl_id.uri = r'https://d-nb.info/gnd/' + pl_id.external_id                          
                                     pl.external_id.append(pl_id)
                         
                                 # Quite often, there are several GND records for one place, and if discovered, they are merged, and all GND IDs but become obsolete.
@@ -1081,16 +1195,16 @@ The longest part of the function the actual parsing of the XMl results, is moved
                         #just in case this name_number is ever used with places
                         pl.name_variant.append(name_variant)
                 case "500":
-                    conn_pe = classes.ConnectedEntity()
+                    conn_pe = classes.EntityConnection()
                     conn_pe.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
+                                    conn_id = classes.ExternalReference()
                                     conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id               
+                                    conn_id.external_id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
                                     conn_pe.external_id.append(conn_id)
 
                             case "a":
@@ -1113,16 +1227,16 @@ The longest part of the function the actual parsing of the XMl results, is moved
                             # I want them removed. 
                         pl.connected_persons.append(conn_pe)
                 case "510":
-                    conn_org = classes.ConnectedEntity()
+                    conn_org = classes.EntityConnection()
                     conn_org.external_id = []
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
-                                    conn_id = classes.ExternalId()
+                                    conn_id = classes.ExternalReference()
                                     conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
+                                    conn_id.external_id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
                                     conn_org.external_id.append(conn_id)
                             case "a": 
                                 conn_org.name = step2.text
@@ -1158,15 +1272,15 @@ The longest part of the function the actual parsing of the XMl results, is moved
                                 else:
                                     pl.comments = step2.text
                 case "551":
-                    conn_pl = classes.ConnectedEntity()
-                    conn_id = classes.ExternalId()
+                    conn_pl = classes.EntityConnection()
+                    conn_id = classes.ExternalReference()
                     for step2 in step1:
                         match step2.get('code'):
                             case "0":
                                 if step2.text[0:8] == "(DE-588)":
                                     conn_id.name = "GND"
-                                    conn_id.id = step2.text[8:]
-                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.id
+                                    conn_id.external_id = step2.text[8:]
+                                    conn_id.uri =  r'https://d-nb.info/gnd/' + conn_id.external_id
                                     conn_pl.external_id.append(conn_id)
                             case "a": 
                                 conn_pl.name = step2.text
@@ -1350,3 +1464,23 @@ async def identify_making_process(making_processes):
 
     
     return making_processes
+
+def find_datafields(record,tag_id):
+    """
+    This function returns for a datafield in an MARCXML record a
+    hash with the subfields, where the key is the code attribute
+    and the value is the text in the subfield.
+    """
+    result=[]
+    datafields=record.findall("{*}recordData/{*}record/{*}datafield[@tag='"+tag_id+"']")
+    for datafield in datafields:
+        subfields=datafield.findall("{*}subfield")
+        subfield_hash={}
+        for subfield in subfields:
+            key= subfield.get("code")
+            value=subfield.text
+            subfield_hash[key]=value
+#            print("Hash"+key+value)
+        result.append(subfield_hash)
+#        print(result)
+    return result

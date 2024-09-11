@@ -6,7 +6,7 @@ This module collects functions that obtain data from external webpages
 import json
 import urllib.request
 import xml.etree.ElementTree
-import logging
+#import logging
 import asyncio
 import aiohttp
 import requests
@@ -22,23 +22,29 @@ import  parsing_helpers
 @classes.func_logger
 async def get_web_data_as_json(url):
     """
-    function that does a web call
+    Do a web call and returns a json object
     """
-    print("Getting web data")
     url = url.replace(" ", "%20")
-    print("url " + url)
-    url_opened = urllib.request.urlopen(url)
-    contents = json.load(url_opened)
-    f = open("requests.txt", "a")
-    f.write("------------------------\n")
-    f.write("WEB CALL\n")
-    f.write("REQUEST\n")
-    f.write("url: " + url)
-    f.write("\nRESPONSE\n")
-    f.write(json.dumps(contents))
-    f.write("\n------------------------\n")
-    f.close()
-    return contents
+    content = await get_web_data(url)
+    result = json.loads(content)
+    return result
+
+
+@classes.func_logger
+async def get_web_data(url):
+    """
+    Do a web call and return byte object
+    """
+    r = await classes.webCall.find(classes.webCall.url == url).to_list()
+    if len(r) > 0:
+        content=r[0].content
+    else: 
+        response = requests.get(url)
+        content = response.content
+        print(type(content))
+        wc = classes.webCall(url=url,content=content)
+        await wc.save()
+    return content
 
 
 @classes.func_logger
@@ -134,7 +140,7 @@ def transform_gnd_id_with_hyphen(id_with_hyphen):
         for step1 in record[2][0]:
             match step1.get("tag"):
                 case "001":
-                    record_id = classes.ExternalId()
+                    record_id = classes.ExternalReference()
                     record_id.name = "GND_intern"
                     record_id.id = step1.text
                     record_id.uri = "GND_intern" + step1.text
