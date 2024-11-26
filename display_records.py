@@ -5,7 +5,7 @@ This module contains functions for displaying (and later perhaps also editing) r
 import db_actions
 import classes
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_book_record(identifier):
     """
 This function displays all elements links to a printed book record

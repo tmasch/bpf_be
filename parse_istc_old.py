@@ -8,7 +8,7 @@ import get_external_data
 
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def parse_istc(url_bibliography):
     """
     This parses the istc records that can be downloaded in JSON. 

@@ -12,7 +12,7 @@ import parsing_helpers
 
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def ingest_organisation(org):
     """
     This function is about translating the imported information of a organisation into the information record used for the database. 

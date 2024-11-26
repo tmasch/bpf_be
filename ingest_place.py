@@ -12,7 +12,7 @@ import get_external_data
 import person_relations
 import parsing_helpers
 
-@classes.func_logger
+@classes.async_func_logger
 async def add_connected_person_to_place(place_new,connected_persons,list_of_ids_to_check):
     # This is step 1 of the stitching process
     for connected_person in connected_persons:
@@ -62,7 +62,7 @@ async def add_connected_person_to_place(place_new,connected_persons,list_of_ids_
             # (although the modul for getting IDs from VIAF currently only processes GND and ULAn)
     return place_new, list_of_ids_to_check
 
-@classes.func_logger
+@classes.async_func_logger
 async def add_connected_organisation_to_place(place_new,connected_organisations,list_of_ids_to_check):
     for connected_org in connected_organisations:
         connected_org.connection_comment, connected_org.connection_type = (
@@ -124,7 +124,7 @@ async def add_connected_organisation_to_place(place_new,connected_organisations,
     return place_new, list_of_ids_to_check
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def ingest_place(place):
     """
 This function saves a place in the database

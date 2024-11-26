@@ -1,4 +1,4 @@
-#pylint: disable=C0115,C0303,W0212,C0116
+#pylint: disable=C0115,C0303,W0212,C0116,C0302
 """"
 This file contains class definitions
 """
@@ -8,10 +8,11 @@ import logging
 import sys
 from pydantic import BaseModel
 from beanie import Document, UnionDoc, Link
+#import inspect
 
 logging.basicConfig(filename="general.log",level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("asyncio")
 
 
 def func_logger(func):
@@ -22,12 +23,32 @@ Place as annotation befor function definition
     def inner(*args, **kwargs):
         caller = sys._getframe(1)
         caller_name=caller.f_globals['__name__']
-        logger.debug('       DEBUG Call func %s from %s',func.__name__,caller_name)
+        module=sys.modules[func.__module__]
+        logger.debug('       DEBUG %s in %s from %s async called',func.__name__,module,caller_name)
         ret = func(*args, **kwargs)
         # with {args, kwargs} returns {ret}
         logger.debug('       DEBUG  %s from %s done',func.__name__,caller_name)
         return ret
     return inner
+
+def async_func_logger(func):
+    """
+Logger for all function calls
+Place as annotation befor function definition
+    """
+    async def inner(*args, **kwargs):
+        caller = sys._getframe(1)
+        caller_name=caller.f_globals['__name__']
+#        module=inspect.getmodule(func)
+        module=sys.modules[func.__module__]
+        logger.debug('       DEBUG %s in %s from %s async called',func.__name__,module,caller_name)
+        ret = await func(*args, **kwargs)
+        # with {args, kwargs} returns {ret}
+        logger.debug('       DEBUG  %s from %s done',func.__name__,caller_name)
+        return ret
+    return inner
+
+
 class InvalidDateException(Exception):
     """
     \todo
@@ -281,7 +302,7 @@ class Union(UnionDoc):
         name = "all_collections"
         class_id = "_class_id"
 
-class Person(Document):
+class Entity(Document):
     """
  This class is used for references to persons in book records. 
  id is the id of the person in authority files (currently, the GND), name the name given in the 
@@ -295,6 +316,7 @@ class Person(Document):
     """
     gnd_id : Optional[str] = ""
     id_name : Optional[str] = ""
+    stub : Optional[bool] = True
     internal_id : Optional[str] = ""
     internal_id_person_type1 : Optional[list[str]] = []
     internal_id_person_type1_needed : Optional[str] = ""
@@ -368,6 +390,48 @@ class Person(Document):
 #    comments : Optional[str] = ""
     class Settings:
         union_doc = Union
+
+class Organisation(Document):
+    """
+ This class is used for references to organisations (publishing houses) in book records. 
+ id is the id of the place in authority files (currently, the GND), name the name given the source
+ and role either "pub" for the publisher, or "prt" for the printer
+ If an organisation is both, there will be two different record for it. 
+    """
+#    id : Optional[str] = ""
+    external_id : Optional[list[ExternalReference]] = []
+    internal_id : Optional[str] = ""
+    internal_id_org_type1 : Optional[list[str]] = []
+    internal_id_org_type1_needed : Optional[str] = ""
+    internal_id_org_type1_comment : Optional[str] = ""
+    name_preferred : Optional[str] = ""
+    name_variant : Optional[list[str]] = []
+    dates_from_source : Optional[list[DateImport]] = []
+#    connected_persons : Optional[list[ConnectedEntity]] = []
+ #   connected_organisations : Optional[list[ConnectedEntity]] = []
+ #   connected_locations : Optional[list[ConnectedEntity]] = []
+    comments : Optional[str] = ""
+    preview : Optional[str] = ""
+    id_name : Optional[str] = ""
+    internal_id : Optional[str] = ""
+    internal_id_preview : Optional[str] = ""
+    internal_id_org_type1 : Optional[list[str]] = []
+    internal_id_org_type1_needed : Optional[str] = ""
+    internal_id_org_type1_comment : Optional[str] = ""
+    name : Optional[str] = ""
+#    role : Optional[str] = ""
+#    chosen_candidate : Optional[int] = ""
+    #potential_candidates : Optional[list[Organisation]] = []
+    new_authority_id : Optional[str] = ""
+#    id : Optional[str] = ""
+    type : Optional[str] = ""  # Is always "Organisation"
+    org_type1: Optional[list[str]] = []
+    # Types 1 are: "Printer", "Collection", "Group of Persons"
+    org_type2: Optional[list[str]] = []
+    # Type 21 is a subtype only needed if type1 is "Group of Persons",
+    #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
+    class Settings:
+        union_doc = Union
     # def __init__(self,name):
     #     super.__init__()
     #     self.name=name
@@ -429,57 +493,57 @@ class Person(Document):
 #     comments : Optional[str] = ""
 #     preview : Optional[str] = ""
 
-class Organisation(Document):
-    """
- This class is used for references to organisations (publishing houses) in book records. 
- id is the id of the place in authority files (currently, the GND), name the name given the source
- and role either "pub" for the publisher, or "prt" for the printer
- If an organisation is both, there will be two different record for it. 
-    """
-#    id : Optional[str] = ""
-    external_id : Optional[list[ExternalReference]] = []
-    internal_id : Optional[str] = ""
-    internal_id_org_type1 : Optional[list[str]] = []
-    internal_id_org_type1_needed : Optional[str] = ""
-    internal_id_org_type1_comment : Optional[str] = ""
-    name_preferred : Optional[str] = ""
-    name_variant : Optional[list[str]] = []
-    dates_from_source : Optional[list[DateImport]] = []
-#    connected_persons : Optional[list[ConnectedEntity]] = []
- #   connected_organisations : Optional[list[ConnectedEntity]] = []
- #   connected_locations : Optional[list[ConnectedEntity]] = []
-    comments : Optional[str] = ""
-    preview : Optional[str] = ""
-    id_name : Optional[str] = ""
-    internal_id : Optional[str] = ""
-    internal_id_preview : Optional[str] = ""
-    internal_id_org_type1 : Optional[list[str]] = []
-    internal_id_org_type1_needed : Optional[str] = ""
-    internal_id_org_type1_comment : Optional[str] = ""
-    name : Optional[str] = ""
-#    role : Optional[str] = ""
-#    chosen_candidate : Optional[int] = ""
-    #potential_candidates : Optional[list[Organisation]] = []
-    new_authority_id : Optional[str] = ""
-#    id : Optional[str] = ""
-    type : Optional[str] = ""  # Is always "Organisation"
-    org_type1: Optional[list[str]] = []
-    # Types 1 are: "Printer", "Collection", "Group of Persons"
-    org_type2: Optional[list[str]] = []
-    # Type 21 is a subtype only needed if type1 is "Group of Persons",
-    #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-    external_id : Optional[list[ExternalReference]] = []
-    name_preferred : Optional[str] = ""
-    name_variant : Optional[list[str]] = []
-    dates_from_source : Optional[list[DateImport]] = []
-    # This is only provisional - there will be some functions to turn the dates
-    #  from import into standardised dates
-#    connected_persons : Optional[list[ConnectedEntity]] = []
-#    connected_organisations : Optional[list[ConnectedEntity]] = []
-#    connected_locations : Optional[list[ConnectedEntity]] = []
-    comments : Optional[str] = ""
-    class Settings:
-        union_doc = Union
+# class Organisation(Document):
+#     """
+#  This class is used for references to organisations (publishing houses) in book records. 
+#  id is the id of the place in authority files (currently, the GND), name the name given the source
+#  and role either "pub" for the publisher, or "prt" for the printer
+#  If an organisation is both, there will be two different record for it. 
+#     """
+# #    id : Optional[str] = ""
+#     external_id : Optional[list[ExternalReference]] = []
+#     internal_id : Optional[str] = ""
+#     internal_id_org_type1 : Optional[list[str]] = []
+#     internal_id_org_type1_needed : Optional[str] = ""
+#     internal_id_org_type1_comment : Optional[str] = ""
+#     name_preferred : Optional[str] = ""
+#     name_variant : Optional[list[str]] = []
+#     dates_from_source : Optional[list[DateImport]] = []
+# #    connected_persons : Optional[list[ConnectedEntity]] = []
+#  #   connected_organisations : Optional[list[ConnectedEntity]] = []
+#  #   connected_locations : Optional[list[ConnectedEntity]] = []
+#     comments : Optional[str] = ""
+#     preview : Optional[str] = ""
+#     id_name : Optional[str] = ""
+#     internal_id : Optional[str] = ""
+#     internal_id_preview : Optional[str] = ""
+#     internal_id_org_type1 : Optional[list[str]] = []
+#     internal_id_org_type1_needed : Optional[str] = ""
+#     internal_id_org_type1_comment : Optional[str] = ""
+#     name : Optional[str] = ""
+# #    role : Optional[str] = ""
+# #    chosen_candidate : Optional[int] = ""
+#     #potential_candidates : Optional[list[Organisation]] = []
+#     new_authority_id : Optional[str] = ""
+# #    id : Optional[str] = ""
+#     type : Optional[str] = ""  # Is always "Organisation"
+#     org_type1: Optional[list[str]] = []
+#     # Types 1 are: "Printer", "Collection", "Group of Persons"
+#     org_type2: Optional[list[str]] = []
+#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
+#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
+#     external_id : Optional[list[ExternalReference]] = []
+#     name_preferred : Optional[str] = ""
+#     name_variant : Optional[list[str]] = []
+#     dates_from_source : Optional[list[DateImport]] = []
+#     # This is only provisional - there will be some functions to turn the dates
+#     #  from import into standardised dates
+# #    connected_persons : Optional[list[ConnectedEntity]] = []
+# #    connected_organisations : Optional[list[ConnectedEntity]] = []
+# #    connected_locations : Optional[list[ConnectedEntity]] = []
+#     comments : Optional[str] = ""
+#     class Settings:
+#         union_doc = Union
 
 
 
@@ -565,17 +629,26 @@ class EntityConnection(Document):
     """
 #    id : Optional[str] = ""
     external_id : Optional[List[ExternalReference]] = []
-    name : Optional[str] = ""
-    connection_type : Optional[str] = ""
+    name : Optional[str] = "" # Name of the person, place or organisation for easier access
+    connection_type : Optional[str] = "" # either person, place or organisation
 # In the GND; the role of a connected person must be given through an abbrevation
 # that gives rather general information, e.g. "bezf" = "family relation";
 # more detailed information can be given in a comment field
     connection_comment : Optional[str] = ""
     connection_time : Optional[str] = ""
     type : Optional[str] = ""
-    person : Optional[Link[Person]] = None
-    organisation : Optional[Link[Organisation]] = None
-    place : Optional[Link[Place]] = None
+    entityA : Optional[Link[Entity]] = None
+    entityB : Optional[Link[Entity]] = None
+
+    relationA : Optional[str] = ""
+    relationB : Optional[str] = ""
+#    person : Optional[Link[Person]] = None
+#    personA : Optional[Link[Person]] = None
+#    personB : Optional[Link[Person]] = None
+#    organisationA : Optional[Link[Organisation]] = None
+#    organisationB : Optional[Link[Organisation]] = None
+#    placeA : Optional[Link[Place]] = None
+#    placeB : Optional[Link[Place]] = None
     class Settings:
         union_doc = Union
 
@@ -672,7 +745,8 @@ This class is for the links of persons, organisations and places to book records
     name : Optional[str] = "" # This field is only a stopgap measure, if
     comment : Optional[str] = ""
     preview : Optional[str] = ""
-    person : Optional[Link[Person]] = None
+    entity : Optional[Link[Entity]] = None
+#    person : Optional[Link[Person]] = None
     connected_persons : Optional[List[Link[EntityConnection]]] = []
     organisation : Optional[Link[Organisation]] = None
     connected_organisations : Optional[List[Link[EntityConnection]]] = []
@@ -686,7 +760,7 @@ class Role(Document):
     role : Optional[str] = ""
     name : Optional[str] = "" # This field is only a stopgap measure, if
     type : Optional[str] = ""
-    chosen_candidate : Optional[int] = 0
+    chosen_candidate_id : Optional[int] = 0
     comment : Optional[str] = ""
     preview : Optional[str] = ""
     entity_and_connections : Optional[Link[EntityAndConnections]] = None
@@ -702,7 +776,7 @@ def make_new_role(role,person_name):
     r=Role(role=role,chosen_candidate=-1)
     if person_name:
         r.entity_and_connections=EntityAndConnections()
-        r.entity_and_connections.person=Person(name=person_name)
+        r.entity_and_connections.entity=Entity(name=person_name)
     return r
 
 class MakingProcess(Document):
@@ -797,9 +871,9 @@ This class is for entering Book records into the database
 #    id : Optional[str] = ""
     type : Optional[str] = "Book"
     bibliographic_id : Optional[list[ExternalReference]] = []
-    persons : Optional[list[Role]] = []
+    persons : Optional[list[Link[Role]]] = []
 #    persons2 : Optional[list[Link[Person]]] = ""
-    organisations : Optional[list [Role]] = []
+    organisations : Optional[list [Link[Role]]] = []
  #   organisations2 : Optional[list[Link[OrganisationDb]]] = ""
     places : Optional[list [Role]] = []
  #   places2 : Optional[list[Link[PlaceDb]]] = ""
@@ -999,6 +1073,6 @@ needed for the individual Artwork and Photograph records
 #     connected_locations : Optional[list[ConnectedEntity]] = []
 #     comments : Optional[str] = ""
 
-class webCall(Document):
+class WebCall(Document):
     url : Optional[str] = ""
     content : Optional[bytes] = ""

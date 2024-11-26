@@ -19,7 +19,7 @@ import  parsing_helpers
 #logger = logging.getLogger(__name__)
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_web_data_as_json(url):
     """
     Do a web call and returns a json object
@@ -30,24 +30,27 @@ async def get_web_data_as_json(url):
     return result
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_web_data(url):
     """
     Do a web call and return byte object
     """
-    r = await classes.webCall.find(classes.webCall.url == url).to_list()
+    print(url)
+    r = await classes.WebCall.find(classes.WebCall.url == url).to_list()
     if len(r) > 0:
+        print("found content in database")
         content=r[0].content
-    else: 
+    else:
+        print("making web call")
         response = requests.get(url)
         content = response.content
         print(type(content))
-        wc = classes.webCall(url=url,content=content)
+        wc = classes.WebCall(url=url,content=content)
         await wc.save()
     return content
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_viaf_header(session, url):
     # This is a short programme I received from Gregor Dick. Together with a gather funciton i
 #    async with session.head(url, allow_redirects=False) as response:
@@ -78,7 +81,7 @@ async def get_viaf_header(session, url):
             return ""
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_viaf_from_authority(url_list):
     # This function the URL of an authority file (currently GND and ULAN) and returns an External_id object
     # It will be used numerous times for 'stitching' records together
@@ -149,7 +152,7 @@ def transform_gnd_id_with_hyphen(id_with_hyphen):
     return record_id
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def search_ulan(person):
     """
     \todo

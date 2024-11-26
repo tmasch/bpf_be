@@ -1,3 +1,4 @@
+#pylint: disable=W0612
 """
 \todo
 """
@@ -8,7 +9,7 @@ import get_external_data
 
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def parse_istc(url_bibliography):
     """
     This parses the istc records that can be downloaded in JSON. 
@@ -84,7 +85,7 @@ async def parse_istc(url_bibliography):
                 imprint_name_long = step1["imprint_name"].strip("[]")
             if "imprint_place" in step1:
                 pl = classes.Role()
-                pl.chosen_candidate=-1
+                pl.chosen_candidate_id=-1
                 pl.entity_and_connections=classes.EntityAndConnections()
                 pl.entity_and_connections.place = classes.Place()
                 pl.entity_and_connections.place.name = step1["imprint_place"].strip("[]")
@@ -245,6 +246,9 @@ async def parse_istc(url_bibliography):
 
 @classes.func_logger
 def istc_date_working(printing_date_raw):
+    """
+    \todo
+    """
     date_pattern = r'(About |about |Before |before |Not before |not before |Shortly before \
     |shortly before |Between |between |After |after |Not after \
     |not after |Shortly after |shortly after )?(\d{1,2} )?\

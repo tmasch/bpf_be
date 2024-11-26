@@ -11,13 +11,16 @@ Later, there should be a search if there are already records for
 
 #import logging
 from nanoid import generate
-
+from rich import print
+from beanie import Document, Link, WriteRules
 import db_actions
 import classes
 import ingest_organisation
 import ingest_person
 import ingest_place
 import parsing_helpers
+import parse_gnd
+
 #dbname = db_actions.get_database()
 #coll=dbname['bpf']
 
@@ -50,17 +53,17 @@ import parsing_helpers
 #    id : Optional[str] = ""
 #    place_type1 : Optional[list[str]]  = []
 
-@classes.func_logger
+@classes.async_func_logger
 async def metadata_dissection(metadata):
     print("creating metadata records")
-    persons_list = await metadata_persons(metadata)
-    print(persons_list)
+    roles = await metadata_persons(metadata)
+    print(roles)
     print("-------------------------------------- organisations")
-    orgs_list = await metadata_organisations(metadata)
+#    orgs_list = await metadata_organisations(metadata)
     print("-------------------------------------- places")
-    places_list = await metadata_place(metadata)
+#    places_list = await metadata_place(metadata)
     print("-------------------------------------- repositories")
-    org = await metadata_repositories(metadata)
+#    org = await metadata_repositories(metadata)
 
     print("-------------------------------------- manuscript")
     if metadata.material == "m": # If the item has been identified as a manuscript
@@ -70,19 +73,21 @@ async def metadata_dissection(metadata):
     print("-------------------------------------- book")
     if metadata.material == "b": # If the item has been identified as printed book
         new_book = await populate_book_from_metadata(metadata)
-        new_book.persons2=persons_list
-        await db_actions.insert_record_book(new_book)
+        new_book.persons=roles
+        await new_book.save(link_rule=WriteRules.WRITE)
+#        new_book.persons2=persons_list
+#        await db_actions.insert_record_book(new_book)
         record_id=new_book.id
 
     print("--------------------------------------")
-    new_pages = await populate_pages_from_metadata(metadata,record_id,org)
-    new_pages.book=new_book
-    await db_actions.insert_record_pages(new_pages)
+#    new_pages = await populate_pages_from_metadata(metadata,record_id,org)
+#    new_pages.book=new_book
+#    await db_actions.insert_record_pages(new_pages)
 
     return 1
 
-@classes.func_logger
-async def metadata_persons(metadata):
+@classes.async_func_logger
+async def metadata_persons_old(metadata):
 
     if metadata.bibliographic_information or metadata.making_processes:
         # Section on Person
@@ -168,9 +173,94 @@ async def metadata_persons(metadata):
     return ppp
 
 
+@classes.async_func_logger
+async def metadata_persons(metadata: classes.Metadata):
+    print(metadata.bibliographic_information[0].persons)
+    roles=[]
+    for role in metadata.bibliographic_information[0].persons:
+        print("Processing role: "+role.role)
+        print("Name: "+role.entity_and_connections.entity.name)
+        chosen_candidate_id = role.chosen_candidate_id
+        print("Chosen candidate index: "+str(chosen_candidate_id))
+# Just for the moment, as there is no selection in the GUI
+        chosen_candidate_id = 0
+        chosen_candidate = role.entity_and_connections.connected_persons[chosen_candidate_id].entityA
+        print("Chosen candidate:")
+        print(chosen_candidate)
+        # Search for person in DB
+        r= await classes.Entity.find(classes.Entity.gnd_id==chosen_candidate.gnd_id).to_list()
+        print("Search result:")
+        print(r)
+        if r:
+            print("Person already in database")
+            print(r)
+        else:
+            print("Person not in database")
+
+            chosen_candidate = await create_person_eac_record(chosen_candidate)
+            print(chosen_candidate.model_dump_json())
+        role.entity_and_connections=chosen_candidate
+        await role.save()
+        roles.append(role)
+    return roles
 
 
-@classes.func_logger
+@classes.async_func_logger
+async def create_person_eac_record(p: classes.Entity):
+    p_new = await create_person_record(p)
+    eac = classes.EntityAndConnections()
+    eac.name=p_new.name_preferred
+    eac.entity=p_new
+    await eac.save()
+
+    r = await parse_gnd.find_related_persons(p_new.gnd_id)
+    for ec in r:
+        #search if person already in db
+
+        #if not, add stub
+        print("Adding connected person")
+        ec.entityA = p_new
+        await ec.entityB.save()
+        await ec.save()
+        eac.connected_persons.append(ec)
+#    print(r)
+    await eac.save()
+    return eac
+
+
+
+@classes.async_func_logger
+async def create_person_record(p: classes.Entity):
+    """
+    This routine searches for person data in GND and creates a record for this person.
+    Note that connected persons, places and organisations are not created.
+    """
+    print("Input")
+    print(p)
+    p_new=classes.Entity()
+
+    p_new.name_preferred=p.name_preferred
+
+    for eid in p.external_id:
+        if eid.name == "GND" and "DE-588" in eid.external_id:
+            p_new.gnd_id = eid.external_id.replace("(DE-588)","")
+
+    p_new.external_id=p.external_id
+    p_new.stub=False
+    p_new.type="Person"
+    await p_new.save()
+    print(p_new.model_dump_json())
+
+    return p_new
+
+
+@classes.async_func_logger
+async def create_person_stub(p: classes.Entity):
+    pass
+
+
+
+@classes.async_func_logger
 async def metadata_organisations(metadata):
     print("Organisation")
     if metadata.bibliographic_information:
@@ -234,6 +324,8 @@ async def metadata_organisations(metadata):
     #                        print("record against duplication: ")
                         print(org_against_duplication)
     return orgs_list
+
+
 
 @classes.func_logger
 async def metadata_place(metadata):
@@ -313,7 +405,7 @@ async def metadata_place(metadata):
                         print(place_against_duplication)
     return places_list
 
-@classes.func_logger
+@classes.async_func_logger
 async def metadata_repositories(metadata):
     # Section on Repositories
         # Repositories are also organisations, however, there is only one repository per book. Furthermore, it is not part of the bibliographical
@@ -346,7 +438,7 @@ async def metadata_repositories(metadata):
             org.potential_candidates[org.chosen_candidate].internal_id = await ingest_organisation.ingest_organisation(org)
     return org
 
-@classes.func_logger
+@classes.async_func_logger
 async def populate_manuscript_from_metadata(metadata):
 # Section on Manuscripts
     print("checking manuscript")
@@ -366,7 +458,7 @@ async def populate_manuscript_from_metadata(metadata):
 #    print(book_record_id)
     return new_manuscript
 
-@classes.func_logger
+@classes.async_func_logger
 async def populate_book_from_metadata(metadata):
 # Section on printed books
 #    book_record_id=""
@@ -434,7 +526,7 @@ async def populate_book_from_metadata(metadata):
 #    print(book_record_id)
     return new_book
 
-@classes.func_logger
+@classes.async_func_logger
 async def populate_pages_from_metadata(metadata,book_record_id,org):
 # Section on individual pages. 
 # This class contains the list of individual pages from the IIIF manifest as well as information on repository and shelf marks. 

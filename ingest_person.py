@@ -14,7 +14,7 @@ import parsing_helpers
 
 
 @classes.func_logger
-async def ingest_person(person: classes.Person):
+async def ingest_person(person: classes.Entity):
     # This function is about translating the imported information of a person into the
     #  information record used for the database.
     # It directly sends the new records to the function for writing it and only
@@ -36,15 +36,15 @@ async def ingest_person(person: classes.Person):
             Step 2b: if no: adding the connection, with a connection type that is the complement
             to the one used in the original connection
         Steps 1 and 2 happen twice: once, if a connection can already made through the default GND
-        records, once, when it is neces§sary to download the VIAF records.
+        records, once, when it is necessary to download the VIAF records.
         Step 3: Check if any record already in Iconobase has a connection with the new record,
         without the new record having a connection with it.
             If yes, addition of a connection to the extant record with a complementary
             connection in the new record.
     """
-    f = open("export.txt", "w")
-    f.write(person.model_dump_json())
-    f.close()
+#    f = open("export.txt", "w")
+#    f.write(person.model_dump_json())
+#    f.close()
 
     list_of_ids_to_check = []
     list_of_viaf_ids = []
@@ -61,8 +61,8 @@ async def ingest_person(person: classes.Person):
     print(type(person_selected))
     #    r = db_actions.find_person
 
-    person_new = classes.Person()
-    person_new.id = generate()
+    person_new = classes.Entity()
+#    person_new.id = generate()
     person_new.type = "Person"
     person_new.person_type1.append(parsing_helpers.map_role_to_person_type(person.role))
     person_new.external_id = person_selected.external_id
@@ -197,14 +197,14 @@ async def ingest_person(person: classes.Person):
                     #                    type_correction, time_correction, comment_correction = add_relationship_in_far_record(org_found, person_new, "connected_persons", connected_org.connection_type, connected_org.connection_time, connected_org.connection_comment), connected_org.connection_time # This is step 2, the reciprocal connection
                     # The following lines were inserted since inexplicably here the function returns not three strings alone, but puts them as first element into a tuple
                     type_correction, time_correction, comment_correction = (
-                        db_actions.add_relationship_in_far_record(
-                            org_found,
-                            person_new,
-                            "connected_persons",
-                            connected_org.connection_type,
-                            connected_org.connection_time,
-                            connected_org.connection_comment,
-                        )
+                        # db_actions.add_relationship_in_far_record(
+                        #     org_found,
+                        #     person_new,
+                        #     "connected_persons",
+                        #     connected_org.connection_type,
+                        #     connected_org.connection_time,
+                        #     connected_org.connection_comment,
+                        # )
                     )  # This is step 2, the reciprocal connection
                     #                    print("values returned by add_relationship_in_far_record")
                     #                    print(x)
@@ -264,16 +264,16 @@ async def ingest_person(person: classes.Person):
                     print("step 1 (GND): place connected to person found")
                     connected_location.id = location_found["id"]
                     connected_location.name = location_found["name_preferred"]
-                    type_correction, time_correction, comment_correction = (
-                        db_actions.add_relationship_in_far_record(
-                            location_found,
-                            person_new,
-                            "connected_persons",
-                            connected_location.connection_type,
-                            connected_location.connection_time,
-                            connected_location.connection_comment,
-                        )
-                    )  # This is step 2, the reciprocal connection
+                    # type_correction, time_correction, comment_correction = (
+                    #     db_actions.add_relationship_in_far_record(
+                    #         location_found,
+                    #         person_new,
+                    #         "connected_persons",
+                    #         connected_location.connection_type,
+                    #         connected_location.connection_time,
+                    #         connected_location.connection_comment,
+                    #     )
+                    # )  # This is step 2, the reciprocal connection
                     if type_correction != "":
                         connected_location.connection_type = type_correction
                     if time_correction != "":
@@ -379,16 +379,16 @@ async def ingest_person(person: classes.Person):
                             "name_preferred"
                         ]  # Here, the year must be added. One should probably rename it as 'preview'.
                         # if a connection with one ID is found, the other connections would be the same.
-                        type_correction, time_correction, comment_correction = (
-                            db_actions.add_relationship_in_far_record(
-                                person_found,
-                                person_new,
-                                "connected_persons",
-                                connected_person.connection_type,
-                                connected_person.connection_time,
-                                connected_person.connection_comment,
-                            )
-                        )  # This is step 2, the reciprocal connection
+                        # type_correction, time_correction, comment_correction = (
+                        #     db_actions.add_relationship_in_far_record(
+                        #         person_found,
+                        #         person_new,
+                        #         "connected_persons",
+                        #         connected_person.connection_type,
+                        #         connected_person.connection_time,
+                        #         connected_person.connection_comment,
+                        #     )
+                        # )  # This is step 2, the reciprocal connection
                         if type_correction != "":
                             connected_person.connection_type = type_correction
                         if time_correction != "":
@@ -546,5 +546,5 @@ async def ingest_person(person: classes.Person):
                         if far_record["type"] == "Place":
                             person_new.connected_locations.append(new_connection)
                         break
-    await db_actions.insert_record_person(person_new)
+    await db_actions.insert_atom(person_new)
     return person_new

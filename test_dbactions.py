@@ -12,7 +12,7 @@ load_dotenv()
 @pytest.mark.asyncio
 async def test_create_person():
     await db_actions.initialise_beanie()
-    p=classes.Person()
+    p=classes.Entity()
     p.name="Test"
     r = await db_actions.save_person(p)
 

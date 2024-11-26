@@ -1,4 +1,4 @@
-#pylint: disable=C0301,E1101
+#pylint: disable=C0301,E1101,W0603,W0612,W0613,C0116,C0303
 """
 This module contains all functions that contain database actions, like
 creating new records, reading from the DB etc.
@@ -18,17 +18,17 @@ import person_relations
 
 
 
-mongo_client=None
+MONGO_CLIENT=None
 
-@classes.func_logger
+@classes.async_func_logger
 async def initialise_beanie():
     mongo_db_database_name = "bpf"
     mongo_host = os.getenv('MONGODB_HOST', '')
-    endpoint = 'mongodb://{0}'.format(mongo_host)
+    endpoint = f"mongodb://{mongo_host}"
     motor_client = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
     database = motor_client[mongo_db_database_name]
     await init_beanie(database=database, document_models=[classes.Metadata,\
-                                                        classes.Person,\
+                                                        classes.Entity,\
                                                         classes.Organisation,\
                                                         classes.BookDb,\
                                                         classes.Place,\
@@ -40,32 +40,37 @@ async def initialise_beanie():
                                                         classes.BibliographicId, \
                                                         classes.BibliographicInformation,\
                                                         classes.Union,
-                                                        classes.webCall])
+                                                        classes.WebCall])
 
 @classes.func_logger
 def get_database():
     """
     Method to get the database connection
     """
-    global mongo_client
-    if bool(mongo_client):
-        return mongo_client['bpf']
+    global MONGO_CLIENT
+    if bool(MONGO_CLIENT):
+        return MONGO_CLIENT['bpf']
     mongo_host = os.getenv('MONGODB_HOST', '')
     print("host",mongo_host)
     print(os.getenv('MONGODB_PORT', ''))
     mongo_port = int(os.getenv('MONGODB_PORT', ''))
     print("port",mongo_port)
-    endpoint = 'mongodb://{0}'.format(mongo_host)
+    endpoint = f"mongodb://{mongo_host}"
     print("endpoint",endpoint)
-    mongo_client = MongoClient(host=endpoint,port=mongo_port,connectTimeoutMS=1000,timeoutMS=1200)
-    print(mongo_client)
-    print("databases",mongo_client.list_database_names())
+    MONGO_CLIENT = MongoClient(host=endpoint,port=mongo_port,connectTimeoutMS=1000,timeoutMS=1200)
+    print(MONGO_CLIENT)
+    print("databases",MONGO_CLIENT.list_database_names())
 #    await init_beanie(database=mongo_client.bpf, document_models=[classes.Metadata,classes.Person,classes.OrganisationDb,classes.BookDb])
-    return mongo_client['bpf']
+    return MONGO_CLIENT['bpf']
     # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
     # client = MongoClient('localhost', 27017)
     # Create the database for our example (we will use the same database throughout the tutorial
 #   return client['bpf']
+
+@classes.func_logger
+async def insert_atom(atom):
+    await atom.insert()
+    return 
 
 @classes.func_logger
 def insert_metadata(metadata: classes.Metadata):
@@ -78,7 +83,7 @@ def insert_metadata(metadata: classes.Metadata):
     collection.insert_one(metadata.dict())
     return "Hello World"
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_all_resources_from_db():
     """
     Method to get all ressources from the database
@@ -91,11 +96,11 @@ async def get_all_resources_from_db():
 # the next line is not working for me :-(
 #    r=list(collection.find({"type" : { "$in" : ["Manuscript", "Book", "Manifest"]}}, {"id": 1, "type" : 1, "preview" : 1}))
 #    r=list(collection.find())
-    books = classes.BookDb.find()
+#    books = classes.BookDb.find()
     records = await classes.Union.find().to_list()
     print(records)
 #    print(r)
-    r = await books.to_list()
+#    r = await books.to_list()
     return records
 
 @classes.func_logger
@@ -125,18 +130,18 @@ def update_image_with_frames(identifier,i,frames):
 #json.dumps([ob.__dict__ for ob in frames])
     return result
 
-@classes.func_logger
-async def insert_record_person(person: classes.Person):
-    """
-This function inserts a newly created record for a person into the database
-It was made for persons connected to books but probably can be used for any person
-    """
-    print("Inserting person metadata in database")
+#@classes.async_func_logger
+#async def insert_record_person(person: classes.Person):
+#    """
+#This function inserts a newly created record for a person into the database
+#It was made for persons connected to books but probably can be used for any person
+#    """
+#    print("Inserting person metadata in database")
 #    dbname = get_database()
 #    collection=dbname['bpf']
 #    collection.insert_one(person.dict())
-    await person.insert()
-    return "Hello World"
+#    await person.insert()
+#    return "Hello World"
 
 #def add_external_id(record_id, external_id):
     # I think that this is not needed and should be removed
@@ -233,7 +238,7 @@ Later, the name connected to the internal ID should be a preview with dates
     changed_record = collection.find_one({"id": record_id})
     print("far record after addition of new connection")
     print(changed_record)
-    return
+    return result
 
 @classes.func_logger
 def add_connection(record_id, connected_entity_type, new_connection):
@@ -249,8 +254,7 @@ This function is used to go to a specific record that has not yet a reciprocal c
     record = collection.find_one({"id" : record_id})
     print("far record after addition of new connection")
     print(record)
-    return
-
+    return result
 @classes.func_logger
 def add_person_type(person_id, person_type1):
     """
@@ -259,7 +263,7 @@ This function is used to add another person type (e.g., Author, Artist etc.) to 
     dbname = get_database()
     collection=dbname['bpf']
     result = collection.update_one({"id" : person_id}, {'$addToSet' : {"person_type1" : person_type1}})
-
+    return result
 
 @classes.func_logger
 def add_organisation_type(organisation_id, organisation_type1):
@@ -348,7 +352,7 @@ def insert_record_manuscript(manuscript : classes.ManuscriptDb):
 #     await book.insert()
 #     return "Hello World"
 
-@classes.func_logger
+@classes.async_func_logger
 async def insert_record_pages(pages : classes.PagesDb):
     """
     \todo
@@ -369,19 +373,19 @@ def create_image_record():
     dbname = get_database()
     collection=dbname['bpf']
 
-@classes.func_logger
-async def find_person(person: classes.Person, parameter: str):
+@classes.async_func_logger
+async def find_person(person: classes.Entity, parameter: str):
     """
 \todo
     """
     dbname = get_database()
     collection = dbname['bpf']
-    person = classes.Person()
+    person = classes.Entity()
     person_found = None
     if parameter=="external_id":
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-        person_found = await classes.Person.find_one(classes.Person.external_id.id == person.id 
-                                            and classes.Person.external_id.name == person.name)
+        person_found = await classes.Entity.find_one(classes.Entity.external_id.id == person.id 
+                                            and classes.Entity.external_id.name == person.name)
 #                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
     elif parameter=="name_preferred":
 #        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
@@ -504,149 +508,148 @@ def find_place_viaf(new_record_viaf_id,new_record_gnd_id):
     return list_found
 
 
-@classes.func_logger
-def add_relationship_in_far_record(record_found: classes.Person , record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
-    """
-\todo Name should be somehing like "link records"
+# @classes.func_logger
+# def add_relationship_in_far_record(record_found: classes.Person , record_new, record_new_type, connected_entity_connection_type, connected_entity_connection_time, connected_entity_connection_comment):
+#     """
+# \todo Name should be somehing like "link records"
 
-This module is used for the 'stitching' together of records; it checks, if an already extant record 
-('far record') already has a connection with the new record.
-If so, it adds the ID of the new record to the connection; if no, it creates a new connection from 
-scratch
-record_found is the record that will receive the reciprocal connection, record_new is the newly created
- record, record_new_type indicates, if the connection has to be inserted
-under "connected_persons", "connected_organisations", or "connected_locations".
-If the 'far record' has better information on the type of connection, its time, or comments, these 
-fields returned to the main module. 
-    """
-    expected_connection_type = ""
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    print("step 2: arrived in add_relationship_in_far_record")
-    print("record_found:")
-    #print(record_found)
-    print("record_new:" )
-    #print(record_new)
-    print("connected_person_connection_type: ")
-    print(connected_entity_connection_type)
-    print("connected_entity_connection_time: ")
-    print(connected_entity_connection_time)
-    connection_correction = ""
-    time_correction = ""
-    comment_correction = ""
-    if record_found: # this is for making the reciprocal connection
-        far_record = record_found[record_new_type]
-        record_found.t
-        print("record_new_type")
-        print(record_new_type)
-        connection_found = False
-        connection_type_for_insert = ""
-        connection_time_for_insert = ""
-        connection_comment_for_insert = ""
+# This module is used for the 'stitching' together of records; it checks, if an already extant record 
+# ('far record') already has a connection with the new record.
+# If so, it adds the ID of the new record to the connection; if no, it creates a new connection from 
+# scratch
+# record_found is the record that will receive the reciprocal connection, record_new is the newly created
+#  record, record_new_type indicates, if the connection has to be inserted
+# under "connected_persons", "connected_organisations", or "connected_locations".
+# If the 'far record' has better information on the type of connection, its time, or comments, these 
+# fields returned to the main module. 
+#     """
+#     expected_connection_type = ""
+#     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+#     print("step 2: arrived in add_relationship_in_far_record")
+#     print("record_found:")
+#     #print(record_found)
+#     print("record_new:" )
+#     #print(record_new)
+#     print("connected_person_connection_type: ")
+#     print(connected_entity_connection_type)
+#     print("connected_entity_connection_time: ")
+#     print(connected_entity_connection_time)
+#     connection_correction = ""
+#     time_correction = ""
+#     comment_correction = ""
+#     if record_found: # this is for making the reciprocal connection
+#         far_record = record_found[record_new_type]
+#         print("record_new_type")
+#         print(record_new_type)
+#         connection_found = False
+#         connection_type_for_insert = ""
+#         connection_time_for_insert = ""
+#         connection_comment_for_insert = ""
 
-        if "sex" in record_found:
-            connection_sex = record_found["sex"]
-        else:
-            connection_sex = ""
-        if hasattr(record_new, "sex"):
-            connection_backwards_sex = record_new.sex
-        else:
-            connection_backwards_sex = ""
-        expected_connection_type = person_relations.relation_correspondence(connected_entity_connection_type, connection_sex)
-        print("extant connection type: ")
-        print(connected_entity_connection_type)
-        print("expected_connection_type:")
-        print(expected_connection_type)
-        # Sometimes, one and the same person appears twice, in different relations. If one relation had just been inserted, it should have the reciprocal connection type - hopefully
-        vague_connection = ["professional relation to", "related to", "other relationship to", "affiliated to"] # this are very general terms of connections that are to be replaced by more precise ones, if possible
+#         if "sex" in record_found:
+#             connection_sex = record_found["sex"]
+#         else:
+#             connection_sex = ""
+#         if hasattr(record_new, "sex"):
+#             connection_backwards_sex = record_new.sex
+#         else:
+#             connection_backwards_sex = ""
+#         expected_connection_type = person_relations.relation_correspondence(connected_entity_connection_type, connection_sex)
+#         print("extant connection type: ")
+#         print(connected_entity_connection_type)
+#         print("expected_connection_type:")
+#         print(expected_connection_type)
+#         # Sometimes, one and the same person appears twice, in different relations. If one relation had just been inserted, it should have the reciprocal connection type - hopefully
+#         vague_connection = ["professional relation to", "related to", "other relationship to", "affiliated to"] # this are very general terms of connections that are to be replaced by more precise ones, if possible
 
-        for far_entity in far_record:
-            for far_external_id in far_entity["external_id"]:
-                for external_id_number in range(len(record_new.external_id)):
-                    if far_external_id["uri"] == record_new.external_id[external_id_number].uri:
-                        if far_entity["connection_type"] == expected_connection_type:
-                            connection_type_to_be_searched = expected_connection_type
-                            connection_type_for_insert = far_entity["connection_type"]
-                            connection_found = True
-                            break
-                        else:
-                            if far_entity["connection_type"] in vague_connection:
-                                connection_type_for_insert = expected_connection_type
-                                print("far connection type was vague and is to be replaced with: ")
-                                print(connection_type_for_insert)
-                                connection_type_to_be_searched = expected_connection_type
-                                connection_found = True
-                                break
-                            elif expected_connection_type in vague_connection:
-                                connection_correction = person_relations.relation_correspondence(far_entity["connection_type"], connection_backwards_sex)
-                                print("connection in new record too vague, sending back correction: ")
-                                print(connection_correction)
-                                connection_type_to_be_searched = far_entity["connection_type"]
-                                connection_type_for_insert = far_entity["connection_type"]
-                                connection_found = True
-                                break
+#         for far_entity in far_record:
+#             for far_external_id in far_entity["external_id"]:
+#                 for external_id_number in range(len(record_new.external_id)):
+#                     if far_external_id["uri"] == record_new.external_id[external_id_number].uri:
+#                         if far_entity["connection_type"] == expected_connection_type:
+#                             connection_type_to_be_searched = expected_connection_type
+#                             connection_type_for_insert = far_entity["connection_type"]
+#                             connection_found = True
+#                             break
+#                         else:
+#                             if far_entity["connection_type"] in vague_connection:
+#                                 connection_type_for_insert = expected_connection_type
+#                                 print("far connection type was vague and is to be replaced with: ")
+#                                 print(connection_type_for_insert)
+#                                 connection_type_to_be_searched = expected_connection_type
+#                                 connection_found = True
+#                                 break
+#                             elif expected_connection_type in vague_connection:
+#                                 connection_correction = person_relations.relation_correspondence(far_entity["connection_type"], connection_backwards_sex)
+#                                 print("connection in new record too vague, sending back correction: ")
+#                                 print(connection_correction)
+#                                 connection_type_to_be_searched = far_entity["connection_type"]
+#                                 connection_type_for_insert = far_entity["connection_type"]
+#                                 connection_found = True
+#                                 break
 
-            if connection_found:
-                print("step 2a: connection found, new ID and name added to it")
-                # This is step 2a: there is already a connection, to which the ID of the new record is added
-#                                print("found record for inserting reciprocal ID")
-                far_entity["id"] = record_new.id
-                if connected_entity_connection_time != "" and far_entity["connection_time"] == "": # this means that the new record gives a connection time, the old record doesn't.
-                    connection_time_for_insert = connected_entity_connection_time
-                    print("connection_time_for_insert")
-                    print(connection_time_for_insert)
-                elif far_entity["connection_time"] != "" and connected_entity_connection_time == "": # this means that the old record has a conneciton time, the new one not
-                    print("connection_time sent to new record")
-                    time_correction = far_entity["connection_time"]
-                else:
-                    print("no connection time for insert in either direction")
-                if connected_entity_connection_comment != "" and far_entity["connection_comment"] == "": # this means that the new record gives a connection time, the old record doesn't.
-                    connection_comment_for_insert = connected_entity_connection_comment
-                    print("connection_comment_for_insert")
-                    print(connection_comment_for_insert)
-                elif far_entity["connection_comment"] != "" and connected_entity_connection_comment == "": #this means that the old record has comments, the new one not
-                    print("connection_comment sent to new record")
-                    comment_correction = far_entity["connection_comment"]
-                else:
-                    print("no connection time for insert either way")
-#                        dbactions.add_connection_id(record_found["id"], record_new_type, far_entity["name"], far_entity["id"])
-                add_connection_id_and_name(record_found["id"], record_new_type, connection_type_to_be_searched, far_entity["name"], record_new.name_preferred, record_new.id, connection_type_for_insert, connection_time_for_insert, connection_comment_for_insert)
-                connection_found = True
-                break
-#                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
-        if connection_found is False:
-            print("step 2b: no connection found, new connection added")
-            # This is step 2b: there is no reciprocal connection, it needs to be established
-#                        print("For person " + person_found["name_preferred"] + " no connection has been found")
-            new_connection = classes.EntityConnection()
-            new_connection.id = record_new.id
-            new_connection.external_id = record_new.external_id
-            new_connection.name = record_new.name_preferred # better use preview including year
-            new_connection.connection_type = expected_connection_type
-            new_connection.connection_time = connected_entity_connection_time
-#            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"])
-            # I need a separate formular, without 'sex', for orgs and places
-#                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
-            add_connection(record_found["id"], record_new_type, new_connection)
-        print("Values to be returned from add_relationship_in_other_record")
-        print("connection_correction: ")
-        print(connection_correction)
-        print(type(connection_correction))
-        print("time_correction")
-        print(time_correction)
-        print(type(time_correction))
-        print("comment_correction: ")
-        print(comment_correction)
-        print(type(comment_correction))
-    return connection_correction, time_correction, comment_correction
+#             if connection_found:
+#                 print("step 2a: connection found, new ID and name added to it")
+#                 # This is step 2a: there is already a connection, to which the ID of the new record is added
+# #                                print("found record for inserting reciprocal ID")
+#                 far_entity["id"] = record_new.id
+#                 if connected_entity_connection_time != "" and far_entity["connection_time"] == "": # this means that the new record gives a connection time, the old record doesn't.
+#                     connection_time_for_insert = connected_entity_connection_time
+#                     print("connection_time_for_insert")
+#                     print(connection_time_for_insert)
+#                 elif far_entity["connection_time"] != "" and connected_entity_connection_time == "": # this means that the old record has a conneciton time, the new one not
+#                     print("connection_time sent to new record")
+#                     time_correction = far_entity["connection_time"]
+#                 else:
+#                     print("no connection time for insert in either direction")
+#                 if connected_entity_connection_comment != "" and far_entity["connection_comment"] == "": # this means that the new record gives a connection time, the old record doesn't.
+#                     connection_comment_for_insert = connected_entity_connection_comment
+#                     print("connection_comment_for_insert")
+#                     print(connection_comment_for_insert)
+#                 elif far_entity["connection_comment"] != "" and connected_entity_connection_comment == "": #this means that the old record has comments, the new one not
+#                     print("connection_comment sent to new record")
+#                     comment_correction = far_entity["connection_comment"]
+#                 else:
+#                     print("no connection time for insert either way")
+# #                        dbactions.add_connection_id(record_found["id"], record_new_type, far_entity["name"], far_entity["id"])
+#                 add_connection_id_and_name(record_found["id"], record_new_type, connection_type_to_be_searched, far_entity["name"], record_new.name_preferred, record_new.id, connection_type_for_insert, connection_time_for_insert, connection_comment_for_insert)
+#                 connection_found = True
+#                 break
+# #                        print("The connected record has a reciprocal connection to which merely the new ID has to be added")
+#         if connection_found is False:
+#             print("step 2b: no connection found, new connection added")
+#             # This is step 2b: there is no reciprocal connection, it needs to be established
+# #                        print("For person " + person_found["name_preferred"] + " no connection has been found")
+#             new_connection = classes.EntityConnection()
+#             new_connection.id = record_new.id
+#             new_connection.external_id = record_new.external_id
+#             new_connection.name = record_new.name_preferred # better use preview including year
+#             new_connection.connection_type = expected_connection_type
+#             new_connection.connection_time = connected_entity_connection_time
+# #            new_connection.connection_type = person_relations.relation_correspondence(connected_person_connection_type, person_found["sex"])
+#             # I need a separate formular, without 'sex', for orgs and places
+# #                        new_connection.connection_type = "1counterpart to " + connected_person.connection_type # This has to be replaced by a proper term
+#             add_connection(record_found["id"], record_new_type, new_connection)
+#         print("Values to be returned from add_relationship_in_other_record")
+#         print("connection_correction: ")
+#         print(connection_correction)
+#         print(type(connection_correction))
+#         print("time_correction")
+#         print(time_correction)
+#         print(type(time_correction))
+#         print("comment_correction: ")
+#         print(comment_correction)
+#         print(type(comment_correction))
+#     return connection_correction, time_correction, comment_correction
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def save_person(p):
 #    p.id= generate()
     r = await p.save()
-    return(r)
+    return r
 
-@classes.func_logger
+@classes.async_func_logger
 async def save_person_and_connections():
 
     pass

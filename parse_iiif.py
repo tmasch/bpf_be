@@ -13,7 +13,7 @@ import parse_gnd
 
 #URI_entered = "abc"
 
-@classes.func_logger
+@classes.async_func_logger
 async def get_bibliographic_data (bid_name, bid_id):
     """
     \todo documentation
@@ -82,7 +82,7 @@ async def get_bibliographic_data (bid_name, bid_id):
 
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def parse_iiif(uri_entered, material) -> classes.Metadata:
     """
     Main iiif manifest parsing routine
@@ -223,7 +223,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Painting"
-        person_blank = classes.Person()
+        person_blank = classes.Entity()
         person_blank.name = ""
         person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
@@ -240,7 +240,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1
         making_process_blank.process_type = "Design"
-        person_blank = classes.Person()
+        person_blank = classes.Entity()
         person_blank.name = ""
 #        person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
@@ -255,7 +255,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 2
         making_process_blank.process_type = "Production of Matrix"
-        person_blank = classes.Person()
+        person_blank = classes.Entity()
 #        person_blank.chosen_candidate = 999
         person_blank.name = ""
         making_process_blank.person = person_blank
@@ -295,7 +295,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
     return m
 
 
-@classes.func_logger
+@classes.async_func_logger
 async def supply_bibliographic_information(additional_bid):
     """
 This function is needed if an IIIF manifest does not include a bibliographic reference.

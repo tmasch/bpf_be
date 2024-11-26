@@ -60,7 +60,7 @@ def parse_manifests_bsb(manifest):
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
 
     repository = classes.Role()
-    repository.chosen_candidate=-1
+    repository.chosen_candidate_id=-1
     repository.name="Repository"
     if location:
         location_divided = re.match(location_pattern, location)

@@ -98,6 +98,7 @@ async def root():
 async def get_metadata(iiif_url, material):
     """
     Method returning metadata for a given iiif url
+    \todo Catch no db available
     """
     logger.info("       INFO /getMetadata - get_metadata")
     print("iiif URL: "+iiif_url)
@@ -129,7 +130,7 @@ async def get_metadata(iiif_url, material):
 #         repository.role = "col"
 #         # Normally, this role depends on the bibliographical data -
 #         # in this case, it has to be set here.
-
+    m.images=[]
 #     m.id=generate()
 # #    print("List of places to be sent to FE")
 # #    print(m.bibliographic_information[0].places)
@@ -257,10 +258,11 @@ async def save_connected_records(metadata: classes.Metadata):
     """
     \todo not quite clear what connected records should be
     """
-    print("hello world")
+#    print("hello world")
+    print(metadata.model_dump_json())
     m = metadata
-    print("Repository in main.py: ")
-    print(m.repository)
+#    print("Repository in main.py: ")
+#    print(m.repository)
     ingest_result = await book_ingest_create_records.metadata_dissection(m)
     #print(m)
     return ingest_result
@@ -354,7 +356,7 @@ async def get_manuscript_record(identifier: str):
     return manuscript_record
 
 
-@app.get("/getPersonRecord", response_model = classes.Person)
+@app.get("/getPersonRecord", response_model = classes.Entity)
 async def get_person_record(identifier: str):
     """
     \todo move to get_resource    

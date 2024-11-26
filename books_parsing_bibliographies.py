@@ -1,4 +1,4 @@
-# pylint: disable=C0302,C0303
+# pylint: disable=C0302,C0303,I1101
 """
 This module contains a number of functions for extracting bibliographical information
 from standard bibliographies such as the VD16.
@@ -87,7 +87,7 @@ def parse_vd17(url_bibliography):
                     print(bid)
 
                 case "100":  # for the author
-                    pe = classes.Person()
+                    pe = classes.Entity()
                     for step2 in field:
                         match step2.get("code"):
                             case "a":
@@ -126,7 +126,7 @@ def parse_vd17(url_bibliography):
                             )
                             bi.printing_information = printing_information_divided[3]
                 case "700":  # for printers and publishers
-                    pe = classes.Person()
+                    pe = classes.Entity()
                     for step2 in field:
                         match step2.get("code"):
                             case "a":
@@ -471,6 +471,8 @@ def parse_vd16(url_bibliography):
     # Although some early 16th-century books give a day, the date field in the VD16 only contains
     #  a year, two years separated by "/" (two different years given in the book) "-"
     if printing_date_long != "":
+        start_year=1000
+        end_year=1001
         if "/" in printing_date_long:
             printing_date_divided = printing_date_long.split("/")
         elif "-" in printing_date_long:

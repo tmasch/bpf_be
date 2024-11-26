@@ -3,11 +3,14 @@
 \todo
 """
 import urllib.request
-import xml.etree.ElementTree
+#import xml.etree.ElementTree
 #import re
 import os
 from pymongo import MongoClient
+import numpy as np
+import pymarc
 #from dates_parsing import date_overall_parsing
+from rich import print
 from lxml import etree
 import get_external_data 
 import parse_date
@@ -28,7 +31,7 @@ import classes
 #dbname =  db_actions.get_database()
 #coll=dbname['bpf']
 
-@classes.func_logger
+@classes.async_func_logger
 async def identify_person(role_in : classes.Role) -> classes.Role:
     """
 This function is used for every person named in the bibliographic record (author, editor, printer 
@@ -36,6 +39,7 @@ etc.). It will first search if a record for this person is already in the MongoD
 then search in the GND. If there is an ID-number (internal or GND, the search is done for the 
 ID-number, otherwise for the name as string, and if this fails, for the name as key-words).
     """
+    print("Person and role to be identified")
     print(role_in.model_dump())
 #    person=role_in.entity_and_connections.person
 #    person
@@ -45,14 +49,14 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
     internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(role_in.role)
 
     found_person=False
-
     print("     Searching for person in database by GND ID")
-    gnd_id_in=role_in.entity_and_connections.person.gnd_id
-    print(gnd_id_in)
-    xx = classes.Role.find(classes.Role.entity_and_connections.person.gnd_id == gnd_id_in,fetch_links=True)
-    role_in_db = await xx.to_list()
-    print("Search result")
-    print(role_in_db)
+    gnd_id_in=role_in.entity_and_connections.entity.gnd_id
+    print("input gnd id:"+gnd_id_in)
+    if gnd_id_in:
+        xx = classes.Role.find(classes.Role.entity_and_connections.entity.gnd_id == gnd_id_in,fetch_links=True)
+        role_in_db = await xx.to_list()
+        print("Search result")
+        print(role_in_db)
 
 
 #    person.chosen_candidate = 999
@@ -69,10 +73,10 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
 #            person.internal_id_preview = person_found["name_preferred"] + " (in Database)"
             # The date should be added, but I first have to write how it is to be parsed
-    if role_in_db:
+        if role_in_db:
 #        role_in_db[0].comment="(in Database)"
-        found_person=True
-        print("found person")
+            found_person=True
+            print("found person")
 
             #The following is a warning that a matching person has the wrong type. 
     # if role_in.role not i
@@ -86,13 +90,13 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
 
 #async def search_for_person_candidates():
-    if not found_person and role_in.entity_and_connections.person.gnd_id:
+    if not found_person and role_in.entity_and_connections.entity.gnd_id:
         print("Searching in GND by ID")
-        print(role_in.entity_and_connections.person.gnd_id)
+        print(role_in.entity_and_connections.entity.gnd_id)
 #        else:
 #            if person.id_name == "GND": # I will have to create similar things for other authority files
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
-              + role_in.entity_and_connections.person.gnd_id\
+              + role_in.entity_and_connections.entity.gnd_id\
                   + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
         print("url for person search: ")
         print(authority_url)
@@ -153,7 +157,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
     if not found_person and role_in.role != "Artist":
         print("No person found yet")
-        person_name_search = role_in.entity_and_connections.person.name
+        person_name_search = role_in.entity_and_connections.entity.name
         for old, new in parsing_helpers.url_replacement.items():
             person_name_search = person_name_search.replace(old, new)
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
@@ -162,6 +166,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
     if not found_person:
             # if not person_in.person_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
+        print("Searching in GND by name")
         name_divided = person_name_search.split("%20")
         name_query = ""           
         for word in name_divided:
@@ -169,7 +174,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
                 search_phrase = r"Per=" + word + r"%20and%20" # I don't get it, but the thing only works if the "=" is written as such and not as Percent code. Above, it is different. 
                 name_query = name_query + search_phrase
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
-        print(authority_url)
+#        print(authority_url)
         new_potential_candidates = await find_and_parse_person_gnd(authority_url)
         role_in.entity_and_connections.connected_persons = new_potential_candidates
 
@@ -187,8 +192,11 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 #    print(person)
     print(role_in.model_dump())
     return role_in
-                
-@classes.func_logger
+
+
+
+
+@classes.async_func_logger
 async def identify_additional_person(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications for persons connected to a book.
@@ -197,9 +205,9 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_persons_list = []
-    potential_person = classes.Person()
+    potential_person = classes.Entity()
 #    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-    person = classes.Person()
+    person = classes.Entity()
     person.new_authority_id = new_authority_id
     person_found = db_actions.find_person(person,"GND")
     if person_found:
@@ -342,7 +350,7 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
-    potential_org = classes.Person()
+    potential_org = classes.Entity()
     org = classes.Organisation
     org.new_authority_id=new_authority_id
 #    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
@@ -525,14 +533,50 @@ Currently all records must come from the GND - if other authority files are incl
     return potential_places_list
 
 
+@classes.async_func_logger
+async def find_and_parse_person_gndId(gnd_id):
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
+                    + gnd_id\
+                    + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+    content=await get_external_data.get_web_data(authority_url)
+    root = etree.XML(content)
+    records=root.find("records", namespaces=root.nsmap)
+    for record in records:
+#Set GND IDs
+        d = find_datafields(record,"035")
+#        print(x)
+        s = find_subfields(d,"a")
+        for y in s:
+            if y.get("a") is not None:
+                external_reference = classes.ExternalReference()
+                external_reference.name="GND"
+                external_reference.external_id=y["a"]
+#                person_found.external_id.append(external_reference)
+
+@classes.async_func_logger
+async def get_records(gnd_id):
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
+                    + gnd_id\
+                    + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
+    content=await get_external_data.get_web_data(authority_url)
+    root = etree.XML(content)
+    records=root.find("records", namespaces=root.nsmap)
+    return records
+
+@classes.async_func_logger
+async def find_related_persons(gnd_id):
+    records = await get_records(gnd_id)
+    for record in records:
+        r = gnd_record_get_connected_persons(record)
+    return r
 
 
-@classes.func_logger
+
+@classes.async_func_logger
 async def find_and_parse_person_gnd(authority_url):
     """
 \todo
     """
-    print("arrived in gnd_parsing_person")
     potential_persons_list = []
 #    url = urllib.request.urlopen(authority_url)
 #    tree = xml.etree.ElementTree.parse(url)
@@ -540,9 +584,7 @@ async def find_and_parse_person_gnd(authority_url):
 
     result = []
     content=await get_external_data.get_web_data(authority_url)
-    print(content)
     root = etree.XML(content)
-
     records=root.find("records", namespaces=root.nsmap)
 #    print(records)
 #    print(records.tag)
@@ -550,6 +592,7 @@ async def find_and_parse_person_gnd(authority_url):
 #    subfield_code="a"
     for record in records:
         print("found record")
+
 
 
     #print(root)
@@ -564,25 +607,55 @@ async def find_and_parse_person_gnd(authority_url):
     #     ortw_preview = ""
     #     name_variant_preview = ""
     #     comments_preview = ""
-#         for step1 in record[2][0]:
-#             match step1.get('tag'):
-# #                case "001":
-# #                    pe_id = External_id()
-# #                    pe_id.name = "GND_intern"
-# #                    pe_id.id = step1.text
-# #                    pe_id.uri = "GND_intern" + step1.text                    
-# #                    pe.external_id.append(pe_id)
 
-        person_found=classes.Person()
+        person_found=classes.Entity()
+        person_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
+        person_found.external_id.extend(gnd_record_get_gnd_id(record))
+        person_found.name_preferred = gnd_record_get_name_preferred(record)
+#        gnd_record_get_connected_persons(record)
+#        person_found.sex = gnd_record_get_sex(record)
+#        print(person_found)
 
-        x = find_datafields(record,"035")
-        print(x)
-        for y in x:
-            if y.get("a") is not None:
-                external_reference = classes.ExternalReference()
-                external_reference.name="GND"
-                external_reference.external_id=y["a"]
-                person_found.external_id.append(external_reference)
+        connected_person = classes.EntityConnection()
+        connected_person.connection_type = "Candidate"
+        connected_person.entityA = person_found
+        result.append(connected_person)
+    return result
+
+
+
+@classes.func_logger
+def gnd_record_get_gnd_internal_id(record):
+    """
+    #         for step1 in record[2][0]:
+    #             match step1.get('tag'):
+    # #                case "001":
+    # #                    pe_id = External_id()
+    # #                    pe_id.name = "GND_intern"
+    # #                    pe_id.id = step1.text
+    # #                    pe_id.uri = "GND_intern" + step1.text                    
+    # #                    pe.external_id.append(pe_id)
+    """
+    external_references=[]
+    # x = find_datafields(record,"001")
+    # print(x)
+    # for y in x:
+    #     if y.get("a") is not None:
+    #         external_reference = classes.ExternalReference()
+    #         external_reference.name = "GND_intern"
+    # datafields=record.findall("{*}recordData/{*}record/{*}datafield[@tag='"+tag_id+"']")
+    # for datafield in datafields:
+    #     subfields=datafield.findall("{*}subfield")
+    #     subfield_hash={}
+    #     for subfield in subfields:
+    #         key= subfield.get("code")
+    #         value=subfield.text
+    return external_references
+
+
+@classes.func_logger
+def gnd_record_get_gnd_id(record):
+    """
 #                 case "035":
 #                     for step2 in step1:
 #                         match step2.get('code'):
@@ -605,10 +678,23 @@ async def find_and_parse_person_gnd(authority_url):
 #                                 # Hence, this ID may be different from the person.id I used for the search in the first place.
 #                                 # Annoyingly, the search also finds IDs from the old database PND. If it is possible that a PND ID is the same as the GND ID of a 
 #                                 # different record, I have to include a function to delete this record from the results (I am enquiring if this is the case)
+"""
+    external_references=[]
+    datafields = find_datafields(record,"035")
+    for datafield in datafields:
+        subfields = find_subfields(datafield,"a")
+        if subfields: 
+            external_reference = classes.ExternalReference()
+            external_reference.name="GND"
+            external_reference.external_id=subfields[0]
+            external_references.append(external_reference)
+    return external_references
 
 
 
-
+@classes.func_logger
+def gnd_record_get_name_preferred(record):
+    """
 #                 case "100":
 #                     for step2 in step1:
 #                         match step2.get('code'):
@@ -624,40 +710,61 @@ async def find_and_parse_person_gnd(authority_url):
 #                                     pe.name_preferred = pe.name_preferred + " (" +  step2.text + ")"
 #                                 else:
 #                                     pe.comments = step2.text
-        name_preferred = ""
-        x = find_datafields(record,"100")
-        y=x[0]
-        if y.get("a") is not None:
-            name_preferred = y["a"]
-            # The numbering for rulers
-        if y.get("b") is not None:
-            name_preferred = name_preferred+ " " + y["b"]
-        if y.get("c") is not None:
-            comments = y["c"]
-            person_found.comments = comments
-        person_found.name_preferred = name_preferred
+"""
+# Set preferred name
+    name_preferred = ""
+    datafields = find_datafields(record,"100")
+    for datafield in datafields:
+        subfields = find_subfields(datafield,"a")
+        if subfields: 
+            name_preferred = subfields[0]
+        subfields = find_subfields(datafield,"b")
+        if subfields: 
+            name_preferred = name_preferred+ " " + subfields[0]
+
+#    x = find_datafields(record,"100")
+
+#    y=find_tuple(x,"a")
+#    if y:
+#        name_preferred = y[0]
+#    y=find_tuple(x,"b")
+#    if y:
+#        name_preferred = name_preferred+ " " + y[0]
+
+#        if y[0] == "c":
+#            comments = y[1]
+#        person_found.comments = comments
+    return name_preferred
+#    person_found.name_preferred = name_preferred
+#    print(name_preferred)
+
+@classes.func_logger
+def gnd_record_get_sex(record):
+    """
+    #                 case "375":
+    #                     for step2 in step1:
+    #                         match step2.get('code'):
+    #                             case "a":
+    #                                 if step2.text == "1":
+    #                                     pe.sex = "male"
+    #                                 if step2.text == "2":
+    #                                     pe.sex = "female"
+    # Set sex
+    """
+    sex = ""
+    x = find_datafields(record,"375")
+    y=find_tuple(x,"a")
+    if y:
+        if y[0] == "1":
+            sex = "male"
+        if y[0] == "2":
+            sex = "female"
+    return sex
 
 
-#                 case "375":
-#                     for step2 in step1:
-#                         match step2.get('code'):
-#                             case "a":
-#                                 if step2.text == "1":
-#                                     pe.sex = "male"
-#                                 if step2.text == "2":
-#                                     pe.sex = "female"
-        sex = ""
-        x = find_datafields(record,"375")
-        y=x[0]
-        if y.get("a") is not None:
-            print(y["a"])
-            if y["a"] == 1:
-                sex = "male"
-            if y["a"] == 2:
-                sex = "female"
-            person_found.sex = sex
-
-
+@classes.func_logger
+def gnd_record_get_name_variant(record):
+    """
 #                 case "400":
 #                     name_number = ""
 #                     name_comment = ""
@@ -685,14 +792,17 @@ async def find_and_parse_person_gnd(authority_url):
 #                             name_variant = ""
 #                     if name_variant:
 #                         pe.name_variant.append(name_variant)
+"""
+    x = find_datafields(record,"400")
+    y=x[0]
+    if y.get("a") is not None:
+        name_variant=y["a"]
+    return name_variant
 
-        x = find_datafields(record,"400")
-        y=x[0]
-        if y.get("a") is not None:
-            name_variant=y["a"]
 
-
-
+@classes.func_logger
+def gnd_record_get_connected_persons(record):
+    """
 #                 case "500":
 #                     conn_pe = classes.Person()
 # #                    conn_pe.external_id = []
@@ -725,11 +835,46 @@ async def find_and_parse_person_gnd(authority_url):
 #                             # someone connected all persons who appear together as authors in the VD16,
 #                             # I want them removed. 
 #                         pe.connected_persons.append(conn_pe)
+"""
+    connections = []
+    datafields = find_datafields(record,"500")
+    for datafield in datafields:
+        p=classes.Entity()
+        p.type="Person"
+        ec=classes.EntityConnection()
+        subfields = find_subfields(datafield,"0")
+        if subfields: 
+            for subfield in subfields:
+                external_reference = classes.ExternalReference()
+                external_reference.name = "GND"
+                external_reference.external_id = subfield
+                p.external_id.append(external_reference)
+                if subfield[0:8] == "(DE-588)":
+                    external_reference.uri =  r'https://d-nb.info/gnd/' + subfield[8:]
+                    p.gnd_id = subfield[8:]
+        subfields = find_subfields(datafield,"a")
+        if subfields: 
+            p.name = subfields[0]
+        subfields = find_subfields(datafield,"4")
+        if subfields: 
+            if "http" not in subfields[0]:
+                ec.connection_type = subfields[0]
+                ec.relationB = subfields[0]
+        subfields = find_subfields(datafield,"9")
+        if subfields: 
+            if subfields[0][0:2] == "v:":
+                ec.connection_comment = subfields[0][2:]
+        ec.entityB = p
+        if "VD-16 Mitverf." not in ec.connection_comment:
+            connections.append(ec)
+    print(connections)
+    return connections
 
-        x = find_datafields(record,"500")
-        for y in x:
-            pp=classes.Person()
 
+
+@classes.func_logger
+def gnd_record_get_stuff(record):
+    """
 #                 case "510":
 #                     conn_org = classes.EntityConnection()
 #                     conn_org.external_id = []
@@ -869,6 +1014,8 @@ async def find_and_parse_person_gnd(authority_url):
     #record = root[2][0][2][0][0]
     #print(record.text)
     #print("potential persons list made")
+"""
+    result = ""
     return result
 
 
@@ -1465,22 +1612,61 @@ async def identify_making_process(making_processes):
     
     return making_processes
 
+#class MarcxmlSubfield():
+#    string : key
+#    string : value
+
+
+# @classes.func_logger
+# def find_datafields(record,tag_id):
+#     """
+#     This function returns for a datafield in an MARCXML record a
+#     hash with the subfields, where the key is the code attribute
+#     and the value is the text in the subfield.
+#     Note that there is only one subfield with the same key allowed
+#     """
+# #    results=np.array([])
+#     print(tag_id)
+#     datafields=record.findall("{*}recordData/{*}record/{*}datafield[@tag='"+tag_id+"']")
+# #    print(datafields)
+#     for datafield in datafields:
+#         subfields=datafield.findall("{*}subfield")
+# #        subfield_hash={}
+#         result=[]
+#         for subfield in subfields:
+#             key= subfield.get("code")
+#             value=subfield.text
+
+# #            subfield_hash[key].append(value)
+#             s = [key,value]
+#             print(s)
+# #            print("Hash"+key+value)
+#             result.append(s)
+#         results = np.append(results,[result],0)
+#     print("resulting datafields")
+#     print(results)
+#     return results
+
+# @classes.func_logger
+# def find_tuple(l,key):
+#     r=[]
+#     for e in l:
+#         if e[0] == key:
+#             print(e[0],e[1],key)
+#             r.append(e[1])
+#             print(r)
+#     return r
+
 def find_datafields(record,tag_id):
-    """
-    This function returns for a datafield in an MARCXML record a
-    hash with the subfields, where the key is the code attribute
-    and the value is the text in the subfield.
-    """
-    result=[]
     datafields=record.findall("{*}recordData/{*}record/{*}datafield[@tag='"+tag_id+"']")
-    for datafield in datafields:
-        subfields=datafield.findall("{*}subfield")
-        subfield_hash={}
-        for subfield in subfields:
-            key= subfield.get("code")
-            value=subfield.text
-            subfield_hash[key]=value
-#            print("Hash"+key+value)
-        result.append(subfield_hash)
-#        print(result)
-    return result
+    return datafields
+
+def find_subfields(datafield,subfield_id):
+    r=[]
+    subfields=datafield.findall("{*}subfield")
+    for subfield in subfields:
+        key= subfield.get("code")
+        value=subfield.text
+        if key == subfield_id:
+            r.append(value)
+    return r
