@@ -87,8 +87,8 @@ async def parse_istc(url_bibliography):
                 pl = classes.Role()
                 pl.chosen_candidate_id=-1
                 pl.entity_and_connections=classes.EntityAndConnections()
-                pl.entity_and_connections.place = classes.Place()
-                pl.entity_and_connections.place.name = step1["imprint_place"].strip("[]")
+                pl.entity_and_connections.entity = classes.Entity()
+                pl.entity_and_connections.entity.name = step1["imprint_place"].strip("[]")
                 pl.role = "mfp"
                 bi.places.append(pl)
 
@@ -130,7 +130,7 @@ async def parse_istc(url_bibliography):
                     printer_name_long = imprint_name_long_divided[0]
                     publisher_name_long = imprint_name_long_divided[1]
                     printer_name_long = printer_name_long.strip(",")
-                    pl_duplicate = classes.Place()
+                    pl_duplicate = classes.Entity()
                     pl_duplicate.name = bi.places[0].name
                     pl_duplicate.role = "pup"
                     bi.places.append(pl_duplicate)

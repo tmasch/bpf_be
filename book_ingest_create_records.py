@@ -184,10 +184,11 @@ async def metadata_persons(metadata: classes.Metadata):
         print("Chosen candidate index: "+str(chosen_candidate_id))
 # Just for the moment, as there is no selection in the GUI
         chosen_candidate_id = 0
-        chosen_candidate = role.entity_and_connections.connected_persons[chosen_candidate_id].entityA
+        chosen_candidate = role.entity_and_connections.connected_entities[chosen_candidate_id].entityA
         print("Chosen candidate:")
         print(chosen_candidate)
         # Search for person in DB
+        print (chosen_candidate.gnd_id)
         r= await classes.Entity.find(classes.Entity.gnd_id==chosen_candidate.gnd_id).to_list()
         print("Search result:")
         print(r)
@@ -222,7 +223,7 @@ async def create_person_eac_record(p: classes.Entity):
         ec.entityA = p_new
         await ec.entityB.save()
         await ec.save()
-        eac.connected_persons.append(ec)
+        eac.connected_entities.append(ec)
 #    print(r)
     await eac.save()
     return eac

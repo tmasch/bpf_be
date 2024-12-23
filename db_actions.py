@@ -29,9 +29,7 @@ async def initialise_beanie():
     database = motor_client[mongo_db_database_name]
     await init_beanie(database=database, document_models=[classes.Metadata,\
                                                         classes.Entity,\
-                                                        classes.Organisation,\
                                                         classes.BookDb,\
-                                                        classes.Place,\
                                                         classes.PagesDb, \
                                                         classes.EntityConnection, \
                                                         classes.EntityAndConnections, \
@@ -412,13 +410,13 @@ async def find_person(person: classes.Entity, parameter: str):
     return person_found
 
 @classes.func_logger
-def find_organisation(organisation: classes.Organisation, parameter: str):
+def find_organisation(organisation: classes.Entity, parameter: str):
     """
 \todo
     """
     dbname = get_database()
     collection = dbname['bpf']
-    organisation_found = classes.Organisation
+    organisation_found = classes.Entity
     if parameter=="external_id":
         organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
     if parameter=="external_id_ingest":
@@ -437,7 +435,7 @@ def find_organisation(organisation: classes.Organisation, parameter: str):
     return organisation_found
 
 @classes.func_logger
-def find_place(place: classes.Place, parameter: str):
+def find_place(place: classes.Entity, parameter: str):
     """
 \todo
     """

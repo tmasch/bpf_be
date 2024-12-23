@@ -225,11 +225,11 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank.process_type = "Painting"
         person_blank = classes.Entity()
         person_blank.name = ""
-        person_blank.chosen_candidate = 999
+#        person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
-        place_blank = classes.Place()
+        place_blank = classes.Entity()
         place_blank.name = ""
-        place_blank.chosen_candidate = 999
+#        place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
         date_blank = classes.DateImport()
         date_blank.datestring_raw = ""
@@ -244,7 +244,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         person_blank.name = ""
 #        person_blank.chosen_candidate = 999
         making_process_blank.person = person_blank
-        place_blank = classes.Place()
+        place_blank = classes.Entity()
         place_blank.name = ""
 #        place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank
@@ -259,7 +259,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
 #        person_blank.chosen_candidate = 999
         person_blank.name = ""
         making_process_blank.person = person_blank
-        place_blank = classes.Place()
+        place_blank = classes.Entity()
         place_blank.name = ""
 #        place_blank.chosen_candidate = 999
         making_process_blank.place = place_blank

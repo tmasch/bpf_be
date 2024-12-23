@@ -64,21 +64,22 @@ def parse_manifests_bsb(manifest):
     repository.name="Repository"
     if location:
         location_divided = re.match(location_pattern, location)
-#        repository.model_dump()
-        entity_and_connections= classes.EntityAndConnections()
-#        repository.model_dump()
-        entity_and_connections.organisation = classes.Organisation()
-#        entity_and_connections.model_dump()
-#        print(location_divided.groups()[0])
-        entity_and_connections.organisation.name = location_divided.groups()[0]
-        repository.entity_and_connections=entity_and_connections
+
+        org=classes.Entity()
+        org.name=location_divided.groups()[0]
+
+        eac=classes.EntityAndConnections()
+        eac.entity=org
+
+#        entity_and_connections= classes.EntityAndConnections()
+#       entity_and_connections.organisation = classes.Entity()
+#        entity_and_connections.Entity.name = location_divided.groups()[0]
+        repository.entity_and_connections=eac
         repository.role = "col"
-#        repository.model_dump()
+
+
         m.repository=repository
         m.shelfmark = location_divided.groups()[2].lstrip()
-#        print(m.repository[0].name)
-#        print(m.shelfmark)
-#    m.model_dump()
 
         
     if bibliographic_id:
@@ -143,7 +144,7 @@ def parse_manifest_halle(URI_entered):
     metadata=manifest["metadata"]
     m = classes.Metadata()
     m.manifest = url.read()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     location = ""
     bibliographic_id = []
     bibliographic_id_number = ""
@@ -233,7 +234,7 @@ def parse_manifest_berlin(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     bibliographic_id = []
     for step1 in classes.Metadata:
@@ -326,7 +327,7 @@ def parse_manifest_cambridge_trinity(URI_entered):
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
     m.manifest = url.read()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     shelfmark = ""
 
     bibliographic_id_transformed = []
@@ -399,7 +400,7 @@ def parse_manifest_thulb(URI_entered):
     url = urllib.request.urlopen(URI_entered)
     manifest = json.load(url)
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and bringing them to database format
     # The manifest contains hardly any data. Each individual canvas, however, has its own URN that is part of the label field
@@ -494,7 +495,7 @@ def parse_manifest_slub(uri_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     repository_pattern = r'(<[^<>]*><[^<>]*><[^<>]*><[^<>]*>)(.*?)(<.*)'
@@ -572,7 +573,7 @@ Since currently no printed books from Corpus have been digitised on this platfor
     url = urllib.request.urlopen(uri_entered)
     manifest = json.load(url)
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     #Step 1: Extracting relevant fields from the general section of the Manifest
     
@@ -631,7 +632,7 @@ def parse_manifest_leipzig(uri_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
 
     for step1 in classes.Metadata:
@@ -709,7 +710,7 @@ def parse_manifest_gallica(URI_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     licence_pattern = r'(<[^<>].*>)(.*?)(<[^<>].*><[^<>].*>)'
     shelfmark_pattern = r'([^,.]*)?[,.]?([^,.]*)?[,.]?(.*)'
@@ -953,7 +954,7 @@ def parse_manifest_ecodices(uri_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     m.license = manifest["license"]
     for step1 in classes.Metadata:
@@ -1007,7 +1008,7 @@ def parse_manifest_erara(uri_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographic_reference_long = ""
     bibliographic_reference_divided = []
     mets_record = ""
@@ -1133,7 +1134,7 @@ def parse_manifest_bodleian(uri_entered):
     #Step 1: Extracting relevant fields from the general section of the Manifest and parsing them
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.manifest = url.read()
     shelfmark_pattern = r'(.*?)(College|Hall|Church)(.*)'
     attribution_pattern = r'(.*?)(https://creativecommons[^>]*)'
@@ -1226,7 +1227,7 @@ def parse_manifest_heidelberg(uri_entered):
     classes.Metadata=manifest["classes.Metadata"]
     attribution = manifest["attribution"][0]["@value"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographic_information = ""
     m.manifest = url.read()
     m.license = manifest["license"]
@@ -1289,7 +1290,7 @@ def parse_manifest_vaticana(uri_entered):
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     classes.Metadata=manifest["classes.Metadata"]
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographic_information = ""
     m.manifest = url.read()
     m.license = manifest["attribution"] # There is no license field, hence I copy the attribution
@@ -1371,7 +1372,7 @@ def parse_manifest_vienna(uri_entered):
     m = classes.Metadata()
     m.manifest = url.read()
     
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographic_information = ""
     attribution = manifest["attribution"]
     for step1 in attribution:
@@ -1474,7 +1475,7 @@ This section is still untested since I couldn't open the manifest
     manifest = url.json()
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographic_information = ""
     shelfmark_part1 = ""
     shelfmark_part2 = ""
@@ -1562,7 +1563,7 @@ def parse_manifest_goettingen (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     record_url = ""
     m.manifest = url.read()
     bibliographical_reference_long = manifest["@id"]
@@ -1668,7 +1669,7 @@ def parse_manifest_princeton (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     
     m.manifest = url.read()
     repository.name = "Princeton University Library"
@@ -1761,7 +1762,7 @@ def parse_manifest_yale (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographical_references_list = []
     m.manifest = url.read()
     repository.name = manifest["requiredStatement"]["value"]["en"][0]
@@ -1826,7 +1827,7 @@ def parse_manifest_boston (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     rights_list = []
     identifiers_list = []
     
@@ -1886,7 +1887,7 @@ def parse_manifest_manchester (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     license_long = manifest["attribution"]   
     license_long = license_long.replace("<p>", "")
     m.license = license_long.replace("</p>", "")
@@ -1929,7 +1930,7 @@ def parse_manifest_cambridge_ul (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.license = manifest["attribution"]   
     m.manifest = url.read()
     classes.Metadata = manifest["classes.Metadata"]
@@ -1983,7 +1984,7 @@ def parse_manifests_irht (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.license = manifest["license"]
     repository.name = manifest["attribution"]
     repository.role = "col"
@@ -2040,7 +2041,7 @@ def parse_manifest_frankfurt (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.license = manifest["license"]
     repository.name = "Universitätsbibliothek Frankfurt"
     repository.role = "col"
@@ -2099,7 +2100,7 @@ def parse_manifest_weimar (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     m.license = manifest["license"]
     repository.name = "Herzogin Anna Amalia Bibliothek, Weimar"
     repository.role = "col"
@@ -2226,7 +2227,7 @@ def parse_manifest_kiel (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = manifest["license"]
@@ -2329,7 +2330,7 @@ def parse_manifest_hamburg (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     shelfmark_long = ""
     bibliographical_reference = ""
     bibliographical_reference_divided = []
@@ -2474,7 +2475,7 @@ def parse_manifest_rostock (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     repository.name = "Universitätsbibliothek Rostock"
     repository.role = "col"
     m.repository.append(repository)
@@ -2567,7 +2568,7 @@ def parse_manifest_nuernberg_stb (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = r'https://creativecommons.org/publicdomain/mark/1.0/' #on the library's website
@@ -2645,7 +2646,7 @@ def parse_manifest_manuscriptorium (URI_entered):
     manifest = json.load(url)
     #Step 1/2: Extracting relevant fields from the general section of the Manifest and parsing them
     m = classes.Metadata()
-    repository = classes.Organisation()
+    repository = classes.Entity()
     bibliographical_reference = ""
     bibliographical_reference_divided = []
     m.license = manifest["license"]

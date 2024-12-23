@@ -1,23 +1,25 @@
-#pylint: disable=C0302,C0303,C0301
+#pylint: disable=C0302,C0303,C0301,C0116
 """
 \todo
 """
-import urllib.request
 #import xml.etree.ElementTree
 #import re
 import os
-from pymongo import MongoClient
+import urllib.request
+
 import numpy as np
 import pymarc
+from lxml import etree
+from pymongo import MongoClient
+
 #from dates_parsing import date_overall_parsing
 from rich import print
-from lxml import etree
-import get_external_data 
+
+import classes
+import db_actions
+import get_external_data
 import parse_date
 import parsing_helpers
-import db_actions
-import classes
-
 
 #This is only for stand-alone execution of functions in this module, in other cases,
 #  a connection to the database has already been made.
@@ -176,7 +178,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=' + name_query + r'BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'    
 #        print(authority_url)
         new_potential_candidates = await find_and_parse_person_gnd(authority_url)
-        role_in.entity_and_connections.connected_persons = new_potential_candidates
+        role_in.entity_and_connections.connected_entities = new_potential_candidates
 
 #        role_in.entity_and_connections.connected_persons.ap
 #                = new_potential_candidates
@@ -274,7 +276,7 @@ This function is used for every organisation named in the bibliographic record (
         candidates_result = db_actions.find_organisation(organisation,"name")
         print("Search for repository candidate completed")
         for candidate_result in candidates_result:
-            candidate = classes.Organisation()   
+            candidate = classes.Entity()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -286,7 +288,7 @@ This function is used for every organisation named in the bibliographic record (
 #        candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_organisation(organisation,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.Organisation()   
+            candidate = classes.Entity()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
@@ -351,7 +353,7 @@ Currently all records must come from the GND - if other authority files are incl
     new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
     potential_org = classes.Entity()
-    org = classes.Organisation
+    org = classes.Entity()
     org.new_authority_id=new_authority_id
 #    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
     org_found = db_actions.find_organisation(org,"GND")
@@ -430,7 +432,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
         candidates_result = db_actions.find_place(place,"name_preferred")
         for candidate_result in candidates_result:           
-            candidate = classes.Place()   
+            candidate = classes.Entity()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"] # I need this to create previews for places of making
             print("candidate found through name search in database (preferred name)" + candidate.internal_id)
@@ -440,7 +442,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_place(place,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.Place()   
+            candidate = classes.Entity()   
             candidate.internal_id = candidate_result["id"]
             print("candidate found through name search in database (variant name name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -504,9 +506,9 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_places_list = []
-    potential_place = classes.Place()
+    potential_place = classes.Entity()
 #    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
-    place=classes.Place
+    place=classes.Entity
     place.new_authority_id=new_authority_id
     place_found = db_actions.find_place(place,"GND")
     if place_found:            
@@ -534,7 +536,7 @@ Currently all records must come from the GND - if other authority files are incl
 
 
 @classes.async_func_logger
-async def find_and_parse_person_gndId(gnd_id):
+async def find_and_parse_person_gndid(gnd_id):
     authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
                     + gnd_id\
                     + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
@@ -610,8 +612,10 @@ async def find_and_parse_person_gnd(authority_url):
 
         person_found=classes.Entity()
         person_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
-        person_found.external_id.extend(gnd_record_get_gnd_id(record))
+        person_found.external_id.extend(gnd_record_get_external_references(record))
         person_found.name_preferred = gnd_record_get_name_preferred(record)
+        person_found.gnd_id=gnd_record_get_gnd_id(record)
+        person_found.type="Person"
 #        gnd_record_get_connected_persons(record)
 #        person_found.sex = gnd_record_get_sex(record)
 #        print(person_found)
@@ -652,9 +656,21 @@ def gnd_record_get_gnd_internal_id(record):
     #         value=subfield.text
     return external_references
 
-
 @classes.func_logger
 def gnd_record_get_gnd_id(record):
+    gnd_id=""
+    datafields = find_datafields(record,"035")
+    for datafield in datafields:
+        subfields = find_subfields(datafield,"a")
+        print(subfields)
+        if subfields:
+            if subfields[0][0:8] == "(DE-588)":
+                gnd_id=subfields[0][8:] #The latter cuts out the prefix '(DE-588)'.
+    print(gnd_id)
+    return gnd_id
+
+@classes.func_logger
+def gnd_record_get_external_references(record):
     """
 #                 case "035":
 #                     for step2 in step1:
@@ -855,6 +871,7 @@ def gnd_record_get_connected_persons(record):
         subfields = find_subfields(datafield,"a")
         if subfields: 
             p.name = subfields[0]
+            p.name_preferred = p.name
         subfields = find_subfields(datafield,"4")
         if subfields: 
             if "http" not in subfields[0]:
@@ -1033,7 +1050,7 @@ def parse_organisation_gnd(authority_url):
     root = tree.getroot()
     record_number = 0
     for record in root[2]:
-        org = classes.Organisation()
+        org = classes.Entity()
 #        comment = ""
         date_preview = ""
         orta_preview = ""
@@ -1255,7 +1272,7 @@ The longest part of the function the actual parsing of the XMl results, is moved
     potential_places_list = []
     for record in root[2]:
 #        print("arrived in parsing record")
-        pl = classes.Place()
+        pl = classes.Entity()
 #        comment = ""
         obpa_preview = ""
         adue_preview = ""
