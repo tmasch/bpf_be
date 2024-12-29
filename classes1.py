@@ -1,4 +1,4 @@
-#pylint: disable=C0115,C0303,W0212,C0116
+#pylint: disable=C0115,C0303,W0212,C0116,C0302
 """"
 This file contains class definitions
 """
@@ -8,10 +8,11 @@ import logging
 import sys
 from pydantic import 
 from beanie import Document, UnionDoc, Link
+#import inspect
 
 logging.basicConfig(filename="general.log",level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("asyncio")
 
 
 def func_logger(func):
@@ -22,12 +23,32 @@ Place as annotation befor function definition
     def inner(*args, **kwargs):
         caller = sys._getframe(1)
         caller_name=caller.f_globals['__name__']
-        logger.debug('       DEBUG Call func %s from %s',func.__name__,caller_name)
+        module=sys.modules[func.__module__]
+        logger.debug('       DEBUG %s in %s from %s async called',func.__name__,module,caller_name)
         ret = func(*args, **kwargs)
         # with {args, kwargs} returns {ret}
         logger.debug('       DEBUG  %s from %s done',func.__name__,caller_name)
         return ret
     return inner
+
+def async_func_logger(func):
+    """
+Logger for all function calls
+Place as annotation befor function definition
+    """
+    async def inner(*args, **kwargs):
+        caller = sys._getframe(1)
+        caller_name=caller.f_globals['__name__']
+#        module=inspect.getmodule(func)
+        module=sys.modules[func.__module__]
+        logger.debug('       DEBUG %s in %s from %s async called',func.__name__,module,caller_name)
+        ret = await func(*args, **kwargs)
+        # with {args, kwargs} returns {ret}
+        logger.debug('       DEBUG  %s from %s done',func.__name__,caller_name)
+        return ret
+    return inner
+
+
 class InvalidDateException(Exception):
     """
     \todo
@@ -281,7 +302,7 @@ class Union(UnionDoc):
         name = "all_collections"
         class_id = "_class_id"
 
-class Person(Document):
+class Entity(Document):
     """
  This class is used for references to persons in book records.
  id is the id of the person in authority files (currently, the GND), name the name given in the
@@ -295,6 +316,7 @@ class Person(Document):
     """
     gnd_id : str = ""
     id_name : str = ""
+    stub : bool = True
     internal_id : str = ""
     internal_id_person_type1 : str = ""
     internal_id_person_type1_needed : str = ""
@@ -326,6 +348,7 @@ class Person(Document):
     preview : str = ""
 #    id : str = ""
     type : str = "" # Is always 'Person'
+#    properties : dict = {}
     person_type1 : str = ""
     # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
     person_type2 : str = ""
@@ -368,9 +391,51 @@ class Person(Document):
 #    comments : str = ""
     class Settings:
         union_doc = Union
-    # def __init__(self,name):
-    #     super.__init__()
-    #     self.name=name
+
+# class Organisation(Document):
+#     """
+#  This class is used for references to organisations (publishing houses) in book records.
+#  id is the id of the place in authority files (currently, the GND), name the name given the source
+#  and role either "pub" for the publisher, or "prt" for the printer
+#  If an organisation is both, there will be two different record for it.
+#     """
+# #    id : str = ""
+#     external_id : ExternalReference = ""
+#     internal_id : str = ""
+#     internal_id_org_type1 : str = ""
+#     internal_id_org_type1_needed : str = ""
+#     internal_id_org_type1_comment : str = ""
+#     name_preferred : str = ""
+#     name_variant : str = ""
+#     dates_from_source : DateImport = ""
+# #    connected_persons : ConnectedEntity = ""
+#  #   connected_organisations : ConnectedEntity = ""
+#  #   connected_locations : ConnectedEntity = ""
+#     comments : str = ""
+#     preview : str = ""
+#     id_name : str = ""
+#     internal_id : str = ""
+#     internal_id_preview : str = ""
+#     internal_id_org_type1 : str = ""
+#     internal_id_org_type1_needed : str = ""
+#     internal_id_org_type1_comment : str = ""
+#     name : str = ""
+# #    role : str = ""
+# #    chosen_candidate : int = ""
+#     #potential_candidates : Organisation = ""
+#     new_authority_id : str = ""
+# #    id : str = ""
+#     type : str = ""  # Is always "Organisation"
+#     org_type1: str = ""
+#     # Types 1 are: "Printer", "Collection", "Group of Persons"
+#     org_type2: str = ""
+#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
+#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
+#     class Settings:
+#         union_doc = Union
+#     # def __init__(self,name):
+#     #     super.__init__()
+#     #     self.name=name
 
 
 
@@ -429,57 +494,57 @@ class Person(Document):
 #     comments : str = ""
 #     preview : str = ""
 
-class Organisation(Document):
-    """
- This class is used for references to organisations (publishing houses) in book records.
- id is the id of the place in authority files (currently, the GND), name the name given the source
- and role either "pub" for the publisher, or "prt" for the printer
- If an organisation is both, there will be two different record for it.
-    """
-#    id : str = ""
-    external_id : ExternalReference = ""
-    internal_id : str = ""
-    internal_id_org_type1 : str = ""
-    internal_id_org_type1_needed : str = ""
-    internal_id_org_type1_comment : str = ""
-    name_preferred : str = ""
-    name_variant : str = ""
-    dates_from_source : DateImport = ""
-#    connected_persons : ConnectedEntity = ""
- #   connected_organisations : ConnectedEntity = ""
- #   connected_locations : ConnectedEntity = ""
-    comments : str = ""
-    preview : str = ""
-    id_name : str = ""
-    internal_id : str = ""
-    internal_id_preview : str = ""
-    internal_id_org_type1 : str = ""
-    internal_id_org_type1_needed : str = ""
-    internal_id_org_type1_comment : str = ""
-    name : str = ""
-#    role : str = ""
-#    chosen_candidate : int = ""
-    #potential_candidates : Organisation = ""
-    new_authority_id : str = ""
-#    id : str = ""
-    type : str = ""  # Is always "Organisation"
-    org_type1: str = ""
-    # Types 1 are: "Printer", "Collection", "Group of Persons"
-    org_type2: str = ""
-    # Type 21 is a subtype only needed if type1 is "Group of Persons",
-    #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-    external_id : ExternalReference = ""
-    name_preferred : str = ""
-    name_variant : str = ""
-    dates_from_source : DateImport = ""
-    # This is only provisional - there will be some functions to turn the dates
-    #  from import into standardised dates
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
-    comments : str = ""
-    class Settings:
-        union_doc = Union
+# class Organisation(Document):
+#     """
+#  This class is used for references to organisations (publishing houses) in book records.
+#  id is the id of the place in authority files (currently, the GND), name the name given the source
+#  and role either "pub" for the publisher, or "prt" for the printer
+#  If an organisation is both, there will be two different record for it.
+#     """
+# #    id : str = ""
+#     external_id : ExternalReference = ""
+#     internal_id : str = ""
+#     internal_id_org_type1 : str = ""
+#     internal_id_org_type1_needed : str = ""
+#     internal_id_org_type1_comment : str = ""
+#     name_preferred : str = ""
+#     name_variant : str = ""
+#     dates_from_source : DateImport = ""
+# #    connected_persons : ConnectedEntity = ""
+#  #   connected_organisations : ConnectedEntity = ""
+#  #   connected_locations : ConnectedEntity = ""
+#     comments : str = ""
+#     preview : str = ""
+#     id_name : str = ""
+#     internal_id : str = ""
+#     internal_id_preview : str = ""
+#     internal_id_org_type1 : str = ""
+#     internal_id_org_type1_needed : str = ""
+#     internal_id_org_type1_comment : str = ""
+#     name : str = ""
+# #    role : str = ""
+# #    chosen_candidate : int = ""
+#     #potential_candidates : Organisation = ""
+#     new_authority_id : str = ""
+# #    id : str = ""
+#     type : str = ""  # Is always "Organisation"
+#     org_type1: str = ""
+#     # Types 1 are: "Printer", "Collection", "Group of Persons"
+#     org_type2: str = ""
+#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
+#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
+#     external_id : ExternalReference = ""
+#     name_preferred : str = ""
+#     name_variant : str = ""
+#     dates_from_source : DateImport = ""
+#     # This is only provisional - there will be some functions to turn the dates
+#     #  from import into standardised dates
+# #    connected_persons : ConnectedEntity = ""
+# #    connected_organisations : ConnectedEntity = ""
+# #    connected_locations : ConnectedEntity = ""
+#     comments : str = ""
+#     class Settings:
+#         union_doc = Union
 
 
 
@@ -503,60 +568,60 @@ class Organisation(Document):
 #     comments : str = ""
 #     preview : str = ""
 
-class Place(Document):
-    """
- This class is used for references to places (virtually alwys towns) in book records.
- id is the id of the place in authority files (currently, the GND), name the name given the source
- and role either "mfp" for the place of printing, or "pup" for the place of publishing.
- If a place is both, there will be two different record for it.
-    """
-    external_id : ExternalReference = ""
-    internal_id : str = ""
-    internal_id_place_type1 : str = ""
-    internal_id_place_type1_comment : str = ""
-    # I will need that field later, when I extend the search for matching types also do
-    # name searches in Iconobase
-    name_preferred : str = ""
-    name_variant : str = ""
-    coordinates : Coordinates = ""
-    dates_from_source : DateImport = ""
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
-    comments : str = ""
-    preview : str = ""
-#    id : str = ""
-#    id_name : str = ""
-    internal_id : str = ""
-    internal_id_preview : str = ""
-    internal_id_place_type1 : str = ""
-    internal_id_place_type1_needed : str = ""
-    internal_id_place_type1_comment : str = ""
-    name : str = ""
-#    role : str = ""
-#    chosen_candidate : int = ""
-#    potential_candidates : PlaceImport = ""
-    new_authority_id : str = ""
-#    id : str = ""
-    type : str = "" # Is always "Place"
-    place_type1 : str = ""
-    # Types 1 are: "Region - historical", "Region - modern", "Town - historical",
-    # "Town - modern", "Building", "Building-part"
-    # There should be only one place_type1 per record, but I keep it as list for the sake of
-    # consistency
-    external_id : ExternalReference = ""
-    name_preferred : str = ""
-    name_variant : str = ""
-    coordinates : Coordinates = ""
-    dates_from_source : DateImport = ""
-    # This is only provisional - there will be some functions to turn the dates from import into
-    # standardised dates
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
-    comments : str = ""
-    class Settings:
-        union_doc = Union
+# class Place(Document):
+#     """
+#  This class is used for references to places (virtually alwys towns) in book records.
+#  id is the id of the place in authority files (currently, the GND), name the name given the source
+#  and role either "mfp" for the place of printing, or "pup" for the place of publishing.
+#  If a place is both, there will be two different record for it.
+#     """
+#     external_id : ExternalReference = ""
+#     internal_id : str = ""
+#     internal_id_place_type1 : str = ""
+#     internal_id_place_type1_comment : str = ""
+#     # I will need that field later, when I extend the search for matching types also do
+#     # name searches in Iconobase
+#     name_preferred : str = ""
+#     name_variant : str = ""
+#     coordinates : Coordinates = ""
+#     dates_from_source : DateImport = ""
+# #    connected_persons : ConnectedEntity = ""
+# #    connected_organisations : ConnectedEntity = ""
+# #    connected_locations : ConnectedEntity = ""
+#     comments : str = ""
+#     preview : str = ""
+# #    id : str = ""
+# #    id_name : str = ""
+#     internal_id : str = ""
+#     internal_id_preview : str = ""
+#     internal_id_place_type1 : str = ""
+#     internal_id_place_type1_needed : str = ""
+#     internal_id_place_type1_comment : str = ""
+#     name : str = ""
+# #    role : str = ""
+# #    chosen_candidate : int = ""
+# #    potential_candidates : PlaceImport = ""
+#     new_authority_id : str = ""
+# #    id : str = ""
+#     type : str = "" # Is always "Place"
+#     place_type1 : str = ""
+#     # Types 1 are: "Region - historical", "Region - modern", "Town - historical",
+#     # "Town - modern", "Building", "Building-part"
+#     # There should be only one place_type1 per record, but I keep it as list for the sake of
+#     # consistency
+#     external_id : ExternalReference = ""
+#     name_preferred : str = ""
+#     name_variant : str = ""
+#     coordinates : Coordinates = ""
+#     dates_from_source : DateImport = ""
+#     # This is only provisional - there will be some functions to turn the dates from import into
+#     # standardised dates
+# #    connected_persons : ConnectedEntity = ""
+# #    connected_organisations : ConnectedEntity = ""
+# #    connected_locations : ConnectedEntity = ""
+#     comments : str = ""
+#     class Settings:
+#         union_doc = Union
 
 
 class EntityConnection(Document):
@@ -565,17 +630,26 @@ class EntityConnection(Document):
     """
 #    id : str = ""
     external_id : ExternalReference = ""
-    name : str = ""
-    connection_type : str = ""
+    name : str = "" # Name of the person, place or organisation for easier access
+    connection_type : str = "" # either person, place or organisation
 # In the GND; the role of a connected person must be given through an abbrevation
 # that gives rather general information, e.g. "bezf" = "family relation";
 # more detailed information can be given in a comment field
     connection_comment : str = ""
     connection_time : str = ""
     type : str = ""
-    person : Person = ""
-    organisation : Organisation = ""
-    place : Place = ""
+    entityA : Entity = ""
+    entityB : Entity = ""
+
+    relationA : str = ""
+    relationB : str = ""
+#    person : Person = ""
+#    personA : Person = ""
+#    personB : Person = ""
+#    organisationA : Organisation = ""
+#    organisationB : Organisation = ""
+#    placeA : Place = ""
+#    placeB : Place = ""
     class Settings:
         union_doc = Union
 
@@ -668,41 +742,30 @@ class EntityAndConnections(Document):
     """
 This class is for the links of persons, organisations and places to book records
     """
-#    id : str = ""
     name : str = "" # This field is only a stopgap measure, if
     comment : str = ""
     preview : str = ""
-    person : Person = ""
-    connected_persons : EntityConnection = ""
-    organisation : Organisation = ""
-    connected_organisations : EntityConnection = ""
-    place : Place = ""
-    connected_places : EntityConnection = ""
+    entity : Entity = ""
+    connected_entities : EntityConnection = ""
     class Settings:
         union_doc = Union
 
 class Role(Document):
-#    id : str = ""
     role : str = ""
     name : str = "" # This field is only a stopgap measure, if
     type : str = ""
-    chosen_candidate : int = 0
+    chosen_candidate_id : int = 0
     comment : str = ""
     preview : str = ""
     entity_and_connections : EntityAndConnections = ""
     class Settings:
         union_doc = Union
-#     def __init__(self,role,person_name):
-#         self.role=role
-#         p=Person(person_name)
-#         self.entity_and_connections.append(p)
-# #        self.entity_and_connections
 
 def make_new_role(role,person_name):
     r=Role(role=role,chosen_candidate=-1)
     if person_name:
         r.entity_and_connections=EntityAndConnections()
-        r.entity_and_connections.person=Person(name=person_name)
+        r.entity_and_connections.entity=Entity(name=person_name)
     return r
 
 class MakingProcess(Document):
@@ -780,7 +843,7 @@ class Metadata(Document):
     bibliographic_information : BibliographicInformation = ""
     location : str = ""
     markxml : str = ""
-    numberOfImages : int = ""
+    numberOfImages : int = 0
     iiifUrl : str = ""
     manifest : str = ""
     images : Image = ""
@@ -998,3 +1061,7 @@ needed for the individual Artwork and Photograph records
 #     connected_organisations : ConnectedEntity = ""
 #     connected_locations : ConnectedEntity = ""
 #     comments : str = ""
+
+class WebCall(Document):
+    url : str = ""
+    content : bytes = ""

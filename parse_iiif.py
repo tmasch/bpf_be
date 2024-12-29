@@ -171,10 +171,10 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
 # Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added.
 
 #    print("getting bibliography")
-    for step1 in range(len(m.bibliographic_id)):
+    for bibliogr_id in m.bibliographic_id:
         #print(m.bibliographic_id[step1][1])
-        bid_name = (m.bibliographic_id[step1]).name
-        bid_id = (m.bibliographic_id[step1]).bib_id
+        bid_name = bibliogr_id.name
+        bid_id = bibliogr_id.bib_id
         bibliographic_information_single = await get_bibliographic_data(bid_name, bid_id)
 
 
@@ -306,7 +306,7 @@ This function parses it and sends the results to the function bibliography_selec
     bid_divided = re.match(bid_pattern, additional_bid)
     bid_name = bid_divided[1]
     bid_id = bid_divided[3]
-    bibliographic_information_single = get_bibliographic_data(bid_name, bid_id)
+    bibliographic_information_single = await get_bibliographic_data(bid_name, bid_id)
     for person in bibliographic_information_single.persons:
         person = await parse_gnd.identify_person(person)
     for organisation in bibliographic_information_single.organisations:

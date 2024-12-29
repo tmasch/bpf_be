@@ -4,22 +4,22 @@ Test of GND parsing
 """
 from unittest import mock
 import pytest
-
+import pytest_asyncio
 import test_get_external_data
 #import requests
 #import unittest
 #import json
-import pytest_asyncio
+
 #from beanie import Document, Link
 #from dotenv import load_dotenv
 #import logging
 
-
+from lxml import etree
 import get_external_data
 import parse_gnd
 #import classes
 import db_actions
-from lxml import etree
+
 #import test_get_external_data
 
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)

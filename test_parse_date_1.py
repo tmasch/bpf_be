@@ -37,7 +37,7 @@ def test_qq_dd_yyyy():
     assert r.year == "1234"
     assert r.state == "SUCCESS"
 
-def test_xx_dd_yyyy():
+def test_xx_mm_yyyy():
     d="xx.12.1234"
     r=parse_date_1.parse_date(d)
     print(r)

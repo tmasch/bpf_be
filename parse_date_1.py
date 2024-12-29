@@ -49,7 +49,6 @@ def parse_date(ds):
         state="SUCCESS"
         messages.append("No valid input")
 
-
     # Date is four-digit year, e.g. 1234
     if len(ds) == 3 and re.match(r"\d{3}",ds):
         year="0"+ds
