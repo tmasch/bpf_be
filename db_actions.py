@@ -33,7 +33,6 @@ async def initialise_beanie():
                                                         classes.PagesDb, \
                                                         classes.EntityConnection, \
                                                         classes.EntityAndConnections, \
-                                                        classes.Role,\
                                                         classes.MakingProcess, \
                                                         classes.BibliographicId, \
                                                         classes.BibliographicInformation,\

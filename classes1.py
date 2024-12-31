@@ -49,83 +49,6 @@ Place as annotation befor function definition
     return inner
 
 
-class InvalidDateException(Exception):
-    """
-    \todo
-    """
-
-
-class InvalidMonthException(Exception):
-    """
-    \todo
-    """
-
-class InvalidDayException(Exception):
-    """
-    \todo
-    """
-
-class InvalidDateStringException(Exception):
-    """
-    \todo
-    """
-
-class InvalidDateRangeException(Exception):
-    """
-    \todo
-    """
-
-class PersonAgainstDuplication():
-    """
-    \todo
-    """
-# I have these classes here and not in 'classes' because they are only needed in these functions.
-    preview : str = ""
-#    id : str = ""
-    person_type1 : str  = ""
-
-class OrgAgainstDuplication():
-    """
-    \todo
-    """
-    preview : str = ""
-#    id : str = ""
-    org_type1 : str  = ""
-
-class PlaceAgainstDuplication():
-    """
-    \todo
-    """
-    preview : str = ""
-#    id : str = ""
-    place_type1 : str  = ""
-
-# class Record():
-#     """
-# \todo
-#     """
-#     type : str = ""
-#     identifier : str = ""
-#     metadata : Metadata = ""
-#     book : BookDb = ""
-#     organisation : OrganisationDb = ""
-#     person : Person = ""
-#     pages : PagesDb = ""
-#     place : PlaceDb = ""
-
-
-
-
-
-
-# class ConnectedEntityDbDisplay():
-#     """
-# This class is for the links of persons, organisations and places to book records
-#     """
-# #    id : str = ""
-#     role : str = ""
-#     preview : str = ""
-
 
 
 class DateImport():
@@ -198,23 +121,6 @@ class Frame():
     w_rel : float = ""
     h_rel : float = ""
 
-class LinkToRepository():
-    """
-    This class is used for entering the link between manuscripts and repositories into the database.
-It can probably be later also used for the link between artworks and repositories
-    """
-    number : int = 0
-    #This is only needed if several former locations
-    #are added later so that they can show in a sensible order (probably back in time)
-    place_id : str = ""
-    current : bool = True
-    collection : bool = True
-    # This field will be set to 'true' if the place has the type "Organisation" and t
-    # he type_org1 "Collection", it will be set to 'false' if the place has the type 'Place'
-    # The purpose of this field is to simplify searches.
-    id_preferred : str = "" # Inventory number of shelf mark
-    id_variant : str = ""
-
 
 
 class Image():
@@ -247,6 +153,23 @@ generally for handling this date
     north : str = ""
     south : str = ""
 
+class LinkToRepository():
+    """
+    This class is used for entering the link between manuscripts and repositories into the database.
+It can probably be later also used for the link between artworks and repositories
+    """
+    number : int = 0
+    #This is only needed if several former locations
+    #are added later so that they can show in a sensible order (probably back in time)
+    place_id : str = ""
+    current : bool = True
+    collection : bool = True
+    # This field will be set to 'true' if the place has the type "Organisation" and t
+    # he type_org1 "Collection", it will be set to 'false' if the place has the type 'Place'
+    # The purpose of this field is to simplify searches.
+    id_preferred : str = "" # Inventory number of shelf mark
+    id_variant : str = ""
+
 
 class BibliographicId(Document):
     """
@@ -260,6 +183,9 @@ This class should be superseded everywhere by External_id, I keep it for the mom
     bib_id : str = ""
 #    id : str = ""
 
+class Attribute():
+    key : str = ""
+    value : str = ""
 
 class ExternalReference():
     """
@@ -270,32 +196,6 @@ book or person within the repertory and, if available, the URI of the entry.
     uri : str = ""
     name : str = ""
     external_id : str = ""
-
-
-
-
-
-# class PersonImport():
-#     """
-#     Person class for importing
-#     """
-#     external_id : ExternalId = ""
-#     internal_id : str = ""
-#     internal_id_person_type1 : str = ""
-#     internal_id_person_type1_comment : str = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     sex : str = ""
-#     dates_from_source : DateImport = ""
-#     datestring : str = ""
-#     date_start : tuple = ()
-#     date_end : tuple = ()
-#     date_aspect : str = ""
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
 
 class Union(UnionDoc):
     class Settings:
@@ -314,314 +214,29 @@ class Entity(Document):
  The results will be put into the field 'potential candidates'.
  The user can pick one of them (or confirm if only one was found)
     """
-    gnd_id : str = ""
-    id_name : str = ""
+    type : str = ""
+#    gnd_id : str = ""
     stub : bool = True
-    internal_id : str = ""
-    internal_id_person_type1 : str = ""
-    internal_id_person_type1_needed : str = ""
-    internal_id_person_type1_comment : str = ""
-    internal_id_preview : str = ""
+    attributes : Attribute = ""
     name : str = ""
-    new_authority_id : str = ""
-    external_id : ExternalReference = ""
-    internal_id : str = ""
-#    internal_id_person_type1 : str = ""
-#    internal_id_person_type1_comment : str = ""
+#    new_authority_id : str = ""
+#    external_id : ExternalReference = ""
+#    internal_id : str = ""
     name_preferred : str = ""
-    name_variant : str = ""
-    sex : str = ""
-    dates_from_source : DateImport = ""
-    datestring : str = ""
-    date_start : tuple = ()
-    date_end : tuple = ()
-    date_aspect : str = ""
-    #model_config = ConfigDict(arbitrary_types_allowed=True)
-#    id : str = ""
-#    role : str = ""
-#    chosen_candidate : int = ""
-#    potential_candidates : Person = ""
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
+#   name_variant : str = ""
+#    dates_from_source : DateImport = ""
+#    datestring : str = ""
+    dates : Date = ""
+#    date_start : tuple = ()
+ #   date_end : tuple = ()
+#    date_aspect : str = ""
     comments : str = ""
     preview : str = ""
-#    id : str = ""
-    type : str = "" # Is always 'Person'
-#    properties : dict = {}
-    person_type1 : str = ""
-    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-    person_type2 : str = ""
-    # Type 2 is a subtype only needed if type1 is "depicted Person"
-    person_type3 : str = ""
-    # Type 3 is a subtype only needed if typ2 is "Saint"
-#    external_id : ExternalId = ""
-#    name_preferred : str = ""
-#    name_variant : str = ""
-#    sex : str = ""
-#    dates_from_source : DateImport = ""
-    # This is only provisional - there will be some functions to turn the dates
-    # from import into standardised dates
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
-#    comments : str = ""
-    # At least two fields are still missing, they are not needed at this step but
-    #  will be needed for records of the type1 "depicted Person":
-    # 'Office' and 'Profession' (one would preferably give an office (in the widest sense)
-    #  together with a term, and, if the person held no office, a profession)
-#    id : str = ""
-#    type : str = "" # Is always 'Person'
-#    person_type1 : str = ""
-    # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-#    person_type2 : str = ""
- #   # Type 2 is a subtype only needed if type1 is "depicted Person"
- #   person_type3 : str = ""
-    # Type 3 is a subtype only needed if typ2 is "Saint"
-#    external_id : ExternalId = ""
-#    name_preferred : str = ""
-#    name_variant : str = ""
-#    sex : str = ""
-#    dates_from_source : DateImport = ""
-    # This is only provisional - there will be some functions to turn the
-    # dates from import into standardised dates
-#    connected_persons : ConnectedEntity = ""
-#    connected_organisations : ConnectedEntity = ""
-#    connected_locations : ConnectedEntity = ""
-#    comments : str = ""
+    linkedEntity : "Entity" = ""
     class Settings:
         union_doc = Union
 
-# class Organisation(Document):
-#     """
-#  This class is used for references to organisations (publishing houses) in book records.
-#  id is the id of the place in authority files (currently, the GND), name the name given the source
-#  and role either "pub" for the publisher, or "prt" for the printer
-#  If an organisation is both, there will be two different record for it.
-#     """
-# #    id : str = ""
-#     external_id : ExternalReference = ""
-#     internal_id : str = ""
-#     internal_id_org_type1 : str = ""
-#     internal_id_org_type1_needed : str = ""
-#     internal_id_org_type1_comment : str = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-# #    connected_persons : ConnectedEntity = ""
-#  #   connected_organisations : ConnectedEntity = ""
-#  #   connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
-#     id_name : str = ""
-#     internal_id : str = ""
-#     internal_id_preview : str = ""
-#     internal_id_org_type1 : str = ""
-#     internal_id_org_type1_needed : str = ""
-#     internal_id_org_type1_comment : str = ""
-#     name : str = ""
-# #    role : str = ""
-# #    chosen_candidate : int = ""
-#     #potential_candidates : Organisation = ""
-#     new_authority_id : str = ""
-# #    id : str = ""
-#     type : str = ""  # Is always "Organisation"
-#     org_type1: str = ""
-#     # Types 1 are: "Printer", "Collection", "Group of Persons"
-#     org_type2: str = ""
-#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
-#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-#     class Settings:
-#         union_doc = Union
-#     # def __init__(self,name):
-#     #     super.__init__()
-#     #     self.name=name
 
-
-
-
-# #@dataclass
-# class PersonDb(Document):
-#     """
-# This class is for entering Person authority records into the database.
-# It contains all needed fields (or better, will do so), so many will remain empty.
-# I hope it will be possible to delete empty fields when turning it into a dict object.
-# If not, one should probably have different classes for different
-#     """
-#     id : str = ""
-#     type : str = "" # Is always 'Person'
-#     person_type1 : str = ""
-#     # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-#     person_type2 : str = ""
-#     # Type 2 is a subtype only needed if type1 is "depicted Person"
-#     person_type3 : str = ""
-#     # Type 3 is a subtype only needed if typ2 is "Saint"
-#     external_id : ExternalId = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     sex : str = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates
-#     # from import into standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     # At least two fields are still missing, they are not needed at this step but
-#     #  will be needed for records of the type1 "depicted Person":
-#     # 'Office' and 'Profession' (one would preferably give an office (in the widest sense)
-#     #  together with a term, and, if the person held no office, a profession)
-#     class Settings:
-#         union_doc = Union
-
-
-
-# class OrganisationImport():
-#     """
-#  This class is used for importing data on organisations from authority records such as the GND
-#     """
-#     external_id : ExternalReference = ""
-#     internal_id : str = ""
-#     internal_id_org_type1 : str = ""
-#     internal_id_org_type1_needed : str = ""
-#     internal_id_org_type1_comment : str = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
-
-# class Organisation(Document):
-#     """
-#  This class is used for references to organisations (publishing houses) in book records.
-#  id is the id of the place in authority files (currently, the GND), name the name given the source
-#  and role either "pub" for the publisher, or "prt" for the printer
-#  If an organisation is both, there will be two different record for it.
-#     """
-# #    id : str = ""
-#     external_id : ExternalReference = ""
-#     internal_id : str = ""
-#     internal_id_org_type1 : str = ""
-#     internal_id_org_type1_needed : str = ""
-#     internal_id_org_type1_comment : str = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-# #    connected_persons : ConnectedEntity = ""
-#  #   connected_organisations : ConnectedEntity = ""
-#  #   connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
-#     id_name : str = ""
-#     internal_id : str = ""
-#     internal_id_preview : str = ""
-#     internal_id_org_type1 : str = ""
-#     internal_id_org_type1_needed : str = ""
-#     internal_id_org_type1_comment : str = ""
-#     name : str = ""
-# #    role : str = ""
-# #    chosen_candidate : int = ""
-#     #potential_candidates : Organisation = ""
-#     new_authority_id : str = ""
-# #    id : str = ""
-#     type : str = ""  # Is always "Organisation"
-#     org_type1: str = ""
-#     # Types 1 are: "Printer", "Collection", "Group of Persons"
-#     org_type2: str = ""
-#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
-#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates
-#     #  from import into standardised dates
-# #    connected_persons : ConnectedEntity = ""
-# #    connected_organisations : ConnectedEntity = ""
-# #    connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     class Settings:
-#         union_doc = Union
-
-
-
-# class PlaceImport():
-#     """
-#  This class is used for importing data on places from authority records such as the GND
-#     """
-#     external_id : ExternalReference = ""
-#     internal_id : str = ""
-#     internal_id_place_type1 : str = ""
-#     internal_id_place_type1_comment : str = ""
-#     # I will need that field later, when I extend the search for matching types also do
-#     # name searches in Iconobase
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     coordinates : Coordinates = ""
-#     dates_from_source : DateImport = ""
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
-
-# class Place(Document):
-#     """
-#  This class is used for references to places (virtually alwys towns) in book records.
-#  id is the id of the place in authority files (currently, the GND), name the name given the source
-#  and role either "mfp" for the place of printing, or "pup" for the place of publishing.
-#  If a place is both, there will be two different record for it.
-#     """
-#     external_id : ExternalReference = ""
-#     internal_id : str = ""
-#     internal_id_place_type1 : str = ""
-#     internal_id_place_type1_comment : str = ""
-#     # I will need that field later, when I extend the search for matching types also do
-#     # name searches in Iconobase
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     coordinates : Coordinates = ""
-#     dates_from_source : DateImport = ""
-# #    connected_persons : ConnectedEntity = ""
-# #    connected_organisations : ConnectedEntity = ""
-# #    connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     preview : str = ""
-# #    id : str = ""
-# #    id_name : str = ""
-#     internal_id : str = ""
-#     internal_id_preview : str = ""
-#     internal_id_place_type1 : str = ""
-#     internal_id_place_type1_needed : str = ""
-#     internal_id_place_type1_comment : str = ""
-#     name : str = ""
-# #    role : str = ""
-# #    chosen_candidate : int = ""
-# #    potential_candidates : PlaceImport = ""
-#     new_authority_id : str = ""
-# #    id : str = ""
-#     type : str = "" # Is always "Place"
-#     place_type1 : str = ""
-#     # Types 1 are: "Region - historical", "Region - modern", "Town - historical",
-#     # "Town - modern", "Building", "Building-part"
-#     # There should be only one place_type1 per record, but I keep it as list for the sake of
-#     # consistency
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     coordinates : Coordinates = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates from import into
-#     # standardised dates
-# #    connected_persons : ConnectedEntity = ""
-# #    connected_organisations : ConnectedEntity = ""
-# #    connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     class Settings:
-#         union_doc = Union
 
 
 class EntityConnection(Document):
@@ -638,104 +253,33 @@ class EntityConnection(Document):
     connection_comment : str = ""
     connection_time : str = ""
     type : str = ""
+    subtype : str = ""
     entityA : Entity = ""
     entityB : Entity = ""
-
     relationA : str = ""
     relationB : str = ""
-#    person : Person = ""
-#    personA : Person = ""
-#    personB : Person = ""
-#    organisationA : Organisation = ""
-#    organisationB : Organisation = ""
-#    placeA : Place = ""
-#    placeB : Place = ""
     class Settings:
         union_doc = Union
 
 
 
-
-
-
-
-
-
-# class OrganisationDb(Document):
-#     """
-# This class is for entering Organisation authority records into the database.
-#     """
-#     id : str = ""
-#     type : str = ""  # Is always "Organisation"
-#     org_type1: str = ""
-#     # Types 1 are: "Printer", "Collection", "Group of Persons"
-#     org_type2: str = ""
-#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
-#     #  it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates
-#     #  from import into standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     class Settings:
-#         union_doc = Union
-
-
-# class PlaceDb(Document):
-#     """
-# This class is for entering Place authority records into the database
-#     """
-#     id : str = ""
-#     type : str = "" # Is always "Place"
-#     place_type1 : str = ""
-#     # Types 1 are: "Region - historical", "Region - modern", "Town - historical",
-#     # "Town - modern", "Building", "Building-part"
-#     # There should be only one place_type1 per record, but I keep it as list for the sake of
-#     # consistency
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     coordinates : Coordinates = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates from import into
-#     # standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-#     class Settings:
-#         union_doc = Union
-
-
-
-
-
-
-
-# class PersonAndConnections(Document):
-#     id : str = ""
+# class Role(Document):
+#     role : str = ""
+#     name : str = "" # This field is only a stopgap measure, if
+#     type : str = ""
+#     chosen_candidate_id : int = 0
 #     comment : str = ""
-#     person : Person = ""
-#     connected_persons : ConnectedEntity = ""
-# #    connected_places : ConnectedEntity = ""
-# #    connected_organisations : ConnectedEntity = ""
+#     preview : str = ""
+#     entity_and_connections : EntityAndConnections = ""
 #     class Settings:
 #         union_doc = Union
 
-# class SelectionCandidate():
-#     chosen_candidate : int = 0
-#     person : Person = ""
-#     person_candidates : Person = ""
-#     place : Place = ""
-#     place_candidates : Place = ""
-#     organisation : Organisation = ""
-#     organisation_candidates : Organisation = ""
-
+# def make_new_role(role,person_name):
+#     r=Role(role=role,chosen_candidate=-1)
+#     if person_name:
+#         r.entity_and_connections=EntityAndConnections()
+#         r.entity_and_connections.entity=Entity(name=person_name)
+#     return r
 
 
 class EntityAndConnections(Document):
@@ -746,27 +290,11 @@ This class is for the links of persons, organisations and places to book records
     comment : str = ""
     preview : str = ""
     entity : Entity = ""
+    chosen_candidate_id : int = 0
     connected_entities : EntityConnection = ""
     class Settings:
         union_doc = Union
 
-class Role(Document):
-    role : str = ""
-    name : str = "" # This field is only a stopgap measure, if
-    type : str = ""
-    chosen_candidate_id : int = 0
-    comment : str = ""
-    preview : str = ""
-    entity_and_connections : EntityAndConnections = ""
-    class Settings:
-        union_doc = Union
-
-def make_new_role(role,person_name):
-    r=Role(role=role,chosen_candidate=-1)
-    if person_name:
-        r.entity_and_connections=EntityAndConnections()
-        r.entity_and_connections.entity=Entity(name=person_name)
-    return r
 
 class MakingProcess(Document):
     """
@@ -775,23 +303,11 @@ class MakingProcess(Document):
     process_number : int = 0
     process_type : str = ""
     process_qualifier : str = ""
-    person : Role = ""
-    place : Role = ""
-    date : Date = ""
+    person : EntityConnection = ""
+    place : EntityConnection = ""
+    date : EntityConnection = ""
     class Settings:
         union_doc = Union
-
-# class MakingProcess():
-#     """
-#     Making process
-#     """
-#     process_number : int = 0
-#     process_type : str = ""
-#     process_qualifier : str = ""
-#     person : Person = ""
-#     place : Place = ""
-#     date : DateImport = ""
-
 
 
 class BibliographicInformation(Document):
@@ -800,9 +316,9 @@ class BibliographicInformation(Document):
     """
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
     bibliographic_id : BibliographicId = ""
-    persons : Role = ""
-    organisations : Role = ""
-    places : Role = ""
+    persons : EntityConnection = ""
+    organisations : EntityConnection = ""
+    places : EntityConnection = ""
     title: str = ""
     volume_number : str = ""
     part_title : str = ""
@@ -836,7 +352,7 @@ class Metadata(Document):
     material : str = ""
 #    repository : (dataclass.field(default_factory=list))
 
-    repository: Role = ""
+    repository: EntityAndConnections = ""
     shelfmark : str = ""
     license : str = ""
     bibliographic_id : ExternalReference = ""
@@ -857,15 +373,11 @@ class BookDb(Document):
     """
 This class is for entering Book records into the database
     """
-#    id : str = ""
     type : str = "Book"
     bibliographic_id : ExternalReference = ""
-    persons : Role = ""
-#    persons2 : Person = ""
-    organisations :  Role = ""
- #   organisations2 : OrganisationDb = ""
-    places :  Role = ""
- #   places2 : PlaceDb = ""
+    persons : EntityConnection = ""
+    organisations :  EntityConnection = ""
+    places :  EntityConnection = ""
     title: str = ""
     volume_number : str = ""
     part_title : str = ""
@@ -874,10 +386,9 @@ This class is for entering Book records into the database
     date_start : tuple = ()
     date_end : tuple = ()
     preview : str = ""
-    # This preview is to be shown in lists of titles
-    # - I am not sure if it will be needed long-term
     class Settings:
         union_doc = Union
+
 
 class ManuscriptDb():
     """
@@ -892,39 +403,6 @@ This class is for entering Manuscript records into the database
     class Settings:
         union_doc = Union
 
-
-# class ConnectedRecord():
-#     """
-# Class for linked Persons, Organsations, Places
-#     """
-#     id : str = ""
-#     role : str = ""
-#     name : str = "" # This field is only a stopgap measure, if
-#     person : Person = ""
-#     organisation : OrganisationDb = ""
-#     place : PlaceDb = ""
-
-
-# class BookDbDisplay():
-#     """
-# This class is for displaying (and perhaps later also for editing) book records from the database
-#     """
-#     id : str = ""
-#     type : str = "Book"
-#     bibliographic_id : ExternalReference = ""
-#     persons :  ConnectedEntityDbDisplay = ""
-#     organisations :  ConnectedEntityDbDisplay = ""
-#     places :  ConnectedEntityDbDisplay = ""
-#     title: str = ""
-#     volume_number : str = ""
-#     part_title : str = ""
-#     printing_date : str = "" # Has to be later replaced with a date object
-#     date_string : str = ""
-#     date_start : tuple = ()
-#     date_end : tuple = ()
-#     preview : str = ""
-#     # This preview is to be shown in lists of titles
-#     # - I am not sure if it will be needed long-term
 
 class PagesDb(Document):
     """
@@ -945,122 +423,6 @@ needed for the individual Artwork and Photograph records
     class Settings:
         union_doc = Union
 
-# class PreviewListDb():
-#     """
-# This class is for displaying preview and id of all manuscripts and books in Iconobase.
-# It is made only as a provisional measure for display purposes, but a similar function could
-# be used to access all manuscripts and books still in the ingest process
-#     """
-#     id : str = ""
-#     type : str = ""
-#     preview : str = ""
-#     name_preferred : str = ""
-#     title : str = ""
-
-
-
-# class LinkToRepositoryDisplay():
-#     """
-# This class is used for displaying (and later also editing) the link between manuscripts
-# and repositories into the database.
-# It can probably be later also used for the link between artworks and repositories
-#     """
-#     number : int = 0
-#     #This is only needed if several former locations are added later so that they can
-#     # show in a sensible order (probably back in time)
-#     place_id : str = ""
-#     current : bool = True
-#     collection : bool = True
-#     # This field will be set to 'true' if the place has the type "Organisation"
-#     # and the type_org1 "Collection", it will be set to 'false' if the place has the type 'Place'
-#     # The purpose of this field is to simplify searches.
-#     id_preferred : str = "" # Inventory number of shelf mark
-#     id_variant : str = ""
-#     preview : Optional[str]
-
-
-# class ManuscriptDbDisplay():
-#     """
-# This class is for displaying (and perhaps later also for editing) manuscript records
-# from the database
-#     """
-#     id : str = ""
-#     type : str = "Manuscript" # is always "Manuscript"
-#     repository : ToRepositoryDisplay = ""
-#     preview : str = ""
-#     # This preview is to be shown in lists of titles - I
-#  am not sure if it will be needed long-term
-
-
-# class PersonDbDisplay():
-#     """
-# This class is for displaying (and perhaps later also for editing) person records from the database
-#     """
-#     id : str = ""
-#     type : str = "" # Is always 'Person'
-#     person_type1 : str = ""
-#     # Types 1 are: "Author", "Printer", "Artist", "Depicted Person"
-#     person_type2 : str = ""
-#     # Type 2 is a subtype only needed if type1 is "depicted Person"
-#     person_type3 : str = ""
-#     # Type 3 is a subtype only needed if typ2 is "Saint"
-#     external_id : ExternalId = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     sex : str = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the
-#     # dates from import into standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-
-# class OrgDbDisplay():
-#     """
-# This class is for displaying (and perhaps later also for editing) Organisation
-# authority records from the database.
-#     """
-#     id : str = ""
-#     type : str = ""  # Is always "Organisation"
-#     org_type1: str = "" # Types 1 are
-#     org_type2: str = ""
-#     # Type 21 is a subtype only needed if type1 is "Group of Persons",
-#     # it would be e.g. 'Guild', 'Monastery', 'Ruling Body'
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the dates
-#     # from import into standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
-
-# class PlaceDbDisplay():
-#     """
-# This class is for displaying (and perhaps later also editing) Place authority records
-# from the database
-#     """
-#     id : str = ""
-#     type : str = "" # Is always "Place"
-#     place_type1 : str = ""
-#     # Types 1 are: "Region - historical", "Region - modern", "Town - historical",
-#     #  "Town - modern", "Building", "Building-part"
-#     # There should be only one place_type1 per record, but I keep it as list for
-#     # the sake of consistency
-#     external_id : ExternalReference = ""
-#     name_preferred : str = ""
-#     name_variant : str = ""
-#     coordinates : Coordinates = ""
-#     dates_from_source : DateImport = ""
-#     # This is only provisional - there will be some functions to turn the
-#     # dates from import into standardised dates
-#     connected_persons : ConnectedEntity = ""
-#     connected_organisations : ConnectedEntity = ""
-#     connected_locations : ConnectedEntity = ""
-#     comments : str = ""
 
 class WebCall(Document):
     url : str = ""

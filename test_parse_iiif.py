@@ -21,7 +21,6 @@ import parse_iiif
 import db_actions
 #import test_get_external_data
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_iiif_herbarius():
