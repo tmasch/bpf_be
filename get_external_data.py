@@ -31,21 +31,21 @@ async def get_web_data_as_json(url):
 
 
 @classes.async_func_logger
-async def get_web_data(url):
+async def get_web_data(url_in):
     """
     Do a web call and return byte object
     """
-    print(url)
-    r = await classes.WebCall.find(classes.WebCall.url == url).to_list()
+    print(url_in)
+    r = await classes.WebCall.find(classes.WebCall.url == url_in).to_list()
     if len(r) > 0:
         print("found content in database")
         content=r[0].content
     else:
         print("making web call")
-        response = requests.get(url)
+        response = requests.get(url_in)
         content = response.content
         print(type(content))
-        wc = classes.WebCall(url=url,content=content)
+        wc = classes.WebCall(url=url_in,content=content)
         await wc.save()
     return content
 

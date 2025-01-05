@@ -59,7 +59,7 @@ def parse_manifests_bsb(manifest):
     bibliographic_id_pattern = r'(.*\')(.*)(\'>)([A-Za-z0-9]*)( )(.*)(</a.*)'
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
 
-    repository = classes.Role()
+    repository = classes.EntityAndConnection()
     repository.chosen_candidate_id=-1
     repository.name="Repository"
     if location:
@@ -68,17 +68,21 @@ def parse_manifests_bsb(manifest):
         org=classes.Entity()
         org.name=location_divided.groups()[0]
 
-        eac=classes.EntityAndConnections()
-        eac.entity=org
+#        eac=classes.EntityAndConnections()
+#        eac.entity=org
 
 #        entity_and_connections= classes.EntityAndConnections()
 #       entity_and_connections.organisation = classes.Entity()
 #        entity_and_connections.Entity.name = location_divided.groups()[0]
-        repository.entity_and_connections=eac
-        repository.role = "col"
+#        repository.entity_and_connections=eac
+
+        ec=classes.EntityConnection()
+        ec.type="col"
+#        ec.entityA=
+#        repository.role = "col"
 
 
-        m.repository=repository
+ #       m.repository=repository
         m.shelfmark = location_divided.groups()[2].lstrip()
 
         

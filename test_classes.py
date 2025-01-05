@@ -26,11 +26,23 @@ async def test_external_reference():
     er.model_dump()
 
 @pytest.mark.asyncio
-async def test_person():
+async def test_entity():
     await db_actions.initialise_beanie()
-    p=classes.Person(name="asdf")
-    p.model_dump()
-    await p.save()
+    p=classes.Entity(name="test_entity")
+#    p.model_dump()
+    a=classes.Attribute(key="test_key",value="test_value")
+    p.attributes.append(a)
+    r = await p.save()
+    assert isinstance(r,classes.Entity)
+    assert r.name == "test_entity"
+#    await p.delete()
+
+@pytest.mark.asyncio
+async def test_entity_person():
+    await db_actions.initialise_beanie()
+    p=classes.Entity(name="test_entity",\
+                     type="person")
+    r = await p.save()
 
 @pytest.mark.asyncio
 async def test_entity_connection():
@@ -63,29 +75,29 @@ async def test_entity_and_connections():
     eac.model_dump()
     await eac.save(link_rule=WriteRules.WRITE)
 
-@pytest.mark.asyncio
-async def test_role():
-    await db_actions.initialise_beanie()
-    r=classes.Role(name="test")
+# @pytest.mark.asyncio
+# async def test_role():
+#     await db_actions.initialise_beanie()
+#     r=classes.Role(name="test")
 
-    eac=classes.EntityAndConnections(name="test")
+#     eac=classes.EntityAndConnections(name="test")
 
-    p=classes.Person(name="test")
-    eac.person=p
-    eac.model_dump()
-    p1=classes.Person(name="t1")
-    ec1=classes.EntityConnection(name="t1")
-    ec1.person=p1
-    eac.connected_persons.append(ec1)
+#     p=classes.Person(name="test")
+#     eac.person=p
+#     eac.model_dump()
+#     p1=classes.Person(name="t1")
+#     ec1=classes.EntityConnection(name="t1")
+#     ec1.person=p1
+#     eac.connected_persons.append(ec1)
 
-    p2=classes.Person(name="t2")
-    ec2=classes.EntityConnection(name="t2")
-    ec2.person=p2
-    eac.connected_persons.append(ec2)
-    classes.Role.model_validate(r)
-    r.entity_and_connections=eac
-    r.model_dump()
-    await r.save(link_rule=WriteRules.WRITE)
+#     p2=classes.Person(name="t2")
+#     ec2=classes.EntityConnection(name="t2")
+#     ec2.person=p2
+#     eac.connected_persons.append(ec2)
+#     classes.Role.model_validate(r)
+#     r.entity_and_connections=eac
+#     r.model_dump()
+#     await r.save(link_rule=WriteRules.WRITE)
 
 
 @pytest.mark.asyncio
