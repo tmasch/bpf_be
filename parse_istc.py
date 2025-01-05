@@ -219,6 +219,9 @@ async def parse_istc(url_bibliography):
 
 @classes.func_logger
 def parse_bibliographic_id(bi, istc_record_short):
+    """
+    Parses ID numbers from ISTC and GND
+    """
     bid = classes.BibliographicId()
     bid.bib_id = istc_record_short["id"]
     bid.name = "ISTC"
@@ -262,7 +265,7 @@ def parse_bibliographic_id(bi, istc_record_short):
 
 #                classes.BibliographicInformation.model_validate(bid)
             bi.bibliographic_id.append(bid)
-    return (bi)
+    return bi
 
 
 
@@ -443,6 +446,9 @@ def analyse_prefix(date_prefix, date_year, string_prefix, start_year, end_year):
 
 @classes.func_logger
 def analyse_year(date_prefix, date_year, date_year_to, date_between_year):
+    """
+    This function parses the indication of years
+    """
     string_prefix = ""
     string_year = ""
     string_year_between = ""
@@ -552,7 +558,8 @@ def analyse_month(date_between_year, date_between_month, date_month):
     return (string_month, start_month, end_month)
 
 @classes.func_logger
-def analyse_day(date_between_day, date_between_year, string_day_between, date_day, end_month, end_year):
+def analyse_day(date_between_day, date_between_year, string_day_between, \
+                date_day, end_month, end_year):
     """
     This function parses indications of days. 
     """

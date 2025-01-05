@@ -10,6 +10,7 @@ import parse_manifests
 import books_parsing_bibliographies
 import get_external_data
 import parse_gnd
+import parse_vd17_vd18
 
 #URI_entered = "abc"
 
@@ -24,11 +25,11 @@ async def get_bibliographic_data (bid_name, bid_id):
         #bibliographic_information_single = VD17_parsing((book_properties[2][step1])[2])
         print("getting bibliography")
         print(url_bibliography)
-        bibliographic_information_single = books_parsing_bibliographies.parse_vd17(url_bibliography)
+        bibliographic_information_single = await parse_vd17_vd18.parse_vd17(url_bibliography)
     elif (bid_name == "VD18" or bid_name == "vd18"):
         url_bibliography = r"http://sru.k10plus.de/vd18?version=2.0&operation=searchRetrieve&query=pica.vdt=vd18" + bid_id + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
         print(url_bibliography)
-        bibliographic_information_single = books_parsing_bibliographies.parse_vd17(url_bibliography)
+        bibliographic_information_single = await parse_vd17_vd18.parse_vd17(url_bibliography)
     elif(bid_name == "VD16" or bid_name == "vd16"):
         vd16_complete = bid_id
         vd16_divided = re.split(" ", vd16_complete)       

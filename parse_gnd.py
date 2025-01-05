@@ -693,7 +693,7 @@ def gnd_record_get_gnd_internal_id(record):
     external_references=[]
     controlfields=record.findall("{*}recordData/{*}record/{*}controlfield[@tag='001']")
     
-    datafields = find_datafields(record,"001")
+    #datafields = find_datafields(record,"001")
     
 
     
@@ -707,7 +707,7 @@ def gnd_record_get_gnd_internal_id(record):
 
     print("internal GND id: ")
     print(external_references)
-    print(datafields)
+    print(controlfields)
     return external_references
 
     # x = find_datafields(record,"001")

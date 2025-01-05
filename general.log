@@ -19799,3 +19799,1559 @@ DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
 DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
 DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
 DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  parse_bibliographic_id from parse_istc done
+DEBUG:asyncio:       DEBUG istc_date_working in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG analyse_year in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_year from parse_istc done
+DEBUG:asyncio:       DEBUG analyse_month in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_month from parse_istc done
+DEBUG:asyncio:       DEBUG analyse_day in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_day from parse_istc done
+DEBUG:asyncio:       DEBUG  istc_date_working from parse_istc done
+DEBUG:asyncio:       DEBUG istc_date_working in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG analyse_year in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_year from parse_istc done
+DEBUG:asyncio:       DEBUG analyse_month in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_month from parse_istc done
+DEBUG:asyncio:       DEBUG analyse_day in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG  analyse_day from parse_istc done
+DEBUG:asyncio:       DEBUG  istc_date_working from parse_istc done
+DEBUG:asyncio:       DEBUG  parse_istc from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10234418/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=23:284024Y&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 8717
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Achilles%20and%20Per=Tatius%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10590768/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=12:120986N&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 5992
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=12:120982G&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 3616
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10904947/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=12:128077Z&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 5969
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=J%C3%A4cklin%20and%20Per=Johann%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10392713/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=23:640608B&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 6753
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Joly%20and%20Per=Nicolaus%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 1317
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Aperger%20and%20Per=Andreas%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 1835
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10858678/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=12:651496S&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 4969
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG vd17_map_printing_year_prefix in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_map_printing_year_prefix from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_canvas in <module 'parse_canvas' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_canvas.py'> from parse_manifests async called
+DEBUG:asyncio:       DEBUG  parse_canvas from parse_manifests done
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Wild%20and%20Per=Sebastian%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG vd17_map_printing_year_prefix in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_map_printing_year_prefix from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG identify_person in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG map_role_to_person_type in <module 'parsing_helpers' from 'C:\\Users\\berth\\bpf_be_fastapi\\parsing_helpers.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  map_role_to_person_type from parse_gnd done
+DEBUG:asyncio:       DEBUG find_and_parse_person_gnd in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_gnd async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Hannas%20and%20Per=Marc%20and%20Per=Anton%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 1249
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): services.dnb.de:443
+DEBUG:urllib3.connectionpool:https://services.dnb.de:443 "GET /sru/authorities?version=1.1&operation=searchRetrieve&query=Per=Hannas%20and%20Per=Marc%20and%20Per=Anton%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100 HTTP/11" 200 1249
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG  get_web_data from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_internal_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_internal_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_external_references in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_external_references from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_preferred in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_preferred from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_name_variant in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_name_variant from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_gnd_id in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_gnd_id from parse_gnd done
+DEBUG:asyncio:       DEBUG gnd_record_get_sex in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  gnd_record_get_sex from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_dates in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_dates from parse_gnd done
+DEBUG:asyncio:       DEBUG parse_gnd_profession in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  parse_gnd_profession from parse_gnd done
+DEBUG:asyncio:       DEBUG get_gnd_comments in <module 'parse_gnd' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_gnd.py'> from parse_gnd async called
+DEBUG:asyncio:       DEBUG  get_gnd_comments from parse_gnd done
+DEBUG:asyncio:       DEBUG  find_and_parse_person_gnd from parse_gnd done
+DEBUG:asyncio:       DEBUG  identify_person from parse_iiif done
+DEBUG:asyncio:       DEBUG  parse_iiif from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
