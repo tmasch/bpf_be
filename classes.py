@@ -214,27 +214,37 @@ class Entity(Document):
  The results will be put into the field 'potential candidates'. 
  The user can pick one of them (or confirm if only one was found)
     """
-    type : Optional[str] = "" 
-#    gnd_id : Optional[str] = ""
-    stub : Optional[bool] = True
+    def add_attribute(self,key,value):
+        a=Attribute(key=key,value=value)
+        self.attributes.append(a)
+    def get_attribute(self,key):
+        v=""
+        for a in self.attributes:
+            if a.key == key:
+                v=a.value
+        return v
     attributes : Optional[list[Attribute]] = []
+    type : Optional[str] = "" 
+    stub : Optional[bool] = True
     name : Optional[str] = ""
-#    new_authority_id : Optional[str] = ""
-#    external_id : Optional[list[ExternalReference]] = []
-#    internal_id : Optional[str] = ""
+    external_id : Optional[List[ExternalReference]] = []
     name_preferred : Optional[str] = ""
-#   name_variant : Optional[list[str]] = []
-#    dates_from_source : Optional[list[DateImport]] = []
-#    datestring : Optional[str] = ""
     dates : Optional[list[Date]] = []
-#    date_start : Optional[tuple] = ()
- #   date_end : Optional[tuple] = ()
-#    date_aspect : Optional[str] = ""
     comments : Optional[str] = ""
     preview : Optional[str] = ""
     linkedEntity : Optional[Link["Entity"]] = None
     class Settings:
         union_doc = Union
+#    gnd_id : Optional[str] = ""
+#    new_authority_id : Optional[str] = ""
+#    external_id : Optional[list[ExternalReference]] = []
+#    internal_id : Optional[str] = ""
+#   name_variant : Optional[list[str]] = []
+#    dates_from_source : Optional[list[DateImport]] = []
+#    datestring : Optional[str] = ""
+#    date_start : Optional[tuple] = ()
+ #   date_end : Optional[tuple] = ()
+#    date_aspect : Optional[str] = ""
 
 
 
@@ -243,13 +253,9 @@ class EntityConnection(Document):
     """
     Class 
     """
-#    id : Optional[str] = ""
     external_id : Optional[List[ExternalReference]] = []
     name : Optional[str] = "" # Name of the person, place or organisation for easier access
     connection_type : Optional[str] = "" # either person, place or organisation
-# In the GND; the role of a connected person must be given through an abbrevation
-# that gives rather general information, e.g. "bezf" = "family relation";
-# more detailed information can be given in a comment field
     connection_comment : Optional[str] = ""
     connection_time : Optional[str] = ""
     type : Optional[str] = ""
@@ -260,6 +266,10 @@ class EntityConnection(Document):
     relationB : Optional[str] = ""
     class Settings:
         union_doc = Union
+#    id : Optional[str] = ""
+# In the GND; the role of a connected person must be given through an abbrevation
+# that gives rather general information, e.g. "bezf" = "family relation";
+# more detailed information can be given in a comment field
 
 
 
@@ -274,24 +284,43 @@ class EntityConnection(Document):
 #     class Settings:
 #         union_doc = Union
 
-# def make_new_role(role,person_name):
-#     r=Role(role=role,chosen_candidate=-1)
-#     if person_name:
-#         r.entity_and_connections=EntityAndConnections()
-#         r.entity_and_connections.entity=Entity(name=person_name)
-#     return r
+def make_new_role(role,person_name):
+    r=Entity()
+    if person_name:
+        r.name=person_name
+    a=Attribute()
+    a.key="role"
+    a.value=role
+    r.attributes.append(a)
+    a=Attribute()
+    a.key="chosen_candidate"
+    a.value=-1
+    r.attributes.append(a)
+    return r
 
 
 class EntityAndConnections(Document):
     """
 This class is for the links of persons, organisations and places to book records
     """
+    def add_attribute(self,key,value):
+        a=Attribute(key=key,value=value)
+        self.attributes.append(a)
+    def get_attribute(self,key):
+        v=""
+        for a in self.attributes:
+            if a.key == key:
+                v=a.value
+        return v
+    attributes : Optional[list[Attribute]] = []
     name : Optional[str] = "" # This field is only a stopgap measure, if
+    type : Optional[str] = ""
     comment : Optional[str] = ""
     preview : Optional[str] = ""
     entity : Optional[Link[Entity]] = None
-    chosen_candidate_id : Optional[int] = 0
+#    chosen_candidate_id : Optional[int] = 0
     connected_entities : Optional[List[Link[EntityConnection]]] = []
+    connections : Optional[List[Link["EntityAndConnections"]]] = []
     class Settings:
         union_doc = Union
 
@@ -316,17 +345,18 @@ class BibliographicInformation(Document):
     """
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
     bibliographic_id : Optional[List[BibliographicId]] = []
-    persons : Optional[List[Link[EntityConnection]]] = []
-    organisations : Optional[List[Link[EntityConnection]]] = []
-    places : Optional[List[Link[EntityConnection]]] = []
+    persons : Optional[List[Link[Entity]]] = []
+    organisations : Optional[List[Link[Entity]]] = []
+    places : Optional[List[Link[Entity]]] = []
+    attributes : Optional[list[Attribute]] = []
     title: Optional[str] = ""
-    volume_number : Optional[str] = ""
-    part_title : Optional[str] = ""
+#    volume_number : Optional[str] = ""
+#    part_title : Optional[str] = ""
     printing_date : Optional[str] = "" # This will be later replaced
     date_string : Optional[str] = ""
     date_start : Optional[tuple] = ()
     date_end : Optional[tuple] = ()
-    printing_information : Optional[str] = ""
+#    printing_information : Optional[str] = ""
     class Settings:
         union_doc = Union
 
@@ -337,6 +367,9 @@ class Metadata(Document):
     """
     Metadata
     """
+    def add_attribute(self,key,value):
+        a=Attribute(key=key,value=value)
+        self.attributes.append(a)
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
 #    def __str__(self):
 #        t="ID:"+self.id+"\n"
@@ -349,21 +382,22 @@ class Metadata(Document):
 #        return(t)
     type : Optional[str] = "Manifest"
 #    id : Optional[str] = ""
-    material : Optional[str] = ""
+    attributes : Optional[list[Attribute]] = []
+#    material : Optional[str] = ""
 #    repository : Optional(dataclass.field(default_factory=list))
 
     repository: Optional[Link[EntityAndConnections]] = None
-    shelfmark : Optional[str] = ""
-    license : Optional[str] = ""
+#    shelfmark : Optional[str] = ""
+#    license : Optional[str] = ""
     bibliographic_id : Optional[list[ExternalReference]] = []
     bibliographic_information : Optional[List[Link[BibliographicInformation]]] = []
-    location : Optional[str] = ""
-    markxml : Optional[str] = ""
+#    location : Optional[str] = ""
+#    markxml : Optional[str] = ""
     numberOfImages : Optional[int] = 0
-    iiifUrl : Optional[str] = ""
-    manifest : Optional[str] = ""
+#    iiifUrl : Optional[str] = ""
+#    manifest : Optional[str] = ""
     images : Optional[list[Image]] = []
-    title : Optional[str] = ""
+#    title : Optional[str] = ""
     making_processes : Optional[List[MakingProcess]] = []
     class Settings:
         union_doc = Union

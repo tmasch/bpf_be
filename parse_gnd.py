@@ -34,7 +34,7 @@ import parsing_helpers
 #coll=dbname['bpf']
 
 @classes.async_func_logger
-async def identify_person(role_in : classes.Role) -> classes.Role:
+async def identify_person(role_in):
     """
 This function is used for every person named in the bibliographic record (author, editor, printer 
 etc.). It will first search if a record for this person is already in the MongoDB database, and 
@@ -89,11 +89,12 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 #    person_in=classes.Role()
 
 #    candidates = []
-    internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(role_in.role)
+    internal_id_person_type1_needed =  parsing_helpers.map_role_to_person_type(role_in.get_attribute("role"))
 
     found_person=False
     print("     Searching for person in database by GND ID")
-    gnd_id_in=role_in.entity_and_connections.entity.gnd_id
+#    gnd_id_in=role_in.entity_and_connections.entity.gnd_id
+    gnd_id_in=role_in.get_attribute("gnd_id")
     print("input gnd id:"+gnd_id_in)
     if gnd_id_in:
         xx = classes.Role.find(classes.Role.entity_and_connections.entity.gnd_id == gnd_id_in,fetch_links=True)
@@ -135,9 +136,9 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
 
 #async def search_for_person_candidates():
-    if not found_person and role_in.entity_and_connections.entity.gnd_id:
+    if not found_person and role_in.get_attribute("gnd_id"):
         print("Searching in GND by ID")
-        print(role_in.entity_and_connections.entity.gnd_id)
+        print(role_in.get_attribute("gnd_id"))
 #        else:
 #            if person.id_name == "GND": # I will have to create similar things for other authority files
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
@@ -200,10 +201,10 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 #                     person_type1_present = person_type1_present[5:]
 #                     candidate.internal_id_person_type1_comment = "This person is currently catalogued as " + person_type1_present + ", but not as '" + person.internal_id_person_type1_needed + "'. The latter will be added if this record has been saved. " 
 
-    if not found_person and role_in.role != "Artist":
+    if not found_person and role_in.get_attribute("gnd_id"):
         # I have the feeling that this search is never executed - why?
         print("No person found yet")
-        person_name_search = role_in.entity_and_connections.entity.name
+        person_name_search = role_in.name
         for old, new in parsing_helpers.url_replacement.items():
             person_name_search = person_name_search.replace(old, new)
         authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=Per%3D' + person_name_search + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
@@ -214,6 +215,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
         # This search shoudl only happen if the search before did not work. It should likewise exclude artists. 
             # if not person_in.person_candidates: #if still nothing has been found, a keyword search is performed instead of a string search. 
         print("Searching in GND by name")
+        person_name_search = role_in.name
         name_divided = person_name_search.split("%20")
         name_query = ""           
         for word in name_divided:
@@ -658,22 +660,27 @@ async def find_and_parse_person_gnd(authority_url):
         person_found=classes.Entity()
         person_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
         person_found.external_id.extend(gnd_record_get_external_references(record))
-        person_found.name_preferred, person_found.comments = gnd_record_get_name_preferred(record)
-        person_found.name_variant, person_found.comments = gnd_record_get_name_variant(record, person_found.comments)
-        person_found.gnd_id=gnd_record_get_gnd_id(record)
+        name_preferred, comments = gnd_record_get_name_preferred(record)
+        person_found.add_attribute("name_preferred",name_preferred)
+        name_variant, comments = gnd_record_get_name_variant(record, person_found.comments)
+#        person_found.add_attribute("name_variant",name_variant)
+        person_found.add_attribute("gnd_id",gnd_record_get_gnd_id(record))
         person_found.type="Person"
 #        person_found.connected_persons =  gnd_record_get_connected_persons(record)
 #        person_found.connected_organisations = gnd_record_get_connected_orgs(record)
 #        person_found.connected_places = gnd_record_get_connected_places(record)
-        person_found.sex = gnd_record_get_sex(record)
-        person_found.dates_from_source = get_gnd_dates(record)
-        person_found.comments = parse_gnd_profession(record, person_found.comments)
-        person_found.comments = get_gnd_comments(record, person_found.comments)
+        person_found.add_attribute("sex",gnd_record_get_sex(record))
+#        person_found.dates_from_source = get_gnd_dates(record)
+#        person_found.comments = parse_gnd_profession(record, person_found.comments)
+#        person_found.comments = get_gnd_comments(record, person_found.comments)
 #        print(person_found)
-        connected_person = classes.EntityConnection()
-        connected_person.connection_type = "Candidate"
-        connected_person.entityA = person_found
-        result.append(connected_person)
+ #       connected_person = classes.EntityConnection()
+ #       connected_person.connection_type = "Candidate"
+ #       connected_person.entityA = person_found
+        result.append(person_found)
+
+
+
     return result
 
 

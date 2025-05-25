@@ -24,7 +24,11 @@ def parse_manifests_bsb(manifest):
 #    print("initialising beanie")
 #    c=db_actions.get_database()
     #print(metadata)
-    m = classes.Metadata()
+#    m = classes.Metadata()
+    m = classes.EntityAndConnections()
+    m.type="Metadata"
+    me=classes.Entity()
+    me.type="Metadata"
 #    repository.entity_and_connections.organisation.id = generate()
     
 #    m.manifest =  url.read()
@@ -49,8 +53,14 @@ def parse_manifests_bsb(manifest):
         print("Location not found")
     if not bibliographic_id:       
         print("Bibliographic ID not found")
+
+
     if "license" in manifest:
-        m.license = manifest["license"][0]
+        a=classes.Attribute()
+        a.key="license"
+        a.value=manifest["license"][0]
+        me.attributes.append(a)
+#        m.license = 
     
 #    m.model_dump()
 
@@ -59,8 +69,9 @@ def parse_manifests_bsb(manifest):
     bibliographic_id_pattern = r'(.*\')(.*)(\'>)([A-Za-z0-9]*)( )(.*)(</a.*)'
     bibliographic_id_pattern_reduced = r'([A-Za-z0-9]*)( )(.*)'
 
-    repository = classes.EntityAndConnection()
-    repository.chosen_candidate_id=-1
+    repository = classes.EntityAndConnections()
+    repository.add_attribute("chosen_candidate_id","-1")
+#    repository.chosen_candidate_id=-1
     repository.name="Repository"
     if location:
         location_divided = re.match(location_pattern, location)
@@ -83,7 +94,10 @@ def parse_manifests_bsb(manifest):
 
 
  #       m.repository=repository
-        m.shelfmark = location_divided.groups()[2].lstrip()
+        a=classes.Attribute()
+        a.key="shelfmark"
+        a.value=location_divided.groups()[2].lstrip()
+        me.attributes.append(a)
 
         
     if bibliographic_id:
@@ -91,50 +105,49 @@ def parse_manifests_bsb(manifest):
             bibliographic_id_individual = step3
             # Sometimes, a link to a bibliographic record is given, with the bibliographic ID being the 'friendly text' in the link; sometimes there is only a
             # string with the bibliographic ID; and in other cases a string with a provisional and essentially useless bibliographic ID that needs to be ignored
-            bid =classes.BibliographicId()
+            bid =classes.ExternalReference()
             if "https" in bibliographic_id_individual: #if there is a link
 #                print(bibliographic_id_individual)
                 bibliographic_id_divided = re.match(bibliographic_id_pattern, bibliographic_id_individual)
 #                print(bibliographic_id_divided)
                 bid.uri = bibliographic_id_divided.groups()[1]
                 bid.name = bibliographic_id_divided.groups()[3]
-                bid.bib_id = bibliographic_id_divided.groups()[5]
+                bid.external_id = bibliographic_id_divided.groups()[5]
             else: #if there is no link
                 bibliographic_id_divided = re.match(bibliographic_id_pattern_reduced, bibliographic_id_individual)                
                 bid.name = bibliographic_id_divided.groups()[0]
-                bid.bib_id = bibliographic_id_divided.groups()[2]              
+                bid.external_id = bibliographic_id_divided.groups()[2]              
 #            bibliographic_id_together = (bibliographic_id_url, bibliographic_id_name, bibliographic_id_number)
             if bibliographic_id_number[-4:-2] != "-0": #If there is a hyphen in the bibliographical number, the number is not relevant 
-                m.bibliographic_id.append(bid)
+                me.external_id.append(bid)
 #    print(m.license)
 #    print(m.repository[0].name)
 #    print(m.shelfmark)
-    
-#    m.model_dump()
+    m.entity=me
    
     #book_properties = (repository, shelfmark, bibliographic_id_transformed, license)
- 
-    #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
-    canvas_label_pattern = r'(.*?)([(].*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
-    canvas_list = (((manifest["sequences"])[0])["canvases"])
-    ###from here onward new function
-    images = parse_canvas.parse_canvas(canvas_list)
-    #for the label (page-number) of the canvas
-    m.numberOfImages = len(images)
-    for im in images:
-        canvas_label_divided = re.match(canvas_label_pattern, im.label_raw)         
-        im.label_page = canvas_label_divided.groups()[0].strip()
-        #if the canvas_label is a figure or Roman numerals only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
-        #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
-            im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
-            im.label_prefix = "fol. "
-        else:
-            im.label_prefix = ""
+    if 1==2:
+        #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
+        canvas_label_pattern = r'(.*?)([(].*)'
+        roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
+        canvas_list = (((manifest["sequences"])[0])["canvases"])
+        ###from here onward new function
+        images = parse_canvas.parse_canvas(canvas_list)
+        #for the label (page-number) of the canvas
+        m.numberOfImages = len(images)
+        for im in images:
+            canvas_label_divided = re.match(canvas_label_pattern, im.label_raw)         
+            im.label_page = canvas_label_divided.groups()[0].strip()
+            #if the canvas_label is a figure or Roman numerals only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
+            #but has as last character "r" or "v", it is probably a folio number. 
+            if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+                im.label_prefix = "p. "
+            elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+                im.label_prefix = "fol. "
+            else:
+                im.label_prefix = ""
 
-    m.images = images
+        m.images = images
     
    
     return m

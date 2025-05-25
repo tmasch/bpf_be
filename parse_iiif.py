@@ -12,6 +12,8 @@ import get_external_data
 import parse_gnd
 import parse_vd17_vd18
 
+import beanie
+
 #URI_entered = "abc"
 
 @classes.async_func_logger
@@ -93,10 +95,6 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
 #    print("getting manifest from url")
     manifest= await get_external_data.get_web_data_as_json(uri_entered)
     
-#    print(manifest)
-
-    #if URI_entered == "":
-    #        break
     if "digitale-sammlungen.de" in uri_entered:
         m = parse_manifests.parse_manifests_bsb(manifest)
     elif "uni-halle.de" in uri_entered:
@@ -157,25 +155,18 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         m = parse_manifests.parse_manifest_nuernberg_stb(uri_entered)
     elif "manuscriptorium.com" in uri_entered: # This is a system describing primarily MSS in Bohemian lands, but also some in Austria
         m = parse_manifests.parse_manifest_manuscriptorium(uri_entered)
-#    m.images=[]
-#    print(m)
-    # I commented this out since I think I need a more robust system to pass on error messages.
-    #else:
-    #    m = Metadata()
-    #    m.title = "Either the entered URL does not refer to a IIIF manifest, or it comes from a library that is not yet supported by Iconobase."
-    #    return(m)
-    m.iiifUrl = uri_entered
-    m.material = material
-#    m.model_dump()
-#    m.model_validate()
 
+
+    m.entity.add_attribute("iiifUrl",uri_entered)
+    print("BSP DONE")
+    m.entity.add_attribute("material",material)
 # Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added.
-
+    await m.save(link_rule=WriteRules.WRITE)
 #    print("getting bibliography")
-    for bibliogr_id in m.bibliographic_id:
+    for bibliogr_id in m.entity.external_id:
         #print(m.bibliographic_id[step1][1])
         bid_name = bibliogr_id.name
-        bid_id = bibliogr_id.bib_id
+        bid_id = bibliogr_id.external_id
         bibliographic_information_single = await get_bibliographic_data(bid_name, bid_id)
 
 
@@ -237,6 +228,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
         making_process_blank.date = date_blank
 
         m.making_processes.append(making_process_blank)
+
     if material == "b": #Printed books
         making_process_blank = classes.MakingProcess()
         making_process_blank.process_number = 1

@@ -1,0 +1,47 @@
+@startuml
+
+
+entity Metadata 
+
+entity BibliographicInformation
+
+Metadata "1" -- "1..n" BibliographicInformation
+
+package "Making Process" {
+class EntityAndConnections {
+type "MakingProcess"
+}
+class EntityM as "Entity" {
+type "MakingProcess"
+}
+
+class EntityConnection
+class AttributesEAC as "Attributes"
+
+class AttributesE as "Attributes" { 
+Process_number
+Process_type
+}
+
+}
+class EntityP as "Entity" {
+type "Person"
+}
+
+EntityAndConnections -> EntityM
+EntityAndConnections -> AttributesEAC
+EntityM -> AttributesE
+
+EntityAndConnections -> EntityConnection
+EntityM <.. EntityConnection : EntityA
+EntityConnection ..> EntityP : EntityB
+
+
+entity MakingProcess {
+String Process_number
+String Process_type 
+}
+
+
+
+@enduml

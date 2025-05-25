@@ -20,6 +20,10 @@ async def parse_istc(url_bibliography):
 
 
     bi = classes.BibliographicInformation()
+    bi=classes.EntityAndConnections()
+    bi.type="BibliographicInformation"
+    bie=classes.Entity()
+    bie.type="BibliographicInformation"
 #    print("URL for search in ISTC: " + url_bibliography)
 #    istc_record_raw = requests.get(url_bibliography, timeout = 10)
 #    istc_record_full = (istc_record_raw).json()
@@ -58,12 +62,16 @@ async def parse_istc(url_bibliography):
             if "imprint_name" in step1:
                 imprint_name_long = step1["imprint_name"].strip("[]")
             if "imprint_place" in step1:
-                pl = classes.Role()
-                pl.chosen_candidate_id=-1
-                pl.entity_and_connections=classes.EntityAndConnections()
-                pl.entity_and_connections.entity = classes.Entity()
-                pl.entity_and_connections.entity.name = step1["imprint_place"].strip("[]")
-                pl.role = "mfp"
+                pl = classes.Entity()
+                pl.name = step1["imprint_place"].strip("[]")
+                a=classes.Attribute()
+                a.key="chosen_candidate_id"
+                a.value==-1
+                pl.attributes.append(a)
+                a=classes.Attribute()
+                a.key="role"
+                a.value=="mfp"
+                pl.attributes.append(a)
                 bi.places.append(pl)
 
             if "imprint_date" in step1:
@@ -222,8 +230,8 @@ def parse_bibliographic_id(bi, istc_record_short):
     """
     Parses ID numbers from ISTC and GND
     """
-    bid = classes.BibliographicId()
-    bid.bib_id = istc_record_short["id"]
+    bid = classes.externalReference()
+    bid.external_id = istc_record_short["id"]
     bid.name = "ISTC"
     bid.uri = r"https://data.cerl.org/istc/"+bid.bib_id
 #    print("bid")
