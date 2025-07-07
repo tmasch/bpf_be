@@ -79,39 +79,39 @@ def parse_vd16(url_bibliography):
     #    person_single_pattern = r'(<a h.*?>)(.*?)(</a>)(.*?)(DE-588)?(.*)?(: Datensatz)?(.*)?'
     ###currently, the system only reads the last author or contributor,
     # and it does not read his bibliographic ID number.
-    if "Verfasser" in record_structured:
-        pe = classes.Person()
-        author = record_structured["Verfasser"]
-        print("Author found")
-        print(author)
-        # author_list_divided = re.findall(person_list_pattern, author_list)
-        # for step1 in author_list_divided:
-        author_single_divided = re.match(person_single_pattern, author)
-        pe.name = author_single_divided[2]
-        pe.id = author_single_divided[6]  # That doesn't work!
-        pe.role = "aut"
-        bi.persons.append(pe)
-    if "Weitere Pers." in record_structured:
-        weitere_pers_list = record_structured["Weitere Pers."]
-        weitere_pers_list_divided = re.findall(person_list_pattern, weitere_pers_list)
-        for step4 in weitere_pers_list_divided:
-            pe = classes.Person()
-            weitere_pers_single_divided = re.match(person_single_pattern, step4)
-            pe.name = weitere_pers_single_divided[2]
-            pe.id = weitere_pers_single_divided[4]
-            if r"¬[Bearb.]¬" in pe.name:
-                pe.name = pe.name[0:-11]
-                pe.role = "edt"
-            else:
-                pe.role = "aut"
-            bi.persons.append(pe)
+    #if "Verfasser" in record_structured:
+    #    pe = classes.Person()
+    #    author = record_structured["Verfasser"]
+    #    print("Author found")
+    #   print(author)
+    #   # author_list_divided = re.findall(person_list_pattern, author_list)
+    #    # for step1 in author_list_divided:
+    #    author_single_divided = re.match(person_single_pattern, author)
+    #    pe.name = author_single_divided[2]
+    #    pe.id = author_single_divided[6]  # That doesn't work!
+    #    pe.role = "aut"
+    #    bi.persons.append(pe)
+    #if "Weitere Pers." in record_structured:
+    #    weitere_pers_list = record_structured["Weitere Pers."]
+    #    weitere_pers_list_divided = re.findall(person_list_pattern, weitere_pers_list)
+    #    for step4 in weitere_pers_list_divided:
+    #        pe = classes.Person()
+    #        weitere_pers_single_divided = re.match(person_single_pattern, step4)
+    #        pe.name = weitere_pers_single_divided[2]
+    #        pe.id = weitere_pers_single_divided[4]
+    #        if r"¬[Bearb.]¬" in pe.name:
+    #            pe.name = pe.name[0:-11]
+    #            pe.role = "edt"
+    #        else:
+    #            pe.role = "aut"
+    #        bi.persons.append(pe)
     if "Impressum" in record_structured:
         impressum = record_structured["Impressum"]
         impressum_pattern = r"([^:]*)(: )?([^;]*)?(; )?([^:]*)?(: )?(.*)?(, )([^,]*)"
         impressum_divided = re.match(impressum_pattern, impressum)
         pl = classes.Entity()
         pl.name = impressum_divided[1]
-        pl.role = "mfp"
+        pl.add_attribute("role", "mfp")
         bi.places.append(pl)
         if impressum_divided[5]:
             pl = classes.Entity()
@@ -133,22 +133,22 @@ def parse_vd16(url_bibliography):
             # If there are several printers or several publishers,
             # they are separated by "und" (at least, if there are two,
             # I don't know what happens with three, and this is extremely rare)
-            for step2 in impressum_single_person1:
-                pe = classes.Person()
-                pe.name = step2
-                pe.role = "prt"
-                bi.persons.append(pe)
+            #for step2 in impressum_single_person1:
+            #    pe = classes.Person()
+            #    pe.name = step2
+            #    pe.role = "prt"
+            #    bi.persons.append(pe)
         if impressum_divided[7]:
             impressum_single_person2 = re.split(" und ", impressum_divided[7])
-            for step3 in impressum_single_person2:
-                pe = classes.Person()
-                pe.name = step3
-                pe.role = "pbl"
-                bi.persons.append(pe)
+            #for step3 in impressum_single_person2:
+            #    pe = classes.Person()
+            #    pe.name = step3
+            #    pe.role = "pbl"
+            #    bi.persons.append(pe)
         if impressum_divided[9]:
             printing_date_long = impressum_divided[9]
         bi.title = record_structured["Titel"]
-        bi.printing_information = record_structured["Ausgabebezeichnung"]
+        #bi.printing_information = record_structured["Ausgabebezeichnung"]
     # Although some early 16th-century books give a day, the date field in the VD16 only contains
     #  a year, two years separated by "/" (two different years given in the book) "-"
     if printing_date_long != "":

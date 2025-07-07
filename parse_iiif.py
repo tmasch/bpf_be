@@ -161,7 +161,7 @@ async def parse_iiif(uri_entered, material) -> classes.Metadata:
     print("BSP DONE")
     m.entity.add_attribute("material",material)
 # Step 2: The bibliographical references in the manifest (in a later development also bibliographical references entered manually) will be parsed, and information from them added.
-    await m.save(link_rule=WriteRules.WRITE)
+    await m.save(link_rule=beanie.WriteRules.WRITE)
 #    print("getting bibliography")
     for bibliogr_id in m.entity.external_id:
         #print(m.bibliographic_id[step1][1])

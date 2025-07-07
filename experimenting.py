@@ -8,12 +8,12 @@ from bson import DBRef
 #import requests
 import json
 import os
-import orjson
+#import orjson
 import pprint 
 import pickle
 from rich import print
 from lxml import etree
-import marcalyx
+#import marcalyx
 #import logging
 import aiohttp
 import pytest
@@ -108,7 +108,7 @@ async def main():
 #    print(r)
 #    if r[0]:
 #        content=r[0].content
-#    await run_parse_iiif()
+    await run_parse_iiif()
 #    id="6707748eb64a43e946737251"
 #    m = await classes.Person.get(id,fetch_links=True)
 #    print(m)

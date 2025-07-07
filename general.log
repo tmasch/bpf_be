@@ -21355,3 +21355,353 @@ DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\U
 DEBUG:asyncio:       DEBUG  initialise_beanie from main done
 DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
 DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:INFO /allResources get_all_resources
+DEBUG:asyncio:       DEBUG get_all_resources_from_db in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00092278/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+INFO:main:INFO /allResources get_all_resources
+DEBUG:asyncio:       DEBUG get_all_resources_from_db in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00064037/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%20M23548%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/11" 200 3696
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00012920/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio: DEBUG   Hello world
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10179136/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd16 from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00043182/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): data.cerl.org:443
+DEBUG:urllib3.connectionpool:https://data.cerl.org:443 "GET /istc/_search?_format=json&pretty=false&query=reference%3A%22GW%20M11245%22&size=10&sort=default&from=0&file=false&orig=true&facet=dimensions&facet=printingcountry&facet=holdingcountry&nofacets=true&mode=default&aggregations=true&style=full HTTP/11" 200 146
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG  parse_istc from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00160492/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb10843803/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): sru.k10plus.de:80
+DEBUG:urllib3.connectionpool:http://sru.k10plus.de:80 "GET /vd17?version=2.0&operation=searchRetrieve&query=pica.vds=12:131523M&maximumRecords=10&startRecord=1&recordSchema=marcxml HTTP/11" 200 7764
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printing_information in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printing_information from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd17 in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd17 from parse_iiif done
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  get_web_data from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_record_type in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_record_type from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_id in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_id from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_author in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_author from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_title in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_title from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_date_raw in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_date_raw from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG map_printing_date in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  map_printing_date from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_printer in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_printer from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_org in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_org from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG vd17_get_place in <module 'parse_vd17_vd18' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_vd17_vd18.py'> from parse_vd17_vd18 async called
+DEBUG:asyncio:       DEBUG  vd17_get_place from parse_vd17_vd18 done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio: DEBUG   Hello world
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio: DEBUG   Hello world
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio: DEBUG   Hello world
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called

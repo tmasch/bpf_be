@@ -34,13 +34,14 @@ async def parse_vd17(url_bibliography):
             author_list = vd17_get_author(record)
             if author_list:
                 bi.persons.extend(author_list)
-            bi.title, bi.volume_number, bi.part_title = vd17_get_title(record)
+            #bi.title, bi.volume_number, bi.part_title = vd17_get_title(record) ## commented out
+            bi.title = vd17_get_title(record)[0] ## added
             printing_date_raw = vd17_get_date_raw(record)
             if printing_date_raw:
                 bi.date_string, bi.date_start, bi.date_end = map_printing_date(
                 printing_date_raw
                   )
-            bi.printing_information = vd17_get_printing_information(record)
+            #bi.printing_information = vd17_get_printing_information(record) ## commented out
             printer_list = vd17_get_printer(record)
             if printer_list:
                 bi.persons.extend(printer_list)

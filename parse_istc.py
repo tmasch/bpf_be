@@ -230,10 +230,10 @@ def parse_bibliographic_id(bi, istc_record_short):
     """
     Parses ID numbers from ISTC and GND
     """
-    bid = classes.externalReference()
+    bid = classes.ExternalReference()
     bid.external_id = istc_record_short["id"]
     bid.name = "ISTC"
-    bid.uri = r"https://data.cerl.org/istc/"+bid.bib_id
+    bid.uri = r"https://data.cerl.org/istc/"+bid.external_id
 #    print("bid")
 #    print(type(bid))
 #    print(bid)
