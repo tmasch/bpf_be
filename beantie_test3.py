@@ -20,6 +20,7 @@ async def main():
 
     eac2 = classes.EntityAndConnections()
     eac2.entity = e1
+    eac2.name = "Genesis and connections"
 
 
 
