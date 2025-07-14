@@ -58,5 +58,8 @@ async def main():
     r = classes.EntityConnection.find(classes.EntityConnection.entityB.name == "The Bible", fetch_links=True)
     print(await r.to_list())
 
+    print("Search Luther as Entity")
+    r = classes.Entity.find(classes.Entity.name=="Martin Luther", fetch_links = True)
+    print(await r.to_list())
 
 asyncio.run(main())

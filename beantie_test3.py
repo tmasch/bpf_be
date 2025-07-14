@@ -37,6 +37,7 @@ async def main():
     eac1.connected_entities.append(ec1)
     eac2.connected_entities.append(ec1)
 
+
     await eac1.save(link_rule=WriteRules.WRITE)
     await eac2.save(link_rule=WriteRules.WRITE)
 
