@@ -22,38 +22,38 @@ Using Bridge/Connections instead of the single EntityConnections
 #@pytest.mark.asyncio
 async def main():
     await db_actions.initialise_beanie()
+    entity_name = "The Bible"
+
     print("Beanie initialised")
 
 
     e1=classes.Entity()
     a1=classes.Attribute()
     a1.key="test"
-    a1.value="test_value luther"
-    e1.name="Martin Luther"
+    a1.value="test_value Genesis"
+    e1.name="Genesis"
     e1.attributes.append(a1)
     await e1.save()
 
-    e2=classes.Entity()
-    a2=classes.Attribute()
-    a2.key="test"
-    a2.value="test_value bible"
-    e2.name="The Bible"
-    e2.attributes.append(a2)
-    await e2.save()
+    r = classes.Entity.find(classes.Entity.name == "The Bible") # normally, one would have this entity alreaday waiting somewhere
+    result_list = await r.to_list()
+    far_entity = result_list[0]
+
+
 
     c1a=classes.Connection()
-    c1a.entity=e1
+    c1a.entity=far_entity
     a1=classes.Attribute()
     a1.key="relation"
-    a1.value="translated by"
+    a1.value="part of"
     c1a.attributes.append(a1)
     #await c1a.save()
 
     c1b=classes.Connection()
-    c1b.entity=e2
+    c1b.entity=e1
     a1=classes.Attribute()
     a1.key="relation"
-    a1.value="translator of"
+    a1.value="has part"
     c1b.attributes.append(a1)
     #await c1b.save()
 
@@ -63,31 +63,40 @@ async def main():
     await b1.save(link_rule=WriteRules.WRITE)
 
 
-    e3=classes.Entity()
-    e3.name="Albrecht Dürer"
-    await e3.save()
+    r = classes.Entity.find(classes.Entity.name == "Martin Luther") # normally, one would have this entity alreaday waiting somewhere
+    result_list = await r.to_list()
+    far_entity = result_list[0]
 
 
-    c2a=classes.Connection()
-    c2a.entity=e3
-    a2=classes.Attribute()
-    a1.key="relation"
-    a1.value="iillustrated by"
-    c2a.attributes.append(a1)
 
-    c2b=classes.Connection()
-    c2b.entity=e2
+    c1a=classes.Connection()
+    c1a.entity=far_entity
     a1=classes.Attribute()
     a1.key="relation"
-    a1.value="illustrator of"
-    c2b.attributes.append(a1)
+    a1.value="wrote a commentary"
+    c1a.attributes.append(a1)
+    #await c1a.save()
 
-    b2=classes.BridgeAlternative()
-    b2.connections.append(c2a)
-    b2.connections.append(c2b)
-    await b2.save(link_rule=WriteRules.WRITE)
+    c1b=classes.Connection()
+    c1b.entity=e1
+    a1=classes.Attribute()
+    a1.key="relation"
+    a1.value="commentator of"
+    c1b.attributes.append(a1)
+    #await c1b.save()
 
-    result= await search_name("The Bible")
+    b1=classes.BridgeAlternative()
+    b1.connections.append(c1a)
+    b1.connections.append(c1b)
+    await b1.save(link_rule=WriteRules.WRITE)
+
+
+
+    await search_name("The Bible")
+    await search_name("Martin Luther")
+    await search_name("Genesis")
+
+
 
     return
 
