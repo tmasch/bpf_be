@@ -21705,3 +21705,372 @@ DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'c:\
 DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
 DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
 DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio: DEBUG   Hello world
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_istc in <module 'parse_istc' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_istc async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'c:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_istc done
+DEBUG:asyncio:       DEBUG parse_bibliographic_id in <module 'parse_istc' from 'c:\\Users\\berth\\bpf_be_fastapi\\parse_istc.py'> from parse_istc async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done

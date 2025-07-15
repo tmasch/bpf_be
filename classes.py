@@ -463,3 +463,49 @@ needed for the individual Artwork and Photograph records
 class WebCall(Document):
     url : Optional[str] = ""
     content : Optional[bytes] = ""
+
+class Connection(Document):
+    def add_attribute(self,key,value):
+        a=Attribute(key=key,value=value)
+        self.attributes.append(a)
+    def get_attribute(self,key):
+        v=""
+        for a in self.attributes:
+            if a.key == key:
+                v=a.value
+        return v
+    attributes : Optional[list[Attribute]] = []
+    entity: Optional[Link["Entity"]] = None
+    class Settings:
+        union_doc = Union
+
+
+
+class Bridge(Document):
+    """
+    Class 
+    """
+    #external_id : Optional[List[ExternalReference]] = []
+    name : Optional[str] = "" # Name of the person, place or organisation for easier access
+    connection : Optional[List[Connection]] = []
+    class Settings:
+        union_doc = Union
+
+
+
+class BridgeAlternative(Document):
+    """
+    Alternative version of Bridge, which has the Connection elements not as part of thedocument,
+    but as separate linked documents - in the hope that this may make retrieval easier
+    """
+    connections : Optional[List[Link[Connection]]] = []
+    class Settings:
+        union_doc = Union
+
+class EntityPlus(Document):
+    """
+    An entity with the connection (only the connections away from the entity)
+    A bit similar to the old EntityAndConnections, but only used for display
+            """
+    entity : Optional[Link[Entity]] = None
+    connections : Optional[List[Link[Connection]]] = []

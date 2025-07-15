@@ -36,8 +36,12 @@ async def initialise_beanie():
                                                         classes.MakingProcess, \
                                                         classes.BibliographicId, \
                                                         classes.BibliographicInformation,\
-                                                        classes.Union,
-                                                        classes.WebCall])
+                                                        classes.Union,\
+                                                        classes.WebCall,\
+                                                            classes.Bridge,\
+                                                            classes.BridgeAlternative,\
+                                                                classes.Connection,\
+                                                                classes.EntityPlus])
 
 @classes.func_logger
 def get_database():
