@@ -13,6 +13,7 @@ import parse_gnd
 import parse_vd17_vd18
 
 import beanie
+from beanie import WriteRules
 
 #URI_entered = "abc"
 
