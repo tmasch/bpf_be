@@ -11,45 +11,64 @@ load_dotenv()
 
 #@classes.func_logger
 #@pytest.mark.asyncio
+async def insert_data():
+    luther=classes.Entity()
+    luther.name="Martin Luther"
+
+    bible=classes.Entity()
+    bible.name="The Bible"
+
+    luther_bible=classes.EntityConnection()
+    luther_bible.entityA=luther
+    luther_bible.nameA=luther.name
+    luther_bible.entityB=bible
+    luther_bible.nameB=bible.name
+    luther_bible.relationA="Translator of"
+    luther_bible.relationB="translated by"
+#    await luther_bible.save(link_rule=WriteRules.WRITE)
+
+    melanchton=classes.Entity()
+    melanchton.name="Melanchton"
+
+    luther_melanchton=classes.EntityConnection()
+    luther_melanchton.entityA=melanchton
+    luther_melanchton.nameA=melanchton.name
+    luther_melanchton.entityB=luther
+    luther_melanchton.nameB=luther.name
+    luther_melanchton.relationA="candidate"
+    luther_melanchton.relationB="candidate"
+
+#    await luther_melanchton.save(link_rule=WriteRules.WRITE)
+
+
+    duerer=classes.Entity()
+    duerer.name="Albrecht Dürer"
+
+    duerer_bible=classes.EntityConnection()
+    duerer_bible.entityB=duerer
+    duerer_bible.entityA=bible
+    duerer_bible.relationA="Illustrator of"
+    duerer_bible.relationB="illustrated by by"
+#    await duerer_bible.save(link_rule=WriteRules.WRITE)
+
+    l=[]
+    l.append(luther_melanchton)
+    l.append(duerer_bible)
+    l.append(luther_bible)
+
+    for e in l:
+        print(e)
+        await e.save(link_rule=WriteRules.WRITE)
+
 async def main():
     await db_actions.initialise_beanie()
 
-
-    e1=classes.Entity()
-    a1=classes.Attribute()
-    a1.key="test"
-    a1.value="test_value luther"
-    e1.name="Martin Luther"
-    e1.attributes.append(a1)
-
-    e2=classes.Entity()
-    a2=classes.Attribute()
-    a2.key="test"
-    a2.value="test_value bible"
-    e2.name="The Bible"
-    e2.attributes.append(a2)
-
-    ec1=classes.EntityConnection()
-    ec1.entityA=e1
-    ec1.entityB=e2
-    ec1.relationA="Translator of"
-    ec1.relationB="translated by"
-    await ec1.save(link_rule=WriteRules.WRITE)
-
-    e3=classes.Entity()
-    e3.name="Albrecht Dürer"
-
-    ec2=classes.EntityConnection()
-    ec2.entityA=e2
-    ec2.entityB=e3
-    ec2.relationA="Illustrator of"
-    ec2.relationB="illustrated by by"
-    await ec2.save(link_rule=WriteRules.WRITE)
+    await insert_data()
 
 
     print("Search Luther")
-    r = classes.EntityConnection.find(classes.EntityConnection.entityA.name == "Martin Luther", fetch_links=True)
-    print(await r.to_list())
+    r = await classes.EntityConnection.find(classes.EntityConnection.entityA.name == "Martin Luther", fetch_links=True).to_list()
+#    print(r)
 
 
     print("Search Bible")

@@ -260,6 +260,8 @@ class EntityConnection(Document):
     connection_time : Optional[str] = ""
     type : Optional[str] = ""
     subtype : Optional[str] = ""
+    nameA : Optional[str] = ""
+    nameB : Optional[str] = ""
     entityA : Optional[Link[Entity]] = None
     entityB : Optional[Link[Entity]] = None
     relationA : Optional[str] = ""
