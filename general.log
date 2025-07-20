@@ -22074,3 +22074,63 @@ DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
 DEBUG:asyncio:Using proactor: IocpProactor
 DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
 DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:Using proactor: IocpProactor
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from __main__ async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:INFO /allResources get_all_resources
+DEBUG:asyncio:       DEBUG get_all_resources_from_db in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_all_resources_from_db from main done
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.digitale-sammlungen.de:443
+DEBUG:urllib3.connectionpool:https://api.digitale-sammlungen.de:443 "GET /iiif/presentation/v2/bsb00161841/manifest HTTP/11" 200 None
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+INFO:main:       INFO /getMetadata - get_metadata
+DEBUG:asyncio:       DEBUG parse_iiif in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from main async called
+DEBUG:asyncio:       DEBUG get_web_data_as_json in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG get_web_data in <module 'get_external_data' from 'C:\\Users\\berth\\bpf_be_fastapi\\get_external_data.py'> from get_external_data async called
+DEBUG:asyncio:       DEBUG  get_web_data from get_external_data done
+DEBUG:asyncio:       DEBUG  get_web_data_as_json from parse_iiif done
+DEBUG:asyncio:       DEBUG parse_manifests_bsb in <module 'parse_manifests' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_manifests.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_manifests_bsb from parse_iiif done
+DEBUG:asyncio:       DEBUG get_bibliographic_data in <module 'parse_iiif' from 'C:\\Users\\berth\\bpf_be_fastapi\\parse_iiif.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG parse_vd16 in <module 'books_parsing_bibliographies' from 'C:\\Users\\berth\\bpf_be_fastapi\\books_parsing_bibliographies.py'> from parse_iiif async called
+DEBUG:asyncio:       DEBUG  parse_vd16 from parse_iiif done
+DEBUG:asyncio:       DEBUG  get_bibliographic_data from parse_iiif done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done
