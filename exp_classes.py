@@ -66,6 +66,8 @@ class Attribute(BaseModel):
     name_variant
     sex
     comment
+    raw (to be used for data imported from outside that has
+    not yet checked in the database)
 
     for Edge (all only once):
     relationA/B
@@ -74,6 +76,7 @@ class Attribute(BaseModel):
     sub-number (if there are several images on a page)
     previewA/B
     qualifier (e.g., 'attributed') - goes in both directions
+
 
 
     for Date (probably only once)
@@ -91,7 +94,7 @@ book or person within the repertory and, if available, the URI of the entry.
     """
     uri : Optional[str] = ""
     name : Optional[str] = ""
-    external_id : Optional[str] = ""
+    id : Optional[str] = ""
 
 
 class Date(BaseModel):
@@ -129,17 +132,17 @@ Iconography, Person, Place, etc.)
         a=Attribute(key=key,value=value)
         self.attributes.append(a)
     def get_attribute(self,key):
-        v=""
+        v=[]
         for a in self.attributes:
             if a.key == key:
-                v=a.value
+                v.append(a.value)
         return v
     attributes : Optional[list[Attribute]] = []
     stub : Optional[bool] = True
     external_id : Optional[List[ExternalReference]] = []
     dates : Optional[list[Date]] = []
     preview : Optional[str] = "" # wird der gebraucht? 
-    linkedEntity : Optional[Link["Edge"]] = None
+#    linked_node : Optional[List[Link["Edge"]]] = []
     class Settings:
         union_doc = Union
 
@@ -152,15 +155,15 @@ class Edge(Document):
         a=Attribute(key=key,value=value)
         self.attributes.append(a)
     def get_attribute(self,key):
-        v=""
+        v=[]
         for a in self.attributes:
             if a.key == key:
-                v=a.value
+                v.append(a.value)
         return v
     attributes : Optional[list[Attribute]] = []
     dates : Optional[list[Date]] = []
-    entityA : Optional[Link[Node]] = None
-    entityB : Optional[Link[Node]] = None
+    nodeA : Optional[Link[Node]] = None
+    nodeB : Optional[Link[Node]] = None
     class Settings:
         union_doc = Union
 
@@ -175,3 +178,4 @@ being displayed.
     """
     node: Optional[Link[Node]] = None
     edges : Optional[List[Link[Edge]]] = []
+    nodes_plus : Optional[List[Link["NodePlus"]]] = []
