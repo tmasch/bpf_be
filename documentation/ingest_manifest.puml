@@ -16,6 +16,16 @@ end note
 :Return data structure to UI;
 |UI|
 :Select values in UI;
+:Add artists etc;
+note right
+Perhaps add other
+data as well, if magic
+was not satisfactory
+end note
+|BFF|
+:Get artists etc.;
+|UI|
+:Select artists in UI;
 :Return selection to BFF;
 |BFF|
 :Transform data 

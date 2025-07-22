@@ -1,0 +1,52 @@
+@startuml
+title Cut out images
+|UI|
+start
+:Select page range;
+note right
+Can already be done at parsing
+manifest stage
+end note
+:Select cropping mode;
+note right
+perhaps indicate if woodcut, 
+grisaille drawing, etc. 
+to select appropriate algorithm
+endnote
+:Lauch process;
+|BFF|
+:Download pages from library;
+:Do automatic cropping;
+|UI|
+:Show all pages in mosaic view
+marking primarily which 
+pages have images at all;
+:User can determine 
+which ones really have images;
+note right
+really quickly, e.g. by 
+clicking on page
+end note
+:User can give start page 
+and type for page numbers;
+|BFF|
+:Create page numbers accordingly;
+|UI|
+:Show page numbers for checking;
+:Switch to view of one page for detailed view;
+:User can add, correct, delete
+and renumber frames;
+|DB|
+:Save cropped-out images;
+|BFF|
+:Create for every image Artwork, Image, 
+Copy (for printed books) and Photo records
+based largely on the Pages document;
+|DB|
+:Save records;
+:Success;
+|UI|
+:Success;
+end
+
+@enduml
