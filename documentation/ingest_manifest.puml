@@ -1,0 +1,46 @@
+@startuml
+title Ingest iif manifest
+|UI|
+start
+:Enter iif url in UI;
+:Select resource type (book or manuscript);
+:Send url to BFF;
+|BFF|
+#orange:Get iif; 
+note right
+skip for 
+data structure 
+testing
+end note
+:Do magic;
+:Return data structure to UI;
+|UI|
+:Select values in UI;
+:Return selection to BFF;
+|BFF|
+:Transform data 
+structures to DB;
+note right
+not sure 
+if this is
+needed
+end note
+|DB|
+:Store data;
+note right
+this is probably
+done in several 
+steps
+end note
+note right
+error handling
+needs to be
+considerered
+end note
+|BFF|
+:Success;
+|UI|
+:Success;
+end
+
+@enduml
