@@ -22172,3 +22172,5 @@ DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
 DEBUG:asyncio:Using proactor: IocpProactor
 DEBUG:asyncio:       DEBUG initialise_beanie in <module 'exp_db_actions' from 'c:\\Users\\berth\\bpf_be_fastapi\\exp_db_actions.py'> from __main__ async called
 DEBUG:asyncio:       DEBUG  initialise_beanie from __main__ done
+DEBUG:asyncio:       DEBUG initialise_beanie in <module 'db_actions' from 'C:\\Users\\berth\\bpf_be_fastapi\\db_actions.py'> from main async called
+DEBUG:asyncio:       DEBUG  initialise_beanie from main done

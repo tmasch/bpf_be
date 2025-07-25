@@ -1,0 +1,99 @@
+@startuml
+title Select Connected Object Records
+|UI|
+start
+note right
+This action will happen
+regularly in different
+types of views, e.g.
+- ingest Book
+- ingest Artwork
+- edit Artwork
+- create/edit Iconography
+- create/edit Object
+endnote
+note right
+Each view has fields
+for entering those
+objects that are
+appropriate for the
+records, and for each
+object a list of 
+connection types
+endnote
+:Select connection types
+from list;
+note right
+this can be done now 
+or later
+endnote
+:Start typing name
+of Object;
+
+repeat
+    :Once a minimum of letters
+    has been typed, they are
+    sent to BFF for Autocomplete, 
+    together with the type of the
+    Object;
+    |BFF|
+    :launches search in DB for
+    Objects whose name  
+    contains this string;
+    |DB|
+    :search;
+    |BFF|
+    :processes search result
+    for display;
+    note right
+    if there is a list of hits,
+    a line 'none of these' is
+    added; if there are no hits,
+    a line 'nothing found'
+    is added (called 'search failed')
+    endnote
+    |UI|
+    :Display result;
+repeat while (User continues typing)
+:User selects item from list;
+if (User selects) then (result)
+    end
+else (search failed)
+    :Launch external search;
+    note right
+    The external search takes
+    several seconds; hence it 
+    is better to launch it not
+    automatically but let the 
+    user launch it for all
+    objects in this view
+    endnote
+    :Send search string and
+    Object Type to BFF;
+    |BFF|
+    :Launch search in 
+    appropriate external
+    database (e.g., GND);
+    :parse search results;
+    :return search results
+    to UI;
+    note right
+    Again with notes for
+    search failed
+    endnote
+    |UI|
+    :Display result;
+    if (User selects) then (result)
+        end
+    else (search failed)
+        :Save all data from this view in FE;
+        :Open view Create Object
+        for appropriate Object type;
+        :Once Object has been created,
+        return to this view;
+        :restore stored data;
+        :automatically insert 
+        newly-created object;
+        end
+
+@enduml

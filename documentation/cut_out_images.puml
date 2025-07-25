@@ -2,16 +2,32 @@
 title Cut out images
 |UI|
 start
-:Select page range;
+:Go to list of books;
 note right
-Can already be done at parsing
-manifest stage
+Alternative entries are
+Book / Manuscript 
+record display; 
+ingest form - in these
+cases, no list of books
+needs to be fetched
 end note
+|BFF|
+:Search relevant books;
+|DB|
+:Get basic metadata 
+(title, number of views, etc.)
+for this books;
+|BFF|
+:Send list to UI;
+|UI|
+:Select page range;
+
 :Select cropping mode;
 note right
-perhaps indicate if woodcut, 
-grisaille drawing, etc. 
-to select appropriate algorithm
+(if helpful) manual indication of
+image type (woodcut, grisaille drawing,
+etc. to determine best parameters for 
+cropping algorithm)
 endnote
 :Lauch process;
 |BFF|
@@ -19,31 +35,57 @@ endnote
 :Do automatic cropping;
 |UI|
 :Show all pages in mosaic view
-marking primarily which 
-pages have images at all;
-:User can determine 
-which ones really have images;
+marking those there images 
+have been found;
+:Manual correction of the
+selection of pages with images;
+  
+
 note right
 really quickly, e.g. by 
 clicking on page
 end note
-:User can give start page 
-and type for page numbers;
+:(if needed) indicate start page 
+and type for page numbers 
+(if needed, repeatedly);
 |BFF|
 :Create page numbers accordingly;
 |UI|
 :Show page numbers for checking;
-:Switch to view of one page for detailed view;
-:User can add, correct, delete
-and renumber frames;
+:Switch to view of the selected
+pages with images, one by one, 
+with frames of images;
+note right
+toggling between 
+the two views
+must be possible
+endnote
+:Manual correction (adding, deleting,
+moving, renumbering frames);
+|BFF|
+:Create the cropped-out images
+based on data from UI;
+note right
+for every page,
+or only at the end?
+(in the latter case, 
+frames have to be
+stored somewhere)
+endnote
 |DB|
 :Save cropped-out images;
 |BFF|
 :Create for every image Artwork, Image, 
 Copy (for printed books) and Photo records
-based largely on the Pages document;
+based on data from the book ingest and 
+manual additions;
+note right
+happens as often as cropped-out images
+are created
+endnote
 |DB|
 :Save records;
+|BFF|
 :Success;
 |UI|
 :Success;
