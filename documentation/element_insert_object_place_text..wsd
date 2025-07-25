@@ -1,5 +1,5 @@
 @startuml
-title Select Connected Object Records (execept Place / Text)
+title Select Connected Object Records Place / Text)
 
 |UI|
 start
@@ -22,44 +22,62 @@ records, and for each
 object a list of 
 connection types
 endnote
-:Select connection type
+note right
+Places and Texts are Objects
+in a hierarchical structure
+(e.g., town > building > 
+building part). Normally, a 
+high-level record (Town / Book)
+would be loaded with all its 
+child records and the fitting 
+child record then chosen - or 
+made, if it does not exist. 
+endnote
+:Select connection types
 from list;
 note right
 this can be done now 
 or later
 endnote
 :Start typing name
-of Object (Autocomplete);
+of Object;
 
 repeat
     :Once a minimum of letters
     has been typed, they are
-    sent to BFF , 
+    sent to BFF for Autocomplete, 
     together with the type of the
     Object;
     |BFF|
     :launches search in DB for
     Objects whose name  
     contains this string;
-    |DB|
-    :search;
-    |BFF|
+    repeat 
+        |DB|
+        :search;
+        |BFF|   
+    repeat while (if any record has 
+    Child records, they are
+    searched)
+
+    :All found records and their
+    Child records are sent to UI;
+    |UI|
+    :Display result;
+repeat while (User continues typing)
     :processes search result
     for display;
-    :add 'results' for 'search failed;
     note right
     if there is a list of hits,
     a line 'none of these' is
     added; if there are no hits,
     a line 'nothing found'
-    is added
+    is added (called 'search failed')
     endnote
-    |UI|
-    :Display result;
-repeat while (User continues typing)
+
 :User selects item from list;
 if (User selects) then (result)
-    end
+
 else (search failed)
     :Launch external search;
     note right
@@ -68,13 +86,7 @@ else (search failed)
     is better to launch it not
     automatically but let the 
     user launch it for all
-    objects with 'search failed'
-    endnote
-    note right
-    for some types of objects
-    (e.g., Actions), there is
-    no search in external 
-    database
+    objects with search failed
     endnote
     :Send search string and
     Object Type to BFF;
@@ -92,17 +104,31 @@ else (search failed)
     |UI|
     :Display result;
     if (User selects) then (result)
-        end
+        
     else (search failed)
         :Save all data from this view in FE;
         :Open view Create Object
         for appropriate Object type;
-        :Once Object records
-        has been created manually,
+        :Once Object has been created,
         return to this view;
         :restore stored data;
         :automatically insert 
         newly-created object;
+    endif
+    endif
+    :user may add/edit child records
+    and select relation to 
+    parent record;
+    note right
+    only the child record type 
+    (e.g., 'building part') and
+    its name can be entered here; 
+    to fill more fields, one has 
+    to go to an Edit Object form
+    (and back here)
+    endnote
+    
         end
+
 
 @enduml

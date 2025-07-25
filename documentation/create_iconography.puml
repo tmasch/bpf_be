@@ -9,20 +9,20 @@ three different points of departure
 - Edit Artwork view
 - View/Edit Object view
 endnote
-:select type of iconography
-(portrait, architecture, etc.);
+:Select type of iconography
+(portrait, emblem, etc.);
 |BFF|
-:Determines possible objects and 
-connection types for this type
-of iconography according 
-to list in config file;
-:Sends these Objects and the 
-forms needed for creating
-variants to UI;
+:Determines possible objects, and 
+connection types for each object,
+for this type of iconography 
+according to list in config file;
 note right
 Objects are e.g. persons, animals,
 places, actions, texts
 endnote
+:Sends these Objects and the 
+forms needed for creating
+variants to UI;
 |UI|
 :Enter Object name and
 select Connection for each
@@ -30,11 +30,22 @@ Object
 (see separate diagram -
 this includes steps 
 in BFF and DB);
-
-
-:Enter preferred name and name
-variants of iconography;
-:enter iconclass notation;
+note right
+Different procedures for
+Place / Text objects and
+for all other objects
+endnote
+:For some types of Iconography,
+a preferred name for it is created
+automatically;
+note right
+e.g., if type is Portrait and name
+is Napoleon, "Portrait of Napoleon"
+is created as suggestion
+endnote
+:Enter (or change) preferred name
+and name variants of iconography;
+:Enter iconclass notation;
 |BFF|
 :Search iconclass notation at 
 iconclass API, return corresponding
@@ -44,7 +55,7 @@ name;
 :(if needed)create form for 
 variant(s) of this records;
 note right
-There would be two forms, a standard
+There are two forms a standard
 form that is largely filled in with 
 the texts for an attribute that may or
 may not be present, and a free form that
@@ -56,10 +67,16 @@ Objects, enter object records
 and connections as above;
 :save the record;
 |BFF|
-:process the record for storage
+:process the record for saving
 in the DB;
+note right
+if Child records for Place and Text
+Objects have been created or modified,
+they have to be saved, too. 
+endnote
 |DB|
-:save record;
+:save record (including Object
+Child records, where applicable);
 |BFF|
 :success;
 |UI|
