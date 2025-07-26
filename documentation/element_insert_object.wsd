@@ -34,19 +34,20 @@ of Object (Autocomplete);
 repeat
     :Once a minimum of letters
     has been typed, they are
-    sent to BFF , 
+    sent to BFF, 
     together with the type of the
     Object;
     |BFF|
-    :launches search in DB for
+    :Launches search in DB for
     Objects whose name  
     contains this string;
     |DB|
-    :search;
+    :Search;
     |BFF|
-    :processes search result
+    :Process search result
     for display;
-    :add 'results' for 'search failed;
+    |UI|
+    :Display result;
     note right
     if there is a list of hits,
     a line 'none of these' is
@@ -54,12 +55,11 @@ repeat
     a line 'nothing found'
     is added
     endnote
-    |UI|
-    :Display result;
+
 repeat while (User continues typing)
 :User selects item from list;
 if (User selects) then (result)
-    end
+    
 else (search failed)
     :Launch external search;
     note right
@@ -79,11 +79,11 @@ else (search failed)
     :Send search string and
     Object Type to BFF;
     |BFF|
-    :Launch search in 
+    #orange:Launch search in 
     appropriate external
     database (e.g., GND);
-    :parse search results;
-    :return search results
+    :Parse search results;
+    :Return search results
     to UI;
     note right
     Again with notes for
@@ -92,7 +92,7 @@ else (search failed)
     |UI|
     :Display result;
     if (User selects) then (result)
-        end
+        
     else (search failed)
         :Save all data from this view in FE;
         :Open view Create Object
@@ -103,6 +103,8 @@ else (search failed)
         :restore stored data;
         :automatically insert 
         newly-created object;
-        end
+    end if
+end if
+end
 
 @enduml

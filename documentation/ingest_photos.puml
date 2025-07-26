@@ -1,0 +1,141 @@
+@startuml
+title Ingest Photograph
+|UI|
+start
+:go to Ingest Photograph View;
+note right
+one would typically 
+go there from the main
+menu
+endnote
+:select photographs
+for upload;
+note right
+typically from
+local drive
+endnote
+:indicate if photos
+represent
+- different Artworks
+- different Images of
+    one Artwork
+- different Photographs
+    of one Image of
+    one Artwork;
+
+if (user wants to give 
+information about location
+relevant for all items) then (yes)
+note left
+information can also added
+later in editing process
+endnote
+
+    if (item in a collection) then (yes)
+        :user fills in search box
+        for collection;
+        :process element_insert_object
+        is run (involving BFF, DB);
+    else (no)
+        :user fills in other 
+        search box;
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    endif
+else (no)
+endif
+if (user wants to give 
+information about illustrated text 
+for all items) then (yes)
+note left
+information can also added
+later in editing process
+endnote
+        :user fills in 
+        search box;
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    
+else (no)
+endif
+if (user wants to select medium) then (yes)
+    :selects medium from list;
+    |BFF|
+    :Determine appropriate
+    Making processes for 
+    this medium, from config file;
+    :Send these processes 
+    to UI;
+    |UI|
+    if (user wants to give 
+    information on artists
+    in any of the processes) then (yes)
+        :user fills in
+        search box;
+        :process element_insert_object
+         is run (involving BFF/DB);
+    else (no)
+    endif
+    if (user wants to give 
+    information on place of making
+    in any of the processes) then (yes)
+        :user fills in
+        search box;
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    else (no)
+    endif
+    if (user wants to give
+    information on date of making
+    in any of the processes) then (yes)
+        :user fills in
+        search box;
+        :entered date is
+        sent to BFF;
+        |BFF|
+        :date is parsed;
+        :parsed dat is returned
+        to UI;
+        |UI|
+        :user checks parsed date;
+    else (no)
+    endif
+else (no)
+endif
+:user saves photographs
+and metadata;
+|BFF|
+:metadata is parsed;
+:according to the selection
+at the beginning and the
+medium selected, Artwork,
+Image, Copy, and Photo records
+for saving in the DB are made;
+:any new Child records for
+Place and Text objects made
+in the element_insert_object_
+Place_Text process are also
+to be saved; 
+
+|DB|
+:new records are saved;
+
+|BFF|
+:photographs are uploaded,
+renamed, and saved;
+note right
+since the uploading can take
+a long time, this has to happen
+in the background, either here, 
+or one could also upload the 
+images first, before running 
+the rest of the routine, and then
+enter the metadata and save them
+
+endnote
+
+
+@enduml

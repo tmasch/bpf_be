@@ -1,0 +1,106 @@
+@startuml
+title Search for Iconography
+|UI|
+start
+:Go to Search Screen;
+:User starts typing name
+of Iconography;
+
+repeat
+    :Once a minimum of letters
+    has been typed, they are
+    sent to BFF for Autocomplete;
+    |BFF|
+    :Launch search in DB for
+    Iconography records whose name  
+    contains this string
+    (Preview only);
+    |DB|
+    :search;
+    |BFF|   
+    
+    :Send all found records to UI;
+    |UI|
+    :Display result;
+repeat while (User continues typing)
+:User selects one
+or more results;
+:Send the selected
+record Ids to BFF;
+|BFF|
+:Launch search for selected
+Iconography records
+(complete, with all
+connected records);
+|DB|
+:Search;
+|BFF|
+:Launch search for 
+all Image records
+with this Iconography
+(with connected 
+Artwork, Copy, and Photo
+Records);
+|DB|
+:Search;
+|BFF|
+:Index (for lack of a 
+better word) result 
+records that they can 
+be sorted, grouped 
+or filtered
+according to 
+- Medium
+- Creation Date 
+- Artist 
+- Place of Making
+ (with Child records)
+- Illustrated text 
+- Iconography 
+ (if the search
+   was for more than one
+   Iconography)
+ - Variants of each
+   Iconography;
+:Sort records by date
+ (as default);
+|UI|
+:Show search results
+ (mainly preview images
+  in mosaic view, plus 
+  content of Iconography
+  record, at least abbreviated);
+:Show possibilities for
+filtering/sorting/grouping 
+as provided by BFF
+(the displayed options
+depend on search result);
+
+:User can do the
+following:
+- filter results according
+   to one or more criteria
+- group results according
+   to one criterion 
+   (more makes little sense)
+- sort results according to
+   one or more criteria
+- display a detail view of one
+   Artwork record
+- display the full Iconography 
+    record
+- launch new searches;
+
+:Editor can also do
+the following:
+- open the full Iconography
+    record for editing
+- open one Artwork record 
+    for editing
+- select a number of Artwork
+    records and open
+    them for bulk editing;
+
+
+
+@enduml

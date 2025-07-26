@@ -12,7 +12,7 @@ endnote
 :Select type of iconography
 (portrait, emblem, etc.);
 |BFF|
-:Determines possible objects, and 
+:Determine possible objects, and 
 connection types for each object,
 for this type of iconography 
 according to list in config file;
@@ -20,7 +20,7 @@ note right
 Objects are e.g. persons, animals,
 places, actions, texts
 endnote
-:Sends these Objects and the 
+:Send these Objects and the 
 forms needed for creating
 variants to UI;
 |UI|
@@ -47,7 +47,7 @@ endnote
 and name variants of iconography;
 :Enter iconclass notation;
 |BFF|
-:Search iconclass notation at 
+#orange:Search iconclass notation at 
 iconclass API, return corresponding
 name;
 |UI|

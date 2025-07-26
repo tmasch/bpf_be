@@ -1,5 +1,5 @@
 @startuml
-title Select Connected Object Records Place / Text)
+title Select Connected Object Records (Place / Text)
 
 |UI|
 start
@@ -49,24 +49,21 @@ repeat
     together with the type of the
     Object;
     |BFF|
-    :launches search in DB for
+    :Launch search in DB for
     Objects whose name  
     contains this string;
     repeat 
         |DB|
         :search;
         |BFF|   
-    repeat while (if any record has 
-    Child records, they are
-    searched)
+    repeat while (Search for Child
+    records, if the record has 
+    connections to any)
 
-    :All found records and their
-    Child records are sent to UI;
+    :Send all found records and their
+    Child records to UI;
     |UI|
     :Display result;
-repeat while (User continues typing)
-    :processes search result
-    for display;
     note right
     if there is a list of hits,
     a line 'none of these' is
@@ -74,6 +71,8 @@ repeat while (User continues typing)
     a line 'nothing found'
     is added (called 'search failed')
     endnote
+
+repeat while (User continues typing)
 
 :User selects item from list;
 if (User selects) then (result)
@@ -86,7 +85,8 @@ else (search failed)
     is better to launch it not
     automatically but let the 
     user launch it for all
-    objects with search failed
+    objects with 'search failed'
+    status
     endnote
     :Send search string and
     Object Type to BFF;
@@ -94,8 +94,8 @@ else (search failed)
     :Launch search in 
     appropriate external
     database (e.g., GND);
-    :parse search results;
-    :return search results
+    :Parse search results;
+    :Return search results
     to UI;
     note right
     Again with notes for

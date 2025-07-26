@@ -6,35 +6,132 @@ start
 :Select resource type (book or manuscript);
 :Send url to BFF;
 |BFF|
-#orange:Get iif; 
-note right
-skip for 
-data structure 
-testing
-end note
-:Do magic;
-:Return data structure to UI;
-|UI|
-:Select values in UI;
-:Add artists etc;
-note right
-Perhaps add other
-data as well, if magic
-was not satisfactory
-end note
+#orange:Get iif manifest; 
+:Parse manifest;
+if (resource type) then (manuscript)
+else (book)
+    :Search for bibliographical
+    reference in manifest;
+    #orange:Get bibliographical
+    description for this reference;
+    if (found) then (yes)
+    else (no)
+        :Send message to UI;
+        |UI| 
+        :User gives bibliographical
+        reference;
+        :Reference sent to BFF;
+        |BFF|
+        #orange:Get bibliographical
+        description for this
+        reference;
+    end if
+    :Parse bibliographical description;
+end if
+:Get from manifest or
+bibligraphical description
+ Objects (Persons/Places)
+ for search
+(search for every Object
+separately);
+|DB|
+:search for Object records;
 |BFF|
-:Get artists etc.;
+if (Object records found) then (yes)
+    
+else (no)
+    #orange:Search for Objects 
+    in GND etc.;
+    :Parse results;
+end if 
+:Return list to UI;
 |UI|
-:Select artists in UI;
+if (expected candidates in list) then (yes)
+else (no)
+    :User adds terms for
+    manual search;
+    note right
+    currently only GND ID, but 
+    other search types also 
+    possible (also in the DB)
+    endnote
+    |BFF|
+    #orange:Search for these 
+    terms in GND;
+    :result returned to 
+    UI;
+    |UI|
+    :result added to list;
+endif
+:User selects Persons
+and places amongst the 
+candidates;
+note right
+Something needs to be 
+done if no plausible candidate
+found in the searches
+(enter Object record manually, 
+create dummy Object record,
+leave out this Object)
+endnote
+if (user wants to select medium) then (yes)
+    :selects medium from list;
+    |BFF|
+    :Determines appropriate
+    Making processes for 
+    this medium, from config file;
+    :Sends these processes 
+    to UI;
+    |UI|
+    if (user wants to give 
+    information on artists
+    in any of the processes) then (yes)
+        :User fills in
+        search box;
+        :process element_insert_object
+         is run (involving BFF/DB);
+    else (no)
+    endif
+    if (user wants to give 
+    information on place of making
+    in any of the processes) then (yes)
+        :user fills in
+        search box;
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    else (no)
+    endif
+    if (user wants to give
+    information on date of making
+    in any of the processes) then (yes)
+        :User fills in
+        search box;
+        :Entered date is
+        sent to BFF;
+        |BFF|
+        :Date is parsed;
+        :Parsed date is returned
+        to UI;
+        |UI|
+        :user checks parsed date;
+    else (no)
+    endif
+else (no)
+endif
+
 :Return selection to BFF;
 |BFF|
 :Transform data 
 structures to DB;
 note right
-not sure 
-if this is
-needed
-end note
+- any new Object records
+- new Book/MS record
+- new record 'Pages' 
+with the data needed
+for the cut_out_images
+process
+endnote
 |DB|
 :Store data;
 note right
