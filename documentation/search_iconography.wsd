@@ -3,30 +3,29 @@ title Search for Iconography
 |UI|
 start
 :Go to Search Screen;
-:User starts typing name
+:Start typing name
 of Iconography;
 
 repeat
     :Once a minimum of letters
-    has been typed, they are
-    sent to BFF for Autocomplete;
+    has been typed, send them 
+    to BFF for Autocomplete;
     |BFF|
     :Launch search in DB for
     Iconography records whose name  
     contains this string
     (Preview only);
     |DB|
-    :search;
+    :Search;
     |BFF|   
     
-    :Send all found records to UI;
+    :Prooces search result
+    for display;
     |UI|
     :Display result;
 repeat while (User continues typing)
-:User selects one
+:Select one
 or more results;
-:Send the selected
-record Ids to BFF;
 |BFF|
 :Launch search for selected
 Iconography records
@@ -44,11 +43,9 @@ Records);
 |DB|
 :Search;
 |BFF|
-:Index (for lack of a 
-better word) result 
-records that they can 
-be sorted, grouped 
-or filtered
+:Determine terms
+for sorting, grouping
+or filtering records
 according to 
 - Medium
 - Creation Date 
@@ -64,35 +61,107 @@ according to
    Iconography;
 :Sort records by date
  (as default);
+ :Limit results to the 
+ maximum size of hits 
+ on a page;
+ 
 |UI|
 :Show search results
  (mainly preview images
   in mosaic view, plus 
   content of Iconography
   record, at least abbreviated);
-:Show possibilities for
+:Show criteria for
 filtering/sorting/grouping 
 as provided by BFF
 (the displayed options
 depend on search result);
 
-:User can do the
-following:
-- filter results according
-   to one or more criteria
-- group results according
-   to one criterion 
-   (more makes little sense)
-- sort results according to
-   one or more criteria
-- display a detail view of one
-   Artwork record
-- display the full Iconography 
-    record
-- launch new searches;
+if (User wants next page
+or results) then (yes)
+    |BFF|
+    :Execute new search
+    (as above);
+    :Sort results
+    as before;
+    :Limit results to the
+    next page that can be
+    displayed;
+    |UI|
+    :Display new result;
+else
+end if 
 
-:Editor can also do
-the following:
+if (User filters, groups 
+or orders results) then (yes)
+    |BFF|
+    :Execute new search
+    (as above);
+    :Sort results as 
+    desired;
+    |UI|
+    :Display new result;
+else
+end if 
+
+if (User selects a record) then (yes)
+    |BFF|
+    :Search this record
+    (see separate diagram);
+    |UI|
+    :Go to single Artwork 
+    display;
+    end
+else
+end if 
+
+if (User selects an
+Iconography record) then (yes)
+    |BFF|
+    :Search this record
+    (see separate diagram);
+    |UI|
+    :Go to single Record 
+    display;
+    end
+else
+end if 
+
+if (User launches a new search
+for a property displayed somewhere) then (yes)
+    |BFF|
+    :Execute new search
+    (as above);
+    :Sort results as 
+    desired;
+    |UI|
+    :Display new result;
+else
+end if 
+
+
+if (user selects an
+Iconography record) then (yes)
+    |BFF|
+    :Search this record
+    (see separate diagram);
+    |UI|
+    :Go to single Record 
+    display;
+    note right
+    An editor can
+    also open the
+    record in Edit
+    view. 
+
+    end note
+    end
+else
+end if 
+
+
+:Editor can additionally
+ do the following:
 - open the full Iconography
     record for editing
 - open one Artwork record 

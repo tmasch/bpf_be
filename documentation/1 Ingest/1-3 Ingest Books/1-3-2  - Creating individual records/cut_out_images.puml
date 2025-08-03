@@ -1,0 +1,184 @@
+@startuml
+title Cut out images
+|UI|
+start
+:Go to list of books;
+note right
+Alternative entries are
+Book / Manuscript 
+record display; 
+ingest form - in these
+cases, no list of books
+needs to be fetched
+end note
+|BFF|
+:Search relevant books;
+|DB|
+:Get basic metadata 
+(title, number of views, etc.)
+for this books;
+|BFF|
+:Send list to UI;
+|UI|
+:Select a book and 
+within the page range;
+
+:Select cropping mode;
+note right
+(if helpful) manual indication 
+of image type (woodcut, 
+grisaille drawing, etc. 
+to determine best parameters 
+for cropping algorithm)
+endnote
+:Lauch process;
+note right
+Since these processes can take
+some time, one should also be 
+able to schedule a number of
+them to run e.g. at night.
+end note
+|BFF|
+:Download pages from library;
+:Do automatic cropping (if
+applicable according to 
+selected image type);
+if (Page is not straight) then (yes)
+    :Rotate page automatically;
+else (no)
+end if 
+
+|UI|
+:Start manual checking
+process;
+note right
+This process can take some 
+time - hence it must be 
+possible to save the current
+state, and resume work later.
+end note
+:Show all pages in mosaic view
+marking those there images 
+have been found
+(e.g., by a coloured frame);
+:Correction the selection
+of pages with images manually
+(select pages with images 
+overlooked by algorithm / 
+unselect pages falsely 
+marked as illustrated);
+  
+
+note right
+really quickly, e.g. by 
+clicking on page
+end note
+if (IIIF manifest has page numbers) then (yes)
+else (no)
+    :Go to first page to
+    be numbered;
+    :Insert starting number
+    and numbering type
+    (e.g., page, folio,
+    quire, plate number);
+    :Repeat if there 
+    are several runs 
+    of page numbers or
+    irregularities;
+    note right
+    If the numbering is
+    very irregular and/or
+    there are very few 
+    illustrated pages,
+    one can number
+    the illustrated
+    pages individually
+    end note
+end if
+|BFF|
+:Create page numbers accordingly;
+|UI|
+:Show page numbers for checking;
+:Switch to view of the selected
+pages with images, one by one, 
+with frames of images;
+note right
+Toggling between 
+the two views
+must be possible, in case
+more pages have to be 
+selected or errors with
+page numbers are
+discovered
+endnote
+:Correct frames manually by 
+adding, deleting,
+moving, renumbering frames;
+if (Entire page is not straight) then (yes)
+    :Rotate page (manually);
+else (no)
+end if
+if (Single image is not straight) then (yes)
+    :Rotate image (automatically or
+    manually);
+else (no)
+end if
+if (Image goes over two facing pages) then (yes)
+    :Mark both pages;
+    |BFF|
+    :Create
+    new image of both 
+    pages togehter;
+    :Create page number
+    of it based on 
+    numbers of constitutet
+    pages;
+    :Insert it in list 
+    of pages and
+    mark it as selected;
+    |UI|
+else (no)
+end if
+
+|BFF|   
+:Create the cropped-out images
+based on data from UI;
+
+:Save cropped-out images;
+
+if (Manuscript or Book) then (Manuscript)
+    :Create for every image Artwork, 
+    Image and Photo records based on data
+    in the Manuscript and Pages records;
+    |DB|
+    :Save records;
+    |BFF|
+else (Book)
+    :Create for every image Artwork, 
+    Image, Copy and Photo records based on data
+    in the Book and Pages records;
+    :Create a Matrix record for the 
+    Making Processes pertaining to the 
+    printing matrix;
+    |DB|
+    :Save records;
+    |BFF|
+    :Run Process of identifying
+    re-used matrices (in 
+    separate diagram);
+    note right
+    This process can take
+    some time, hence it 
+    should be possible 
+    to interrupt workflow
+    here and resume it
+    at a later time. 
+    end note
+end if
+
+:Success;
+|UI|
+:Success;
+end
+
+@enduml

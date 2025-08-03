@@ -1,0 +1,212 @@
+@startuml
+title Identifying re-used printing matrices
+|UI|
+|BFF|
+start
+note right
+This is normally happens
+at the conclusion of the
+image cropping process. 
+However, it should be 
+possible to interrupt
+this process beforehand
+and then get started here
+afresh. In this case, one
+would start with a list
+of books as in 
+cut_out_images. 
+end note
+note right
+It can also be called from the
+ingest_photos process
+end note
+note right
+This process is carried
+out for every single image
+end note
+note right
+It must be possible to interrupt
+and resume this process. 
+end note
+:Launch algorithm for
+image comparison;
+note right
+The following assumes that
+the VISE algorithm of the 
+Oxford Visual Geometry Group
+is used. I heard that the 
+WISE algorithm by the same
+group, although made for
+a different purpose, would
+work better but I haven't
+tried it yet. 
+end note
+:Compare new image
+with main corpus;
+note right
+It is a pitfall of the VISE
+algorithm that the corpus for
+comparison has to be re-indexed
+after every addition - a rather
+time-consuming process
+(if I remember correctly, for 
+our expected size of corpus
+probably several hours on a PC
+that is somewhat more powerful
+than a standard desktop PC).
+Hence, one has to put new additions
+into a temporal corpus that is
+then merged into the main corpus
+once it has reached a certain 
+size, and one has to compare
+new images with all corpora. 
+Perhaps, one even needs several
+temporal corpora, including one
+for the current book only, to 
+keep it quick. 
+end note
+if (Match found) then (yes)
+else (no)
+    :Compare new image
+    with temporal corpus
+    (or with several ones);
+    if (Match found) then (yes)
+    else (no)
+        :Add new image to 'latest'
+        temporal corpus;
+        note right
+        I wonder if one should also add
+        matches to the temporal corpus.
+        This would make the corpus
+        considerably larger (probably
+        factor 2-5) and hence slow
+        re-indexing, but it could 
+        produce more hits. 
+        In this case, often several
+        images of the same matrix
+        record may be found. 
+        end note
+        :Reindex this corpus;
+        :Go to nextimage;
+        end
+    end if
+end if
+|DB| 
+:Search Matrix record connected
+to identified match;
+:Search records connected to
+this Matrix record (preview only);
+|BFF|
+:Process Matrix record for UI;
+|UI|
+:Display the following items:
+- Current image and identified
+    match
+- Making processes of identified
+    match
+- Illustrated text(s) linked to
+    identified match
+- Iconographies linked to
+    identified match;
+note right
+The VISE UI has a nice way
+of showing the images as in 
+a blink comparator - this
+could be imitated
+end note
+if (User confirms match) then (yes)
+    if (Conflict between Making
+    Process information in the 
+    new record and the Matrix) then (yes)
+        :Choose one version;
+        note right
+        Mix and match possible
+        end note
+    else (no)
+    end if
+    |BFF|
+    if (new record has additional
+    making process information or 
+    new records and Matrix record
+    have conflicting information
+    and user decided to take 
+    information from new record) then (yes)
+        :Update Matrix record;
+    else (no)
+    end if
+    if (Printing date of connected to
+    new record is before earliest 
+    printing date in Matrix record) then (yes)
+        :Change earliest printing date
+        in Matrix record to printing
+        date of new record;
+    else (no)
+    end if 
+    :Create Edge between Artwork
+    and Matrix records;
+    |DB|
+    :Save updated Matrix record
+     (if needed);
+    :Save new Edge; 
+    :Delete the old Matrix
+    record connected to this
+    image (with all edges);
+    
+
+else (no)
+    |BFF|
+    :search again in the corpus
+    of images, excluding the 
+    last result;
+    if (another result found) then (yes)
+        :Search for Matrix record
+        and display new match as 
+        before;
+    else (no)
+        |BFF|
+        :Add new image to 'latest'
+        temporal corpus (as above);
+end if    
+end if 
+|UI|
+:Select illustrated text
+and or one or more 
+iconographies from Matrix
+record;
+note left
+This procedure allows the simple
+copying of information if the same
+image is used in the same context
+and/or wiht the same singificance.
+However, there is no reason why
+one should not be able to give
+this information even if the
+woodcuts are not exact matches. 
+end note
+
+if (Selection made) then (yes)
+    |BFF|
+    :Create edge between new Artwork
+    record and selected illustrated 
+    text;
+    :Create edge between new image
+    record and every selected 
+    iconography;
+    |DB|
+    :Save new edges;
+else (no)
+end if 
+|BFF|
+:Success;
+|UI|
+:Success (no need for a message);
+|BFF|
+:Repeat for next image;
+end
+@enduml
+
+
+
+
+
+    

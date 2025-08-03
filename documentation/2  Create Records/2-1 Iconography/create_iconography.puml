@@ -1,0 +1,107 @@
+@startuml
+title Creating Iconography Records
+|UI|
+start
+:Go to Edit Iconography View;
+note right
+three different points of departure
+- start menu
+- Edit Artwork view
+- View/Edit Object view
+endnote
+:Select type of iconography
+(portrait, emblem, etc.);
+|BFF|
+:Determine possible objects, and 
+connection types for each object,
+for this type of iconography 
+according to list in config file;
+note right
+Objects are e.g. persons, animals,
+places, actions, texts
+endnote
+|UI|
+:Enter Object name and
+select Connection for each
+Object
+(processes element_insert_object
+or element_insert_object_
+text_place);
+note right
+Different procedures for
+Place / Text objects and
+for all other objects
+endnote
+:Create preferred name
+of Iconography (for some 
+types of iconography only);
+note right
+e.g., if type is Portrait and name
+is Napoleon, "Portrait of Napoleon"
+is created as suggestion
+endnote
+:Enter (or change) preferred name
+and name variants of iconography;
+:Enter iconclass notation;
+|BFF|
+#orange:Search iconclass notation at 
+iconclass API, return corresponding
+name;
+|UI|
+:Display name of iconography
+from Iconclass;
+
+if (Record needs variants) then (yes)
+
+    :Open form for 
+    variant(s) of this records;
+    note right
+    There are two forms a standard
+    form that is largely filled in with 
+    the texts for an attribute that may or
+    may not be present, and a free form that
+    has to be filled in manually
+    endnote
+    :Fill in variant records form;
+    if (Variants are connected
+    to additional objects) then (yes)
+        :enter object records
+        and connections, using
+        element_insert_object or
+        eLement_insert_object_
+        place_text;
+        note right
+        this would be e.g. 
+        attributes or additional
+        persons 
+        end note
+    
+
+    else (no)
+    end if
+else (no)
+end if
+    :Save record;
+    |BFF|
+    :Process record for saving
+    in the DB;
+    note right
+    if Child records for Place and Text
+    Objects have been created or modified,
+    they have to be saved, too. 
+    endnote
+    |DB|
+:Save record (including Object
+Child records, where applicable);
+|BFF|
+:Success;
+|UI|
+:Success;
+:Return to place of departure;
+end  
+
+
+
+
+
+@enduml

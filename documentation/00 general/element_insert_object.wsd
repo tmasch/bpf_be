@@ -33,12 +33,10 @@ of Object (Autocomplete);
 
 repeat
     :Once a minimum of letters
-    has been typed, they are
-    sent to BFF, 
-    together with the type of the
-    Object;
+    has been typed, Send this text 
+    and the Object type to BFF;
     |BFF|
-    :Launches search in DB for
+    :Launch search in DB for
     Objects whose name  
     contains this string;
     |DB|
@@ -46,21 +44,21 @@ repeat
     |BFF|
     :Process search result
     for display;
-    |UI|
-    :Display result;
     note right
-    if there is a list of hits,
-    a line 'none of these' is
-    added; if there are no hits,
-    a line 'nothing found'
-    is added
+    Add options for 'failed 
+    search' (if there are hits, 
+    add 'none of these'; if there
+    are none, add 'nothing found')
     endnote
 
+    |UI|
+    :Display result;
+
 repeat while (User continues typing)
-:User selects item from list;
-if (User selects) then (result)
+
+if (Select item from list) then (result)
     
-else (search failed)
+else ('failed search' option)
     :Launch external search;
     note right
     The external search takes
@@ -68,7 +66,8 @@ else (search failed)
     is better to launch it not
     automatically but let the 
     user launch it for all
-    objects with 'search failed'
+    objects with 'failed search'
+    selected
     endnote
     note right
     for some types of objects
@@ -83,25 +82,24 @@ else (search failed)
     appropriate external
     database (e.g., GND);
     :Parse search results;
-    :Return search results
-    to UI;
     note right
-    Again with notes for
-    search failed
+    Again with notes
+    for 'failed search'
     endnote
     |UI|
     :Display result;
-    if (User selects) then (result)
+    if (Select from list) then (result)
         
-    else (search failed)
+    else ('failed search'
+    option)
         :Save all data from this view in FE;
-        :Open view Create Object
+        :Open view Create missing Object
         for appropriate Object type;
         :Once Object records
         has been created manually,
         return to this view;
-        :restore stored data;
-        :automatically insert 
+        :Restore stored data;
+        :Automatically insert 
         newly-created object;
     end if
 end if

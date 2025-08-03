@@ -44,40 +44,44 @@ of Object;
 
 repeat
     :Once a minimum of letters
-    has been typed, they are
-    sent to BFF for Autocomplete, 
-    together with the type of the
-    Object;
+    has been typed, send tem
+    and Object type to BFF 
+    for Autocomplete;
     |BFF|
     :Launch search in DB for
     Objects whose name  
     contains this string;
-    repeat 
-        |DB|
-        :search;
-        |BFF|   
-    repeat while (Search for Child
-    records, if the record has 
-    connections to any)
+    
+    |DB|
+    :Search;
+    |BFF|   
+    if (Result record has
+        links to child records) then (yes)
+        repeat
+            |DB|
+            :Search child records;
+            |BFF|
+        repeat while (Child record
+        has in turn child records)
+    else (no)
+    end if 
+    :Process search result
+    for display;
+    note right
+    Add options for 'failed 
+    search' (if there are hits, 
+    add 'none of these'; if there
+    are none, add 'nothing found')
+    endnote
 
-    :Send all found records and their
-    Child records to UI;
     |UI|
     :Display result;
-    note right
-    if there is a list of hits,
-    a line 'none of these' is
-    added; if there are no hits,
-    a line 'nothing found'
-    is added (called 'search failed')
-    endnote
 
 repeat while (User continues typing)
 
-:User selects item from list;
-if (User selects) then (result)
-
-else (search failed)
+if (Select item from list) then (result)
+    
+else ('failed search' option)
     :Launch external search;
     note right
     The external search takes
@@ -85,50 +89,42 @@ else (search failed)
     is better to launch it not
     automatically but let the 
     user launch it for all
-    objects with 'search failed'
-    status
+    objects with 'failed search'
+    selected
+    endnote
+    note right
+    for some types of objects
+    (e.g., Actions), there is
+    no search in external 
+    database
     endnote
     :Send search string and
     Object Type to BFF;
     |BFF|
-    :Launch search in 
+    #orange:Launch search in 
     appropriate external
     database (e.g., GND);
     :Parse search results;
-    :Return search results
-    to UI;
     note right
-    Again with notes for
-    search failed
+    Again with notes
+    for 'failed search'
     endnote
     |UI|
     :Display result;
-    if (User selects) then (result)
+    if (Select from list) then (result)
         
-    else (search failed)
+    else ('failed search'
+    option)
         :Save all data from this view in FE;
-        :Open view Create Object
+        :Open view Create missing Object
         for appropriate Object type;
-        :Once Object has been created,
+        :Once Object records
+        has been created manually,
         return to this view;
-        :restore stored data;
-        :automatically insert 
+        :Restore stored data;
+        :Automatically insert 
         newly-created object;
-    endif
-    endif
-    :user may add/edit child records
-    and select relation to 
-    parent record;
-    note right
-    only the child record type 
-    (e.g., 'building part') and
-    its name can be entered here; 
-    to fill more fields, one has 
-    to go to an Edit Object form
-    (and back here)
-    endnote
-    
-        end
-
-
+    end if
+end if
+end
 @enduml

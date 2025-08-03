@@ -1,0 +1,176 @@
+@startuml
+title Ingest Photograph
+|UI|
+start
+:Go to Ingest Photograph View;
+note right
+one would typically 
+go there from the main
+menu
+endnote
+:Upload photographs
+to FE;
+note right
+typically from
+local drive
+endnote
+:Indicate if photos
+represent
+- different Artworks
+- different Images of
+    one Artwork
+- different Photographs
+    of one Image of
+    one Artwork;
+    note left
+    1-1-screen1
+    end note
+
+if (User wants to give 
+information about location
+relevant for all items) then (yes)
+note left
+information can also added
+later in editing process
+endnote
+
+    if (item in a collection) then (yes)
+        :Fill in search box
+        for collection;
+        :process element_insert_object
+        is run (involving BFF, DB);
+    else (no)
+        :Fills in search box
+        for 'not in collection';
+        note left
+        1-1-screen2
+        end note
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    endif
+else (no)
+endif
+if (User wants to give 
+information about illustrated text 
+for all items) then (yes)
+note left
+information can also added
+later in editing process
+endnote
+        :Fill in 
+        search box;
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    
+else (no)
+endif
+if (User wants to select medium) then (yes)
+    :Select medium from list;
+    |BFF|
+    :Determine appropriate
+    Making processes for 
+    this medium, from config file;
+    |UI|
+    :Making processes for this
+    medium, each with search 
+    boxes for person, place,
+    and date are shown;
+    note left
+    1-1-screen3
+    end note
+    note right
+    This means that artists etc.
+    can only be added once a medium
+    has been indicated. 
+    end note
+
+    if (User wants to give 
+    information on artists
+    in any of the processes) then (yes)
+        :Fill in search box;
+        :process element_insert_object
+         is run (involving BFF/DB);
+         note left
+         1-1-screen4
+         end note
+        :Preferred place of activity 
+        of artist (from record) is 
+        written into Place record and
+        shown in Place search box;
+        note right
+        If the Artist record has just
+        been ingested and lacks a preferred
+        place of activity, this action must
+        be done after the artist record
+        has been completed
+        end note
+    else (no)
+    endif
+    if (User wants to give 
+    information on place of making
+    in any of the processes) then (yes)
+        :Fill in search box;
+        note right
+        This would overwrite the place
+        name entered here automatically
+        after giving an artist's name.
+        end note
+        :process element_insert_object_
+        place_text is run
+        (involving BFF/DB);
+    else (no)
+    endif
+    if (User wants to give
+    information on date of making
+    in any of the processes) then (yes)
+        :Fill in search box;
+        |BFF|
+        :Parse date;
+        |UI|
+        :Check parsed date;
+    else (no)
+    endif
+else (no)
+endif
+if (Images are printed 
+book illustrations - perhaps
+this would be triggered manually) then (yes)
+    :run process 
+    identify_reused_matrices;
+:Save photographs
+and metadata;
+|BFF|
+:Parse metadata;
+:Create Artwork,
+Image, Copy, and Photo records
+according to the selection 
+made at the beginning;
+:Create any new Child records for
+Place and Text objects made
+in the element_insert_object_
+Place_Text process; 
+
+|DB|
+:Save new records;
+
+|BFF|
+:Upload, rename, 
+and save photo files;
+note right
+since the uploading can take
+a long time, this has to happen
+in the background.
+This could either be here,
+or one uploads the images
+to a dedicated directory on
+the server at the very beginning
+and them merely copies them 
+from there
+endnote
+:Success;
+|UI|
+:Success;
+
+@enduml
