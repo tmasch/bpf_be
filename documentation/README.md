@@ -28,6 +28,11 @@ Iconobase - Overview of Functions
 
 *(This table of contents can be conveniently generated using the Markdown All in One VS Code plugin)*
 
+Include diagram
+<!--
+!includeurl https://raw.githubusercontent.com/tmasch/bpf_be/refs/heads/master/documentation/search_depicted_object.wsd
+-->
+
 # 0. General
 
 ## 0.0 Record Types
