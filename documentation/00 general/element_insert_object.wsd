@@ -57,7 +57,6 @@ repeat
 repeat while (User continues typing)
 
 if (Select item from list) then (result)
-    
 else ('failed search' option)
     :Launch external search;
     note right
@@ -102,7 +101,80 @@ else ('failed search' option)
         :Automatically insert 
         newly-created object;
     end if
+
 end if
+
+if (New record is 
+an iconography record AND 
+selected connection already
+in the database AND the 
+iconographic connections 
+related to this record 
+are not sorted automatically 
+e.g., alphabeticaly)  then (yes)
+    |BFF|
+    :Launch search for all
+    Iconographies of the type
+    of the new record connected
+    to selected record 
+    (directly or indirectly);
+    note right
+    This 
+    step is primarily needed 
+    for iconographies. 
+    It is only necessary 
+    if the record is already
+    in the DB, since a newly
+    ingested record would not
+    have any connected icono-
+    graphies yet. In some
+    cases, these lists may
+    be sorted automatically 
+    e.g., alphabetically, then
+    this step is not needed.
+    end note
+    |DB|
+    :search;
+    |BFF|
+    :turn results into 
+    structured list;
+        |UI|
+    :Display list;
+    :Select place where
+    connection to new
+    iconography record
+    would fit in;
+else (no)
+end if
+if (Name of matched record
+looks odd in list of connections
+for new record) then (yes)
+    :overwrite name with 
+    preview name;
+else (no)
+end if
+if (Name of new iconography record
+looks odd in list of connections
+for matched record) then (yes)
+    :overwrite name with 
+    preview name;
+else (no)
+end if
+if (Connection needs a date) then (yes)
+    :enter date;
+    note right
+    e.g., for relationships 
+    involving persons (marriage etc.)
+    end note
+    |BFF|
+    :parse date;
+    |UI|
+    :check date;
+    else (no)
+    end if
+
+
+
 end
 
 @enduml
