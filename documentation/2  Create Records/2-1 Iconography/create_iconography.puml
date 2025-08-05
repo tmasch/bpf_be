@@ -11,6 +11,9 @@ three different points of departure
 endnote
 :Select type of iconography
 (portrait, emblem, etc.);
+note left
+2-1-screen1
+end note
 |BFF|
 :Determine possible objects, and 
 connection types for each object,
@@ -21,12 +24,23 @@ Objects are e.g. persons, animals,
 places, actions, texts
 endnote
 |UI|
+:Search boxes to enter
+Objects appropriate for
+this type of iconography
+and lists for selecting 
+connection types are shown;
+note left
+2-1-screen2
+end note
 :Enter Object name and
 select Connection for each
 Object
 (processes element_insert_object
 or element_insert_object_
 text_place);
+note left
+2-1-screen3
+endnote
 note right
 Different procedures for
 Place / Text objects and
@@ -42,6 +56,9 @@ is created as suggestion
 endnote
 :Enter (or change) preferred name
 and name variants of iconography;
+note left 
+2-1-screen4
+endnote
 :Enter iconclass notation;
 |BFF|
 #orange:Search iconclass notation at 
@@ -50,6 +67,9 @@ name;
 |UI|
 :Display name of iconography
 from Iconclass;
+note left
+2-1-screen5
+end note
 
 if (Record needs variants) then (yes)
 
@@ -62,6 +82,11 @@ if (Record needs variants) then (yes)
     may not be present, and a free form that
     has to be filled in manually
     endnote
+    note left
+    2-1-1screen6
+    top standard
+    bottom free
+    end note
     :Fill in variant records form;
     if (Variants are connected
     to additional objects) then (yes)
