@@ -1,12 +1,40 @@
 Iconobase - Overview of Functions
 
-0. General
+- [0. General](#0-general)
+	- [0.0 Record Types](#00-record-types)
+		- [0.0.0 Individual records describe properties of one single artwork.](#000-individual-records-describe-properties-of-one-single-artwork)
+		- [0.0.1 'Group records'](#001-group-records)
+		- [0.0.2 Authority Records](#002-authority-records)
+	- [0.1 Structure of Records (in theory)](#01-structure-of-records-in-theory)
+	- [0.2 Structure of Records (attempt to apply this structure to MongoDB)](#02-structure-of-records-attempt-to-apply-this-structure-to-mongodb)
+	- [0.2 Material stored outside the database:](#02-material-stored-outside-the-database)
+- [1.0 General Structure](#10-general-structure)
+	- [1.1 Ingest Photos from local drive](#11-ingest-photos-from-local-drive)
+	- [1.2 Ingest Photos from a Museum Website](#12-ingest-photos-from-a-museum-website)
+	- [1.3 Ingest Photos from a digitised manuscript or book from a library website.](#13-ingest-photos-from-a-digitised-manuscript-or-book-from-a-library-website)
+		- [1.3.1 Downloading information on the Book or Manuscript](#131-downloading-information-on-the-book-or-manuscript)
+		- [1.3.2 Creating individual image records](#132-creating-individual-image-records)
+- [2 Creating Records](#2-creating-records)
+	- [2.1 Creating Iconography records](#21-creating-iconography-records)
+	- [2.2 Creating child records for Place and Text records](#22-creating-child-records-for-place-and-text-records)
+	- [2.3 Creating keyword and heading records](#23-creating-keyword-and-heading-records)
+	- [2.4 Creating other Authority records](#24-creating-other-authority-records)
+- [3 Filling newly created records](#3-filling-newly-created-records)
+	- [3.1 Fully manual editing](#31-fully-manual-editing)
+	- [3.2 Bulk editing](#32-bulk-editing)
+	- [3.3 Copying information](#33-copying-information)
+	- [3.4 Merging individual records](#34-merging-individual-records)
+	- [3.5 Completing information in Authority records](#35-completing-information-in-authority-records)
 
-0.0 Record Types
+*(This table of contents can be conveniently generated using the Markdown All in One VS Code plugin)*
+
+# 0. General
+
+## 0.0 Record Types
 
 There are three types of record
 
-0.0.0 Individual records describe properties of one single artwork. 
+### 0.0.0 Individual records describe properties of one single artwork. 
 
 They consist of four records joined together with 1:n connections
 
@@ -16,7 +44,7 @@ They consist of four records joined together with 1:n connections
 - Photo: information on the photograph, also on downloading options
 
 
-0.0.1 'Group records'
+### 0.0.1 'Group records'
 This group is not yet well developed, it should contain at least two - rather different - types of records
 
 - Matrix: contains information (making processes, connected iconographies, connected illustrated texts) relevant for all artworks that are impressions of the same printing matrix. Only relevant for printed book illustrations. 
@@ -24,7 +52,7 @@ This group is not yet well developed, it should contain at least two - rather di
 - Cycle: holds together a group of Images that were made together and have a joint iconographic significance (simple example. images of the Four Evangelists on a pulpit)
 
 
-0.0.2 Authority Records
+### 0.0.2 Authority Records
 They consist of a larger number of records that can be linked to a greater number of Artwork (or Group) records, among them are
 
 - Iconography
@@ -45,7 +73,7 @@ Amnongst them, the Place and Text Authority Records normally come in hierarchica
 Region > Town > Building > Building Part > Multi-part artwork
 Text > Chapter > Passage > Quotation
 
-0.1 Structure of Records (in theory)
+## 0.1 Structure of Records (in theory)
 
 Records can have the following elements:
 
@@ -53,7 +81,7 @@ Records can have the following elements:
 - External References
 - Connections to other records (containing information on the type of relationship, numbers for displaying the connections in a logical order and alternative names for previews. Some of this information is relevant for both directions of the connection, other only for one direction)
 
-0.2 Structure of Records (attempt to apply this structure to MongoDB)
+## 0.2 Structure of Records (attempt to apply this structure to MongoDB)
 
 In practical terms, most of the records will be saved as 'Node' entities, with the connections saved as 'Edge' entities so that connections can be made or broken without having to change the 'Nodes'. 
 
@@ -74,12 +102,12 @@ An 'Edge' contains:
 
 
 
-0.2 Material stored outside the database:
+## 0.2 Material stored outside the database:
 - Image files for display/download, in a format that allows quick display on the web and zooming in
 - Image files of printed book illustrations for identifying re-uses of matrices. They have to follow specific criteria (e.g., probably b/w, relatively low res). If VISE is used for these comparison (see below) they have to be indexed in a specific way, and it is probably necessary to have a main collection and some small temporary collections that are from time to time ingested in the main collection (necessitating major reindexing). 
 - Lists of permitted media, connection types etc., stored in a config file for easy access. 
 
-1.0 General Structure
+# 1.0 General Structure
 Some functions (largely search and display) can be used by anyone, others (ingest and edit) only by registered editors. 
 It may be best to have one interface, with a numer of functions blocked for non-registered users. 
 Changes by registered editors should be logged (primarily for training new editors)
@@ -102,7 +130,7 @@ In nearly all cases (perhaps with the exception of 1.1.2), newly ingested Artwor
 Furthermore,  Authority records ingested in this process will probably need additional information and should likewise only released once they had been manually edited (probably first thing, before the individual records). 
 Especially if several editors are working on the database, it makes sense to establish ingest processes. An editor would create a new process and ingest a number of images - probably not more than a few hundred - in this process. The individual records of these images can then be filled manually and published when ready. Once the last image (and the last authority record ingested in this process) have been published, the process is closed. 
 
-1.1 Ingest Photos from local drive
+## 1.1 Ingest Photos from local drive
 (see \documentation\1 Ingest\1-1 Ingest Photos)
 - A number of photographs are uploaded, and Individual records are created for them. 
 - The user can specify the following information:
@@ -114,7 +142,7 @@ Especially if several editors are working on the database, it makes sense to est
 - In rare cases (e.g., lost artworks that should be recorded because copies after them are in the database), it would also be possible to create these records without uploading an actual image. In this case, there would be no Photo record (and probably also no Copy record). 
 
 
-1.2 Ingest Photos from a Museum Website
+## 1.2 Ingest Photos from a Museum Website
 This function has not yet been built in the prototype - it is largely 'Zukunftsmusik' since, as of 2025, only very few museum database have APIs. Since there is currently no standard similar to IIIF, this function would probably need considerable adjustment for every museum. 
 
 It could work as follows:
@@ -128,12 +156,12 @@ It could work as follows:
 	- For each artwork, the iconography records from the museum database are matched with the records in the database. The editor can confirm these matches (and supply missing data, e.g. about iconographic variants), change the iconography, or delete it and add it later. 
 
 
-1.3 Ingest Photos from a digitised manuscript or book from a library website. 
+## 1.3 Ingest Photos from a digitised manuscript or book from a library website. 
 - This is the most complex scenario, consisting of two, for printed images of three steps. 
 - Since the second and third step necessitate going through all images one by one, they can take considerable time, hence it must be possible to interrupt and resume these processes. 
 - It may make sense to have a list of all manuscripts and books currently in this process, indicating what stage theyre in, and allowing the editors to start or resume work at the appropriate place. 
 
-1.3.1 Downloading information on the Book or Manuscript
+### 1.3.1 Downloading information on the Book or Manuscript
 (see \documentation\1 Ingest\1-3 Ingest Books\1-3-1 - Downloading Information)
 
 - Editor enters address of an IIIF manifest
@@ -144,7 +172,7 @@ It could work as follows:
 - Texts, Artists and Places are likewise checked against the database or, if that fails, external resources, the editor can confirm matches, launch manual searches in external databases, or manually create new authority records. 
 - The results are saved as a Manuscript or Book record and a provisional record (currently called 'Pages') that contains information on the individual canvasses of the IIIF manifest as well as the entered information on illustrated texts and making process. 
 
-1.3.2 Creating individual image records
+### 1.3.2 Creating individual image records
 (see \documentation\1 Ingest\1-3 Ingest Books\1-3-2  - Creating individual records)
 
 - All pages of a digitised manuscript and book are downloaded, an algorithm identifies illustrations (this also includes straightening them as necessary). 
@@ -162,14 +190,14 @@ It could work as follows:
 - If the editor confirms the match, relevant information from the Matrix record of the new image is copied into the Matrix record of the match (if there are any conflicts, the editor decides which version to use), then the Matrix record of the new image is deleted, and the new image is connected to the Matrix record of the match instead. 
 - The editor can further copy one reference on an illustrated text and one or more references to iconographies in the Matrix record to the Artwork and Image records respectively of the new image. (For practical reasons, this can be done whether the match was confirmed or not, simply because it is a labour-saving device). 
 
-2 Creating Records
+# 2 Creating Records
 - Individual records are created through the Ingest procedure above. 
 - Group records are produced partially through the Ingest process (Matrix record), partially through editing (Cycle record)
 - Authority records connected directly to Artwork records (Persons, Institutions, Collections, Texts) will normally be created during the ingest processes. 
 - Manual creation is typically necessary for Iconography records, furthermore for some types of records of Objects of depictions that cannot be ingested from outside databases (probably Personifications, Activities), for child records of the hierarchical Place and Text records - furthermore for any Object, for which no record is found in an external resource. 
 - Manual creation will also be necessary for records representing general keywords or headings. 
 
-2.1 Creating Iconography records
+## 2.1 Creating Iconography records
 (see \documentation\2  Create Records\2-1 Iconography)
 
 - First, the type of Iconography has to be selected (Portrait, Emblem, etc.)
@@ -179,28 +207,28 @@ It could work as follows:
 - If the iconography has variants (e.g., if an image of a saint appears with different attributes), these can be catalogued. It makes sense to have two forms for entering this data - one largely filled in with simple options 'yes', 'no', 'unclear', 'not yet determined', and another that has only the last two options complete, whilst the rest can be filled in freely. If an option in one of the variants needs connections to other Object records, they can be entered as described above. (It should also be possible to combine some variants, especially attributes, also with Object records, e.g., records of saints). In this case, once a connection to an Object record is made, one could decide whether the variants connected with this person should be available in this iconography record. This needs more thinking (e.g., should the variant records be copied to the Iconography record and then adjusted or should simply links to them be available? The latter would be more elegant but may create some dispaly problems). 
 - At the end, the Iconography record is saved as a Node with Edges to all connected object records. If variants are defined, probably each variant, and each option within the variants, is a separate Node. 
 
-2.2 Creating child records for Place and Text records
+## 2.2 Creating child records for Place and Text records
 (see \documentation\00 general\element_insert_object_place_text)
 - Amongst Place and Text records, only high-level records ("Town", "Book") are ingested and supplied with data. Lowever-level records typically only consist of a name and the Edges linking them upward and downward. 
 - Hence, there is a simplified way of creating these records:
 - When creating a link to a Place record (when ingesting Photo records, 1.1, or when Creating Iconography records, 2.1) or to a Text record (when editing Artwork records, see below, or when Creating Iconograhy records, 2.1), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It would also be possible to open the record in a separate view to add more information, if desired). 
 - This is not yet fully thought through. Some child records, especially building records, but also major subdivisions of texts (e.g., Biblical Books) may very well have external authority records that could be ingested like other Authority records, and it may also make sense that one searches for them, not for the Town or Book records (which would be rather voluminous for e.g. the City of Rome, or the Bible). 
 
-2.3 Creating keyword and heading records
+## 2.3 Creating keyword and heading records
 - These records are very simple - in most cases, one would merely enter a name and connections to one or two parent headings (in some situations, there might be some external authority record). 
 
-2.4 Creating other Authority records
+## 2.4 Creating other Authority records
 This would largely happen for Persons, Organisations, Places, and Texts for which there are no external authority records - and probably for all Offices, Personifications and Activities, since there are no authority records for such concepts (unless I find some, e.g. in the Getty Data). 
 - Normally, such records would be manually created as part of an Ingest process (1.1, 1.2, 1.3) or the creation of an Iconography record (2.1). In this case, one would probably store the record one had been working on in the FE, open the view to create the new record, and then resume work on the earlier record. 
 - In order to create a new Authority record, one first has to select the record type, then add at least one connection to another record (with relations defined by the record type), and give it a name. 
 
 
-3 Filling newly created records
+# 3 Filling newly created records
 In virtually all cases (exceptions being perhaps records ingested from museum databases, 1.2, or records that have gone through the re-used matrix search, 1.3), new individual records need manual editing. Most important for the database is iconographic information in the Image record (although very few photos may not need it); furthermore, the Artwork record needs information on Medium, Making Processes, Whereabouts, and, where applicable, illustrated texts. 
 This can be supported by special searches that show e.g. only those images in the current ingest process that have no whereabouts or specific wherabouts. 
 Depending on the material, there might be several ways of achieving this - which can also be combined. 
 
-3.1 Fully manual editing
+## 3.1 Fully manual editing
 This way of proceeding is called for if either all images need very different metadata or all fields that do not need different metadata (e.g., whereabouts, making processes) have been filled in at theingest or through bulk editing (3.2 below). 
 - One goes to the first image in the current ingest process that needs to be treated and opens the edit view. This view will combine all individual records together (Artwork, Image, Copy, Photograph) - if there are more Image records to an Artwork record, orsimilar for Copy and Photograph records, one can flip between them). 
 - In this record, all necessary data can be entered: 
@@ -219,7 +247,7 @@ This way of proceeding is called for if either all images need very different me
 	- any Records (Persons, Collections, Places, Texts, Iconographies) that do not exist yet can be ingested or manually created. To do so, the Individual records would be stored and reloaded once the new record(s) have been created. 
 Then, this procedure is repeated at the next record. There could be a function that does not only save the record, but also makes it public, and another that save it, makes it public, and removes it from the current ingest process. These functions should include some checking of minimum standards for publication. 
 
-3.2 Bulk editing
+## 3.2 Bulk editing
 This procedure is useful if some information (typically, it would be whereabouts or making processes) have to be added to a number of records. If one has ingested 100 photos from a church, one might e.g. mark all the ceiling paintings and link them to the same artist and date, or mark all images from the high altar and set them to the child place 'high altar'. This function will tpically be used for new images but could also make sense if e.g. it turns out that all miniatures from a manuscript need to be redated. 
 - Select the images either in the current ingest process or in search results. 
 - Open the edit screen. It will look like the edit screen from 3.1, but all fields in which the individual records have divergent content will be greyed out. 
@@ -227,7 +255,7 @@ This procedure is useful if some information (typically, it would be whereabouts
 - If any field is filled in or changed, these changes will apply to all records that have been marked. 
 - If one tries to change a greyed-out field, one receives a warning - if one discards it, all the individual contents of this field will be replaced by the new content. 
 
-3.3 Copying information
+## 3.3 Copying information
 This procedure is useful for Manuscripts and Books. Often, copy of the same text have very similar images at more or less the same places. If one such manuscript or book has been fully catalogued, and a second one is ingested, the following procedure could be used. 
 - Select the manuscript or book record of the model and the manuscript and book record of the new material
 - Open a view with a split screen that shows the first image connected to either manuscript or book record
@@ -240,7 +268,7 @@ This procedure is useful for Manuscripts and Books. Often, copy of the same text
 	- Should the editor notice that some information in the model is incorrect, it should be possible to correct it on the spot. 
 Since this procedure can take some time (in some cases, there may be several hundred images), it must be possible to interrupt and resume it. 
 
-3.4 Merging individual records
+## 3.4 Merging individual records
 This can be necessary if a group of photos was imported as 'different Artworks', but some of them are actually Images belonging to one and the same Artwork, or Copies belonging to one and the same Image record, or Photos belonging to one and the same Copy record. 
 - In this case, one has to mark all relevant records (either in a view of a current ingest, or in a search view), select and option 'merge' and indicate if the merging should place on Artwork, Image, or Copy level. 
 - If the records that are to be merged contain conflicting information, one is asked, which information to keep in the merged record
@@ -251,7 +279,7 @@ It would also be relatively simple to have a function that would atomise the rec
 With a combination of these two functions, one could probably do all merging and separating operations that might become necessary, albeit in an awkward way. Since I expect such operations to be very rare, this might be sufficient, but one might also built something more comfortable, that would show all Image, Copy, and Photo records belonging to an Artwork as a tree, on which elements could be moved around. 
 
 
-3.5 Completing information in Authority records
+## 3.5 Completing information in Authority records
 Authority records as ingested automatically from the GND or another source often lack some information that is needed for Iconobase. This information could either be added immediately after ingesting the new record or later, before the record is made public. 
 
 It could mean two things: 
