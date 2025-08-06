@@ -1,5 +1,8 @@
 Iconobase - Overview of Functions
 
+# Table of contents
+
+- [Table of contents](#table-of-contents)
 - [0. General](#0-general)
 	- [0.0 Record Types](#00-record-types)
 		- [0.0.0 Individual records describe properties of one single artwork.](#000-individual-records-describe-properties-of-one-single-artwork)
@@ -28,12 +31,14 @@ Iconobase - Overview of Functions
 
 *(This table of contents can be conveniently generated using the Markdown All in One VS Code plugin)*
 
-Include diagram
-<!--
-!includeurl https://raw.githubusercontent.com/tmasch/bpf_be/refs/heads/master/documentation/search_depicted_object.wsd
--->
+*Generating png diagrams:*  
+*Install plantweb using "pip install plantweb" or similar*  
+*Run 'plantweb --format png plantumlfile'*
+
 
 # 0. General
+> why is the numbering starting at 0?
+> Do we need numbering at all?
 
 ## 0.0 Record Types
 
@@ -196,7 +201,11 @@ It could work as follows:
 - The editor can further copy one reference on an illustrated text and one or more references to iconographies in the Matrix record to the Artwork and Image records respectively of the new image. (For practical reasons, this can be done whether the match was confirmed or not, simply because it is a labour-saving device). 
 
 # 2 Creating Records
-- Individual records are created through the Ingest procedure above. 
+[Contents](#table-of-contents)
+> Can we please include such a toc link at each chapter?
+
+- Individual records are created through the [Ingest](#10-general-structure) procedure above. 
+> Maybe such links are nice?
 - Group records are produced partially through the Ingest process (Matrix record), partially through editing (Cycle record)
 - Authority records connected directly to Artwork records (Persons, Institutions, Collections, Texts) will normally be created during the ingest processes. 
 - Manual creation is typically necessary for Iconography records, furthermore for some types of records of Objects of depictions that cannot be ingested from outside databases (probably Personifications, Activities), for child records of the hierarchical Place and Text records - furthermore for any Object, for which no record is found in an external resource. 
@@ -211,6 +220,9 @@ It could work as follows:
 - The Iconclass notation(s) for this iconography are entered, and hence a link to Iconclass built (all Iconography records without Iconclass notations will be sent to the Iconclass editorsto consider creating notations for these Iconographies). 
 - If the iconography has variants (e.g., if an image of a saint appears with different attributes), these can be catalogued. It makes sense to have two forms for entering this data - one largely filled in with simple options 'yes', 'no', 'unclear', 'not yet determined', and another that has only the last two options complete, whilst the rest can be filled in freely. If an option in one of the variants needs connections to other Object records, they can be entered as described above. (It should also be possible to combine some variants, especially attributes, also with Object records, e.g., records of saints). In this case, once a connection to an Object record is made, one could decide whether the variants connected with this person should be available in this iconography record. This needs more thinking (e.g., should the variant records be copied to the Iconography record and then adjusted or should simply links to them be available? The latter would be more elegant but may create some dispaly problems). 
 - At the end, the Iconography record is saved as a Node with Edges to all connected object records. If variants are defined, probably each variant, and each option within the variants, is a separate Node. 
+
+> This is how to include images
+![Create](./2%20%20Create%20Records/2-1%20Iconography/create_iconography.png)
 
 ## 2.2 Creating child records for Place and Text records
 (see \documentation\00 general\element_insert_object_place_text)
