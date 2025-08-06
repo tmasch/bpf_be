@@ -1,0 +1,276 @@
+@startuml
+title Copying descriptions from book illustrations
+|UI|
+start
+:Select model manuscript or book;
+:Select manuscript or book
+to be described;
+note right
+How this selection would be done, 
+depends on the structure of the UI.
+The most intuitive thing would be 
+to search one, create a split screen,
+and search the other. 
+Another way would be to search the
+model, copy its ID, search the new
+record, open it, select 'copy cata-
+logue descriptions', and enter 
+ID of model
+end note
+:Open view for copying descriptions;
+note right
+This view has a split screen, 
+showing at the beginning
+the first image of the source
+manuscript or book on one 
+side, together with information
+on Illustrated Text and Icono-
+graphy from its individual records,
+and the first image of the new
+manuscript or book on the 
+other side
+endnote
+
+|BFF|
+:Search for the first images
+connected to either book or
+manuscripts;
+note right
+It may be necessary to 
+search also already for 
+the connected iconographies,
+in this case, the separate
+search for them as shown
+further down would not 
+be needed.
+end note
+|DB|
+:Search;
+|BFF|
+:Load Photos for these records;
+:Format data for UI;
+|UI|
+if (Images are in sync) then (yes)
+else (no)
+    :move one or both sides
+    forward until they are
+    in sync;
+    note right
+    The phrase 'in sync'
+    means that they are both
+    at the same text passage 
+    in the manuscript or book, 
+    most probably showing 
+    similar images
+    end note
+    |BFF|
+    :Search for the next image;
+    note right
+    In the case that there are
+    several Image records for an 
+    Artwork record, each must be
+    treated separately
+    end note
+    |DB|
+    :Search;
+    |BFF|
+    :Load Photos for these records;
+    :Format data for UI;
+end if
+|UI|
+:Check if the two images
+illustrate the same passage
+of the text;
+if (Unclear?
+Context needed?) then (yes)
+    |BFF|
+    #orange:Search the full-page
+    images from the external 
+    resource the images come 
+    from;
+    |UI|
+    :Show full-page in lieu 
+    of the images in the dabase;
+    :Switch back after
+    user has made up mind;
+else (no)
+end if 
+if (User determines both images
+illustrate the same passage of 
+the text) then (yes)
+    |BFF|
+    :Create Edge between
+    new Artwork record and
+    the passage of text
+    connected to model
+    Artwork record;
+    |DB|
+    :Save Edge;
+    |BFF|
+    :Return to UI;
+else (no)
+    if (User decides to manually
+    enter illustrated passage
+    of text) then (yes)
+        :process element_insert_
+        object_place_text_ is used;
+        note right 
+        This could equally be done
+        later with manual editing,
+        but it may be more convenient
+        to do it here on the spot
+        end note
+        |BFF|
+        :Create the Edge selected
+        in this process;
+        |DB|
+        :Save Edge;
+        |BFF|
+        :Return to UI;
+        |UI|
+    else (no)
+    end if 
+end if 
+:Check if the two images
+show the same iconography;
+note right
+If several iconographies
+are connected to the 
+Model Image record, it
+must be possible to do this
+individually, or for
+all in one go
+end note 
+if (same iconography) then (yes)
+    :Check if also the 
+    variants of the
+    iconography are 
+    the same;
+    note right
+    Only applicable if
+    one of the icono-
+    graphies of the model
+    has variants
+    endnote
+    if (also same variants) then (yes)
+        :Select Option Copy 
+        Iconography + variants;
+        |BFF|
+        :Copy the Edge between the 
+        Model Image record and 
+        Iconography, replace ID
+        of Model Image record
+        with new Image record;
+        |DB|
+        :Save new Edge|
+        |BFF|
+        :Return to UI;
+        |UI|
+    else (no)
+        :Select Option Copy
+        Iconography and 
+        Determine variants;
+        |BFF|
+        :Search for the Iconography
+        Record connected to the 
+        Model image record;
+        note right
+        Possibly, this record
+        was already loaded in 
+        order to display the 
+        Model Image record in the
+        first place, in this case,
+        this search can be omitted
+        end note 
+        |DB|
+        :Search;
+        |BFF|
+        :Send full names of variants
+        to UI;
+        |UI|
+        :Select the appropriate
+        variants;
+        |BFF|
+        :Create Edge with the IDs of 
+        the new Image record, the 
+        iconography of the Model 
+        image record, and the 
+        selected variants;
+        |DB|
+        :Save new Edge;
+        |BFF|
+        :Return to UI;
+        |UI|
+    end if
+else (no)
+    if (User decides to manually
+    enter Iconography) then (yes)
+        :User starts
+        entering iconography
+        (with autocomplete);
+        note right 
+        This could equally be done
+        later with manual editing,
+        but it may be more convenient
+        to do it here on the spot
+        end note
+        |BFF|
+        :Search for iconography that
+        contains the string entered
+        by user;
+        |DB|
+        :Search;
+        |BFF|
+        if (iconography found) then (yes)
+            :send the found
+            iconographies with
+            their variants to UI;
+            |UI|
+            :Select iconography,
+            and variants of it
+            (if it has any);
+            |BFF|
+            :Create Edge with the
+            IDs of the new Image 
+            record, the selected 
+            iconography, and the 
+            selected variants;
+            |DB|
+            :Save Edge;
+            |BFF|
+            :Return to UI;
+        else (no)
+            :Send notice of
+            failed search to UI;
+            |UI|
+            if (User wants to create
+            new Iconographic record) then (yes)
+                :Save all changes 
+                in this view;
+                :Open View for
+                New Iconography;
+                :Resume work here
+                (newly created 
+                Iconography is
+                selected);
+            else (no)
+                :No iconography assigned
+                in this process;
+            end if
+        end if
+
+        |UI|
+    else (no)
+        :No iconography assigned
+        in this process;
+    end if 
+end if
+:Move to next image;
+note right
+Move should happen
+automatically after
+User made his 
+decisions in UI
+end note
+end
+@enduml
