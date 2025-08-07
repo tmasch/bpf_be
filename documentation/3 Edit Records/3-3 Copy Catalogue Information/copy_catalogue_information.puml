@@ -205,61 +205,9 @@ if (same iconography) then (yes)
 else (no)
     if (User decides to manually
     enter Iconography) then (yes)
-        :User starts
-        entering iconography
-        (with autocomplete);
-        note right 
-        This could equally be done
-        later with manual editing,
-        but it may be more convenient
-        to do it here on the spot
-        end note
-        |BFF|
-        :Search for iconography that
-        contains the string entered
-        by user;
-        |DB|
-        :Search;
-        |BFF|
-        if (iconography found) then (yes)
-            :send the found
-            iconographies with
-            their variants to UI;
-            |UI|
-            :Select iconography,
-            and variants of it
-            (if it has any);
-            |BFF|
-            :Create Edge with the
-            IDs of the new Image 
-            record, the selected 
-            iconography, and the 
-            selected variants;
-            |DB|
-            :Save Edge;
-            |BFF|
-            :Return to UI;
-        else (no)
-            :Send notice of
-            failed search to UI;
-            |UI|
-            if (User wants to create
-            new Iconographic record) then (yes)
-                :Save all changes 
-                in this view;
-                :Open View for
-                New Iconography;
-                :Resume work here
-                (newly created 
-                Iconography is
-                selected);
-            else (no)
-                :No iconography assigned
-                in this process;
-            end if
-        end if
-
-        |UI|
+        :Process as in 2.0.1
+        (adding connections, 
+        version for Iconography);
     else (no)
         :No iconography assigned
         in this process;
@@ -274,3 +222,5 @@ decisions in UI
 end note
 end
 @enduml
+
+
