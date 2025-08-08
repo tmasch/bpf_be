@@ -1,0 +1,125 @@
+@startuml
+title Select Connected Object Records (Iconography)
+
+|UI|
+start
+note right
+This action happens
+regularly in two contextsn:
+- manual editing
+of Artwork records (3.1)
+- copying information (3.3)
+It may also happen occasionally
+in Bulk editing (3.2)
+endnote
+note right
+Different from 2.0.0 there 
+is no need to select a 
+connection type - it is 
+always the same
+end note
+
+:Start typing name
+of Iconography (Autocomplete);
+
+repeat
+    :Once a minimum of letters
+    has been typed, Send this text 
+    and type 'Iconography' to BFF;
+    |BFF|
+    :Launch search in DB for
+    Iconography records whose name  
+    contains this string;
+    |DB|
+    :Search;
+    |BFF|
+    :Process search result
+    for display;
+    note right
+    Needed are previews
+    and pershaps also 
+    the names of variants
+    (with names of all 
+    options - unless they 
+    are loaded later 
+    separately)
+    end note
+    |UI|
+    :Display result;
+
+repeat while (User continues typing)
+
+if (Select item from list) then (result)
+    |BFF|
+    :Retrieve variants (with 
+    names of all options) 
+    from DB;
+    note right
+    Step can be omitted
+    if they have been
+    retrieved at the 
+    original search
+    end note
+    |DB|
+    :Search;
+    |BFF|
+    :Process search result 
+    for display;
+    |UI|
+    :Display variants;
+    :Select for every 
+    variant the appropriate
+    option(s);
+
+else (no result selected)
+       if (User decides to
+       create a new 
+       Iconography record) then (yes)
+      
+        :Save all data from this view in FE;
+        :Open view Create 
+        Iconography Record;
+        :Once Iconography records
+        has been created manually,
+        return to this view;
+        :Restore stored data;
+        :Automatically insert 
+        newly-created Iconography
+        record - with variants,
+        if any have been created;
+        :Select for every
+        variant the appropriate
+        option(s);
+    else (no)
+        :No connection to 
+        iconography is made;
+    end if
+end if
+:Save record;
+note right
+It is possible that 
+a number of other 
+elements of the record, 
+not only the Iconography,
+are being changed
+end note
+|BFF|
+:Create Edge between
+Image record and 
+Iconocgraphy (if 
+Options have been 
+chosen for variants,
+their IDs are added 
+as attributes);
+|DB|
+:Save new Edge;
+|BFF|
+:Success;
+|UI|
+:Success;
+
+
+
+end
+
+@enduml

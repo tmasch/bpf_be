@@ -81,6 +81,7 @@ They consist of a larger number of records that can be linked to a greater numbe
 - Office
 - Text
 - Activity
+- Element of a coat-of-arms (see below)
 - General Keyword / Heading
 
 Most of these records should be self-explanatory - with exception of the Office record. It is used to group depicted persons together. Each office record consists of a profession and an organisation or a place (e.g., King of England, Canon of Augsburg). Indicating an Office and a time would be a convenient way to locate a historical figure. 
@@ -88,6 +89,11 @@ Most of these records should be self-explanatory - with exception of the Office 
 Amnongst them, the Place and Text Authority Records normally come in hierarchically ordered groups, e.g.
 Region > Town > Building > Building Part > Multi-part artwork
 Text > Chapter > Passage > Quotation
+
+Iconography records can contain variants. In this case, there is one or more criteria, each with several options that may or may not be mutually exclusive (e.g. criterion: "with sword", options "yes", "no", "uncertain", "to be determined"). The Iconography is hence determined by the indication of an Iconography record and a list the IDS of all selected options. It is also possible to have some Criteria that appear rarely, and that have only one Option with an ID, selectedif the Criterion applies. 
+
+Similar systems of variants would probably used for records describing elements of coats-of-arms (e.g., for different tinctures or postures of heraldic lions). Hence, they should be separate from e.g. the record of the animal 'lion' (I thought of having similarly separate records for attributes and elements of emblems, but this may not be necessary)
+
 
 ## 0.1 Structure of Records (in theory)
 
@@ -269,6 +275,7 @@ It could work as follows:
 - An Edge between the Image and the selected Iconography record is saved. 
 - The IDs of any selected Options are saved as part of this Edge
 
+![Create](./2%20%20Create%20Records/2-0-2%20Connection%20to%20Iconography/connection_to_iconography.png)
 
 ### 2.0.2 Version for Place and Text records (thus records with child records)
 [Contents](#table-of-contents)
@@ -278,7 +285,6 @@ It could work as follows:
 - When creating a link to a Place record (when ingesting Photo records, 1.1, or when Creating Iconography records, 2.1) or to a Text record (when editing Artwork records, see below, or when Creating Iconograhy records, 2.1), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It would also be possible to open the record in a separate view to add more information, if desired. 
 - This is not yet fully thought through. Some child records, especially building records, but also major subdivisions of texts (e.g., Biblical Books) may very well have external authority records that could be ingested like other Authority records, and it may also make sense that one searches for them, not for the Town or Book records (which would be rather voluminous for e.g. the City of Rome, or the Bible). 
 ![Create](./00%20general/element_insert_object_place_text.png)
-
 
 
 

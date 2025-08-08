@@ -1,5 +1,5 @@
 @startuml
-title Select Connected Object Records (execept Place / Text)
+title Select Connected Records (exeept Place / Text / Iconography)
 
 |UI|
 start
