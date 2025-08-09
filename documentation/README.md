@@ -13,7 +13,7 @@ Iconobase - Overview of Functions
 	- [0.2 Structure of Records (attempt to apply this structure to MongoDB)](#02-structure-of-records-attempt-to-apply-this-structure-to-mongodb)
 	- [0.2 Material stored outside the database:](#02-material-stored-outside-the-database)
 - [1 General Structure](#1-general-structure)
-	- [1.0 Ingest Artworks](#10-ingest-artworks)
+	- [1.0 Ingest Photos](#10-ingest-photos)
 	- [1.1 Ingest Photos from local drive](#11-ingest-photos-from-local-drive)
 	- [1.2 Ingest Photos from a Museum Website](#12-ingest-photos-from-a-museum-website)
 	- [1.3 Ingest Photos from a digitised manuscript or book from a library website.](#13-ingest-photos-from-a-digitised-manuscript-or-book-from-a-library-website)
@@ -28,12 +28,15 @@ Iconobase - Overview of Functions
 	- [2.1 Creating Iconography records](#21-creating-iconography-records)
 	- [2.2 Creating keyword and heading records](#22-creating-keyword-and-heading-records)
 	- [2.3 Creating other Authority records](#23-creating-other-authority-records)
-- [3 Filling newly created records](#3-filling-newly-created-records)
+- [3 Filling and Editing records](#3-filling-and-editing-records)
 	- [3.1 Fully manual editing](#31-fully-manual-editing)
 	- [3.2 Bulk editing](#32-bulk-editing)
 	- [3.3 Copying information](#33-copying-information)
 	- [3.4 Merging individual records](#34-merging-individual-records)
 	- [3.5 Completing information in Authority records](#35-completing-information-in-authority-records)
+	- [3.6 Deleting Authority Records](#36-deleting-authority-records)
+	- [3.7 Merging Authority Records](#37-merging-authority-records)
+- [4 Searching for Records](#4-searching-for-records)
 
 
 
@@ -123,7 +126,6 @@ An 'Edge' contains:
 - Attributes (as above) relevant for connection to the second 'Node' only
 
 
-
 ## 0.2 Material stored outside the database:
 - Image files for display/download, in a format that allows quick display on the web and zooming in
 - Image files of printed book illustrations for identifying re-uses of matrices. They have to follow specific criteria (e.g., probably b/w, relatively low res). If VISE is used for these comparison (see below) they have to be indexed in a specific way, and it is probably necessary to have a main collection and some small temporary collections that are from time to time ingested in the main collection (necessitating major reindexing). 
@@ -150,13 +152,13 @@ The following types of functions are needed:
 
 
 
-## 1.0 Ingest Artworks
+## 1.0 Ingest Photos
 [Contents](#table-of-contents)
 
 This is the most common way for creating records - not only artwork records, but also group and authority records connected to them. 
 In nearly all cases (perhaps with the exception of 1.1.2), newly ingested Artwork records still lack essential information and need manual filling. Hence, they should be marked as 'in progress' - they should be suppress in public searches, but editors should be able to search for these records only (in order to edit and then make them public). 
 Furthermore,  Authority records ingested in this process will probably need additional information and should likewise only released once they had been manually edited (probably first thing, before the individual records). 
-Especially if several editors are working on the database, it makes sense to establish ingest processes. An editor would create a new process and ingest a number of images - probably not more than a few hundred - in this process. The individual records of these images can then be filled manually and published when ready. Once the last image (and the last authority record ingested in this process) have been published, the process is closed. 
+Especially if several editors are working on the database, it makes sense to establish ingest processes. An editor would create a new process and ingest a number of images - probably not more than a few hundred - in this process. The individual records of these images can then be filled manually and published when ready. Once the last image (and the last authority record ingested in this process) have been published, the process can be closed. 
 
 ## 1.1 Ingest Photos from local drive
 [Contents](#table-of-contents)
@@ -204,6 +206,9 @@ It could work as follows:
 - If the manifest or the bibliographical record contain references to Collections, Persons, and Places, a search for them is done in the database and, if it fails, in external resources (e.g., GND). The editor can select the appropriate match or, if necessary, manually search and ingest or create new authority records. 
 - The editor can select the text illustrated here, medium and, once the appropriate Making Processes have been determined, enter Artists, Places, and Dates in these forms. 
 - Texts, Artists and Places are likewise checked against the database or, if that fails, external resources, the editor can confirm matches, launch manual searches in external databases, or manually create new authority records. 
+- If any authority records are found in external resources, they will be ingested automatically. 
+- A new record is ingested automatically, if there was no record found in the database but one from external resources, and if there is a record in the database, but it is only a stub. 
+- If any newly ingested record contains connections to other authority records (often the case), the connected records are either imported in full, or the information in the connection is merely used to create stubs. This will depend on the type of records (e.g., persons connected to other persons will be normally imported as stubs, but places connected to a collection as full records. In addition, if there is already a stub in the database, it would be upgraded to a full record since it is apparently relevant.**)
 - The results are saved as a Manuscript or Book record and a provisional record (currently called 'Pages') that contains information on the individual canvasses of the IIIF manifest as well as the entered information on illustrated texts and making process. 
 ![Create](./1%20Ingest/1-3%20Ingest%20Books/1-3-1%20-%20Downloading%20Information/ingest_manifest.png)
 
@@ -312,12 +317,13 @@ This would largely happen for Persons, Organisations, Places, and Texts for whic
 - Normally, such records would be manually created as part of an Ingest process (1.1, 1.2, 1.3) or the creation of an Iconography record (2.1). In this case, one would probably store the record one had been working on in the FE, open the view to create the new record, and then resume work on the earlier record. 
 - In order to create a new Authority record, one first has to select the record type, then add at least one connection to another record (with relations defined by the record type), and give it a name. 
 
-# 3 Filling newly created records
+# 3 Filling and Editing records
 [Contents](#table-of-contents)
 
 In virtually all cases (exceptions being perhaps records ingested from museum databases, 1.2, or records that have gone through the re-used matrix search, 1.3), new individual records need manual editing. Most important for the database is iconographic information in the Image record (although very few photos may not need it); furthermore, the Artwork record needs information on Medium, Making Processes, Whereabouts, and, where applicable, illustrated texts. 
 This can be supported by special searches that show e.g. only those images in the current ingest process that have no whereabouts or specific wherabouts. 
 Depending on the material, there might be several ways of achieving this - which can also be combined. 
+Later editing of records - which will be comparably rare, follows the same principles
 
 ## 3.1 Fully manual editing
 [Contents](#table-of-contents)
@@ -387,7 +393,46 @@ Authority records as ingested automatically from the GND or another source often
 
 It could mean two things: 
 - Determining the type of an authority record (e.g., is a depicted person a historical figure, a mythological figure, etc.I)
-- Creating links to other records - e.g., a 'historical figure' must be defined by a place, a date, and a profession, however vague (or, in many cases easier, by an office and dates), an artist must have a preferred place of activity, a town must belong to a region, and an animal species to larger groups). 
-
+- Creating links to other records - e.g., a 'historical figure' must be defined by a place, a date, and a profession, however vague (or, in many cases easier, by an office and dates), an artist must have a preferred place of activity, a town must belong to a region, and an animal species to larger groups. 
+- If a place of activity is assigned to an artist, all Making processes with this artist and no link to a place are to be supplied with this place or activity as place. 
 This would be done through manual editing. One would probably go through all unpublished Authority records in an Ingest process, open them and be prompted which information was still missing. 
 
+## 3.6 Deleting Authority Records
+[Contents](#table-of-contents)
+This action would be needed very rarely in production node, more common would be a merger (see below). 
+- Authority records cannot be deleted, if they still have meaningful connections. 
+- There are three scenarios:
+  - Record has no connections at all - it can be deleted
+  - Record is only connected to stubs - it can be deleted together with the stubs
+  - Record of type Place or Text is only connected to Parent record (and perhaps to stubs) - it can be deleted (together with the stubs, should there be any)
+  - Record is not connected to any individual or group record but to one and only one other Authority record - it can be demoted to a stub, all stubs connected to it can be deleted
+  - Record is connected to two or more authority records and/or to at least on individual or Group record - it cannot be deleted nor demoted to a stub
+- If the record is deleted or demoted to a stub, all stubs connected to it are deleted, as are all Edges connecting to this record. 
+- If the record cannot be deleted, a list of all connected records that prevent the deletion from happening, has to be sent to the UI. 
+
+## 3.7 Merging Authority Records
+[Contents](#table-of-contents)
+This action would normally be used (instead of deleting above) if it became obvious that two Authority records actually denote the same thing. 
+- User selects two authority records, either with search on split screen, or searching one, copying its ID, searching the other, chose 'Merge' and enter the ID of the other record. 
+- A merger is only possible between two records of the same record type (e.g. two persons)
+- For all Attributes of record B:
+  - If an Attribute that can be repeated (e.g., variant name) exists in record B but not in record A, it is copied to record A
+  - If an Attrbute that cannot be repeated (e.g., preferred name, sex, geographical coordinates) exists in both records A and B, but with different values, the user has to decide which ones to take over
+- For all Edges containing the ID of record B:
+  - If record B has a connection to a record and record A has a connection to the same record with the same attributes, the connection of record B is deleted
+  - if record B has a connection to a record to which record A has no connection, the ID of record B in the Edge is replaced with the ID or record A
+  - if both record A nad B have connections to the same authority record, but with different attributes, the user has to decide which will be used for merged record (mixing and matching of attributes allowed) - of if both connections actually mean different things, and both are to be retained - e.g. if one connects an artist and a town as 'born in' and another as 'active in' (in any connection that is to be retained, all references to record B have to be replaced with references to record A.)
+  - All connections +
+  - The ID of record B is added as attribute 'former ID' or so to record A (this is needed for iconography records in case that there some outside resource referred to its ID, but it may make sense to do this always)
+  - The Node for record B is being deleted (all Edges leading to it should have been deleted by the steps before)
+
+
+# 4 Searching for Records
+- Virtually all searches go for some elements of Authority records (e.g. works by certain artists, works in certain locations, works showing certain iconographies). ONly a search for a museum inventory number or an auction lot number would go for the Edge between an Artwork record and an Authority record (a search for a manusript shelf mark would search for the Edge between two Authority records). There might be also searches for specific IDs of individual records used when editing the database. 
+- If a search is for an Authority record, it can have two intended results:
+  - Firstly, the Authority record as data. It would be rather use to browse from and and see if there are other relevant Authority records, and then to display the images connected to them. 
+  - Secondly, the search could go for all individual records connected to the found Authority records. Two things have to be kept in mind:
+    - There may be different connections, and not all of them relevant for the search (e.g., a search for portraits of Michelangelo should not turn out works by Michelangelo) - however, it may also be that a user wants to see more than one connection (e.g., all images showing Michelangelo, be their portraits or history paintings) or simply anything connected to a certain Authority record
+    - Depending on the type of connection, there may be rather different paths. A search for works of art made by Michelangelo would, for instance to search for an Person named Michelangelo that has the type 'Artist', copy its ID, and look for Artwork records that have this ID in their Making processes. A search for Images of all Types featuring Michelangelo would search for a Person named Michelangelo that has the type 'Depicted Person' (one and the same record for Michelangelo would have both types, if both works by and images of him are in the database), search for all Iconography records related to this person record and then search all Image records connected to one of these Iconography records and then show search the connected Artwork record (with a preview image of taken from that Image and Photo records that are marked as 'Preferred' for the Iconography 'Michelangelo', if there are more). A still more complex example: One might search for saints that have as attribute a candle. Here, one would first search for the object 'candle' and search for all Iconography records this record is connected to. However, one has to filter them so that all records that are not linked to Persons with the attribute 'Saint' are excluded, and one has to filter the search for Image records to those that also contain the Option ID for the variant that a 'candle' is shown. 
+    - This means that one will need a UI with a number of different search boxes, and that one needs a number of different searches - some of them with recursive elements, in the BFF. 
+  - In the following, some examples of searches shall be demonstrated. 
