@@ -164,7 +164,7 @@ end if
 :Create Edge between the 
 Authority record ingested
 originally and this new
-record;
+record (or stub);
 |DB|
 :Store all new Authority
 records and Edges between
@@ -178,7 +178,7 @@ the data needed for
 the next step of 
 the process (1.3.2);
 |DB|
-:Store new book / 
+:Store new book or 
 manuscript and 
 Pages records;
 note right
