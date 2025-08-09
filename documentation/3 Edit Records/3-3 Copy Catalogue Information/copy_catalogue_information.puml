@@ -36,7 +36,7 @@ endnote
 connected to either book or
 manuscripts;
 note right
-It may be necessary to 
+It may be convenient to 
 search also already for 
 the connected iconographies,
 in this case, the separate
@@ -63,6 +63,16 @@ else (no)
     most probably showing 
     similar images
     end note
+    note right
+    If there are images
+    in the new record with
+    no parallel in the model,
+    it might make sense 
+    to supply here the data
+    manually rather than 
+    doing it later with
+    separate manual editing.    
+    end note
     |BFF|
     :Search for the next image;
     note right
@@ -81,6 +91,14 @@ end if
 :Check if the two images
 illustrate the same passage
 of the text;
+note right
+If there are two references 
+(only possible with some 
+liturgical books), it must
+be possible to do that for
+both together, or for each
+one separately. 
+end note
 if (Unclear?
 Context needed?) then (yes)
     |BFF|
@@ -95,25 +113,104 @@ Context needed?) then (yes)
     user has made up mind;
 else (no)
 end if 
+if (User notices that 
+information on illustrated
+passage of text in model
+is wrong) then (yes)
+    :User can correct it
+    as in 2.0.2;
+    note right
+    It is plausible that
+    such an error would
+    be noticed here, 
+    and it should be 
+    possible to correct
+    it on the spot    
+    end note
+    :the corrected version
+    is used as model;
+else (no)
+end if 
 if (User determines both images
 illustrate the same passage of 
 the text) then (yes)
     |BFF|
-    :Create Edge between
-    new Artwork record and
-    the passage of text
-    connected to model
-    Artwork record;
+    if (There is already an
+    Edge between new Artwork
+    record and a passage of 
+    text) then (yes)    
+        if (both Edges are identical) then (yes)
+            :pass;
+        elseif (both Edges can coexist) then (yes)
+            :Keep old Edge  and
+            create new Edge between
+            new Artwork record and
+            the passage of text
+            connected to model
+            record;
+            note right
+            This is the case
+            for some liturgical
+            texts
+            end note
+        elseif (Old Edge links 
+        to parent record of
+         new Edge) then (yes)        
+            :Delete old Edge  and
+            create new Edge between
+            new Artwork record and
+            the passage of text
+            connected to model
+            record;
+            note right
+            This could happen
+            if e.g. at the Ingest
+            of a Bible manuscript,
+            all Artwork records
+            get the Illustrated
+            text 'Bible', and 
+            now they get something
+            more specific    
+            end note
+        else (other cases)
+            :send query to UI;
+            |UI|
+            if (Decide which
+            reference to keep) then (old)
+                |BFF|
+                :Pass;
+                |UI|
+            else (new)
+                |BFF|
+                :Delete old Edge  and
+                create new Edge between
+                new Artwork record and
+                the passage of text
+                connected to model
+                record;
+            end if
+
+
+        end if
+
+
+    else (no)
+        :Create Edge between
+        new Artwork record and
+        the passage of text
+        connected to model
+        Artwork record;
+    end if
     |DB|
-    :Save Edge;
+    :Save and Delete Edges;
     |BFF|
     :Return to UI;
 else (no)
     if (User decides to manually
     enter illustrated passage
     of text) then (yes)
-        :process element_insert_
-        object_place_text_ is used;
+        :add connection 
+        as in 2.0.2;
         note right 
         This could equally be done
         later with manual editing,
@@ -141,73 +238,137 @@ must be possible to do this
 individually, or for
 all in one go
 end note 
-if (same iconography) then (yes)
-    :Check if also the 
-    variants of the
-    iconography are 
-    the same;
+if (User notices that 
+information on Iconography
+in model is wrong) then (yes)
+    :User can correct it
+    with process 2.0.1;
     note right
-    Only applicable if
-    one of the icono-
-    graphies of the model
-    has variants
-    endnote
-    if (also same variants) then (yes)
-        :Select Option Copy 
-        Iconography + variants;
-        |BFF|
-        :Copy the Edge between the 
-        Model Image record and 
-        Iconography, replace ID
-        of Model Image record
-        with new Image record;
-        |DB|
-        :Save new Edge|
-        |BFF|
-        :Return to UI;
-        |UI|
+    It is plausible that
+    such an error would
+    be noticed here, 
+    and it should be 
+    possible to correct
+    it on the spot    
+    end note
+    :the corrected version
+    is used as model;
+else (no)
+end if 
+if (same iconography) then (yes)
+    if (iconography has variants) then (yes)
+        :Check if also the 
+        variants of the
+        iconography are 
+        the same;
+        if (also same variants) then (yes)
+            :Select Option Copy 
+            Iconography + variants;
+            note right
+            There should be two options,
+            one for 'save and move on', 
+            one for 'save and stay' - 
+            there may be cases, when
+            one wants to copy also 
+            the variants but needs
+            to change at least one
+            of them
+            end note
+        else (no)
+            :Select Option Copy
+            Iconography and 
+            Determine variants;
+        end if
+        if (Variants to be changed) then (yes)
+            |UI|
+            :Send ID of selected
+            iconography to BE;
+            note right
+            Manual changes of 
+            variants are necessary
+            if the record was 
+            copied without variants;
+            if the user selected 'save
+            and stay' above, he wants
+            to change the variants
+            end note
+            note right
+            Possibly, this information
+            was already loaded in 
+            order to display the 
+            Model Image record in the
+            first place, in this case,
+            this search can be omitted
+            end note 
+            |BFF|
+            :Search for the Iconography
+            Record connected to the 
+            Model image record;
+            |DB|
+            :Search;
+            |BFF|
+            :Send full names of variants
+            to UI;
+            |UI|
+            :Display the variants;
+            if (user had selected
+            Copy Iconography + 
+            variants beforehand) then (yes)
+                :automatically select 
+                the options selected 
+                in the model record;
+            else (no)
+            end if
+            :Manually Select the 
+            appropriate variants / 
+            correct automatic
+            selection;
+            :Complete process
+            of changing variants;
+        else (no)
+        end if 
     else (no)
-        :Select Option Copy
-        Iconography and 
-        Determine variants;
-        |BFF|
-        :Search for the Iconography
-        Record connected to the 
-        Model image record;
-        note right
-        Possibly, this record
-        was already loaded in 
-        order to display the 
-        Model Image record in the
-        first place, in this case,
-        this search can be omitted
-        end note 
-        |DB|
-        :Search;
-        |BFF|
-        :Send full names of variants
-        to UI;
-        |UI|
-        :Select the appropriate
-        variants;
-        |BFF|
+    end if
+    |BFF|
+    if (variants had been
+    changed manually) then (yes)     
         :Create Edge with the IDs of 
         the new Image record, the 
         iconography of the Model 
-        image record, and the 
-        selected variants;
-        |DB|
-        :Save new Edge;
-        |BFF|
-        :Return to UI;
-        |UI|
+        image record, and the IDs
+        of the selected options
+        in the variants;
+    else (no variants or no changes)
+        :Copy Edge between model
+        record and new record,
+        replace ID of model record
+        with ID of new record;
     end if
+    |DB|
+    :Save new Edge;
+    |BFF|
+    :Return to UI;
+    |UI|
 else (no)
     if (User decides to manually
     enter Iconography) then (yes)
         :Process as in 2.0.1
         (adding connections, 
         version for Iconography);
+        note right 
+        This could equally be done
+        later with manual editing,
+        but it may be more convenient
+        to do it here on the spot
+        end note
+        note right
+        Should the new record
+        already have an icono-
+        graphy, it could be manually
+        deleted here, otherwise it
+        will remain.
+        end note
+
     else (no)
         :No iconography assigned
         in this process;
