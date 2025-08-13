@@ -275,7 +275,7 @@ It could work as follows:
 - An Edge between the Image and the selected Iconography record is saved. 
 - The IDs of any selected Options are saved as part of this Edge
 
-![Create](./2%20%20Create%20Records/2-0-2%20Connection%20to%20Iconography/connection_to_iconography.png)
+![Create](./connect_iconography.png)
 
 ### Connect Place / Text
 [Contents](#table-of-contents)
@@ -298,7 +298,7 @@ It could work as follows:
 - If the iconography has variants (e.g., if an image of a saint appears with different attributes), these can be catalogued. It makes sense to have two forms for entering this data - one largely filled in with simple options 'yes', 'no', 'unclear', 'not yet determined', and another that has only the last two options complete, whilst the rest can be filled in freely. If an option in one of the variants needs connections to other Object records, they can be entered as described above. (It should also be possible to combine some variants, especially attributes, also with Object records, e.g., records of saints). In this case, once a connection to an Object record is made, one could decide whether the variants connected with this person should be available in this iconography record. This needs more thinking (e.g., should the variant records be copied to the Iconography record and then adjusted or should simply links to them be available? The latter would be more elegant but may create some dispaly problems). 
 - At the end, the Iconography record is saved as a Node with Edges to all connected object records. If variants are defined, probably each variant, and each option within the variants, is a separate Node. 
 
-![Create](./2%20%20Create%20Records/2-1%20Iconography/create_iconography.png)
+![Create](./create_iconography.png)
 
 ## Create keyword and heading records
 [Contents](#table-of-contents)
@@ -366,7 +366,7 @@ This procedure is useful for Manuscripts and Books. Often, copy of the same text
 	- Should the editor notice that some information in the model is incorrect, it should be possible to correct it on the spot. 
 Since this procedure can take some time (in some cases, there may be several hundred images), it must be possible to interrupt and resume it. 
 
-![Create](./3%20Edit%20Records/3-3%20Copy%20Catalogue%20Information/copy_catalogue_information.png)
+![Create](./copy_information.png)
 
 ## Merge individual records
 [Contents](#table-of-contents)

@@ -12,7 +12,7 @@ endnote
 :Select type of iconography
 (portrait, emblem, etc.);
 note left
-2-1-screen1
+screen1
 end note
 |BFF|
 :Determine possible objects, and 
@@ -30,7 +30,7 @@ this type of iconography
 and lists for selecting 
 connection types are shown;
 note left
-2-1-screen2
+screen2
 end note
 :Enter Object name and
 select Connection for each
@@ -39,7 +39,7 @@ Object
 or element_insert_object_
 text_place);
 note left
-2-1-screen3
+screen3
 endnote
 note right
 Different procedures for
@@ -57,7 +57,7 @@ endnote
 :Enter (or change) preferred name
 and name variants of iconography;
 note left 
-2-1-screen4
+screen4
 endnote
 :Enter iconclass notation;
 |BFF|
@@ -68,7 +68,7 @@ name;
 :Display name of iconography
 from Iconclass;
 note left
-2-1-screen5
+screen5
 end note
 
 if (Record needs variants) then (yes)
@@ -83,7 +83,7 @@ if (Record needs variants) then (yes)
     has to be filled in manually
     endnote
     note left
-    2-1-1screen6
+    screen6
     top standard
     bottom free
     end note

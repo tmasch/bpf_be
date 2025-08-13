@@ -23,7 +23,7 @@ represent
     of one Image of
     one Artwork;
     note left
-    1-1-screen1
+    screen1
     end note
 
 if (User wants to give 
@@ -43,7 +43,7 @@ endnote
         :Fills in search box
         for 'not in collection';
         note left
-        1-1-screen2
+        screen2
         end note
         :process element_insert_object_
         place_text is run
@@ -78,7 +78,7 @@ if (User wants to select medium) then (yes)
     boxes for person, place,
     and date are shown;
     note left
-    1-1-screen3
+    screen3
     end note
     note right
     This means that artists etc.
@@ -93,7 +93,7 @@ if (User wants to select medium) then (yes)
         :process element_insert_object
          is run (involving BFF/DB);
          note left
-         1-1-screen4
+         screen4
          end note
         :Preferred place of activity 
         of artist (from record) is 
