@@ -1,0 +1,204 @@
+@startuml 
+title Creating Cycle Records 
+|UI|
+start
+:Select records that 
+should go into the Cycle;
+note right
+Within a search for 
+Images
+end note
+note right
+Pick the images in narrative
+order, if there is any
+end note
+:Launch Create Cycle
+(perhaps from a 
+Context menu);
+|BFF|
+:Create empty Cycle
+Group Record;
+:Create Edges between
+all selected Images
+and the Group record,
+numering them in the 
+order they have been 
+selected;
+:Search Artwork records
+connected to the selected
+Images from DB;
+|DB|
+:Search;
+|BFF|
+:Load preview
+images;
+:Compare Making 
+Processes (as Shown 
+beneath);
+note right
+If all records have 
+more the same number
+(and more than one) 
+Making processes, 
+repeat for every 
+process. If they have
+a different number
+of Making processes,
+this has to be shown 
+in the UI somehow
+end note
+:Compare Process 
+Qualifyer 
+(e.g. 'attributed);
+if (Same quaifier) then (yes)
+    :Copy Qualifyer
+    in Group record;
+else (no)
+    |UI|
+    :Display List 
+    of all used 
+    qualifier;
+    note right
+    The UI does not show each
+    case that needs to be 
+    decided separately, but
+    cases that hve been 
+    decided automatically plus
+    the ones where the user
+    has to decide
+    end note
+
+    :Manually select 
+    one or leave 
+    field empty;
+    |BFF|
+    :Copy selected
+    Qualifyer in 
+    Group record;
+end if
+:Compare Artist information;
+if (Same artist) then (yes)
+    :Copy Artist information
+    in Group record;
+else (no)
+    |UI|
+    :Display List of all
+    used artists;
+    :Manually select one 
+    or leave field empty;
+    |BFF|
+    :Copy selected artist 
+    in Group record;
+end if 
+if (Same Place 
+of production) then (yes)
+    :Copy Place information
+    in Group record;
+else (no)
+    |UI|
+    :Display list of all 
+    used places;
+    :Manually select one 
+    or leave field empty;
+    note right
+    It should be possible 
+    to enter a new place
+    through Connect
+    Place / Text 
+    end note
+    |BFF|
+    :Copy selected Place 
+    in Group record;
+end if
+if (Same Date) then (yes)
+    :Copy Date information 
+    in Group record;
+else (no)
+    |UI|
+    :Display list of 
+    all entered dates;
+    :Manually select one 
+    or select timespan
+    encompassing all entered
+    dates or enter 
+    new date;
+    if (New date entered) then (yes)
+        |BFF|
+        :Parse new date;
+        |UI|
+        :Display parsed date;
+    else (no)
+    end if 
+|BFF|
+end if
+if (Same Location) then (yes)
+    :Copy Location information
+    in Group record;
+else (no)
+    if (All Locations are 
+    Children of one Building
+    Record) then (yes)
+        :Copy Location information
+        of lowest common Parent 
+        in Group record;
+    else (no)
+        |UI|
+        :Display list of all
+        used Locations (with 
+        Parents up to Town)
+        :Manually select one 
+        or leave field empty;
+        |BFF|
+        :Copy selected Location
+        in Group record;
+    end if
+end if 
+|UI|
+:Enter Theme according 
+to Connect Iconography;
+note right
+Probably no variants
+end note
+note right
+Probably, there is never
+more than one Theme, but
+I am not sure yet
+end note
+:Move thumbnail
+images around until 
+they are in the 
+the order;
+|BFF|
+:Adjust the counting
+of the Edges between
+the new Cycle record
+and the Image records
+accordingly;
+|UI|
+:Check entered data;
+note right
+All references in the 
+Making Processes or
+Locations can be changed
+with the Connect Simple 
+or Connect Place/Time 
+Processes
+end note
+:Save new record;
+|BFF|
+:Save Node of the Cycle 
+record with information on 
+Making Processes (probably a 
+node of its own) and 
+Locations, and Edges to 
+individual Image records;
+|DB|
+:Save;
+|BFF|
+:Success;
+|UI|
+:Success;
+
+end
+
+@enduml 

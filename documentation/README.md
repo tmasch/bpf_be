@@ -13,9 +13,9 @@ Iconobase - Overview of Functions
 	- [Material stored outside the database:](#material-stored-outside-the-database)
 - [General Structure](#general-structure)
 	- [Ingest](#ingest)
-	- [Ingest from local drive](#ingest-from-local-drive)
+	- [Ingest photos from local drive](#ingest-photos-from-local-drive)
 	- [Ingest from a museum](#ingest-from-a-museum)
-	- [Ingest Photos from a library](#ingest-photos-from-a-library)
+	- [Ingest Photos from a Library](#ingest-photos-from-a-library)
 		- [Step 1: Downloading information on the Book or Manuscript](#step-1-downloading-information-on-the-book-or-manuscript)
 		- [Step 2: Creating individual image records](#step-2-creating-individual-image-records)
 		- [Step 3: Identifying re-used printing Matrices](#step-3-identifying-re-used-printing-matrices)
@@ -32,6 +32,9 @@ Iconobase - Overview of Functions
 	- [Bulk editing](#bulk-editing)
 	- [Copy information](#copy-information)
 	- [Merge individual records](#merge-individual-records)
+	- [Connect Individual Records](#connect-individual-records)
+	- [Create Cycle records](#create-cycle-records)
+	- [Edit Cycle records](#edit-cycle-records)
 	- [Complete information in Authority records](#complete-information-in-authority-records)
 	- [Delete Authority Records](#delete-authority-records)
 	- [Merge Authority Records](#merge-authority-records)
@@ -72,6 +75,7 @@ This group is not yet well developed, it should contain at least two - rather di
 They consist of a larger number of records that can be linked to a greater number of Artwork (or Group) records, among them are
 
 - Iconography
+- Theme of a Cycle
 - Person
 - Personification
 - Animal/Plant
@@ -90,7 +94,7 @@ Amnongst them, the Place and Text Authority Records normally come in hierarchica
 Region > Town > Building > Building Part > Multi-part artwork
 Text > Chapter > Passage > Quotation
 
-Iconography records can contain variants. In this case, there is one or more criteria, each with several options that may or may not be mutually exclusive (e.g. criterion: "with sword", options "yes", "no", "uncertain", "to be determined"). The Iconography is hence determined by the indication of an Iconography record and a list the IDS of all selected options. It is also possible to have some Criteria that appear rarely, and that have only one Option with an ID, selectedif the Criterion applies. 
+Iconography records can contain variants. In this case, there is one or more criteria, each with several options that may or may not be mutually exclusive (e.g. criterion: "with sword", options "yes", "no", "uncertain", "to be determined"). The Iconography is hence determined by the indication of an Iconography record and a list the IDS of all selected options. It is also possible to have some Criteria that appear rarely, and that have only one Option with an ID, selected if the Criterion applies. The records 'Theme of a Cycle' are similar to the Iconography records, but probably do not need variants. 
 
 Similar systems of variants would probably used for records describing elements of coats-of-arms (e.g., for different tinctures or postures of heraldic lions). Hence, they should be separate from e.g. the record of the animal 'lion' (I thought of having similarly separate records for attributes and elements of emblems, but this may not be necessary)
 
@@ -157,7 +161,7 @@ In nearly all cases (perhaps with the exception of [Ingest from a Museum](#inges
 Furthermore,  Authority records ingested in this process will probably need additional information and should likewise only released once they had been manually edited (probably first thing, before the individual records). 
 Especially if several editors are working on the database, it makes sense to establish ingest processes. An editor would create a new process and ingest a number of images - probably not more than a few hundred - in this process. The individual records of these images can then be filled manually and published when ready. Once the last image (and the last authority record ingested in this process) have been published, the process can be closed. 
 
-## Ingest from local drive
+## Ingest photos from local drive
 [Contents](#table-of-contents)
 
 - A number of photographs are uploaded, and Individual records are created for them. 
@@ -169,7 +173,7 @@ Especially if several editors are working on the database, it makes sense to est
 - If any of the selected Persons, Places, or Collections are already in the database, Edges between them and the record are created - otherwise, Authority records for them are being ingested or created, and Edges are established with them. 
 - In rare cases (e.g., lost artworks that should be recorded because copies after them are in the database), it would also be possible to create these records without uploading an actual image. In this case, there would be no Photo record (and probably also no Copy record). 
 
-![Create](./1%20Ingest/1-1%20Ingest%20Photos/ingest_photos.png)
+![Create](./ingest_photos.png)
 
 ## Ingest from a museum
 [Contents](#table-of-contents)
@@ -187,7 +191,7 @@ It could work as follows:
 	- For each artwork, the iconography records from the museum database are matched with the records in the database. The editor can confirm these matches (and supply missing data, e.g. about iconographic variants), change the iconography, or delete it and add it later. 
 
 
-## Ingest Photos from a library
+## Ingest Photos from a Library
 [Contents](#table-of-contents)
 
 - This is the most complex scenario, consisting of two, for printed images of three steps. 
@@ -207,7 +211,7 @@ It could work as follows:
 - A new record is ingested automatically, if there was no record found in the database but one from external resources, and if there is a record in the database, but it is only a stub. 
 - If any newly ingested record contains connections to other authority records (often the case), the connected records are either imported in full, or the information in the connection is merely used to create stubs. This will depend on the type of records (e.g., persons connected to other persons will be normally imported as stubs, but places connected to a collection as full records. In addition, if there is already a stub in the database, it would be upgraded to a full record since it is apparently relevant.**)
 - The results are saved as a Manuscript or Book record and a provisional record (currently called 'Pages') that contains information on the individual canvasses of the IIIF manifest as well as the entered information on illustrated texts and making process. 
-![Create](./1%20Ingest/1-3%20Ingest%20Books/1-3-1%20-%20Downloading%20Information/ingest_manifest.png)
+![Create](./ingest_books_step1.png)
 
 ### Step 2: Creating individual image records
 [Contents](#table-of-contents)
@@ -218,18 +222,18 @@ It could work as follows:
 - If the IIIF-Manifest does not contain page numbers, they can be added at this stage by an editor. 
 - For manuscripts, the result is the creation of an Artwork, Image, and Photo record for every miniature, largely based on information in the 'Pages' record. 
 - For printed books, the result is the creation of an Artwork, Image, Copy, Photo and Matrix record for every illustration, largely based on information int the 'Pages' record. 
-![Create](./1%20Ingest/1-3%20Ingest%20Books/1-3-2%20-%20Creating%20individual%20records/cut_out_images.png)
+![Create](./ingest_books_step2.png)
 
 ### Step 3: Identifying re-used printing Matrices
 [Contents](#table-of-contents)
 
-- This step is necessary for printed book illustrations (also for any printed book illustrations ingested not via this procedure but manually under [Ingest from local drive](#ingest-from-local-drive)). It does not yet exist in the prototype.
+- This step is necessary for printed book illustrations (also for any printed book illustrations ingested not via this procedure but manually under [Ingest from local drive](#ingest-photos-from-local-drive)). It does not yet exist in the prototype.
 - The images are one by one matched with the special repository of (rather low-res) images of printed book illustrations. 
 - Any match is shown to the editor. 
 - If the editor confirms the match, relevant information from the Matrix record of the new image is copied into the Matrix record of the match (if there are any conflicts, the editor decides which version to use), then the Matrix record of the new image is deleted, and the new image is connected to the Matrix record of the match instead. 
 - The editor can further copy one reference on an illustrated text and one or more references to iconographies in the Matrix record to the Artwork and Image records respectively of the new image. (For practical reasons, this can be done whether the match was confirmed or not, simply because it is a labour-saving device). 
 
-![Create](./1%20Ingest/1-3%20Ingest%20Books/1-3-3%20-%20Identifying%20re-used%20matrices/identify_reused_matrices.png)
+![Create](./ingest_books_step3.png)
 
 
 # Creating Records
@@ -261,7 +265,7 @@ It could work as follows:
 - The user can then select records from these search results - those would then be ingested into the database
 - Alternatively, the user could manually create new records and connect them (this would mean saving the view in which the work just took place, open a view to create a new record, save it, resume work on the original view, and select a connection with the newly made record.)
 
-![Create](./00%20general/element_insert_object.png)
+![Create](./connect_simple.png)
 
 
 ### Connect Iconography
@@ -282,9 +286,9 @@ It could work as follows:
 
 - Amongst Place and Text records, only high-level records ("Town", "Book") are ingested and supplied with data. Lowever-level records typically only consist of a name and the Edges linking them upward and downward. 
 - Hence, there is a simplified way of creating these records:
-- When creating a link to a Place record (in [Ingest from local drive](#ingest-from-local-drive) or [Create Iconography](#create-iconography)) or to a Text record (in [Edit manually](#edit-manually) / [Bulk editing](#bulk-editing) or[Create Iconography](#create-iconography)), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It would also be possible to open the record in a separate view to add more information, if desired. 
+- When creating a link to a Place record (in [Ingest from local drive](#ingest-photos-from-local-drive) or [Create Iconography](#create-iconography)) or to a Text record (in [Edit manually](#edit-manually) / [Bulk editing](#bulk-editing) or[Create Iconography](#create-iconography)), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It would also be possible to open the record in a separate view to add more information, if desired. 
 - This is not yet fully thought through. Some child records, especially building records, but also major subdivisions of texts (e.g., Biblical Books) may very well have external authority records that could be ingested like other Authority records, and it may also make sense that one searches for them, not for the Town or Book records (which would be rather voluminous for e.g. the City of Rome, or the Bible). 
-![Create](./00%20general/element_insert_object_place_text.png)
+![Create](./connect_place_text.png)
 
 
 
@@ -380,6 +384,36 @@ It would also be relatively simple to have a function that would atomise the rec
 
 With a combination of these two functions, one could probably do all merging and separating operations that might become necessary, albeit in an awkward way. Since I expect such operations to be very rare, this might be sufficient, but one might also built something more comfortable, that would show all Image, Copy, and Photo records belonging to an Artwork as a tree, on which elements could be moved around. 
 
+## Connect Individual Records
+Connections are possible on the Artwork and on the Image levels
+- Connections on the Artwork level are used if one Artwork is the copy of another, or if one Artwork played a role in the creation of another artwork (e.g., a preparative drawing and a finished painting)
+- Connections on the Image level mean that there are distinct works of art that either show together a scene (e.g., an Annunciation distributed over two outer wings of an altarpiece) or that they belong together in a typological relationship. 
+- In order to create a relationship one would either show the records side-by-side on a split screen, or copy the Artwork (or Image) ID of one and then close it and open the other. In either case, one would then select 'Connect' (perhaps through a context menu) and select the connection type.
+- The connction is merely and Edge between the two records. 
+- The difficulty is in the UI, to make sure that the connection is between the right Images, if there are several Images per Artwork (it may not be evident for the user, what is on the Artwork, and what on the Image level). 
+- It must be possible to change the connection type and to delete the connection. 
+
+## Create Cycle records
+Image Cycles are groups of Images that have a common iconographic theme and belong to artworks that are (or at least were) in one place (e.g., Scenes from the life of saint XY painted in a church)
+A cycle always has a theme that is treated like an Iconography Authority record (e.g., "Life of Saint XY", "Four Continents"). It furthermore has all the information on the Artwork record shared by all members of the cycle (can be Medium, Making Processes, Locations, perhaps Illustrated texts). 
+The following steps are needed to create a Cycle:
+- Select the records of Images that would become part of it (normally in a search for images). Ideally, one would select them in narrative order
+- The system compares the related Artwork records and copies the information shared by all images into the new Cycle record (needs checking and manual correction)
+  - If there are different Locations, but all are parts of one building, the Building record is shown here.
+  - If there is different information in different Artwork records, the user decides which one to take
+- Manually select Theme of Cycle (or create new Theme record, if needed)
+- Manually correct ordering of images according to narrative order (by drag and drop)
+![Create](./create_cycle.png)
+
+
+## Edit Cycle records
+The following actions would be necessary:
+- Add more Images to a Cycle record. If the connected Artwork data of these Image is in conflict with the Artwork data of the Cycle, it might be best to notify user to solve the problem with manual corrections. In any case, the Cycle screen shoud appear because one probably would have to change the narrative order. 
+- Remove images from Cycle record. 
+- Merge Cycles: Could perhaps simply be done by searching for all images in one Cycle, selecting them, adding them to another Cycle, and deleting the original Cycle
+- Change Artwork Data / Theme / Order of images
+- Delete Cycle: Simply delete Node for Cycle and all Edges connected to it
+ 
 
 ## Complete information in Authority records
 [Contents](#table-of-contents)
