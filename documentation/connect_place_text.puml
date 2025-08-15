@@ -1,4 +1,4 @@
-@startuml
+@startuml connect_place_text
 title Select Connected Object Records (Place / Text)
 
 |UI|
@@ -76,8 +76,37 @@ repeat
 
     |UI|
     :Display result;
+    note left
+    screen1
+    end note
 
 repeat while (User continues typing)
+
+if (User needs a not-yet extant 
+Child record of a displayed record) then (yes)
+    :Manually insert
+    Child record and
+    record type;
+    note left
+    screen2
+    end note
+    note right
+    One can insert
+    several records
+    end note
+    note right
+    It must be possible
+    to change position
+    of (not only) new
+    records in list of
+    Child records
+    end note
+    :Automatically select
+    new Child record;
+else (no)
+end if 
+
+
 
 if (Select item from list) then (result)
     
@@ -112,7 +141,9 @@ else ('failed search' option)
     |UI|
     :Display result;
     if (Select from list) then (result)
-        
+        :If needed, add Child
+        record(s), as described
+        above;
     else ('failed search'
     option)
         :Save all data from this view in FE;
@@ -126,5 +157,32 @@ else ('failed search' option)
         newly-created object;
     end if
 end if
+:Save record;
+note right
+Probably, more things
+in the record than the 
+connection to this
+Place or text have been
+changed, they also
+will need to be saved
+end note
+|BFF|
+:Save any newly ingested
+Place / Text record;
+:Save any newly created
+Child record;
+:Save any new Edges
+Parent and Child records;
+:Save Edge between 
+record edited here and
+connected Place/Time 
+Record;
+|DB|
+:Save;
+|BFF|
+:Success;
+|UI|
+:Success;
+
 end
 @enduml

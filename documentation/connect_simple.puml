@@ -1,5 +1,5 @@
 @startuml
-title Select Connected Records (exeept Place / Text / Iconography)
+title Select Connected Records (except Place / Text / Iconography)
 
 |UI|
 start
@@ -53,6 +53,15 @@ repeat
 
     |UI|
     :Display result;
+    note left
+    screen1
+    (with results)
+    end note
+    note left
+    screen2 
+    (without
+    results)
+    end note
 
 repeat while (User continues typing)
 
@@ -87,6 +96,9 @@ else ('failed search' option)
     endnote
     |UI|
     :Display result;
+    note left
+    screen3
+    end note
     if (Select from list) then (result)
         
     else ('failed search'
@@ -172,7 +184,27 @@ if (Connection needs a date) then (yes)
     :check date;
     else (no)
     end if
-
+:Save record;
+note right
+Probably, more things
+in the record than the 
+connection to this
+Place or text have been
+changed, they also
+will need to be saved
+end note
+|BFF|
+:Save any newly
+ingested record;
+:Save Edge between
+record edited here 
+and connected record;
+|DB|
+:Save;
+|BFF|
+:Success;
+|UI|
+:Success;
 
 
 end

@@ -1,4 +1,4 @@
-@startuml
+@startuml connect_iconography
 title Select Connected Object Records (Iconography)
 
 |UI|
@@ -7,14 +7,14 @@ note right
 This action happens
 regularly in two contextsn:
 - manual editing
-of Artwork records (3.1)
-- copying information (3.3)
+of Artwork records 
+- copying information 
 It may also happen occasionally
-in Bulk editing (3.2)
+in Bulk editing
 endnote
 note right
-Different from 2.0.0 there 
-is no need to select a 
+Different from Connect Simple,
+ there is no need to select a 
 connection type - it is 
 always the same
 end note
@@ -37,7 +37,7 @@ repeat
     for display;
     note right
     Needed are previews
-    and pershaps also 
+    and perhaps also 
     the names of variants
     (with names of all 
     options - unless they 
@@ -46,6 +46,9 @@ repeat
     end note
     |UI|
     :Display result;
+    note left
+    screen1
+    end note
 
 repeat while (User continues typing)
 
@@ -67,6 +70,9 @@ if (Select item from list) then (result)
     for display;
     |UI|
     :Display variants;
+    note left
+    screen2
+    end note
     :Select for every 
     variant the appropriate
     option(s);

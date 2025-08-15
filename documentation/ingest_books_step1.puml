@@ -1,8 +1,11 @@
-@startuml
+@startuml ingest_books_step1
 title Ingest iif manifest
 |UI|
 start
 :Enter iif url in UI;
+note left
+screen1 
+end note
 :Select resource type (book or manuscript);
 |BFF|
 #orange:Get iif manifest; 
@@ -49,6 +52,10 @@ else (no)
 end if 
 
 |UI|
+:Display results;
+note left
+screen2
+end note 
 if (Expected candidates
 in list?) then (yes)
 else (no)
@@ -64,6 +71,9 @@ else (no)
     terms in GND;
     |UI|
     :Result added to list;
+    note left
+    screen3
+    end note
 endif
 :Select Persons
 and places amongst the 
@@ -83,6 +93,11 @@ from list) then (yes)
     Making processes for 
     this medium, from config file;
     |UI|
+    :Display empty forms for 
+    Making Processes;
+    note left
+    screen4
+    endnote
     if (User wants to give 
     information on artists
     in any of the processes) then (yes)
@@ -129,6 +144,9 @@ from list) then (yes)
         :Parse data;
         |UI|
         :user checks parsed date;
+        note left
+        screen5
+        end note
     else (no)
     endif
 else (no)
