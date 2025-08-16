@@ -12,9 +12,9 @@ Iconobase - Overview of Functions
 	- [Structure of Records (attempt to apply this structure to MongoDB)](#structure-of-records-attempt-to-apply-this-structure-to-mongodb)
 	- [Material stored outside the database:](#material-stored-outside-the-database)
 - [General Structure](#general-structure)
-	- [Ingest](#ingest)
-	- [Ingest photos from local drive](#ingest-photos-from-local-drive)
-	- [Ingest from a museum](#ingest-from-a-museum)
+- [Ingest Photos](#ingest-photos)
+	- [Ingest Photos from local drive](#ingest-photos-from-local-drive)
+	- [Ingest Photos from a Museum](#ingest-photos-from-a-museum)
 	- [Ingest Photos from a Library](#ingest-photos-from-a-library)
 		- [Step 1: Downloading information on the Book or Manuscript](#step-1-downloading-information-on-the-book-or-manuscript)
 		- [Step 2: Creating individual image records](#step-2-creating-individual-image-records)
@@ -27,15 +27,19 @@ Iconobase - Overview of Functions
 	- [Create Iconography](#create-iconography)
 	- [Create keyword and heading records](#create-keyword-and-heading-records)
 	- [Create other Authority records](#create-other-authority-records)
-- [Fill and Edit records](#fill-and-edit-records)
+- [Fill and Edit individual records](#fill-and-edit-individual-records)
 	- [Edit manually](#edit-manually)
 	- [Bulk editing](#bulk-editing)
 	- [Copy information](#copy-information)
 	- [Merge individual records](#merge-individual-records)
 	- [Connect Individual Records](#connect-individual-records)
+- [Fill and Edit Group records](#fill-and-edit-group-records)
 	- [Create Cycle records](#create-cycle-records)
 	- [Edit Cycle records](#edit-cycle-records)
+	- [Edit Matrix records](#edit-matrix-records)
+- [Fill end edit Authority records](#fill-end-edit-authority-records)
 	- [Complete information in Authority records](#complete-information-in-authority-records)
+	- [Edit Authority records](#edit-authority-records)
 	- [Delete Authority Records](#delete-authority-records)
 	- [Merge Authority Records](#merge-authority-records)
 - [Search](#search)
@@ -139,29 +143,29 @@ Changes by registered editors should be logged (primarily for training new edito
 
 The following types of functions are needed:
 
-1 Ingest Artworks
+Ingest Photos
 
-2 Create records manually
+Create records manually
 
-3 Fill newly created records / Edit records
+Fill newly created records / Edit records
 
-4 Search for records
+Search for records
 
-5 Display records
+Display records
 
-6 Export data
+Export data
 
 
 
-## Ingest
+# Ingest Photos
 [Contents](#table-of-contents)
 
 This is the most common way for creating records - not only artwork records, but also group and authority records connected to them. 
-In nearly all cases (perhaps with the exception of [Ingest from a Museum](#ingest-from-a-museum)), newly ingested Artwork records still lack essential information and need manual filling. Hence, they should be marked as 'in progress' - they should be suppress in public searches, but editors should be able to search for these records only (in order to edit and then make them public). 
+In nearly all cases (perhaps with the exception of [Ingest from a Museum](#ingest-photos-from-a-museum)), newly ingested Artwork records still lack essential information and need manual filling. Hence, they should be marked as 'in progress' - they should be suppress in public searches, but editors should be able to search for these records only (in order to edit and then make them public). 
 Furthermore,  Authority records ingested in this process will probably need additional information and should likewise only released once they had been manually edited (probably first thing, before the individual records). 
 Especially if several editors are working on the database, it makes sense to establish ingest processes. An editor would create a new process and ingest a number of images - probably not more than a few hundred - in this process. The individual records of these images can then be filled manually and published when ready. Once the last image (and the last authority record ingested in this process) have been published, the process can be closed. 
 
-## Ingest photos from local drive
+## Ingest Photos from local drive
 [Contents](#table-of-contents)
 
 - A number of photographs are uploaded, and Individual records are created for them. 
@@ -175,7 +179,7 @@ Especially if several editors are working on the database, it makes sense to est
 
 ![Create](./ingest_photos.png)
 
-## Ingest from a museum
+## Ingest Photos from a Museum
 [Contents](#table-of-contents)
 
 This function has not yet been built in the prototype - it is largely 'Zukunftsmusik' since, as of 2025, only very few museum database have APIs. Since there is currently no standard similar to IIIF, this function would probably need considerable adjustment for every museum. 
@@ -239,7 +243,7 @@ It could work as follows:
 # Creating Records
 [Contents](#table-of-contents)
 
-- Individual records are created through the [Ingest](#ingest) procedure above. 
+- Individual records are created through the [Ingest](#ingest-photos) procedure above. 
 > Maybe such links are nice?
 - Group records are produced partially through the Ingest process (Matrix record), partially through editing (Cycle record)
 - Authority records connected directly to Artwork records (Persons, Institutions, Collections, Texts) will normally be created during the ingest processes. 
@@ -286,7 +290,8 @@ It could work as follows:
 
 - Amongst Place and Text records, only high-level records ("Town", "Book") are ingested and supplied with data. Lowever-level records typically only consist of a name and the Edges linking them upward and downward. 
 - Hence, there is a simplified way of creating these records:
-- When creating a link to a Place record (in [Ingest from local drive](#ingest-photos-from-local-drive) or [Create Iconography](#create-iconography)) or to a Text record (in [Edit manually](#edit-manually) / [Bulk editing](#bulk-editing) or[Create Iconography](#create-iconography)), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It would also be possible to open the record in a separate view to add more information, if desired. 
+- When creating a link to a Place record (in [Ingest from local drive](#ingest-photos-from-local-drive) or [Create Iconography](#create-iconography)) or to a Text record (in [Edit manually](#edit-manually) / [Bulk editing](#bulk-editing) or[Create Iconography](#create-iconography)), one would normally search for the 'Town' or the 'Book' record. If it is in the database, it would not be displayed alone, but with all child records. The editor could select an extant Child record or insert at any place the name of a new Child record (and select the level of this record, e.g. building, building-part etc., that in turn defines the relation between it and its parent record.). These records would be saved with no other content than the name and the Edges linking it to other records. It must be possible to determine in which place within the series of Child records fo the Parent records the new record should belong. 
+- It would also be possible to open the record in a separate view to add more information, if desired. 
 - This is not yet fully thought through. Some child records, especially building records, but also major subdivisions of texts (e.g., Biblical Books) may very well have external authority records that could be ingested like other Authority records, and it may also make sense that one searches for them, not for the Town or Book records (which would be rather voluminous for e.g. the City of Rome, or the Bible). 
 ![Create](./connect_place_text.png)
 
@@ -315,11 +320,12 @@ It could work as follows:
 This would largely happen for Persons, Organisations, Places, and Texts for which there are no external authority records - and probably for all Offices, Personifications and Activities, since there are no authority records for such concepts (unless I find some, e.g. in the Getty Data). 
 - Normally, such records would be manually created as part of in [Ingest](#ingest) or in [Create Iconography](#create-iconography). In this case, one would probably store the record one had been working on in the FE, open the view to create the new record, and then resume work on the earlier record. 
 - In order to create a new Authority record, one first has to select the record type, then add at least one connection to another record (with relations defined by the record type), and give it a name. 
+- Child records for Place and Text records that need no information besides a name and connections to Parent and Child records can also be created directly when one [connects to Place and Text records](#connect-place--text). 
 
-# Fill and Edit records
+# Fill and Edit individual records
 [Contents](#table-of-contents)
 
-In virtually all cases (exceptions being perhaps [records ingested from museum databases](#ingest-from-a-museum) or records that have gone through the [re-used matrix search](#step-3-identifying-re-used-printing-matrices)), new individual records need manual editing. Most important for the database is iconographic information in the Image record (although very few photos may not need it); furthermore, the Artwork record needs information on Medium, Making Processes, Whereabouts, and, where applicable, illustrated texts. 
+In virtually all cases (exceptions being perhaps [records ingested from museum databases](#ingest-photos-from-a-museum) or records that have gone through the [re-used matrix search](#step-3-identifying-re-used-printing-matrices)), new individual records need manual editing. Most important for the database is iconographic information in the Image record (although very few photos may not need it); furthermore, the Artwork record needs information on Medium, Making Processes, Whereabouts, and, where applicable, illustrated texts. 
 This can be supported by special searches that show e.g. only those images in the current ingest process that have no whereabouts or specific wherabouts. 
 Depending on the material, there might be several ways of achieving this - which can also be combined. 
 Later editing of records - which will be comparably rare, follows the same principles
@@ -393,6 +399,7 @@ Connections are possible on the Artwork and on the Image levels
 - The difficulty is in the UI, to make sure that the connection is between the right Images, if there are several Images per Artwork (it may not be evident for the user, what is on the Artwork, and what on the Image level). 
 - It must be possible to change the connection type and to delete the connection. 
 
+# Fill and Edit Group records
 ## Create Cycle records
 Image Cycles are groups of Images that have a common iconographic theme and belong to artworks that are (or at least were) in one place (e.g., Scenes from the life of saint XY painted in a church)
 A cycle always has a theme that is treated like an Iconography Authority record (e.g., "Life of Saint XY", "Four Continents"). It furthermore has all the information on the Artwork record shared by all members of the cycle (can be Medium, Making Processes, Locations, perhaps Illustrated texts). 
@@ -407,6 +414,8 @@ The following steps are needed to create a Cycle:
 
 
 ## Edit Cycle records
+[Contents](#table-of-contents)
+
 The following actions would be necessary:
 - Add more Images to a Cycle record. If the connected Artwork data of these Image is in conflict with the Artwork data of the Cycle, it might be best to notify user to solve the problem with manual corrections. In any case, the Cycle screen shoud appear because one probably would have to change the narrative order. 
 - Remove images from Cycle record. 
@@ -414,6 +423,17 @@ The following actions would be necessary:
 - Change Artwork Data / Theme / Order of images
 - Delete Cycle: Simply delete Node for Cycle and all Edges connected to it
  
+ ## Edit Matrix records
+ [Contents](#table-of-contents)
+
+ These records would be created automatically when [re-used printing matrices are identified](#step-3-identifying-re-used-printing-matrices). Any manual editing would be probably only needed if something has gone wrong: 
+ - Artwork was connected by mistake to a Matrix and has to be removed from it.
+	- Edge between Matrix and Artwork records is deleted
+	- If this Artwork record was the only example for a specific Illustrated Text or a specific Iconography connected to this Matrix, the links to this Illustrationed Text or Iconography are deleted from the Matrix record. 
+- By default, the earliest impression of a Matrix is shown when running through [identify re-used printing matrices](#step-3-identifying-re-used-printing-matrices). If this image is unsuitable (e.g., incomplete) one could manually select another default image. 
+- There may be a need to add bibliographical references or comments to a Matrix record (or, one would add them to an Artwork and tick a box that they should apply for the Matrix - the latter might be more user-friendly). 
+
+# Fill end edit Authority records
 
 ## Complete information in Authority records
 [Contents](#table-of-contents)
@@ -426,8 +446,19 @@ It could mean two things:
 - If a place of activity is assigned to an artist, all Making processes with this artist and no link to a place are to be supplied with this place or activity as place. 
 This would be done through manual editing. One would probably go through all unpublished Authority records in an Ingest process, open them and be prompted which information was still missing. 
 
+## Edit Authority records
+[Contents](#table-of-contents)
+
+Manual editing of Authority records is possible in many ways, e.g. 
+- Add, change, or remove names or variant names
+- Add or remove references to external Authority records
+- Add or remove connections to other Authority records
+
+- For Place and Text records: change the order of Child records, move one or more Child records to another Parent record, rename Child record, or change rank of Child record
+
 ## Delete Authority Records
 [Contents](#table-of-contents)
+
 This action would be needed very rarely in production node, more common would be a merger (see below). 
 - Authority records cannot be deleted, if they still have meaningful connections. 
 - There are three scenarios:
@@ -441,6 +472,7 @@ This action would be needed very rarely in production node, more common would be
 
 ## Merge Authority Records
 [Contents](#table-of-contents)
+
 This action would normally be used (instead of deleting above) if it became obvious that two Authority records actually denote the same thing. 
 - User selects two authority records, either with search on split screen, or searching one, copying its ID, searching the other, chose 'Merge' and enter the ID of the other record. 
 - A merger is only possible between two records of the same record type (e.g. two persons)
@@ -457,11 +489,63 @@ This action would normally be used (instead of deleting above) if it became obvi
 
 
 # Search
+[Contents](#table-of-contents)
+
 - Virtually all searches go for some elements of Authority records (e.g. works by certain artists, works in certain locations, works showing certain iconographies). ONly a search for a museum inventory number or an auction lot number would go for the Edge between an Artwork record and an Authority record (a search for a manusript shelf mark would search for the Edge between two Authority records). There might be also searches for specific IDs of individual records used when editing the database. 
 - If a search is for an Authority record, it can have two intended results:
   - Firstly, the Authority record as data. It would be rather use to browse from and and see if there are other relevant Authority records, and then to display the images connected to them. 
   - Secondly, the search could go for all individual records connected to the found Authority records. Two things have to be kept in mind:
     - There may be different connections, and not all of them relevant for the search (e.g., a search for portraits of Michelangelo should not turn out works by Michelangelo) - however, it may also be that a user wants to see more than one connection (e.g., all images showing Michelangelo, be their portraits or history paintings) or simply anything connected to a certain Authority record
     - Depending on the type of connection, there may be rather different paths. A search for works of art made by Michelangelo would, for instance to search for an Person named Michelangelo that has the type 'Artist', copy its ID, and look for Artwork records that have this ID in their Making processes. A search for Images of all Types featuring Michelangelo would search for a Person named Michelangelo that has the type 'Depicted Person' (one and the same record for Michelangelo would have both types, if both works by and images of him are in the database), search for all Iconography records related to this person record and then search all Image records connected to one of these Iconography records and then show search the connected Artwork record (with a preview image of taken from that Image and Photo records that are marked as 'Preferred' for the Iconography 'Michelangelo', if there are more). A still more complex example: One might search for saints that have as attribute a candle. Here, one would first search for the object 'candle' and search for all Iconography records this record is connected to. However, one has to filter them so that all records that are not linked to Persons with the attribute 'Saint' are excluded, and one has to filter the search for Image records to those that also contain the Option ID for the variant that a 'candle' is shown. 
-    - This means that one will need a UI with a number of different search boxes, and that one needs a number of different searches - some of them with recursive elements, in the BFF. 
-  - In the following, some examples of searches shall be demonstrated. 
+
+## Options for Search up-front
+
+- This means that one will need a UI with a number of different search boxes, and that one needs a number of different searches - some of them with recursive elements, in the BFF. 
+- This search will happen partially 'up front' through search boxes, partially 'afterwards' in the results view through different facets. 
+- The search screen should probably have the following options:
+  - free search (would search in names of all Authority files)
+  - Person (with options Artist - Author - Printer - Depicted Person - Owner of Coat-of-Arms etc.)
+  - Place (with options Place of Making - Whereabouts, in the latter case Option to exclude Whereabouts that are Collections)
+  - Inventory number of shelf mark (both together with a Collection or alone, some shelf marks are so idiosyncratic that they do not appear in more than one collection)
+  - Text (with options Illustrated Text - Iconography inspired by text)
+  - Personification
+  - Animal or Plant
+  - Thing
+  - Action
+  - General Keyword
+
+## Options for filtering, sorting, and structuring results through facets
+- The facets in the results view should allow three things (although not all all three things): filtering results, sorting results, and structuring - the latter is like sorting, but puts inserts a heading each time there is a new term in sorting. Each item in a facet should come with the number of search hits in this facet. If a hit fits with more than one facets (e.g., two different artists), it would probably make most sense to repeat it in sorting or structuring results. 
+- The following facets are needed
+  - Medium:
+    - in alphabetical order
+    - for filtering, sorting results, and structuring results
+- Artist: 
+    - in alphabetical order
+    - for filtering, sorting results, and structuring results
+  - Place of making
+    - hierarchical: Region (there could be several levels), then town
+    - for filtering and structuring results (also hierarchically, mere sorting would make little sense)
+  - Date: 
+    - for sorting the thumbnails in chronological order (for most searches default setting), and for filtering. (Also in case of sorting/structuring according to other criteria, any hits that are equal in relation to the sorting criterion should be sorted by date)
+    - Structuring results may be possible by century or by decade depending on temporal distribution of results
+    - For filtering dates, one would not have dates to choose from, but rather give start and end dates, either through manual entering or through moving slides. The number of hits would not be shows as figures but as a curve. 
+    - Question: should the start date, or an average of start and end date be used for sorting / structuring?
+  - Location:
+    - also hierarchical, from Region (in this case modern administrative region) down to building parts and composite artworks
+    - includes by default also Collections (defined as organisations) - although it must be possible to exclude them
+    - it must likewise be possible to exclude former Locations. 
+    - for filtering and structuring results (also hierarchically, mere sorting would make little sense)
+  - Illustrated Text:
+    - also hierarchical, from Titel (and author) down to passages and quotes
+- for filtering and structuring results (also hierarchically, mere sorting would make little sense)
+  - Page number:
+    - Default sorting for searches searches of illustrations of a specific manuscript or book
+    - Only needed for sorting, not for filtering and structuring (the latter is plausible, but I don't see the point)
+  - Iconography:
+    - by default in alphabetical order (I don't think that there are other possibilities). However, if the search was iconographical (e.g., for all iconographies showing a certain person), all connections would be shown sorted first by connection type and then by the order of the connections (e.g., if one searches for scenes from the Life of Christ, the Nativity would come before the Circumcision)
+    - for filtering and structuring (mere sorting would make little sense)
+    - If an iconography has variants, filtering and perhaps structuring could be done according to these variants (if there are too many, structuring would be a mess, with maybe 100 groups, most only containing 1-2 thumbnails)
+- There should be also possibilities for browsing. This would be easily achievable for lists that could be filtered with facets (e.g., depicted persons filtered into saints, mythological figures etc.), and for other items that are in a hierarchical structure (e.g., Places, Plants/Animals). Probably, there would be some 'general browsing' mode as in the Warburg Database so that one could from one point get to everywhere. This is primarily for finding authority records, but if one is specialised enough for the number of connected images to be relatively small, one could show that (it makes no sense to show the first 200 thumbnails for 'Christianity')
+
+  
