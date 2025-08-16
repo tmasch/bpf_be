@@ -26,6 +26,7 @@ import db_actions
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_name_preferred():
+    await db_actions.initialise_beanie()
     authority_id = "11860354X"
     authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
               + authority_id\

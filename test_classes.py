@@ -29,18 +29,17 @@ async def test_external_reference():
 async def test_entity():
     await db_actions.initialise_beanie()
     p=classes.Entity(name="test_entity")
-#    p.model_dump()
-    a=classes.Attribute(key="test_key",value="test_value")
-    p.attributes.append(a)
+    p.set_attribute(key="test_key",value="test_value")
     r = await p.save()
     assert isinstance(r,classes.Entity)
     assert r.name == "test_entity"
+    assert r.get_attribute("test_key") == "test_value"
 #    await p.delete()
 
 @pytest.mark.asyncio
 async def test_entity_person():
     await db_actions.initialise_beanie()
-    p=classes.Entity(name="test_entity",\
+    p=classes.Entity(name="Martin Luther",\
                      type="person")
     r = await p.save()
 

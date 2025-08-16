@@ -214,7 +214,7 @@ class Entity(Document):
  The results will be put into the field 'potential candidates'. 
  The user can pick one of them (or confirm if only one was found)
     """
-    def add_attribute(self,key,value):
+    def set_attribute(self,key,value):
         a=Attribute(key=key,value=value)
         self.attributes.append(a)
     def get_attribute(self,key):
@@ -223,6 +223,8 @@ class Entity(Document):
             if a.key == key:
                 v=a.value
         return v
+#    def validate(self):
+        
     attributes : Optional[list[Attribute]] = []
     type : Optional[str] = "" 
     stub : Optional[bool] = True
@@ -232,7 +234,7 @@ class Entity(Document):
     dates : Optional[list[Date]] = []
     comments : Optional[str] = ""
     preview : Optional[str] = ""
-    linkedEntity : Optional[Link["Entity"]] = None
+#    linkedEntity : Optional[Link["Entity"]] = None
     class Settings:
         union_doc = Union
 #    gnd_id : Optional[str] = ""
