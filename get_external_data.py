@@ -35,6 +35,7 @@ async def get_web_data(url_in):
     """
     Do a web call and return byte object
     """
+    print("searching for")
     print(url_in)
     r = await classes.WebCall.find(classes.WebCall.url == url_in).to_list()
     if len(r) > 0:

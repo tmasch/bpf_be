@@ -51,24 +51,24 @@ async def main():
     classes.logger.debug(" DEBUG   Hello world")
 #    os.environ["MONGODB_HOST"] = "localhost"
 #    os.environ["MONGODB_PORT"] = "27017"
-    
+
     await db_actions.initialise_beanie()
-    e=classes.Entity()
-    a=classes.Attribute()
-    a.key="test"
-    a.value="test_value"
-    e.attributes.append(a)
-    print(e)
+    # e=classes.Entity()
+    # a=classes.Attribute()
+    # a.key="test"
+    # a.value="test_value"
+    # e.attributes.append(a)
+    # print(e)
 
-    print(e.get_attribute("test"))
+    # print(e.get_attribute("test"))
 
-    eac=classes.EntityAndConnections(name="eac")
-    r=classes.EntityAndConnections(name="r")
+    # eac=classes.EntityAndConnections(name="eac")
+    # r=classes.EntityAndConnections(name="r")
 
-    eac.connections.append(r)
-    print(eac)
-    await r.save()
-    await eac.save()
+    # eac.connections.append(r)
+    # print(eac)
+    # await r.save()
+    # await eac.save()
 #     p=classes.Entity(type="Person",name="person")
 # #    await p.save()
 #     b=classes.Entity(type="Book",name="book")
@@ -97,9 +97,17 @@ async def main():
 # #    classes.E
 # #    print(await r.to_list())
 # #    print(marc)
-# #    iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
-# #    url = iiif_url
-# #    r = await get_external_data.get_web_data_as_json(iiif_url)
+    e=classes.Entity()
+    e.name="sdfgfd"
+
+    wc = classes.WebCall()
+    wc.url="asdf"
+    iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
+    url = iiif_url
+    print(iiif_url)
+#    await classes.WebCall.find(classes.WebCall.url == iiif_url)
+    await classes.WebCall.find(classes.WebCall.url == url).to_list()
+    r = await get_external_data.get_web_data_as_json(iiif_url)
 
 
 # #    print(type(r))
@@ -108,7 +116,7 @@ async def main():
 #    print(r)
 #    if r[0]:
 #        content=r[0].content
-    await run_parse_iiif()
+    # await run_parse_iiif()
 #    id="6707748eb64a43e946737251"
 #    m = await classes.Person.get(id,fetch_links=True)
 #    print(m)
@@ -117,11 +125,11 @@ async def main():
 
 
 
-async def run_parse_iiif():
-    iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
-    material="book"
-    r = await parse_iiif.parse_iiif(iiif_url,material)
-    response = await r.save(link_rule=WriteRules.WRITE)
-    return response
+# async def run_parse_iiif():
+#     iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
+#     material="book"
+#     r = await parse_iiif.parse_iiif(iiif_url,material)
+#     response = await r.save(link_rule=WriteRules.WRITE)
+#     return response
 
 asyncio.run(main())

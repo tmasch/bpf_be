@@ -13,7 +13,7 @@ import get_external_data
 #import parse_iiif
 import logging
 import classes
-#import db_actions   
+import db_actions   
 
 #logger = logging.getLogger(__name__)
 load_dotenv()
@@ -49,6 +49,7 @@ def test_get_web_data_as_json():
 #@classes.func_logger
 @pytest.mark.asyncio
 async def test_get_external_data():
+    await db_actions.initialise_beanie()
     authority_id = "11860354X"
     authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
               + authority_id\
