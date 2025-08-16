@@ -40,6 +40,10 @@ async def create_test_record_thomas_aquinas():
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
+async def create_test_record_max_emanuel():
+    gnd_id="11857941X"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
 
 
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
@@ -60,7 +64,7 @@ async def test_parse_gnd_name_preferred_1():
 #@classes.func_logger
 async def test_parse_gnd_name_preferred_2():
     """
-    Only subfield a filled
+    Also subfield c filled - not a ruler
     """
     await db_actions.initialise_beanie()
     record=await create_test_record_thomas_aquinas()
@@ -68,3 +72,17 @@ async def test_parse_gnd_name_preferred_2():
     assert name_preferred[0] == 'Thomas (von Aquin, Heiliger)'
     assert name_preferred[1] == ''
 
+
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_name_preferred_3():
+    """
+    Also subfield b filled - 
+    subfield c filled with a ruler's
+    designation that is to be ignored
+    """
+    await db_actions.initialise_beanie()
+    record=await create_test_record_max_emanuel()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    assert name_preferred[0] == 'Maximilian Emanuel II.'
+    assert name_preferred[1] == 'Bayern, Kurfürst'

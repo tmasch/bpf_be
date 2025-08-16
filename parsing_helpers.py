@@ -209,3 +209,17 @@ url_replacement = {" " : "%20", "ä" : "%C3%A4", "ö" : "%C3%B6", "ü" : "%C3%BC
                         "á" : "%C3%A1", "é" : "%C3%A9", "í" : "%C3%AD", "ó" : "%C3%B3", "ú": "%C3%BA", \
                         "à" : "%C3%A0", "è" : "%C3%A8", "ì": "%C3%AC", "ò" : "%C3%B2", "ù" : "%C3%B9", \
                         "Č" : "%C4%8C", "č" : "%C4%8D", "Ř": "%C5%98", "ř" : "%C5%99", "Š" : "%C5%A0", "š" : "%C5%A1"}
+
+@classes.func_logger
+def turn_umlaut_to_unicode(text):
+    """
+    Many texts from outside sources, most notably the GND, have a strange
+    encoding that treats letters with umlaut or accents into two letters. 
+    This module replaces them with the correct unicode character. 
+    The list is still incomlete. 
+    """
+    encoding_list = {"Ö": "Ö", "Ü": "Ü", "ä": "ä", "ö": "ö", "ü": "ü", "é": "é", "ě" : "ě" }
+    for old, new in encoding_list.items():
+        text = text.replace(old, new)
+    return text
+    

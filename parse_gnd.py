@@ -1884,7 +1884,8 @@ def find_subfields(datafield,subfield_id):
     subfields=datafield.findall("{*}subfield")
     for subfield in subfields:
         key= subfield.get("code")
-        value=subfield.text
+        value_raw=subfield.text
+        value = parsing_helpers.turn_umlaut_to_unicode(value_raw)
         if key == subfield_id:
             r.append(value)
     return r
