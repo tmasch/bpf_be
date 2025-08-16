@@ -799,22 +799,13 @@ def gnd_record_get_external_references(record):
 @classes.func_logger
 def gnd_record_get_name_preferred(record):
     """
-#                 case "100":
-#                     for step2 in step1:
-#                         match step2.get('code'):
-#                             case "a":
-#                                 pe.name_preferred = step2.text                               
-#                             case "b": # The numbering for rulers
-#                                 pe.name_preferred = pe.name_preferred + " " + step2.text
-#                             case "c": # For rulers, comments on Territory, title and time of ruling. However, 
-#                                 # I put that now into a comment field. Once I have all the structure for persons' offices I might try to make an automatic import,
-#                                 # but I fear it is too messy to make it worthwhile. 
-#                                 if not ("Kaiser" in step2.text or "König" in step2.text or "Herzog" in step2.text or "Kurfürst" in step2.text or "Markgraf" in step2.text or \
-#                                         "Bischof" in step2.text or "Fürstbischof" in step2.text or "Erzbischof" in step2.text or "Fürsterzbischof" in step2.text or "Abt" in step2.text):
-#                                     pe.name_preferred = pe.name_preferred + " (" +  step2.text + ")"
-#                                 else:
-#                                     pe.comments = step2.text
-"""
+    Takes the preferred name from field 100
+    Possible additions: some more standard identifyers in 100c
+    e.g. "Gott", "Biblische Person" could be moved to 'Comment'
+    Or: standardised terms in the 'Comment' section may even
+    be used for putting Person records into the right group
+    of person
+    """
 # Set preferred name
     name_preferred = ""
     comments = ""
@@ -828,14 +819,26 @@ def gnd_record_get_name_preferred(record):
             name_preferred = name_preferred+ " " + subfields[0]
         subfields = find_subfields(datafield,"c")
         if subfields:
-            if not ("Kaiser" in subfields[0] or "König" in subfields[0] or "Herzog" in subfields[0] \
+            if ("Kaiser" in subfields[0] or "König" in subfields[0] or "Herzog" in subfields[0] \
                     or "Kurfürst" in subfields[0] or "Markgraf" in subfields[0] \
                         or "Bischof" in subfields[0] or "Fürstbischof" in subfields[0] \
                             or "Erzbischof" in subfields[0] or "Fürsterzbischof" in subfields[0] \
                                 or "Abt" in subfields[0]):
-                name_preferred = name_preferred + " (" + subfields[0] + ")"
-            else:
                 comments = subfields[0]
+            elif ", Heiliger" in subfields[0]:
+                name_preferred = name_preferred +" ("+ subfields[0][:-10] + ")"
+                comments = "Saint"
+            elif ", Heilige" in subfields[0]:
+                name_preferred = name_preferred +" ("+ subfields[0][:-9] + ")"
+                comments = "Saint"
+            elif subfields[0] == "Heiliger":
+                comments = "Saint"
+            elif subfields[0] == "Heilige":
+                comments = "Saint"            
+
+            
+            else:
+                name_preferred = name_preferred + " (" + subfields[0] + ")"
 
 #    x = find_datafields(record,"100")
 
