@@ -2,10 +2,10 @@
 """
 Test of GND parsing
 """
-from unittest import mock
+#from unittest import mock
 import pytest
-import pytest_asyncio
-import test_get_external_data
+#import pytest_asyncio
+#import test_get_external_data
 #import requests
 #import unittest
 #import json
@@ -22,23 +22,24 @@ import db_actions
 
 #import test_get_external_data
 
+@pytest.mark.asyncio
+async def test_parse_gnd_get_records():
+    await db_actions.initialise_beanie()
+    gnd_id="11860354X"
+    records=await parse_gnd.get_records(gnd_id)
+    assert type(records).__name__ == "_Element"
+
+async def create_test_record_rubens():
+    gnd_id="11860354X"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
+
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_name_preferred():
     await db_actions.initialise_beanie()
-    authority_id = "11860354X"
-    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
-              + authority_id\
-                  + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
-    result = []
-    content=await get_external_data.get_web_data(authority_url)
-    root = etree.XML(content)
-    records=root.find("records", namespaces=root.nsmap)
-#    print(records)
-#    print(records.tag)
-#    tag_id='400'
-#    subfield_code="a"
-    for record in records:
-        print("found record")
-    pass
+    record=await create_test_record_rubens()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    assert name_preferred[0] == 'Rubens, Peter Paul'
+    assert name_preferred[1] == ''

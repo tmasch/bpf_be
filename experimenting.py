@@ -26,6 +26,7 @@ from unittest import mock
 
 import book_ingest_create_records
 import get_external_data
+import parse_gnd
 import parse_iiif
 import db_actions
 #import main as app
@@ -97,18 +98,27 @@ async def main():
 # #    classes.E
 # #    print(await r.to_list())
 # #    print(marc)
-    e=classes.Entity()
-    e.name="sdfgfd"
+#     e=classes.Entity()
+#     e.name="sdfgfd"
 
-    wc = classes.WebCall()
-    wc.url="asdf"
-    iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
-    url = iiif_url
-    print(iiif_url)
-#    await classes.WebCall.find(classes.WebCall.url == iiif_url)
-    await classes.WebCall.find(classes.WebCall.url == url).to_list()
-    r = await get_external_data.get_web_data_as_json(iiif_url)
-
+#     wc = classes.WebCall()
+#     wc.url="asdf"
+#     iiif_url="https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00027407/manifest"
+#     url = iiif_url
+#     print(iiif_url)
+# #    await classes.WebCall.find(classes.WebCall.url == iiif_url)
+#     await classes.WebCall.find(classes.WebCall.url == url).to_list()
+#     r = await get_external_data.get_web_data_as_json(iiif_url)
+    gnd_id="11860354X"
+    r=await parse_gnd.get_records(gnd_id)
+    print(type(r).__name__)
+    print(r[0])
+    record=r[0]
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    print(name_preferred)
+#    for record in r:
+#        print("found record")
+#        print(record)
 
 # #    print(type(r))
 #     #print(r)
