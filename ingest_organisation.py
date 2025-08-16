@@ -244,7 +244,7 @@ async def ingest_organisation(org):
 
 # Similar features have to be added for connected organisations and places, once this is possible.             
 
-            new_connected_person = classes.EntityConnection()
+            new_connected_person = classes.Edge()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -260,7 +260,7 @@ async def ingest_organisation(org):
     if org_selected.connected_organisations:
         for connected_organisation in org_selected.connected_organisations:
             print("now processing connected organisation " + connected_organisation.name)
-            new_connected_organisation = classes.EntityConnection()
+            new_connected_organisation = classes.Edge()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -285,7 +285,7 @@ async def ingest_organisation(org):
                 connected_location.connection_time = connected_location.connection_comment[8:]
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = classes.EntityConnection()
+            new_connected_location = classes.Edge()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -331,7 +331,7 @@ async def ingest_organisation(org):
                         print("connected org not yet in new record, needs to be added")
                         far_connection_type = far_connected_org["connection_type"]
                         db_actions.add_connection_id_and_name(far_record["id"], "connected_organisations", far_connection_type, far_connected_org["name"], org_new.name_preferred, org_new.id, far_connection_type, far_connected_org["connection_time"], far_connected_org["connection_comment"])
-                        new_connection = classes.EntityConnection()
+                        new_connection = classes.Edge()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = person_relations.relation_correspondence(far_connection_type, "")

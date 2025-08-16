@@ -34,7 +34,7 @@ async def main():
         await bridge.delete(link_rule=DeleteRules.DO_NOTHING)
     
     
-    r = classes.Entity.find(classes.Entity.name == entity_name) 
+    r = classes.Node.find(classes.Node.name == entity_name) 
     result_list = await r.to_list()
     result = result_list[0] # Normally, one would search for a uniqueID
     await result.delete()

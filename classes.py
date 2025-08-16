@@ -202,7 +202,7 @@ class Union(UnionDoc):
         name = "all_collections"
         class_id = "_class_id"
 
-class Entity(Document):
+class Node(Document):
     """
  This class is used for references to persons in book records. 
  id is the id of the person in authority files (currently, the GND), name the name given in the 
@@ -251,7 +251,7 @@ class Entity(Document):
 
 
 
-class EntityConnection(Document):
+class Edge(Document):
     """
     Class 
     """
@@ -264,8 +264,8 @@ class EntityConnection(Document):
     subtype : Optional[str] = ""
     nameA : Optional[str] = ""
     nameB : Optional[str] = ""
-    entityA : Optional[Link[Entity]] = None
-    entityB : Optional[Link[Entity]] = None
+    entityA : Optional[Link[Node]] = None
+    entityB : Optional[Link[Node]] = None
     relationA : Optional[str] = ""
     relationB : Optional[str] = ""
     class Settings:
@@ -289,7 +289,7 @@ class EntityConnection(Document):
 #         union_doc = Union
 
 def make_new_role(role,person_name):
-    r=Entity()
+    r=Node()
     if person_name:
         r.name=person_name
     a=Attribute()
@@ -321,9 +321,9 @@ This class is for the links of persons, organisations and places to book records
     type : Optional[str] = ""
     comment : Optional[str] = ""
     preview : Optional[str] = ""
-    entity : Optional[Link[Entity]] = None
+    entity : Optional[Link[Node]] = None
 #    chosen_candidate_id : Optional[int] = 0
-    connected_entities : Optional[List[Link[EntityConnection]]] = []
+    connected_entities : Optional[List[Link[Edge]]] = []
     connections : Optional[List[Link["EntityAndConnections"]]] = []
     class Settings:
         union_doc = Union
@@ -336,9 +336,9 @@ class MakingProcess(Document):
     process_number : Optional[int] = 0
     process_type : Optional[str] = ""
     process_qualifier : Optional[str] = ""
-    person : Optional[EntityConnection] = None
-    place : Optional[EntityConnection] = None
-    date : Optional[EntityConnection] = None
+    person : Optional[Edge] = None
+    place : Optional[Edge] = None
+    date : Optional[Edge] = None
     class Settings:
         union_doc = Union
 
@@ -349,9 +349,9 @@ class BibliographicInformation(Document):
     """
 #    model_config = ConfigDict(arbitrary_types_allowed=True)
     bibliographic_id : Optional[List[BibliographicId]] = []
-    persons : Optional[List[Link[Entity]]] = []
-    organisations : Optional[List[Link[Entity]]] = []
-    places : Optional[List[Link[Entity]]] = []
+    persons : Optional[List[Link[Node]]] = []
+    organisations : Optional[List[Link[Node]]] = []
+    places : Optional[List[Link[Node]]] = []
     attributes : Optional[list[Attribute]] = []
     title: Optional[str] = ""
 #    volume_number : Optional[str] = ""
@@ -413,9 +413,9 @@ This class is for entering Book records into the database
     """
     type : Optional[str] = "Book"
     bibliographic_id : Optional[list[ExternalReference]] = []
-    persons : Optional[list[Link[EntityConnection]]] = []
-    organisations : Optional[list [Link[EntityConnection]]] = []
-    places : Optional[list [EntityConnection]] = []
+    persons : Optional[list[Link[Edge]]] = []
+    organisations : Optional[list [Link[Edge]]] = []
+    places : Optional[list [Edge]] = []
     title: Optional[str] = ""
     volume_number : Optional[str] = ""
     part_title : Optional[str] = ""

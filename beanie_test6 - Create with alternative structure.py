@@ -25,7 +25,7 @@ async def main():
     print("Beanie initialised")
 
 
-    e1=classes.Entity()
+    e1=classes.Node()
     a1=classes.Attribute()
     a1.key="test"
     a1.value="test_value luther"
@@ -33,7 +33,7 @@ async def main():
     e1.attributes.append(a1)
     await e1.save()
 
-    e2=classes.Entity()
+    e2=classes.Node()
     a2=classes.Attribute()
     a2.key="test"
     a2.value="test_value bible"
@@ -63,7 +63,7 @@ async def main():
     await b1.save(link_rule=WriteRules.WRITE)
 
 
-    e3=classes.Entity()
+    e3=classes.Node()
     e3.name="Albrecht Dürer"
     await e3.save()
 

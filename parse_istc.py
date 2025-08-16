@@ -22,7 +22,7 @@ async def parse_istc(url_bibliography):
     bi = classes.BibliographicInformation()
     bi=classes.EntityAndConnections()
     bi.type="BibliographicInformation"
-    bie=classes.Entity()
+    bie=classes.Node()
     bie.type="BibliographicInformation"
 #    print("URL for search in ISTC: " + url_bibliography)
 #    istc_record_raw = requests.get(url_bibliography, timeout = 10)
@@ -62,7 +62,7 @@ async def parse_istc(url_bibliography):
             if "imprint_name" in step1:
                 imprint_name_long = step1["imprint_name"].strip("[]")
             if "imprint_place" in step1:
-                pl = classes.Entity()
+                pl = classes.Node()
                 pl.name = step1["imprint_place"].strip("[]")
                 a=classes.Attribute()
                 a.key="chosen_candidate_id"
@@ -112,7 +112,7 @@ async def parse_istc(url_bibliography):
                     printer_name_long = imprint_name_long_divided[0]
                     publisher_name_long = imprint_name_long_divided[1]
                     printer_name_long = printer_name_long.strip(",")
-                    pl_duplicate = classes.Entity()
+                    pl_duplicate = classes.Node()
                     pl_duplicate.name = bi.places[0].name
                     pl_duplicate.role = "pup"
                     bi.places.append(pl_duplicate)

@@ -92,7 +92,7 @@ One needs a separate function for parsing organisations.
             for connection in artist_record["la:related_from_by"]:
                 connections_list.append(connection)
         for connection in connections_list:
-            conn_ent = classes.EntityConnection()
+            conn_ent = classes.Edge()
             conn_ent.external_id = []
             conn_id = classes.ExternalReference()
             id_raw = connection["la:relates_to"]["id"]
@@ -521,7 +521,7 @@ One needs a separate function for parsing organisations.
         if "took_place_at" in artist_record["born"]:
             if artist_record["born"]["took_place_at"][0]:
                 for place_raw in artist_record["born"]["took_place_at"]:
-                    conn_place = classes.EntityConnection()
+                    conn_place = classes.Edge()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortg"
                     place_id_list = []
@@ -536,7 +536,7 @@ One needs a separate function for parsing organisations.
         if "took_place_at" in artist_record["died"]:
             if artist_record["died"]["took_place_at"][0]:
                 for place_raw in artist_record["died"]["took_place_at"]: # in case several alternative places are given
-                    conn_place = classes.EntityConnection()
+                    conn_place = classes.Edge()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "orts"
                     place_id_list = []
@@ -558,7 +558,7 @@ One needs a separate function for parsing organisations.
                 for place_raw in place_list: # I have the feeling, that there is an 'activity' record for every place, but perhaps there may be also sometimes two places linked to one 'activity' record
         #            print("place of activity found")
         #            print(place_raw)
-                    conn_place = classes.EntityConnection()
+                    conn_place = classes.Edge()
                     conn_place.name = place_raw["_label"]
                     conn_place.connection_type = "ortw"
                     place_id_list = []

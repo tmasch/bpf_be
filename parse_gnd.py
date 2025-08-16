@@ -254,9 +254,9 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_persons_list = []
-    potential_person = classes.Entity()
+    potential_person = classes.Node()
 #    person_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-    person = classes.Entity()
+    person = classes.Node()
     person.new_authority_id = new_authority_id
     person_found = db_actions.find_person(person,"GND")
     if person_found:
@@ -323,7 +323,7 @@ This function is used for every organisation named in the bibliographic record (
         candidates_result = db_actions.find_organisation(organisation,"name")
         print("Search for repository candidate completed")
         for candidate_result in candidates_result:
-            candidate = classes.Entity()   
+            candidate = classes.Node()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -335,7 +335,7 @@ This function is used for every organisation named in the bibliographic record (
 #        candidates_result = coll.find({"name_variant" : organisation.name}, {"id": 1, "name_preferred" : 1, "org_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_organisation(organisation,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.Entity()   
+            candidate = classes.Node()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"]
             candidate.internal_id_org_type1 = candidate_result["org_type1"]
@@ -399,8 +399,8 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_orgs_list = []
-    potential_org = classes.Entity()
-    org = classes.Entity()
+    potential_org = classes.Node()
+    org = classes.Node()
     org.new_authority_id=new_authority_id
 #    org_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "org_type1" : 1})
     org_found = db_actions.find_organisation(org,"GND")
@@ -479,7 +479,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
         candidates_result = db_actions.find_place(place,"name_preferred")
         for candidate_result in candidates_result:           
-            candidate = classes.Entity()   
+            candidate = classes.Node()   
             candidate.internal_id = candidate_result["id"]
             candidate.name_preferred = candidate_result["name_preferred"] # I need this to create previews for places of making
             print("candidate found through name search in database (preferred name)" + candidate.internal_id)
@@ -489,7 +489,7 @@ Since there are often many locations connected toa town (e.g., all villages in i
 #        candidates_result = coll.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
         candidates_result = db_actions.find_place(place,"name_variant")
         for candidate_result in candidates_result:
-            candidate = classes.Entity()   
+            candidate = classes.Node()   
             candidate.internal_id = candidate_result["id"]
             print("candidate found through name search in database (variant name name)" + candidate.internal_id)
             candidate.preview = candidate_result["name_preferred"] + " (in Database)"
@@ -553,9 +553,9 @@ Currently all records must come from the GND - if other authority files are incl
     """
     new_authority_id = new_authority_id.strip()
     potential_places_list = []
-    potential_place = classes.Entity()
+    potential_place = classes.Node()
 #    place_found = coll.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
-    place=classes.Entity
+    place=classes.Node
     place.new_authority_id=new_authority_id
     place_found = db_actions.find_place(place,"GND")
     if place_found:            
@@ -657,7 +657,7 @@ async def find_and_parse_person_gnd(authority_url):
     #     name_variant_preview = ""
     #     comments_preview = ""
 
-        person_found=classes.Entity()
+        person_found=classes.Node()
         person_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
         person_found.external_id.extend(gnd_record_get_external_references(record))
         name_preferred, comments = gnd_record_get_name_preferred(record)
@@ -993,9 +993,9 @@ def gnd_record_get_connected_persons(record):
     connections = []
     datafields = find_datafields(record,"500")
     for datafield in datafields:
-        p=classes.Entity()
+        p=classes.Node()
         p.type="Person"
-        ec=classes.EntityConnection()
+        ec=classes.Edge()
         subfields = find_subfields(datafield,"0")
         if subfields: 
             for subfield in subfields:
@@ -1071,9 +1071,9 @@ def gnd_record_get_connected_orgs(record):
     connections = []
     datafields = find_datafields(record,"500")
     for datafield in datafields:
-        org=classes.Entity()
+        org=classes.Node()
         org.type="Organisation"
-        ec=classes.EntityConnection()
+        ec=classes.Edge()
         subfields = find_subfields(datafield,"0")
         if subfields: 
             for subfield in subfields:
@@ -1149,9 +1149,9 @@ def gnd_record_get_connected_places(record):
     connections = []
     datafields = find_datafields(record,"500")
     for datafield in datafields:
-        pl=classes.Entity()
+        pl=classes.Node()
         pl.type="Place"
-        ec=classes.EntityConnection()
+        ec=classes.Edge()
         subfields = find_subfields(datafield,"0")
         if subfields: 
             for subfield in subfields:
@@ -1370,7 +1370,7 @@ were reused from parsing person records.
         if not exclude:
             print("found record")
 
-            org_found=classes.Entity()
+            org_found=classes.Node()
             org_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
             org_found.external_id.extend(gnd_record_get_external_references(record))
             org_found.name_preferred = gnd_org_record_get_name_preferred(record)
@@ -1386,7 +1386,7 @@ were reused from parsing person records.
             org_found.comments = get_gnd_comments(record, org_found.comments)
     #        print(org_found)
 
-            connected_org = classes.EntityConnection()
+            connected_org = classes.Edge()
             connected_org.connection_type = "Candidate"
             connected_org.entityA = org_found
             result.append(connected_org)
@@ -1508,7 +1508,7 @@ The longest part of the function the actual parsing of the XMl results, is moved
     for record in records:
 #        print("arrived in parsing record")
 
-        pl_found = classes.Entity()
+        pl_found = classes.Node()
         entity_types = gnd_place_record_get_entity_type(record)
         if(("gik" in entity_types or "giz" in entity_types or "gxz" in entity_types) and "gil" not in entity_types):
             # This is for searching for towns. If I want to use this function later also for searching e.g., countries,
@@ -1531,7 +1531,7 @@ The longest part of the function the actual parsing of the XMl results, is moved
             pl_found.comments = get_gnd_comments(record, pl_found.comments)
     #        print(org_found)
 
-            connected_place = classes.EntityConnection()
+            connected_place = classes.Edge()
             connected_place.connection_type = "Candidate"
             connected_place.entityA = pl_found
             result.append(connected_place)

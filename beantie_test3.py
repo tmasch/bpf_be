@@ -15,7 +15,7 @@ async def main():
     await db_actions.initialise_beanie()
     print("adding entity 'Genesis' and connecting it with entity 'Bible'")
 
-    e1=classes.Entity()
+    e1=classes.Node()
     e1.name = "Genesis"
 
     eac2 = classes.EntityAndConnections()
@@ -28,7 +28,7 @@ async def main():
     result_list = await r.to_list()
     eac1 = result_list[0]
 
-    ec1=classes.EntityConnection()
+    ec1=classes.Edge()
     ec1.entityA=e1
     ec1.entityB=eac1.entity
     ec1.relationA="part of"

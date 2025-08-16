@@ -189,7 +189,7 @@ async def metadata_persons(metadata: classes.Metadata):
         print(chosen_candidate)
         # Search for person in DB
         print (chosen_candidate.gnd_id)
-        r= await classes.Entity.find(classes.Entity.gnd_id==chosen_candidate.gnd_id).to_list()
+        r= await classes.Node.find(classes.Node.gnd_id==chosen_candidate.gnd_id).to_list()
         print("Search result:")
         print(r)
         if r:
@@ -207,7 +207,7 @@ async def metadata_persons(metadata: classes.Metadata):
 
 
 @classes.async_func_logger
-async def create_person_eac_record(p: classes.Entity):
+async def create_person_eac_record(p: classes.Node):
     p_new = await create_person_record(p)
     eac = classes.EntityAndConnections()
     eac.name=p_new.name_preferred
@@ -231,14 +231,14 @@ async def create_person_eac_record(p: classes.Entity):
 
 
 @classes.async_func_logger
-async def create_person_record(p: classes.Entity):
+async def create_person_record(p: classes.Node):
     """
     This routine searches for person data in GND and creates a record for this person.
     Note that connected persons, places and organisations are not created.
     """
     print("Input")
     print(p)
-    p_new=classes.Entity()
+    p_new=classes.Node()
 
     p_new.name_preferred=p.name_preferred
 
@@ -256,7 +256,7 @@ async def create_person_record(p: classes.Entity):
 
 
 @classes.async_func_logger
-async def create_person_stub(p: classes.Entity):
+async def create_person_stub(p: classes.Node):
     pass
 
 
@@ -561,7 +561,7 @@ async def populate_pages_from_metadata(metadata,book_record_id,org):
                 making_process_db = classes.MakingProcessDb()
                 making_process_db.process_type = making_process.process_type
                 if making_process.person.internal_id:
-                    person = classes.EntityConnection()
+                    person = classes.Edge()
                     person.id = making_process.person.internal_id # is apparently always there, if a person has been chosen
 #                    print("role of person")
 #                    print(making_process.person.role)
@@ -575,7 +575,7 @@ async def populate_pages_from_metadata(metadata,book_record_id,org):
                 if making_process.place.internal_id:
                     print("Place as entered in making_processs")
                     print(making_process.place)
-                    place = classes.EntityConnection()
+                    place = classes.Edge()
                     place.id = making_process.place.internal_id # is apparently always there, if a place has been chosen
 #                    print("role of person")
 #                    print(making_process.person.role)

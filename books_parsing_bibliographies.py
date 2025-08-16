@@ -109,12 +109,12 @@ def parse_vd16(url_bibliography):
         impressum = record_structured["Impressum"]
         impressum_pattern = r"([^:]*)(: )?([^;]*)?(; )?([^:]*)?(: )?(.*)?(, )([^,]*)"
         impressum_divided = re.match(impressum_pattern, impressum)
-        pl = classes.Entity()
+        pl = classes.Node()
         pl.name = impressum_divided[1]
         pl.add_attribute("role", "mfp")
         bi.places.append(pl)
         if impressum_divided[5]:
-            pl = classes.Entity()
+            pl = classes.Node()
             pl.name = impressum_divided[5]
             pl.role = "pup"
             bi.places.append(pl)
@@ -124,7 +124,7 @@ def parse_vd16(url_bibliography):
             # is only given in section 1 and not repeated in section 5.
             # However, it needs to entered twice into the database,
             # as place of publishing and as place of printing.
-            pl = classes.Entity()
+            pl = classes.Node()
             pl.name = impressum_divided[1]
             pl.role = "pup"
             bi.places.append(pl)

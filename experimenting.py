@@ -109,14 +109,20 @@ async def main():
 # #    await classes.WebCall.find(classes.WebCall.url == iiif_url)
 #     await classes.WebCall.find(classes.WebCall.url == url).to_list()
 #     r = await get_external_data.get_web_data_as_json(iiif_url)
-    gnd_id="11860354X"
-    r=await parse_gnd.get_records(gnd_id)
-    print(type(r).__name__)
-    print(r[0])
-    record=r[0]
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
-    print(name_preferred)
-#    for record in r:
+    # gnd_id="11860354X"
+    # r=await parse_gnd.get_records(gnd_id)
+    # print(type(r).__name__)
+    # print(r[0])
+    # record=r[0]
+    # name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    # print(name_preferred)
+    r=await db_actions.find_person("Test","name")
+    print(r.__len__())
+    for i in r:
+        print(i)
+#    r.count()
+#   
+#  for record in r:
 #        print("found record")
 #        print(record)
 

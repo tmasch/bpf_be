@@ -14,7 +14,7 @@ import parsing_helpers
 
 
 @classes.func_logger
-async def ingest_person(person: classes.Entity):
+async def ingest_person(person: classes.Node):
     # This function is about translating the imported information of a person into the
     #  information record used for the database.
     # It directly sends the new records to the function for writing it and only
@@ -61,7 +61,7 @@ async def ingest_person(person: classes.Entity):
     print(type(person_selected))
     #    r = db_actions.find_person
 
-    person_new = classes.Entity()
+    person_new = classes.Node()
 #    person_new.id = generate()
     person_new.type = "Person"
     person_new.person_type1.append(parsing_helpers.map_role_to_person_type(person.role))
@@ -397,7 +397,7 @@ async def ingest_person(person: classes.Entity):
                             connected_person.connection_comment = comment_correction
                         break
 
-            new_connected_person = classes.EntityConnection()
+            new_connected_person = classes.Edge()
             new_connected_person.id = connected_person.id
             new_connected_person.name = connected_person.name
             new_connected_person.external_id = connected_person.external_id
@@ -420,7 +420,7 @@ async def ingest_person(person: classes.Entity):
             print(
                 "now processing connected organisation " + connected_organisation.name
             )
-            new_connected_organisation = classes.EntityConnection()
+            new_connected_organisation = classes.Edge()
             new_connected_organisation.id = connected_organisation.id
             new_connected_organisation.external_id = connected_organisation.external_id
             new_connected_organisation.name = connected_organisation.name
@@ -463,7 +463,7 @@ async def ingest_person(person: classes.Entity):
                 )
                 connected_location.connection_comment = "wohnort"
 
-            new_connected_location = classes.EntityConnection()
+            new_connected_location = classes.Edge()
             new_connected_location.id = connected_location.id
             new_connected_location.external_id = connected_location.external_id
             new_connected_location.name = connected_location.name
@@ -522,7 +522,7 @@ async def ingest_person(person: classes.Entity):
                             far_connected_person["connection_time"],
                             far_connected_person["connection_comment"],
                         )
-                        new_connection = classes.EntityConnection()
+                        new_connection = classes.Edge()
                         new_connection.id = far_record["id"]
                         new_connection.name = far_record["name_preferred"]
                         new_connection.connection_type = (

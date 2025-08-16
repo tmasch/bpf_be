@@ -27,7 +27,7 @@ async def main():
     print("Beanie initialised")
 
 
-    e1=classes.Entity()
+    e1=classes.Node()
     a1=classes.Attribute()
     a1.key="test"
     a1.value="test_value Genesis"
@@ -35,7 +35,7 @@ async def main():
     e1.attributes.append(a1)
     await e1.save()
 
-    r = classes.Entity.find(classes.Entity.name == "The Bible") # normally, one would have this entity alreaday waiting somewhere
+    r = classes.Node.find(classes.Node.name == "The Bible") # normally, one would have this entity alreaday waiting somewhere
     result_list = await r.to_list()
     far_entity = result_list[0]
 
@@ -63,7 +63,7 @@ async def main():
     await b1.save(link_rule=WriteRules.WRITE)
 
 
-    r = classes.Entity.find(classes.Entity.name == "Martin Luther") # normally, one would have this entity alreaday waiting somewhere
+    r = classes.Node.find(classes.Node.name == "Martin Luther") # normally, one would have this entity alreaday waiting somewhere
     result_list = await r.to_list()
     far_entity = result_list[0]
 

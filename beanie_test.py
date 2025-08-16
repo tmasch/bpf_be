@@ -1,4 +1,4 @@
-#pylint: disable=C0301,C0114,C0116
+#pylint: disable=C0301,C0114,C0116,W0622
 import asyncio
 from rich import print
 from beanie import WriteRules
@@ -12,13 +12,13 @@ load_dotenv()
 #@classes.func_logger
 #@pytest.mark.asyncio
 async def insert_data():
-    luther=classes.Entity()
+    luther=classes.Node()
     luther.name="Martin Luther"
 
-    bible=classes.Entity()
+    bible=classes.Node()
     bible.name="The Bible"
 
-    luther_bible=classes.EntityConnection()
+    luther_bible=classes.Edge()
     luther_bible.entityA=luther
     luther_bible.nameA=luther.name
     luther_bible.entityB=bible
@@ -27,10 +27,10 @@ async def insert_data():
     luther_bible.relationB="translated by"
 #    await luther_bible.save(link_rule=WriteRules.WRITE)
 
-    melanchton=classes.Entity()
+    melanchton=classes.Node()
     melanchton.name="Melanchton"
 
-    luther_melanchton=classes.EntityConnection()
+    luther_melanchton=classes.Edge()
     luther_melanchton.entityA=melanchton
     luther_melanchton.nameA=melanchton.name
     luther_melanchton.entityB=luther
@@ -41,10 +41,10 @@ async def insert_data():
 #    await luther_melanchton.save(link_rule=WriteRules.WRITE)
 
 
-    duerer=classes.Entity()
+    duerer=classes.Node()
     duerer.name="Albrecht Dürer"
 
-    duerer_bible=classes.EntityConnection()
+    duerer_bible=classes.Edge()
     duerer_bible.entityB=duerer
     duerer_bible.entityA=bible
     duerer_bible.relationA="Illustrator of"
@@ -67,18 +67,18 @@ async def main():
 
 
     print("Search Luther")
-    r = await classes.EntityConnection.find(classes.EntityConnection.entityA.name == "Martin Luther", fetch_links=True).to_list()
+    r = await classes.Edge.find(classes.Edge.entityA.name == "Martin Luther", fetch_links=True).to_list()
 #    print(r)
 
 
     print("Search Bible")
-    r = classes.EntityConnection.find(classes.EntityConnection.entityA.name == "The Bible", fetch_links=True)
+    r = classes.Edge.find(classes.Edge.entityA.name == "The Bible", fetch_links=True)
     print(await r.to_list())
-    r = classes.EntityConnection.find(classes.EntityConnection.entityB.name == "The Bible", fetch_links=True)
+    r = classes.Edge.find(classes.Edge.entityB.name == "The Bible", fetch_links=True)
     print(await r.to_list())
 
     print("Search Luther as Entity")
-    r = classes.Entity.find(classes.Entity.name=="Martin Luther", fetch_links = True)
+    r = classes.Node.find(classes.Node.name=="Martin Luther", fetch_links = True)
     print(await r.to_list())
 
 asyncio.run(main())

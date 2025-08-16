@@ -14,7 +14,7 @@ from beanie import init_beanie
 import motor.motor_asyncio
 
 import classes
-import person_relations
+#import person_relations
 
 
 
@@ -28,10 +28,10 @@ async def initialise_beanie():
     motor_client = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
     database = motor_client[mongo_db_database_name]
     await init_beanie(database=database, document_models=[classes.Metadata,\
-                                                        classes.Entity,\
+                                                        classes.Node,\
                                                         classes.BookDb,\
                                                         classes.PagesDb, \
-                                                        classes.EntityConnection, \
+                                                        classes.Edge, \
                                                         classes.EntityAndConnections, \
                                                         classes.MakingProcess, \
                                                         classes.BibliographicId, \
@@ -376,51 +376,55 @@ def create_image_record():
     collection=dbname['bpf']
 
 @classes.async_func_logger
-async def find_person(person: classes.Entity, parameter: str):
+async def find_person(search_string: str, search_parameter: str):
     """
 \todo
     """
-    dbname = get_database()
-    collection = dbname['bpf']
-    person = classes.Entity()
-    person_found = None
-    if parameter=="external_id":
+#    dbname = get_database()
+#    collection = dbname['bpf']
+#    person = classes.Entity()
+    search_result = None
+    match search_parameter: 
+        case "name":
+            search_result=classes.Node.find(classes.Node.name==search_string)
+        case "external_id":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-        person_found = await classes.Entity.find_one(classes.Entity.external_id.id == person.id 
-                                            and classes.Entity.external_id.name == person.name)
+#            search_result = await classes.Entity.find_one(classes.Entity.external_id.id == person.id 
+#                                            and classes.Entity.external_id.name == person.name)
 #                person_found = coll.find_one({"external_id": {"$elemMatch": {"name": external_id.name, "id": external_id.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
-    elif parameter=="name_preferred":
-#        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+        case "name_preferred":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = await classes.Person.find(classes.Person.name_preferred == person.name)
-        person_found = collection.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
-    elif parameter=="name_variant":
-        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+#            search_result = collection.find({"name_preferred" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
+        case "name_variant":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find({"name_variant" : person.name}, {"id": 1, "name_preferred" : 1, "person_type1" : 1})
-    elif parameter=="GND":
-        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+        case "GND":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": person.new_authority_id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
-    elif parameter=="external_id_ingest":
-        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+        case "external_id_ingest":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_persons" : 1})
-    elif parameter=="external_id_connected_organisation":
-        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+        case "external_id_connected_organisation":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_organisations" : 1})
-    elif parameter=="external_id_connected_location":
-        classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
+        case "external_id_connected_location":
+            classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "name_preferred" : 1, "sex" : 1, "connected_locations" : 1})
-    print(person_found)
+    print(search_result)
  #   if person_found:
 #        print("ID "+person_found.id+" NAME "+person_found.name_preferred)
-    return person_found
+    return await search_result.to_list()
 
 @classes.func_logger
-def find_organisation(organisation: classes.Entity, parameter: str):
+def find_organisation(organisation: classes.Node, parameter: str):
     """
 \todo
     """
     dbname = get_database()
     collection = dbname['bpf']
-    organisation_found = classes.Entity
+    organisation_found = classes.Node
     if parameter=="external_id":
         organisation_found = collection.find_one({"external_id": {"$elemMatch": {"name": organisation.id_name, "id": organisation.id}}}, {"id": 1, "name_preferred": 1, "org_type1": 1})
     if parameter=="external_id_ingest":
@@ -439,7 +443,7 @@ def find_organisation(organisation: classes.Entity, parameter: str):
     return organisation_found
 
 @classes.func_logger
-def find_place(place: classes.Entity, parameter: str):
+def find_place(place: classes.Node, parameter: str):
     """
 \todo
     """
@@ -648,7 +652,10 @@ def find_place_viaf(new_record_viaf_id,new_record_gnd_id):
 @classes.async_func_logger
 async def save_person(p):
 #    p.id= generate()
-    r = await p.save()
+    if p.type == "Person":
+        r = await p.save()
+    else:
+        r="ERROR"
     return r
 
 @classes.async_func_logger

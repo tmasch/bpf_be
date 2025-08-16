@@ -15,31 +15,31 @@ async def main():
     await db_actions.initialise_beanie()
 
 
-    e1=classes.Entity()
+    e1=classes.Node()
     a1=classes.Attribute()
     a1.key="test"
     a1.value="test_value luther"
     e1.name="Martin Luther"
     e1.attributes.append(a1)
 
-    e2=classes.Entity()
+    e2=classes.Node()
     a2=classes.Attribute()
     a2.key="test"
     a2.value="test_value bible"
     e2.name="The Bible"
     e2.attributes.append(a2)
 
-    ec1=classes.EntityConnection()
+    ec1=classes.Edge()
     ec1.entityA=e1
     ec1.entityB=e2
     ec1.relationA="Translator of"
     ec1.relationB="translated by"
     await ec1.save(link_rule=WriteRules.WRITE)
 
-    e3=classes.Entity()
+    e3=classes.Node()
     e3.name="Albrecht Dürer"
 
-    ec2=classes.EntityConnection()
+    ec2=classes.Edge()
     ec2.entityA=e2
     ec2.entityB=e3
     ec2.relationA="Illustrator of"
@@ -66,18 +66,18 @@ async def main():
 
 
     print("Search Luther")
-    r = classes.EntityConnection.find(classes.EntityConnection.entityA.name == "Martin Luther", fetch_links=True)
+    r = classes.Edge.find(classes.Edge.entityA.name == "Martin Luther", fetch_links=True)
     print(await r.to_list())
 
 
     print("Search Bible")
-    r = classes.EntityConnection.find(classes.EntityConnection.entityA.name == "The Bible", fetch_links=True)
+    r = classes.Edge.find(classes.Edge.entityA.name == "The Bible", fetch_links=True)
     print(await r.to_list())
-    r = classes.EntityConnection.find(classes.EntityConnection.entityB.name == "The Bible", fetch_links=True)
+    r = classes.Edge.find(classes.Edge.entityB.name == "The Bible", fetch_links=True)
     print(await r.to_list())
 
     print("Search Luther as Entity")
-    r = classes.Entity.find(classes.Entity.name=="Martin Luther", fetch_links = True)
+    r = classes.Node.find(classes.Node.name=="Martin Luther", fetch_links = True)
     print(await r.to_list())
 
 

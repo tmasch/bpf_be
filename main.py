@@ -356,7 +356,7 @@ async def get_manuscript_record(identifier: str):
     return manuscript_record
 
 
-@app.get("/getPersonRecord", response_model = classes.Entity)
+@app.get("/getPersonRecord", response_model = classes.Node)
 async def get_person_record(identifier: str):
     """
     \todo move to get_resource    
