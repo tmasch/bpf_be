@@ -6,7 +6,7 @@ individual canvases(canvas_properties). Because much information in the manifest
 there has to be a separate function for each library. 
 """
 
-import urllib.request
+#import urllib.request
 import json
 import re
 import xml.etree.ElementTree
@@ -14,10 +14,10 @@ import requests
 from lxml import etree
 import classes
 import parse_canvas
+import parsing_helpers
 
 @classes.func_logger
 def parse_manifests_bsb(manifest):
-    #f=open(r'C:\Users\berth\Documents\Warburg\Experimente - Python\iconobase\manifest.json', 'r', encoding='utf-8')
 
     #Step 1: Extracting relevant fields from the general section of the Manifest
     metadata=manifest["metadata"]
@@ -87,7 +87,7 @@ def parse_manifests_bsb(manifest):
 #        entity_and_connections.Entity.name = location_divided.groups()[0]
 #        repository.entity_and_connections=eac
 
-        ec=classes.Edge()
+        ec=classes.EntityConnection()
         ec.type="col"
 #        ec.entityA=
 #        repository.role = "col"
@@ -128,8 +128,7 @@ def parse_manifests_bsb(manifest):
     #book_properties = (repository, shelfmark, bibliographic_id_transformed, license)
     if 1==2:
         #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
-        canvas_label_pattern = r'(.*?)([(].*)'
-        roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
+        canvas_label_pattern = r'(.*?)([(].*)'    
         canvas_list = (((manifest["sequences"])[0])["canvases"])
         ###from here onward new function
         images = parse_canvas.parse_canvas(canvas_list)
@@ -140,9 +139,9 @@ def parse_manifests_bsb(manifest):
             im.label_page = canvas_label_divided.groups()[0].strip()
             #if the canvas_label is a figure or Roman numerals only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
             #but has as last character "r" or "v", it is probably a folio number. 
-            if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+            if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
                 im.label_prefix = "p. "
-            elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+            elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
                 im.label_prefix = "fol. "
             else:
                 im.label_prefix = ""
@@ -222,7 +221,6 @@ def parse_manifest_halle(URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     #canvas_label_pattern = r'(.*?)([(].*)'
-    #roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     images = parse_canvas.parse_canvas(canvas_list)
@@ -309,7 +307,6 @@ def parse_manifest_berlin(URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
 
     canvas_label_pattern = r'(.*?)(\[.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     images =parse_canvas.parse_canvas(canvas_list)
     #for the label (page-number) of the canvas
@@ -323,9 +320,9 @@ def parse_manifest_berlin(URI_entered):
         im.label_page = canvas_label_long_divided.groups()[0].strip()
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
         else:
             im.label_prefix = ""        
@@ -477,7 +474,6 @@ def parse_manifest_thulb(URI_entered):
     #canvas_id_pattern1 = r'(.*?)_(0000_[\d]{2,5}.*).tif'
     #canvas_id_pattern2 = r'(.*)_([\d]{2,5}).tif'
 
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
    
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)
@@ -490,9 +486,9 @@ def parse_manifest_thulb(URI_entered):
             im.label_page = canvas_label_long_divided[1].strip()
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
         else:
             im.label_prefix = ""        
@@ -557,7 +553,6 @@ def parse_manifest_slub(uri_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     canvas_label_pattern = r'(.*?)([(].*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -573,9 +568,9 @@ def parse_manifest_slub(uri_entered):
         
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
 
@@ -694,7 +689,6 @@ def parse_manifest_leipzig(uri_entered):
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -709,9 +703,9 @@ def parse_manifest_leipzig(uri_entered):
             im.label_page = canvas_label_long
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m
@@ -938,7 +932,6 @@ def parse_manifest_gallica(URI_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     canvas_label_pattern = r'(.*?)([(].*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -954,9 +947,9 @@ def parse_manifest_gallica(URI_entered):
         
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
  
@@ -995,7 +988,6 @@ def parse_manifest_ecodices(uri_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
     canvas_label_pattern = r'(.*?)([(].*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1007,9 +999,9 @@ def parse_manifest_ecodices(uri_entered):
         
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m
@@ -1114,7 +1106,6 @@ def parse_manifest_erara(uri_entered):
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
     canvas_label_pattern = r'(\[\d*\])(.*)?'#There is always a counting of canvases, and sometimes a page-number following it
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1130,9 +1121,9 @@ def parse_manifest_erara(uri_entered):
         
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
 
@@ -1217,7 +1208,6 @@ def parse_manifest_bodleian(uri_entered):
     
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1279,7 +1269,6 @@ def parse_manifest_heidelberg(uri_entered):
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1290,9 +1279,9 @@ def parse_manifest_heidelberg(uri_entered):
         im.label_page = im.label_raw
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m
@@ -1362,7 +1351,6 @@ def parse_manifest_vaticana(uri_entered):
  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1373,9 +1361,9 @@ def parse_manifest_vaticana(uri_entered):
         im.label_page = im.label_raw
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m
@@ -1471,7 +1459,6 @@ def parse_manifest_vienna(uri_entered):
                       
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = ((manifest["sequences"])[0])["canvases"]
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1564,7 +1551,6 @@ This section is still untested since I couldn't open the manifest
     
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1660,7 +1646,6 @@ def parse_manifest_goettingen (URI_entered):
                     
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     canvas_id_pattern = r'(.*)(canvas/)(.*)'
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_properties = []
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     images = parse_canvas.parse_canvas(canvas_list)    
@@ -1672,9 +1657,9 @@ def parse_manifest_goettingen (URI_entered):
         im.label_page = im.label_raw
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m
@@ -1816,7 +1801,6 @@ def parse_manifest_yale (URI_entered):
 
                     
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}    
     canvas_list = (manifest["items"])
     images = parse_canvas.parse_canvas_yale(canvas_list)    
     m.numberOfImages = len(images)
@@ -1824,9 +1808,9 @@ def parse_manifest_yale (URI_entered):
     
     for im in images:
         im.label_page = im.label_raw
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
         else:
             im.label_prefix = ""
@@ -1922,7 +1906,6 @@ def parse_manifest_manchester (URI_entered):
                  
     #Step 3: Extracting the relevant fields for the records on individual pages in the manifest and transforming them into database format
     
-    roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
     canvas_list = (((manifest["sequences"])[0])["canvases"])
     images = parse_canvas.parse_canvas(canvas_list)    
     m.numberOfImages = len(images)
@@ -1933,9 +1916,9 @@ def parse_manifest_manchester (URI_entered):
         im.label_page = im.label_raw
         #if the canvas_label is a figure or Roman numerlas only, it probably is a page number, and hence "p. " is added. If it is a figure or Roman numerals 
         #but has as last character "r" or "v", it is probably a folio number. 
-        if im.label_page and (im.label_page.isnumeric() or all(characters in roman_numerals for characters in im.label_page)): 
+        if im.label_page and (im.label_page.isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page)): 
             im.label_prefix = "p. "
-        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
+        elif im.label_page and (im.label_page[0:-1].isnumeric() or all(characters in parsing_helpers.roman_numerals for characters in im.label_page[0:-1])) and (im.label_page[-1] in {"r", "v"}):
             im.label_prefix = "fol. "
     m.images = images
     return m

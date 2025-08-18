@@ -17,7 +17,7 @@ def find_images(identifier):
     """
     print("finding images")
     print(identifier)
-    r=db_actions.get_resource_from_db(identifier)
+#    r=db_actions.get_resource_from_db(identifier)
     print(r["images"][0])
     i=r["images"][0]
     frames=process_image(i)

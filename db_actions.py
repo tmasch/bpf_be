@@ -69,21 +69,21 @@ def get_database():
     # Create the database for our example (we will use the same database throughout the tutorial
 #   return client['bpf']
 
-@classes.func_logger
-async def insert_atom(atom):
-    await atom.insert()
-    return 
+# @classes.func_logger
+# async def insert_atom(atom):
+#     await atom.insert()
+#     return 
 
-@classes.func_logger
-def insert_metadata(metadata: classes.Metadata):
-    """
-    Method to create a metadata record
-    """
-    print("Inserting metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(metadata.dict())
-    return "Hello World"
+# @classes.func_logger
+# def insert_metadata(metadata: classes.Metadata):
+#     """
+#     Method to create a metadata record
+#     """
+#     print("Inserting metadata in database")
+#     dbname = get_database()
+#     collection=dbname['bpf']
+#     collection.insert_one(metadata.dict())
+#     return "Hello World"
 
 @classes.async_func_logger
 async def get_all_resources_from_db():
@@ -105,20 +105,20 @@ async def get_all_resources_from_db():
 #    r = await books.to_list()
     return records
 
-@classes.func_logger
-def get_resource_from_db(identifier):
-    """
-    Method to get a single record from the database given its id
-    """
-    print(identifier)
-    dbname = get_database()
-    collection = dbname['bpf']
-    r=collection.find({"id" : identifier })
-    print("search done")
-    print(r[0])
-#    for rr in r:
-#        print(rr)
-    return r[0]
+# @classes.func_logger
+# def get_resource_from_db(identifier):
+#     """
+#     Method to get a single record from the database given its id
+#     """
+#     print(identifier)
+#     dbname = get_database()
+#     collection = dbname['bpf']
+#     r=collection.find({"id" : identifier })
+#     print("search done")
+#     print(r[0])
+# #    for rr in r:
+# #        print(rr)
+#     return r[0]
 
 @classes.func_logger
 def update_image_with_frames(identifier,i,frames):
@@ -258,6 +258,7 @@ This function is used to go to a specific record that has not yet a reciprocal c
     print(record)
     return result
 @classes.func_logger
+
 def add_person_type(person_id, person_type1):
     """
 This function is used to add another person type (e.g., Author, Artist etc.) to a person record
@@ -380,13 +381,11 @@ async def find_person(search_string: str, search_parameter: str):
     """
 \todo
     """
-#    dbname = get_database()
-#    collection = dbname['bpf']
-#    person = classes.Entity()
     search_result = None
     match search_parameter: 
         case "name":
-            search_result=classes.Node.find(classes.Node.name==search_string)
+            search_result=classes.Node.find( classes.Node.name==search_string and
+                                             classes.Node.type=="Person" )
         case "external_id":
             classes.logger.info("   ---    NOT IMPLEMENTED   ---   ")
 #        person_found = collection.find_one({"external_id": {"$elemMatch": {"name": person.name, "id": person.id}}}, {"id": 1, "person_type1": 1, "name_preferred": 1})
@@ -455,7 +454,9 @@ def find_place(place: classes.Node, parameter: str):
     if parameter=="name_preferred":
         place_found = collection.find({"name_preferred" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1})
     if parameter=="name_variant":
-        place_found = collection.find({"name_variant" : place.name}, {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
+        place_found = collection.find(
+            {"name_variant" : place.name}, 
+            {"id": 1, "name_preferred" : 1, "place_type1" : 1}) #I search first for the preferred names (assuming that it is more likely there will be a good match, and only later for the variants)
     if parameter=="GND":
         place_found = collection.find_one({"external_id": {"$elemMatch": {"name": "GND", "id": place.new_authority_id}}}, {"id": 1, "name_preferred": 1, "place_type1" : 1})
     if parameter=="external_id_ingest":
@@ -662,3 +663,18 @@ async def save_person(p):
 async def save_person_and_connections():
 
     pass
+
+
+def make_new_role(role,person_name):
+    r=classes.Node()
+    if person_name:
+        r.name=person_name
+    a=classes.Attribute()
+    a.key="role"
+    a.value=role
+    r.attributes.append(a)
+    a=classes.Attribute()
+    a.key="chosen_candidate"
+    a.value=-1
+    r.attributes.append(a)
+    return r

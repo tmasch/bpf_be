@@ -1,13 +1,13 @@
-
+"""
+Testing of db_actions.py
+"""
 import pytest
 from dotenv import load_dotenv
-
 
 import classes
 import db_actions
 
 load_dotenv()
-
 
 @pytest.mark.asyncio
 async def test_create_person():
@@ -28,18 +28,17 @@ async def test_create_person():
 
 @pytest.mark.asyncio
 async def test_find_person_name():
+    """
+    Test find_person, case searching by name
+    """
     await db_actions.initialise_beanie()
-#    classes.Entity.find()
     p=classes.Node()
     p.name="Test"
     p.type="Person"
-    t = await db_actions.save_person(p)
+    await db_actions.save_person(p)
     r=await db_actions.find_person("Test","name")
-    assert r.__len__() == 1
+    assert len(r) == 1
     assert r[0].name == "Test"
     assert r[0].type == "Person"
     await r[0].delete()
-
-
-
-
+    

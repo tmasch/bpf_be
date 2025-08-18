@@ -1,9 +1,12 @@
 """
 Module contains functions for producing dummy records
 """
+from dotenv import load_dotenv
+from rich import print
 import asyncio
 import exp_classes
 import exp_db_actions
+from beanie import Document, Link, WriteRules
 
 async def dummy_record_manuscript():
     """
@@ -157,6 +160,7 @@ async def dummy_record_collection(search_name):
 
 
 
+load_dotenv()
 
 
 async def main():
@@ -164,9 +168,10 @@ async def main():
     manuscript_plus = await dummy_record_manuscript()
     print(manuscript_plus)
     print("xxx")
+    await manuscript_plus.save(link_rule=WriteRules.WRITE)
 
-    collection_plus = await dummy_record_collection("Bayerische Staatsbibliothek")
-    print(collection_plus)
+#    collection_plus = await dummy_record_collection("Bayerische Staatsbibliothek")
+#    print(collection_plus)
 
 
 asyncio.run(main())

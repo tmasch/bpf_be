@@ -14,13 +14,8 @@ import pytest
 #from dotenv import load_dotenv
 #import logging
 
-from lxml import etree
-import get_external_data
 import parse_gnd
-#import classes
 import db_actions
-
-#import test_get_external_data
 
 @pytest.mark.asyncio
 async def test_parse_gnd_get_records():
@@ -54,52 +49,35 @@ async def create_test_record_saint_scholastica():
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_gnd_name_preferred_1():
+async def test_parse_gnd_name_preferred():
     """
     Only subfield a filled
     """
     await db_actions.initialise_beanie()
-    record=await create_test_record_rubens()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    rubens=await create_test_record_rubens()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(rubens)
     assert name_preferred[0] == 'Rubens, Peter Paul'
     assert name_preferred[1] == ''
-
-
-@pytest.mark.asyncio
-#@classes.func_logger
-async def test_parse_gnd_name_preferred_2():
     """
     Also subfield c filled - not a ruler - Saint
     """
-    await db_actions.initialise_beanie()
-    record=await create_test_record_thomas_aquinas()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    thomas=await create_test_record_thomas_aquinas()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(thomas)
     assert name_preferred[0] == 'Thomas (von Aquin)'
     assert name_preferred[1] == 'Saint'
-
-
-@pytest.mark.asyncio
-#@classes.func_logger
-async def test_parse_gnd_name_preferred_3():
     """
     Also subfield b filled - 
     subfield c filled with a ruler's
     designation that is to be ignored
     """
-    await db_actions.initialise_beanie()
-    record=await create_test_record_max_emanuel()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    max=await create_test_record_max_emanuel()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(max)
     assert name_preferred[0] == 'Maximilian Emanuel II.'
     assert name_preferred[1] == 'Bayern, Kurfürst'
-
-@pytest.mark.asyncio
-#@classes.func_logger
-async def test_parse_gnd_name_preferred_4():
     """
     Subfield c only indicates a saint
     """
-    await db_actions.initialise_beanie()
-    record=await create_test_record_saint_scholastica()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
+    scholastica=await create_test_record_saint_scholastica()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(scholastica)
     assert name_preferred[0] == 'Scholastika'
     assert name_preferred[1] == 'Saint'

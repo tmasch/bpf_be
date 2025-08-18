@@ -223,6 +223,13 @@ class Node(Document):
             if a.key == key:
                 v=a.value
         return v
+    def get_name(self):
+        v=""
+        for a in self.attributes:
+            if a.key == "name":
+                v=a.value.to_string()
+        return v
+
 #    def validate(self):
         
     attributes : Optional[list[Attribute]] = []
@@ -288,19 +295,7 @@ class Edge(Document):
 #     class Settings:
 #         union_doc = Union
 
-def make_new_role(role,person_name):
-    r=Node()
-    if person_name:
-        r.name=person_name
-    a=Attribute()
-    a.key="role"
-    a.value=role
-    r.attributes.append(a)
-    a=Attribute()
-    a.key="chosen_candidate"
-    a.value=-1
-    r.attributes.append(a)
-    return r
+
 
 
 class EntityAndConnections(Document):

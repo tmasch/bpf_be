@@ -1,5 +1,5 @@
 """
-Testing of classes
+Testing of classes.py
 """
 import pytest
 from dotenv import load_dotenv

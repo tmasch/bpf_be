@@ -217,7 +217,6 @@ def parse_date(ds):
         messages.append('Date in X.X.YYYY format')
         state="SUCCESS"
 
-
     # Date is MM.YYYY
     if re.match(r"\d{2}\.\d{4}", ds) and len(ds) == 7:
         t=ds.split(".")

@@ -839,22 +839,7 @@ def gnd_record_get_name_preferred(record):
             
             else:
                 name_preferred = name_preferred + " (" + subfields[0] + ")"
-
-#    x = find_datafields(record,"100")
-
-#    y=find_tuple(x,"a")
-#    if y:
-#        name_preferred = y[0]
-#    y=find_tuple(x,"b")
-#    if y:
-#        name_preferred = name_preferred+ " " + y[0]
-
-#        if y[0] == "c":
-#            comments = y[1]
-#        person_found.comments = comments
     return (name_preferred, comments)
-#    person_found.name_preferred = name_preferred
-#    print(name_preferred)
 
 @classes.func_logger
 def gnd_record_get_sex(record):
