@@ -27,22 +27,13 @@ async def initialise_beanie():
     endpoint = f"mongodb://{mongo_host}"
     motor_client = motor.motor_asyncio.AsyncIOMotorClient(endpoint)
     database = motor_client[mongo_db_database_name]
-    await init_beanie(database=database, document_models=[classes.Metadata,\
+    await init_beanie(database=database, document_models=[\
                                                         classes.Node,\
-                                                        classes.BookDb,\
-                                                        classes.PagesDb, \
                                                         classes.Edge, \
-                                                        classes.EntityAndConnections, \
-                                                        classes.MakingProcess, \
-                                                        classes.BibliographicId, \
-                                                        classes.BibliographicInformation,\
+                                                        classes.Graph, \
                                                         classes.Union,\
                                                         classes.WebCall,\
-                                                            #classes.Bridge,\
-                                                            #classes.BridgeAlternative,\
-                                                                #classes.Connection,\
-                                                                #classes.EntityPlus
-                                                                ])
+                                                        ])
 
 @classes.func_logger
 def get_database():
@@ -332,16 +323,16 @@ once I have an 'edit' view for authority records.
 #     return "Hello World"
 
 
-@classes.func_logger
-def insert_record_manuscript(manuscript : classes.ManuscriptDb):
-    """
-    \todo
-    """
-    print("Inserting metadata in database")
-    dbname = get_database()
-    collection=dbname['bpf']
-    collection.insert_one(manuscript.dict())
-    return "Hello World"
+# @classes.func_logger
+# def insert_record_manuscript(manuscript : classes.ManuscriptDb):
+#     """
+#     \todo
+#     """
+#     print("Inserting metadata in database")
+#     dbname = get_database()
+#     collection=dbname['bpf']
+#     collection.insert_one(manuscript.dict())
+#     return "Hello World"
 
 # @classes.func_logger
 # async def insert_record_book(book : classes.BookDb):
@@ -355,17 +346,17 @@ def insert_record_manuscript(manuscript : classes.ManuscriptDb):
 #     await book.insert()
 #     return "Hello World"
 
-@classes.async_func_logger
-async def insert_record_pages(pages : classes.PagesDb):
-    """
-    \todo
-    """
-    print("Inserting pages metadata in database")
-#    dbname = get_database()
-#    collection=dbname['bpf']
-#    collection.insert_one(pages.dict())
-    await pages.insert()
-    return "Hello World"
+# @classes.async_func_logger
+# async def insert_record_pages(pages : classes.PagesDb):
+#     """
+#     \todo
+#     """
+#     print("Inserting pages metadata in database")
+# #    dbname = get_database()
+# #    collection=dbname['bpf']
+# #    collection.insert_one(pages.dict())
+#     await pages.insert()
+#     return "Hello World"
 
 @classes.func_logger
 def create_image_record():

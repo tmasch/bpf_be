@@ -10,7 +10,7 @@ import get_external_data
 
 
 @classes.async_func_logger
-async def parse_istc(url_bibliography):
+async def parse_istc(url) -> classes.Graph:
     """
     This parses the istc records that can be downloaded in JSON. 
     Since the Imprint is normally one line only, some string processing is necessary
@@ -18,66 +18,55 @@ async def parse_istc(url_bibliography):
     # A small problem: if there are several imprints, I take the
     # place and printer information from all, but the date only from the last.
 
+    results=classes.Graph()
 
-    bi = classes.BibliographicInformation()
-    bi=classes.EntityAndConnections()
-    bi.type="BibliographicInformation"
-    bie=classes.Node()
-    bie.type="BibliographicInformation"
-#    print("URL for search in ISTC: " + url_bibliography)
-#    istc_record_raw = requests.get(url_bibliography, timeout = 10)
-#    istc_record_full = (istc_record_raw).json()
-#    print(istc_record_full)
-    istc_record_full = await get_external_data.get_web_data_as_json(url_bibliography)
-#    print(istc_record_full2)
-#    print(url_bibliography)
-#    print(istc_record_full)
-
+    istc_record_full = await get_external_data.get_web_data_as_json(url)
+    istc_record_short = istc_record_full["rows"][0]
     if (istc_record_full["hits"])["value"] == 0:
         print("No hits")
         return
 
-    istc_record_short = istc_record_full["rows"][0]
+    bi = classes.Node()
+    bi.type="BibliographicInformation"
 
 ####### FINDING BIBILIOGRAPHIC ID
-    bi = parse_bibliographic_id(bi, istc_record_short)
+    bib_ids = parse_istc_bibliographic_id(istc_record_short)
+    bi.external_id.extend(bib_ids)
 
 ####### FINDING AUTHOR
     if "author" in istc_record_short:
-        # author = classes.Role()
-        # author.entity_and_connections=classes.EntityAndConnections()
-        # author.entity_and_connections.person=classes.Person()
-        # author.entity_and_connections.person.name = istc_record_short["author"]
-        # author.role = "aut"
-        author = classes.make_new_role(role="aut",person_name=istc_record_short["author"])
-        bi.persons.append(author)
+        author=classes.Node()
+        author.type="person"
+        author.set_attribute("role","aut")
+        author.name=istc_record_short["author"]
+        results.nodes.append(author)
 
-    if "imprint" in istc_record_short:
-        for step1 in istc_record_short["imprint"]:
+    return results
+
+
+def parse_istc_imprint(record):
+
+    result=classes.Graph()
+
+    if "imprint" in record:
+        for imprint in record["imprint"]:
             # this is iterated in case there are several imprints, I reckon
             printer_name_long = ""
             publisher_name_long = ""
 #            print("step1 in imprint: ")
 #            print(step1)
-            if "imprint_name" in step1:
-                imprint_name_long = step1["imprint_name"].strip("[]")
-            if "imprint_place" in step1:
-                pl = classes.Node()
-                pl.name = step1["imprint_place"].strip("[]")
-                a=classes.Attribute()
-                a.key="chosen_candidate_id"
-                a.value==-1
-                pl.attributes.append(a)
-                a=classes.Attribute()
-                a.key="role"
-                a.value=="mfp"
-                pl.attributes.append(a)
-                bi.places.append(pl)
 
-            if "imprint_date" in step1:
+            if "imprint_place" in imprint:
+                place = classes.Node()
+                place.name = imprint["imprint_place"].strip("[]")
+                place.set_attribute("chosen_candidate_id",-1)
+                place.set_attribute("role","mfp")
+                result.nodes.append(place)
+
+            if "imprint_date" in imprint:
 #                print(step1["imprint_date"])
                 #bi.printing_date = step1["imprint_date"].strip("[]")
-                printing_date_raw = step1["imprint_date"].strip("[]")
+                printing_date_raw = imprint["imprint_date"].strip("[]")
                 bi.date_string, bi.date_start, bi.date_end = istc_date_working(printing_date_raw)
 
 #
@@ -99,6 +88,8 @@ async def parse_istc(url_bibliography):
 #            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] +
 #              " - " + bi.date_end.isoformat()[0:10] + ")"
 
+            if "imprint_name" in imprint:
+                imprint_name_long = imprint["imprint_name"].strip("[]")
 
 
             if imprint_name_long:
@@ -211,69 +202,56 @@ async def parse_istc(url_bibliography):
         if "title" in istc_record_short:
             bi.title = istc_record_short["title"]
 
-    print("BIBLIOGRAPHIC INFORMATION")
-#    print(bi)
-    print("VALIDATING")
-#    bi.bibliographic_id[0].model_validate()
 
- #   print("bi.bibliographic_id[0]")
- #   print(bi.bibliographic_id[0])
-#    bi.bibliographic_id[0].model_validate()
-
-#    bi.persons[0].model_validate()
-#    bi.model_validate()
-    classes.BibliographicInformation.model_validate(bi)
     return bi
 
+
+
 @classes.func_logger
-def parse_bibliographic_id(bi, istc_record_short):
+def parse_istc_bibliographic_id(istc_record_short):
     """
     Parses ID numbers from ISTC and GND
     """
-    bid = classes.ExternalReference()
-    bid.external_id = istc_record_short["id"]
-    bid.name = "ISTC"
-    bid.uri = r"https://data.cerl.org/istc/"+bid.external_id
-#    print("bid")
-#    print(type(bid))
-#    print(bid)
-#    print(await bid.validate_self())
-#    print("")
+    bib_ids=[]
 
-    bi.bibliographic_id.append(bid)
+    bib_id = classes.ExternalReference()
+    bib_id.external_id = istc_record_short["id"]
+    bib_id.name = "ISTC"
+    bib_id.uri = r"https://data.cerl.org/istc/"+bib_id.external_id
+    bib_ids.append(bib_id)
 
 
-    for step1 in istc_record_short['references']:
+    for reference in istc_record_short['references']:
         #print("step1: " + step1)
-        if step1["reference_name"] == "GW":
-            bid = classes.BibliographicId()
-            bid.bib_id = str(step1["reference_location_in_source"])
-            bid.name = "GW"
+        if reference["reference_name"] == "GW":
+            bib_id = classes.ExternalReference()
+            bib_id.external_id = str(reference["reference_location_in_source"])
+            bib_id.name = "GW"
             gw_type0 = r'\d{1,5}' # the standard type
             gw_type1 = r'M\d{5,7}' # a number from the still unpublished volumes
             gw_type2 = r'\d{7}N' # a later addition
             gw_type3 = x = r'([XVI]{1,4}) Sp\.(\d{1,3})([a-z])'
             # a reference to a book that is now not regarded as an incunable
             gw_type4 = x = r'([XVI]{1,4}) Sp\.(\d{1,3})([a-z]P)' # no clue what this is
-            if re.match(gw_type0, bid.bib_id):
-                x = 5 - len(bid.bib_id)
+            if re.match(gw_type0, bib_id.external_id):
+                x = 5 - len(bib_id.external_id)
                 y = "0" * x
-                bid.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" \
-                    + y + bid.bib_id + ".htm"
-            elif re.match(gw_type1, bid.bib_id):
-                bid.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/" + \
-                    bid.bib_id + ".htm"
-            elif re.match(gw_type2, bid.bib_id):
-                bid.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
-                    bid.bib_id + ".htm"
-            elif re.match(gw_type3, bid.bib_id) or re.match(gw_type4, bid.bib_id):
-                x = re.match(gw_type3, bid.bib_id)
-                bid.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
+                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" \
+                    + y + bib_id.external_id + ".htm"
+            elif re.match(gw_type1, bib_id.external_id):
+                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/" + \
+                    bib_id.external_id + ".htm"
+            elif re.match(gw_type2, bib_id.external_id):
+                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
+                    bib_id.external_id + ".htm"
+            elif re.match(gw_type3, bib_id.external_id) or re.match(gw_type4, bib_id.external_id):
+                x = re.match(gw_type3, bib_id.external_id)
+                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
                     x[1] + x[2] + (x[3]).upper() + ".htm"
 
 #                classes.BibliographicInformation.model_validate(bid)
-            bi.bibliographic_id.append(bid)
-    return bi
+            bib_ids.append(bib_id)
+    return bib_ids
 
 
 

@@ -174,7 +174,7 @@ async def metadata_persons_old(metadata):
 
 
 @classes.async_func_logger
-async def metadata_persons(metadata: classes.Metadata):
+async def metadata_persons(metadata):
     print(metadata.bibliographic_information[0].persons)
     roles=[]
     for role in metadata.bibliographic_information[0].persons:

@@ -44,6 +44,9 @@ import classes
 
 load_dotenv()
 
+class Test:
+    def __init__:
+
 #@classes.func_logger
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 #@pytest.mark.asyncio
@@ -116,10 +119,10 @@ async def main():
     # record=r[0]
     # name_preferred=parse_gnd.gnd_record_get_name_preferred(record)
     # print(name_preferred)
-    r=await db_actions.find_person("Test","name")
-    print(r.__len__())
-    for i in r:
-        print(i)
+#    r=await db_actions.find_person("Test","name")
+#    print(r.__len__())
+#    for i in r:
+#        print(i)
 #    r.count()
 #   
 #  for record in r:

@@ -1,10 +1,12 @@
-#pylint: disable=C0301,C0116
+#pylint: disable=C0301,C0116,W0611,W0622
 """
 Testing of main
 """
 #import os
 #from unittest import mock
 import pytest
+from rich import print
+from beanie import WriteRules
 
 import main
 
@@ -20,3 +22,4 @@ async def test_get_metadata():
     material="book"
     r = await main.get_metadata(iiif_url,material)
     print(r)
+    await r.save(link_rule=WriteRules.WRITE)

@@ -130,7 +130,7 @@ async def get_metadata(iiif_url, material):
 #         repository.role = "col"
 #         # Normally, this role depends on the bibliographical data -
 #         # in this case, it has to be set here.
-    m.images=[]
+#    m.images=[]
 #     m.id=generate()
 # #    print("List of places to be sent to FE")
 # #    print(m.bibliographic_information[0].places)
@@ -227,15 +227,15 @@ async def supply_biblio_information(additional_bid):
 #     print(making_processes)
 #     return making_processes
 
-@app.post("/createNewResource")
-async def create_new_resource(metadata: classes.Metadata):
-    """
-    Endpoint to create a new resource in the database
-    """
-    logger.info("INFO createNewResource create_new_resource")
-    m = metadata
-    db_actions.insert_metadata(m)
-    return m
+# @app.post("/createNewResource")
+# async def create_new_resource(metadata):
+#     """
+#     Endpoint to create a new resource in the database
+#     """
+#     logger.info("INFO createNewResource create_new_resource")
+#     m = metadata
+#     db_actions.insert_metadata(m)
+#     return m
 
 
 @app.post("/createImageRecord")
@@ -254,7 +254,7 @@ async def create_image_record_endpoint(coords: classes.Frame):
     return
 
 @app.post("/saveConnectedRecords")
-async def save_connected_records(metadata: classes.Metadata):
+async def save_connected_records(metadata):
     """
     \todo not quite clear what connected records should be
     """
@@ -326,13 +326,14 @@ async def find_all_images(identifier: str):
     print(r)
     return
 
-@app_router.get("/getBookRecord", response_model = classes.BookDb)
+@app_router.get("/getBookRecord")
 async def get_book_record(identifier: str):
     """
     \todo move to get_resource
     """
     logger.info("INFO getBookRecord get_book_record")
-    book_record = await display_records.get_book_record(identifier)
+    book_record=""
+#    book_record = await display_records.get_book_record(identifier)
     print("bookrecord before returning from main.py: ")
 #    print(await book_record.to_list())
 #    print(book_record)
@@ -345,12 +346,13 @@ async def get_book_record(identifier: str):
         )
     return book_record
 
-@app.get("/getManuscriptRecord", response_model = classes.ManuscriptDb)
+@app.get("/getManuscriptRecord")
 async def get_manuscript_record(identifier: str):
     """
     \todo move to get_resource    
     """
-    manuscript_record = display_records.get_manuscript_record(identifier)
+    manuscript_record=""
+#    manuscript_record = display_records.get_manuscript_record(identifier)
     print("manuscriptkrecord before returning from main.py: ")
     print(manuscript_record)
     return manuscript_record

@@ -2,20 +2,10 @@
 """
 Test of GND parsing
 """
-#from unittest import mock
 import pytest
-#import pytest_asyncio
-#import test_get_external_data
-#import requests
-#import unittest
-#import json
 
-#from beanie import Document, Link
-#from dotenv import load_dotenv
-#import logging
-
-import parse_gnd
 import db_actions
+import parse_gnd
 
 @pytest.mark.asyncio
 async def test_parse_gnd_get_records():

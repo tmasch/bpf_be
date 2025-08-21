@@ -63,7 +63,7 @@ async def insert_data():
 async def main():
     await db_actions.initialise_beanie()
 
-    await insert_data()
+#    await insert_data()
 
 
     print("Search Luther")

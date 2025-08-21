@@ -13,7 +13,7 @@ import get_external_data
 #import parse_iiif
 import logging
 import classes
-import db_actions   
+import db_actions
 
 #logger = logging.getLogger(__name__)
 load_dotenv()
@@ -55,3 +55,4 @@ async def test_get_external_data():
               + authority_id\
                   + r'%20and%20BBG%3DTp*&recordSchema=MARC21-xml&maximumRecords=100'
     content=await get_external_data.get_web_data(authority_url)
+    print(content)
