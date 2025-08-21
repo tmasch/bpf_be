@@ -29,7 +29,7 @@ def test_convert_roman_numerals_mmxxv():
     assert an == "2025"
 
 def test_convert_roman_numerals_mxm():
-    rn = "mxm"
+    rn = "mcmxc"
     an = parsing_helpers.convert_roman_numerals(rn)
     assert an == "1990"
 
