@@ -1,4 +1,4 @@
-#
+#pylint: disable=C0116
 """
 Testing of parsing_helpers.py
 """
@@ -10,7 +10,7 @@ def test_turn_umlaut_to_unicode():
 
 def test_convert_roman_numerals_mdcc():
     rn = "MDCC"
-    an = parsing_helpers.convert_roman_numerals(rn)    
+    an = parsing_helpers.convert_roman_numerals(rn)
     assert an == "1700"
 
 def test_convert_roman_numerals_mcmxii():
