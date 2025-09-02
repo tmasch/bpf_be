@@ -1,0 +1,9 @@
+@startuml 
+class ExternalReference
+
+ExternalReference : number : int - nr
+ExternalReference : id : str - o - nr 
+ExternalReference : name : str - o - nr 
+ExternalReference : uri : str - o - nr 
+
+@enduml

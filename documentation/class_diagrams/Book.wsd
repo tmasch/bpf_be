@@ -1,12 +1,13 @@
 @startuml 
 class Book 
-Book : references : external_reference - r
+Book : references : ExternalReference - r
 Book : title : str - o - nr
 Book : parent title : str - nr
 Book : volume number : str - nr
-Book : date : date - nr
-Book : all catalogued? : boolean - o - nr
-Book : all catalogued? - comments : str - nr
+Book : date : Date - nr
+Book : all_catalogued : boolean - o - nr
+Book : all_catalogued_comments : str - nr
+Book : bibliography : Bibliography - r
 
 class Person 
 
@@ -14,10 +15,9 @@ class Place
 
 class Manuscript
 
-class EdgeToArtwork
-EdgeToArtwork : current? : boolean - o - nr
-EdgeToArtwork : page number for display : str - nr
-EdgeToArtwork : sequence number : perhaps tuple \n                  of two integers - nr
+class EdgeBookArtwork
+EdgeBookArtwork : page number for display : str - nr
+EdgeBookArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
 class Artwork
 
@@ -27,8 +27,8 @@ Book "0..n" --- "0..n" Person : > author was  \n author of <
 
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 
-Book "0..n" --- "1" EdgeToArtwork : contains > 
+Book "0..n" --- "1" EdgeBookArtwork : contains > 
 
-EdgeToArtwork "1" --- "0..1" Artwork : in <
+EdgeBookArtwork "1" --- "0..1" Artwork : in <
 
 @enduml 

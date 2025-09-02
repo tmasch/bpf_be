@@ -1,0 +1,10 @@
+@startuml
+ 
+ class Date 
+
+ Date : active : bool - o - nr
+ Date : date_string : string - o - nr 
+ Date : date_start : tuple of three integers- o - nr 
+ Date : date_end : tuple of three integers - o - nr
+
+@endumli
