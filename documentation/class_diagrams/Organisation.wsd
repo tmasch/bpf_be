@@ -16,6 +16,11 @@ class Place
 
 class Iconography
 
+class Option 
+    
+class Criterion
+
+
 class Cycle
 
 class Artwork 
@@ -45,6 +50,12 @@ EdgeOrganisationIconography : numberA : int - nr
 EdgeOrganisationIconography : numberB : int - nr
 EdgeOrganisationIconography : previewA : str - nr
 EdgeOrganisationIconography : previewB : str - nr
+
+class EdgeOrganisationOption
+EdgeOrganisationOption : numberA : int - nr
+EdgeOrganisationOption : numberB : int - nr
+EdgeOrganisationOption : previewA : str - nr
+EdgeOrganisationOption : previewB : str - nr
 
 class EdgeOrganisationCycle
 EdgeOrganisationCycle : numberA : int - nr
@@ -90,6 +101,11 @@ EdgeOrganisationPlace "1" ---- "0..n" Place : located here <
 
 Organisation "0..n" --- "1" EdgeOrganisationIconography : shows members of >
 EdgeOrganisationIconography "1" --- "0..n" Iconography : portrayed persons belong to <
+
+Organisation "0..n" --- "1" EdgeOrganisationOption : shows additionally members of >
+EdgeOrganisationOption "1" --- "0..n" Option : additional portrayed persons belong to <
+
+Organisation "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
 
 Organisation "0..n" --- "1" EdgeOrganisationCycle : related image cycles >
 EdgeOrganisationCycle "1" --- "0..n" Cycle : theme of cycle <

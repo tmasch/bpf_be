@@ -303,13 +303,15 @@ It could work as follows:
 [Contents](#table-of-contents)
 
 - First, the type of Iconography has to be selected (Portrait, Emblem, etc.)
-- Based on this type, one can enter one or more connected objects in search boxes and select the connection they have with the iconography (e..g, 'portrait of', 'acting person', etc.). The connection to or ingest or creation of these Authority records is described in \documentation\00 general\element_insert_object and element_insert_object_place_text respectively. . 
+- Based on this type, one can enter one or more connected objects in search boxes and select the connection they have with the iconography (e..g, 'portrait of', 'acting person', etc.). The connection to or ingest or creation of these Authority records is described in \documentation\00 general\element_insert_object and element_insert_object_place_text respectively. TODO: import variants, if available. 
 - A name (and name variants or comments) are given manually (for some types of iconography, e.g. portraits, a name will be created automatically out of type and connected objects, which, however, can still be changed manually). 
 - The Iconclass notation(s) for this iconography are entered, and hence a link to Iconclass built (all Iconography records without Iconclass notations will be sent to the Iconclass editorsto consider creating notations for these Iconographies). 
 - If the iconography has variants (e.g., if an image of a saint appears with different attributes), these can be catalogued. It makes sense to have two forms for entering this data - one largely filled in with simple options 'yes', 'no', 'unclear', 'not yet determined', and another that has only the last two options complete, whilst the rest can be filled in freely. If an option in one of the variants needs connections to other Object records, they can be entered as described above. (It should also be possible to combine some variants, especially attributes, also with Object records, e.g., records of saints). In this case, once a connection to an Object record is made, one could decide whether the variants connected with this person should be available in this iconography record. This needs more thinking (e.g., should the variant records be copied to the Iconography record and then adjusted or should simply links to them be available? The latter would be more elegant but may create some dispaly problems). 
 - At the end, the Iconography record is saved as a Node with Edges to all connected object records. If variants are defined, probably each variant, and each option within the variants, is a separate Node. 
 
 ![Create](./readme_diagrams/create_iconography.png)
+
+
 
 ## Create keyword and heading records
 [Contents](#table-of-contents)
