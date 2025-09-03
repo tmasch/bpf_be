@@ -54,6 +54,99 @@ ToDo!
 
 # Authority records
 
+## Person
+
+This record is for any person (Artists, Authors, etc., Depicted figures), hence the great number of possible connections. 
+
+![Create](./class_diagrams/Person.png)
+
+**Attributes:**
+
+- type: 
+  - There must be at least a basic type (probably one of the following: "Author", "Printer", "Artist", "Depicted Person").
+  - If the type is "Depicted Person", there must be at least one of the following: "Biblical Figure", "Saint", "Historical Figure", "Mythological Figure", "Literary Figure"
+  - Possible, there are further necessary types, e.g. for "Saint" "Martyr", "Confessor", "Virgin" etc., or for Mythological Figure "Graeco-Roman", "Egyptian" etc.
+  - One Person can have a number of types on every level, and every type determines which attributes and connections will be needed. 
+
+
+**Edge between Person and Heading:**
+
+This could be used, for instance, for indicating professions. 
+
+
+**Edge between Person and Text:**
+
+Here, two very different relations are possible. firstly the author of / author of a text as given in the diagram, but also:
+Text mentioning figure / mentioned in (for literary figures, e.g. to connect Gulliver to Gulliver's Travels)
+
+
+**Edge between Person and Book:**
+
+This means the author in the biblical record of a concrete edition of a book, not the author of a text as used in iconographical descriptions. 
+In addition to author of / author was, several other relations are possible:
+editor of / editor was
+printer of / printer was
+publisher of / publisher was
+
+
+**Edge between Person and MakingProcess:**
+
+Note the cardinality, every MakingProcess contains only one Person.
+
+
+**Edge between Person and Office (EdgePersonOffice):**
+
+Offices held by the person. In case of several Offices one would probably sort them chronologically in the UI (or use numberA and mumberB in the Edge)
+
+
+**Edge between Person and Organisation (EdgePersonOrganisation):**
+
+In addition to has member / member of, many other relations are possible, e.g.:
+founded by / founder of
+has director / director of (unless 'Office is used for that')
+has benefactor / benefactor of
+etc. 
+
+
+**Edge between Person and Place (EdgePersonPlace):**
+
+In addition to born in / place of birth, several other relationships are possible, e.g.:
+died in / place of death
+active in / place of activity
+buried in / place of burial
+
+
+**Edge between Person and Person (EdgePersonPerson):**
+
+In addition to father of / son of, a great number of other family relations are possible, e.g.
+husband of / wife of
+etc. etc.
+
+**Edge between Person and Iconography (EdgePersonIconography)**
+
+In addition to portrayed in / portrayed person, other relationships are possible - they depend on the type of iconography selected, e.g.
+portrayed in / portrayed person (for portraits)
+shown in / acting person (for narrative scenes)
+allegory of / connected allegory (for allegorical images)
+emblem about / connected emblem (for emblems)
+arms of / arms (for heraldry)
+
+The attributes given on the Edge are the standard attributes for everything connected to iconography. Since they go in directions, one could also write them onto the arrows. 
+
+
+**Edge between Person and Option (EdgePersonOption)**
+
+This works similar to EdgePersonIconography, but it connects not to the 'whole' iconography but only to a variant (e.g., for an additional figure)
+
+**Edge between Person and Criterion**
+
+It is possible to save Criteria not only with Iconographies, but also with Persons (and other records connected to Iconographies, though it will be only really current for Persons and Personifications). If on Iconography is connectedwith this Person, one could link (all or some) criteria of the Person to the specific Iconography. This procedure has been forgotten when I described the creation of Iconographic records in README. !!!!
+
+**Edge between Person and Cycle (EdgePersonCycle)**
+
+This Edge works similar to the Edge between Person and Iconography, but in this case the Person would be the common 'Theme' of a cycle (e.g., "Labours of Hercules"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Organisation)
+
+
 
 ## Organisation 
 
@@ -63,7 +156,7 @@ This record is for two different types of organisations, firstly Collections and
 
 **Attributes:**
 - type:
-  - There must be at least a type "Collection"i or a type "Group of Members" (I hope I find a better name), and there can also be both. 
+  - There must be at least a type "Collection" or a type "Group of Members" (I hope I find a better name), and there can also be both. 
   - If there is a type "Collection", there must also be a type "Museum", "Library", "Archive" (pershaps), "Private Collection", "Dealer", or "Auction House". These are mutually exclusive, and they determine the way other attributes are displayed in the UI. 
   - The name_variant field would also include former names. Currently, there is no way to indicate the time of name changes, but this is not really the job of Iconobase. 
   
@@ -103,6 +196,14 @@ coat of arms of / organisation bearing these arms (for heraldic images)
 
 The attributes given on the Edge are the standard attributes for everything connected to iconography. Since they go in directions, one could also write them onto the arrows. 
 
+
+**Edge between Organisation and Option (EdgeOrganisationOption)**
+
+This works similar to EdgeOrganisationIconography, but it connects not to the 'whole' iconography but only to a variant (this will be rarey used for Organisations, it is rather here to keep it parallel to Persons)
+
+**Edge between Organisation and Criterion**
+
+This Edge is primarily incuded to have a parallel with an Edge for Persons. 
 
 **Edge between Organisation and Cycle (EdgeOrganisationCycle)**
 
