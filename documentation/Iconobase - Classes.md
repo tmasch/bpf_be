@@ -93,6 +93,8 @@ publisher of / publisher was
 
 Note the cardinality, every MakingProcess contains only one Person.
 
+**Edge between Person and Family :**
+I am not sure how to use this (it would be helpful for coats-of-arms, but it is a rather vague concept, e.g., do people also belong to the family of the in-laws? what is a family, and what is a branch of a family?). 
 
 **Edge between Person and Office (EdgePersonOffice):**
 
@@ -145,6 +147,30 @@ It is possible to save Criteria not only with Iconographies, but also with Perso
 **Edge between Person and Cycle (EdgePersonCycle)**
 
 This Edge works similar to the Edge between Person and Iconography, but in this case the Person would be the common 'Theme' of a cycle (e.g., "Labours of Hercules"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Organisation)
+
+
+**Additional criteria for creating links:**
+
+- Only Persons with the type "Author" or "Literary Figure" can be linked to Texts. 
+- Only Persons with the type "Author" or "Printer" can be linked to Books
+- Only Persons with the type "Artist" or "Printer" can be linked to Making Processes ("Printer" only to specific Making Processes). 
+- Only Persons with the type "Depicted Person" can be linked to Iconography, Option, Criterion, and Cycle 
+ 
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- A Person with the type "Historical Person" needs a Date and furthermore must be linked to either an Office or a Profession (Heading) plus a Place. 
+- A Person with the type "Depicted Person" needs a sex (can also be unknown)
+- A Person with the type "Literary Person" needs a Text. 
+- A Person needs to be linked to a Book, a Text (as author etc.), a Making Process, or an Iconography (or Option or Cycle). 
+
+
+
 
 
 
@@ -236,7 +262,11 @@ These three Edges have the same structure.
 
 - The Organisation must be connected to another record. 
 
+## Place
 
+A Place can be anything from a country down to a composite object containing several Artworks (e.g., a multi-part altarpiece). Like Text records, places are hierarchically organised, each Place being connected to one and only one parent place. 
+
+TO BE CONINTUED
 
 ## Book 
 
