@@ -321,9 +321,10 @@ This record is a parallel to the 'Book' record, but is for objects that only exi
 
 **Attributes**:
 
-The type could indicate if it is a Manuscript, or unique decoration in a printed book. This is primarily relevant for display purposes, it would be confusing to call a printed book with a painting on the first page a manuscript. Both options are mutually exclusive, hence the attribute is marked as non repetible - however, in other cases, the type would be repetible, and it doesn't harm to have it here as repetible, too. 
-ExternalReference is here primilary for the planned International Standard Manuscript Number. 
-all_catalogued? functions as with Books. 
+- The type could indicate if it is a Manuscript, or unique decoration in a printed book. This is primarily relevant for display purposes, it would be confusing to call a printed book with a painting on the first page a manuscript. Both options are mutually exclusive, hence the attribute is marked as non repetible - however, in other cases, the type would be repetible, and it doesn't harm to have it here as repetible, too. 
+- ExternalReference is here primilary for the planned International Standard Manuscript Number. 
+- The fields common_name_preferred and common_name_variant will only be used for some very prominent manuscripts that are known not only under the shelfmark (as usual), but also under a name, e.g. "Lindisfarne Gospels"
+- all_catalogued? functions as with Books. 
 
 **Edge between Manuscript and Artwork (EdgeManuscriptArtwork):**
 

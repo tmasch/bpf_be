@@ -2,6 +2,8 @@
 class Manuscript 
 Manuscript : type : str - o - nr
 Manuscript : references : ExternalReference - r
+Manuscript : common_name_preferred : str - nr
+Manuscript : common_name_variant : str - r
 Manuscript : all_catalogued : boolean - o - nr
 Manuscript : all_catalogued_comments : str - nr
 Manuscript : bibliography : Bibliography - r
