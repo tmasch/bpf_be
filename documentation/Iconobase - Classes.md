@@ -116,6 +116,7 @@ In addition to born in / place of birth, several other relationships are possibl
 died in / place of death
 active in / place of activity
 buried in / place of burial
+The date field would be needed for "active in" or similar relationships. 
 
 
 **Edge between Person and Person (EdgePersonPerson):**
@@ -146,7 +147,7 @@ It is possible to save Criteria not only with Iconographies, but also with Perso
 
 **Edge between Person and Cycle (EdgePersonCycle)**
 
-This Edge works similar to the Edge between Person and Iconography, but in this case the Person would be the common 'Theme' of a cycle (e.g., "Labours of Hercules"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Organisation)
+This Edge works similar to the Edge between Person and Iconography, but in this case the Person would be the common 'Theme' of a cycle (e.g., "Labours of Hercules"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Person)
 
 
 **Additional criteria for creating links:**
@@ -201,7 +202,7 @@ etc.
 This is used if a role in an organisation seems to be so prominent that it would be defined as 'Office', a good example might be "Abbot of Aldersbach". I am not yet really sure on how to count the connections. 
 
 
-**Edge between Organisation and Place (EgeOganisationPlace)**
+**Edge between Organisation and Place (EdgeOganisationPlace)**
 
 In addition to located in / located here, some other relations are possible, e.g.:
 owns this building / building of (e.g., for the connection between "Aldersbach Abbey" and the monastic buildings at Aldersbach)
@@ -251,7 +252,7 @@ These three Edges have the same structure.
 - For EdgeOrganisationPlace, the different relations go only together with specific types of Place, e.g. "located in" only with a Town or a Region, and "owns this building" only with a Building or a Building-Part
 - For EdgeOrganisationIconography, the different relations go only together with specific types of iconography. 
 - The three links with "Collection" can only be used if the Organisation has "Collection" amongst its types. 
-- 
+ 
 
 **Additional criteria for validation for saving record:**
 
@@ -264,9 +265,120 @@ These three Edges have the same structure.
 
 ## Place
 
-A Place can be anything from a country down to a composite object containing several Artworks (e.g., a multi-part altarpiece). Like Text records, places are hierarchically organised, each Place being connected to one and only one parent place. 
+A Place can be anything from a country down to a composite object containing several Artworks (e.g., a multi-part altarpiece). Like Text records, places are hierarchically organised, each Place normally being connected to one and only one parent place. 
 
-TO BE CONINTUED
+![Create](./class_diagrams/Place.png)
+
+**Attributes:**
+- type: Here, types are mutually exclusive (e.g., Town, Building, etc.), hence type is non-repetible
+- coordinates: I suggested here feour different non-repetible attributes - one could also pack them into a separate class. The coordinates are given in two variants in the GND, once as degrees - minutes - seconds, once as decimal fractions. If one still wants to import both, one would need either a separate, repetible, class for the coordinates, or eight non-repetible attributes. The first set would need tuples of integers, the second floats. 
+- date: I am not sure if this would be used here, it could be used to indicate when buildings or building-parts existed (will in most cases be open-ended). Other dates would be shown in the Edge
+
+**Edge between Place and Person (EdgePersonPlace):**
+
+In addition to born in / place of birth, several other relationships are possible, e.g.:
+died in / place of death
+active in / place of activity
+buried in / place of burial
+The date field would be needed for "active in" or similar relationships. 
+ 
+**Edge between Place and Family (EdgePlaceFamily):**
+
+As most things connected to the class Family, this is still vague. It could be used to connect families with their main places of activity, or perhaps also places of origin. 
+
+**Edge between Place and Office:**
+
+An Office must be connected either to an Organisation (e.g., Abbot of St Gallen Abbey) or to a Place (e.g., King of France). 
+In case one would want to record also other connections, e.g., the seat of the office, e.g. Bonn for the Archbishop of Cologne, one might need here a date field in the Edge, but I think this is an overkill. 
+
+**Edge between Organisation and Place (EdgeOganisationPlace):**
+
+This link will be needed in two constellations: 
+- Organisations that are groups of members could be connected the Towns or Historical Regions where they were based. 
+- Organisations that are collections could be connected to the Towns or Modern regions where they would be found. 
+In addition to located in / located here, some other relations are possible, e.g.:
+owns this building / building of (e.g., for the connection between "Aldersbach Abbey" and the monastic buildings at Aldersbach). 
+
+
+
+**Edge between Place and Place (EdgePlacePlace):**
+
+Every place has to be connected to a parent place (e.g., a building to a town). Naturally, this will not be possible for the top parent (e.g. "Earth" or "Universe", should one allow for extraterrestrial places). In virtually all places, there will be one and only one parent. The only exception would be records of the type 'Town' - they could be connected to one record of the type 'Modern Region' and one or more records of the type 'Historical Region' (e.g., Bonn would be linked to the modern region "Nordrhein-Westfalen", but probably to the Historical Region "Mittelrhein"). The former is used to locations of artworks, the latter for places of origin. In some cases, there might be several Historical Regions, e.g., the "Byzantium" and "Ottoman Empire" for Constantinople. (It might be possible that 'Historical Regions' might also have several other 'Historical Regions' as parents). 
+
+
+**Edge between Place and Iconography (EdgePlaceIconography):**
+
+There are several relationships possible, depending on the Type of Iconography and the Type of Place, e.g.
+
+for Iconography "Topographical View" and Place "Historical Region": 
+view / view of
+map / map of
+
+for Iconography "Topographical View" and Place "Town": 
+view / view of
+plan / plan of
+
+for Iconography "Topographical View" and Place "Building", "Building" or "Building part": 
+exterior / exterior of
+interior / interior of
+reconstruction / reconstruction of
+elevation / elevation of
+plan / plan of
+
+for Iconography "Narrative Scene" 
+action happening here / place of action (Here is a problem: this would only indicate where an action took place, not if the place is really shown there, the latter would be rather under EdgePlaceOption)
+
+**Edge between Place and Option (EdgePlaceOption):**
+
+This is in principle similar to EdgePlaceIconograhy. It will probably be largely used if a building or a building part can feature in a narrative scene or not (e.g., if the Meta Romuli appears in the Crucifixion of St Peter)
+
+
+**Edge between Place and Criterion:**
+
+This would function in general like the link between Person and Criterion - however, I am not sure if it would really be used. 
+
+
+**Edge between Place and Cycle (EdgePlaceCycle):**
+
+This Edge works similar to the Edge between Place and Iconography, but in this case the Place would be the common 'Theme' of a cycle (e.g., "Events happened in Florence"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Place). 
+
+**Edge between Place and Heading:**
+
+I am not sure about how this Edge could be used. Perhaps, one might group differenttypes of buildings or building parts together, e.g. Franciscan Churches, Libraries, or Pulpits. 
+
+**Additional criteria for creating links:**
+
+Most links only make sense with certain types of Place records: 
+
+- Persons / Families / Offices: only types "Historical Region" and "Town"
+- Organisations: 
+  - for located in: "Historical Region", "Modern Region", and "Town"
+  - for owned the building: "Building Group", "Building"
+- Places: only the following connections for 'has part' are possible:
+  - "Historical Region" : "Historical Region", "Town"
+  - "Modern Region" : "Modern Region", "Town"
+  - "Town" : "Building", "Building Group", "Composite Artwork" [the latter used e.g. for monuments]
+  - "Building Group" : "Building"
+  - "Building" : "Building Part", "Composite Artwork"
+  - "Building Part" : "Building Part", "Composite Artwork"
+  - "Composite Artwork" : "Composite Artwork" (e.g. wings of a large altarpiece)
+- MakingProcesses : "Historical Region", "Town"
+- Artworks: "Town", "Building Complex", "Building", "Building Part", "Composite Artwork"
+
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- The Place must be 'part of' a parent place. 
+  - If the Place is connected with an Artwork or an Organisation with the type "Collection", it must be connected to a upwards through "Modern Regions". 
+  - If it is connected with a Person, a Family, an Office, an Organisation that is not a collection, a Book, an Iconography, an Option, a Criterion, or a MakingProcess, it must be connected upwards through "Historical Regions"
+- In addtion, the Place must be connected to at least another node. 
+
+
 
 ## Book 
 
@@ -364,5 +476,4 @@ This Edge is the same as the Edge between Artworks and Collections.
 - The Manuscript must be connected to at least one Organisation of the type "Collection". 
 - If the Collection is a Library or an Archive, there must be an inventory_number_current. 
 - If the Collection is an Auction House, there must be a date (or a dummy for date not known??)
-
 

@@ -1,0 +1,102 @@
+@startuml 
+class Place
+Place : type : str - o - nr
+Place : references : ExternalReference - r
+Place : name_preferred : str - o - nr
+Place : name_variant : str - r
+Place : coordinates_n : format to be determined - nr
+Place : coordinates_s : format to be determined - nr
+Place : coordinates_e : format to be determined - nr
+Place : coordinates_w : format to be determined - nr
+Place : date : Date - nr
+Place : bibliography : Bibliography - r
+
+
+class Person 
+
+class Family
+
+class Office
+
+class Organisation
+
+class Place 
+
+class Iconography
+
+class Option 
+    
+class Criterion
+
+class Cycle
+
+class Book
+
+class Heading
+
+class MakingProcess
+
+class EdgePersonPlace
+EdgePersonPlace : date : Date - nr
+
+class EdgePlaceFamily
+EdgePlaceFamily : date : Date - nr
+
+class EdgeOrganisationPlace
+EdgeOrganisationPlace : date : Date - nr
+
+class EdgePlacePlace
+EdgePlacePlace : date : Date - nr
+
+class EdgePlaceIconography
+EdgePlaceIconography : numberA : int - nr
+EdgePlaceIconography : numberB : int - nr
+EdgePlaceIconography : previewA : str - nr
+EdgePlaceIconography : previewB : str - nr
+
+class EdgePlaceOption
+EdgePlaceOption : numberA : int - nr
+EdgePlaceOption : numberB : int - nr
+EdgePlaceOption : previewA : str - nr
+EdgePlaceOption : previewB : str - nr
+
+class EdgePlaceCycle
+EdgePlaceCycle : numberA : int - nr
+EdgePlaceCycle : numberB : int - nr
+EdgePlaceCycle : previewA : str - nr
+EdgePlaceCycle : previewB : str - nr
+
+Person "0..n" -- "1" EdgePersonPlace : born in >
+EdgePersonPlace "1" -- "0..n" Place : born here <
+
+Place "0..n" -- "1" EdgePlaceFamily: active here >
+EdgePlaceFamily "1" -- "0..n" Family : place of activity <
+
+Place "0..n" --- "0..n" Office : > offices here \n office in <
+
+Organisation "0..n" -- "1" EdgeOrganisationPlace : located in >
+EdgeOrganisationPlace "1" -- "0..n" Place : located here <
+
+Place "0..n" -- "1" EdgePlacePlace : has part >
+EdgePlacePlace "1" -- "1 or 1..n" Place : part of <
+
+Place "0..n" -- "1" EdgePlaceIconography : view >
+EdgePlaceIconography "1" -- "0..n" Iconography : view of <
+
+Place "0..n" -- "1" EdgePlaceOption : additionally depicted in >
+EdgePlaceOption "1" -- "0..n" Option : additional depicted place <
+
+Place "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
+
+Place "0..n" -- "1" EdgePlaceCycle : related image cycles >
+EdgePlaceCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Book "0..n" --- "0..n" Place : > published in  \n place of publication of <
+
+Place "0..n" --- "0..n" Heading : < is example for \n has example >
+
+Place "0..n" --- "1" MakingProcess : < made in \n was place of making of >
+
+Place "0..n" --- "0..n" Artwork : < in \n location of >
+
+@enduml 
