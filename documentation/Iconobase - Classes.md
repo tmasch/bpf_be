@@ -311,18 +311,27 @@ Every place has to be connected to a parent place (e.g., a building to a town). 
 There are several relationships possible, depending on the Type of Iconography and the Type of Place, e.g.
 
 for Iconography "Topographical View" and Place "Historical Region": 
+
 view / view of
+
 map / map of
 
 for Iconography "Topographical View" and Place "Town": 
+
 view / view of
+
 plan / plan of
 
 for Iconography "Topographical View" and Place "Building", "Building" or "Building part": 
+
 exterior / exterior of
+
 interior / interior of
+
 reconstruction / reconstruction of
+
 elevation / elevation of
+
 plan / plan of
 
 for Iconography "Narrative Scene" 
@@ -376,8 +385,88 @@ Most links only make sense with certain types of Place records:
 - The Place must be 'part of' a parent place. 
   - If the Place is connected with an Artwork or an Organisation with the type "Collection", it must be connected to a upwards through "Modern Regions". 
   - If it is connected with a Person, a Family, an Office, an Organisation that is not a collection, a Book, an Iconography, an Option, a Criterion, or a MakingProcess, it must be connected upwards through "Historical Regions"
-- In addtion, the Place must be connected to at least another node. 
+- In addtion, the Place must be conPnected to at least another node. 
 
+
+## Text
+
+This class is used for texts as such, their physical copies are rather described in the classes Book and Manuscript. They are needed in three circumstances: firstly, they indicate the textual source for an iconography, secondly, they identify the passage of a text into which a certain Artwork is placed as illustration, and thirdly, they identify quotations used as inscriptions. 
+
+Like Place, instances of this class are stacked hierarchically - apart from the highest level, each instance of Text is connected to one and only one parent text. 
+
+![Create](./class_diagrams/Text.png)
+
+**Attributes:**
+
+- type: The type shows the hierarchical position of the node, hence it is not repetible. There would be probably the following types: 
+  - "Text": At the top of the hierarchy, meaning a book, or otherwise an independent text. Is the only type that does not have a link to a parent text. May have a link to one or more persons
+  - "Chapter": A subsection of a text that is typically marked as such, e.g. by a chapter heading or a number
+  - "Passage": A subsection of a text that forms a narrative unit but is not marked by a heading. 
+  - "Quotation"
+- numbering: This string would contain information on th place of a Text within a larger Text, it would be used for display, not for sorting. its format would depend very much on the type of the text, e.g. "Chapter 2", "Mt. 2:3-15". Because of the needed flexibility, it probably makes little sense to divide this into several subfields. However, one would probably need some help for putting in information to achieve consistency. The ordering of text records within a parent text is done through the EdgeTextText. 
+- name_preferred: This would contain the title of a book or chapter, or the content of a quotation, in the original language (for Bibles in Latin, I assume), and for Texts of the type passage a made-up English heading. In a Text of the type Chapter that has a numbering, the name_preferred is not obligatory. 
+- name_translated: Translation of the name_preferred into English (if one wants to be multi-lingual, one could probably have several name_translated fields in several languagues)
+- date: It could beused for Texts of the type Text to give the date when a text was first published, but I am not sure if this is really needed. 
+- duplicate: Normally, every Artwork can only be the illustration of one Text - however, but a Text marked Duplicate can be connected additionally (this may be used for liturgical books)
+
+**Edge between Text and Text (EdgeTextText):**
+A Text of the type chapter, passage, or quotation, has the cardinality 1 for connection with a parent Text, but a Text of the type text has no parent Text, and hence the cardinality is here 0. 
+
+The number is used for ordering the child Text (since the 'numbering') in the child Text records is a string. This element is placed in the Edge parallel to the "numberA" and "numberB" in other Edges - since the numbering is going here in one direction only, one could also make it an attribute of the child Text 
+
+**Edge between Person and Text:**
+
+This is used for two very different relationships: 
+
+The first is about a (normally real-life) person regarded as responsible for the making of the text. Apart from wrote / written by, also the following relationships are possible. 
+
+compiled / compiled by
+
+translated / translated by
+
+The second is for persons that are the inventions of an author (typical example: Don Quixote) or were largely embellished in this text (e.g., Alexander the Great in the Alexander Romance), and it would also be used for figures from the Bible. They would be either attached to the whole text, or only to the chapters or passages that are relevant, e.g., Abraham would be probably only linked to Genesis or parts from Genesis. 
+
+Here, the relationship would be: 
+
+person from / comes from
+
+(one might have slightly different wording for persons whose live was only embellished by a text). 
+
+
+
+**Edge between Text and Heading:**
+
+I am not sure if this is needed, and what for. 
+
+**Edge between Text and Manuscript:**
+**Edge between Text and Book:**
+
+These two Edges could be used to show for every text the illustrated manuscripts and books kept in Iconobase. However, strictly speaking, this information could be inferred via the connections between Manuscript and Artwork, and Artwork and Text (or Book and Artwork, and Artwork and Text), hence I am not sure if it has to be (a) created manually (b) created automatically and then stored so that it could be edited manually, or (c) created automatically for search processes only. 
+
+**Edge between Text and Artwork:**
+
+Here, the cardinality from Artwork to Text is normally 0..1 (an Artwork may can only illustrate one Text, the text written next to it). However, there can be additional connections to texts with duplicate as True, hence 0..n in this situation. 
+
+**Additional criteria for creating links:**
+- Links between Texts and Texts: The following "part of" connections are possible. One should not that "Chapters" are not hierarchically higher than "Passages". In the Bible, for instance, one might have a "Passage" "Story of Abraham" comprising some 10 chapters of Genesis. 
+  - "Texts" can be linked to "Chapters", "Passages", and "Quotations"
+  - "Chapters" can be linked to "Chapters", "Passages", and "Quotations"
+  - "Passages" can be linked to "Chapters", "Passages", and "Quotations"
+  - I am not sure if "Quotations" would be at the end, or if they could be linked to other "Quotations"
+  
+
+- Links between Texts and Persons: 
+  - If the person is responsible for the production of the text, there must be the type 'Author'
+  - If the person appears in the text, there must be the type 'Literary Figure' or 'Biblical Figure'
+
+
+- Links between Text and Iconography. I am not sure if this should be restricted to certain types of Iconography, especially "Narrative scene". 
+
+
+**Additional criteria for validation for publishing record:**
+
+- The Text must be 'part of' a parent Text (unless it has the type "Text")  
+- In addtion, the Text must be connected to at least another node. 
 
 
 ## Book 
