@@ -13,6 +13,8 @@ Text : duplicate : bool - o - nr
 
 class Person 
 
+class Family
+
 class Iconography
 
 class Option 
@@ -51,6 +53,8 @@ EdgeTextCycle : previewA : str - nr
 EdgeTextCycle : previewB : str - nr
 
 Person "0..n" --- "0..n" Text : > wrote \n written by <
+
+Text "0..n" --- "0..n" Family : > describes \n appears in by <
 
 Text "0..n" -- "1" EdgeTextText : has part >
 EdgeTextText "1" -- "0 or 1" Text :  part of >

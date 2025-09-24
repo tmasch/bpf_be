@@ -1,0 +1,76 @@
+@startuml
+class Family
+Family : references : ExternalReference - r
+Family : name_preferred : str - o - nr
+Family : name_variant : str - r
+Family : date : Date - nr
+Family : bibliography : Bibliography - r
+
+class Person
+
+class Heading
+
+class Place
+
+class Office
+
+class Text
+
+class Iconography 
+
+class Option 
+
+class Cycle 
+
+class EdgeFamilyPlace
+EdgeFamilyPlace : date : Date - nr
+
+class EdgeFamilyOffice
+EdgeFamilyOffice : date : Date - nr
+
+class EdgeFamilyIconography
+EdgeFamilyIconography : numberA : int - nr
+EdgeFamilyIconography : numberB : int - nr
+EdgeFamilyIconography : previewA : str - nr
+EdgeFamilyIconography : previewB : str - nr
+
+class EdgeFamilyOption
+EdgeFamilyOption : numberA : int - nr
+EdgeFamilyOption : numberB : int - nr
+EdgeFamilyOption : previewA : str - nr
+EdgeFamilyOption : previewB : str - nr
+
+class EdgeFamilyCycle
+EdgeFamilyCycle : numberA : int - nr
+EdgeFamilyCycle : numberB : int - nr
+EdgeFamilyCycle : previewA : str - nr
+EdgeFamilyCycle : previewB : str - nr
+
+Person "0..n" --- "0..n" Family : > member of \n has member <
+
+Text "0..n" --- "0..n" Family : > describes \n appears in by <
+
+Family "0..n" --- "0..n" Heading : < is example for \n has example >
+
+Family "0..n" -- "1" EdgeFamilyPlace : lived in >
+EdgeFamilyPlace "1" -- "0..n" Place : lived here <
+
+Family "0..n" -- "1" EdgeFamilyOffice : had frequently office >
+EdgeFamilyOffice "1" -- "0..n" Office : office was held frequently by <
+
+Family "0..n" -- "1" EdgeFamilyIconography : coat-of-arms >
+EdgeFamilyIconography "1" -- "0..n" Iconography : coat-of-arms of <
+
+Family "0..n" -- "1" EdgeFamilyOption : additionally portrayed in >
+EdgeFamilyOption "1" -- "0..n" Option : additional portrayed person <
+
+Family "0..n" -- "1" EdgeFamilyCycle : related image cycles >
+EdgeFamilyCycle "1" -- "0..n" Cycle : theme of cycle <
+
+
+
+
+@enduml
+
+
+

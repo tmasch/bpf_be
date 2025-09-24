@@ -172,6 +172,98 @@ This Edge works similar to the Edge between Person and Iconography, but in this 
 
 
 
+## Family
+
+This class is primarily an addition to the class Person. Its main purpose is to be able to search for all images connected with members of a specific family (largely noble families with many portrayed members), even if they are not all linked together by Person-Person relations. One can furthermore connect it to iconographies that are specific for whole families (typically heraldry) or for image cycles whose topic is members of a certain family. It would probably also be used for fictional families. 
+
+Currently, there is no provision to connect Families to MakingProcesses (e.g. made by Embriachi family) - I hesistate since such family workshops hardly ran over more than 2-3 generations and just only a small part in the history of a family (although probably in many cases the only part relevant here). On the other, how to do it else? Having a 'Family workshop' with a specific lifetime connected to a family? At a first glance, this could be smoother. The resulting Edge between Family and Organisation could also be used for connecting e.g. the organisation "Medici Family Collection" to the Medici Family. I have to think about it. 
+
+![Create](./class_diagrams/Family.png)
+
+
+**Attributes:**
+
+- date: this means the date when the family is important for the purposes of this database (otherwise, one would have to start with Adam, naturally)
+
+
+**Edge between Family and Text:**
+
+This would be only used for fictional families. 
+
+
+**Edge between Family and Heading:**
+
+It may make sense to use this link to group together types of families, e.g. ruling families, or lower nobility, but I am not sure how much sense this would make. 
+
+
+**Edge between Family and Place (EdgeFamilyPlace):**
+
+This could be used either simply to allocate families to countries, or to give a typical family seat, if there be one. Several such connections are possible, and they could be limited by dates (I am not sure about the practicalities)
+
+
+**Edge between Family and Office (EdgeFamilyOffice):**
+
+This would be used to connect families of rulers with the office, e.g. the Wittelsbach family to Dukes/Electors/Kings of Bavaria. It could also be used for families that regularly held non-hereditary offices (e.g. the Wittelsbach also as Archbishops of Cologne in the Baroque Age), but this may get a bit too much. 
+
+
+**Edge between Family and Iconography (EdgeFamilyIconography):**
+**Edge between Family and Option (EdgeFamilyOption):**
+
+The Edge to Iconography would be used with different relationships for different types of iconography, heraldry would be the typical use, however, some other relationships might also be possible:
+
+portrait of members / family of portrayed persons (for a group portrait). 
+
+The Edge to Option would function similarly, but it is hard to think of real use-cases, so I primarily included it for the sake of consistency. 
+
+
+**Edge between Family and Cycle (EdgeFamilyCycle):**
+
+This Edge would be used for regularly, e.g. for ciycles of family portraits, or for cycles of history paintings showing achievements of members of a family. 
+
+
+**Additional criteria for creating links:**
+
+- none
+ 
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- a Family probably should have a connection to a Place. 
+- a Family needs to be connected to a Person or an Iconography/Option/Cycle. 
+
+
+## Office
+
+Like Family, this is primarily an addition to the class Person. It helps to search for images connected to persons who had the same office, e.g. all Bishops of Augsburg. An Office is defined as a 'job' within an 'organisation' (or in case of political authorities, with a place). Typically, there is only one holder of an Office at a time, although there would be exceptions (e.g., Roman consuls - I a not sure if canon of a Cathedral would count as office since there is a higher, but limited, number, but perhaps it should) 
+
+**Attributes:**
+
+- date: This would denote the time when the office existed, but I am not sure how important this information really is (I mainly left the field here for the sake of consistency). If it is used, it should allow for timespans that have no end date. 
+
+**Edge between Office and Office:**
+
+This Edge could be used to indicate which Office was replaced by another (e.g. Duke of Bavaria by Elector of Bavaria). I am not sure how necessary it is, and it is certainly sometimes subjective. 
+
+**Edge between Office and Cycle (EdgeOfficeCycle):**
+
+This is meant e.g. for portrait series of all bishops of a certain see. Perhaps, one would need also here connections to Iconography and Option, but I currently have problems finding a use case. 
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- an Office must be connected to either an Organisation or a Place (Place meaning here Region - historical or Town). 
+- an Office needs to be connected to a Person or an Iconography/Option/Cycle. 
+- each EdgePersonOffice must contain a date - to allow sorting of office-holders. 
+
 
 
 
@@ -467,6 +559,7 @@ Here, the cardinality from Artwork to Text is normally 0..1 (an Artwork may can 
 
 - The Text must be 'part of' a parent Text (unless it has the type "Text")  
 - In addtion, the Text must be connected to at least another node. 
+
 
 
 ## Book 
