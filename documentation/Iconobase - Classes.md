@@ -729,7 +729,12 @@ These three Edges are ony used if the Artwork is in turn the iconography for oth
 There might be an alternative set of relationships for EdgeArtworkIconography:
 reconstruction / reconstruction of 
 
+**Edge between Artwork and Image:**
+
+This Edge currently only contains the number of the Images, making sure that the Images are listed in a sensible order (e.g., starting with an overview, and then perhaps from bottom left to top right in case of a big fresco, or so). Since every Image is connected to one and only one Artwork, one could likewise keep the Edge empty and store this information as attribute of Image - I suggest here this solution to be consistent with other Edges. 
+
 **Additional criteria for creating links:**
+
 - Links to MakingProcesses can only be made ife the type of the MakingProcess aligns with one of the medium attributes of the Artwork (e.g., a Fresco cannot be 'sculpted'). 
 - Links to locations (i.e. Places, Organisations (=Collections), Manuscripts and Books) can ony be made according if the location aligns with one of the medium attributes of the Artwork (e.g., a printed book image can only be linked with a Book, a fresco cannot linked with a Manuscript, etc.)
 - Links to Iconography, Option, and Cycle can only be made if the Artwork has a name_preferred. 

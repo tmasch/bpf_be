@@ -28,6 +28,8 @@ class Option
 
 class Cycle
 
+class Image
+
 class EdgeArtworkMakingProcess
 EdgeArtworkMakingProcess : number - int - o - nr
 
@@ -69,6 +71,9 @@ EdgeArtworkCycle : numberB : int - nr
 EdgeArtworkCycle : previewA : str - nr
 EdgeArtworkCycle : previewB : str - nr
 
+class EdgeArtworkImage
+EdgeArtworkImage : number : int - o - nr
+
 Iconography "0..n" -- "1" EdgeArtworkIconography : image >
 EdgeArtworkIconography "1" -- "0..n" Artwork : image of <
 
@@ -98,6 +103,9 @@ EdgeBookArtwork "1" -- "0..n" Book : contains <
 Artwork "0..n" --- "0..1 or 0..n" Text : > illustrates \n illustration of <
 
 Artwork "0..1" -- "0..1" Artwork : < copy of \n copy >
+
+Artwork "0..1" -- "1" EdgeArtworkImage : > shows 
+EdgeArtworkImage "1" -- "1" Image : < shown in
 
 
 
