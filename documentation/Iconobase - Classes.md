@@ -239,7 +239,9 @@ This Edge would be used for regularly, e.g. for ciycles of family portraits, or 
 
 ## Office
 
-Like Family, this is primarily an addition to the class Person. It helps to search for images connected to persons who had the same office, e.g. all Bishops of Augsburg. An Office is defined as a 'job' within an 'organisation' (or in case of political authorities, with a place). Typically, there is only one holder of an Office at a time, although there would be exceptions (e.g., Roman consuls - I a not sure if canon of a Cathedral would count as office since there is a higher, but limited, number, but perhaps it should) 
+Like Family, this is primarily an addition to the class Person. It helps to search for images connected to persons who had the same office, e.g. all Bishops of Augsburg. An Office is defined as a 'job' within an 'organisation' (or in case of political authorities, with a place). Typically, there is only one holder of an Office at a time, although there would be exceptions (e.g., Roman consuls - I a not sure if canon of a Cathedral would count as office since there is a higher, but limited, number, but perhaps it should). 
+
+![Create](./class_diagrams/Office.png)
 
 **Attributes:**
 
@@ -337,6 +339,21 @@ These three Edges have the same structure.
 - EdgeArtworkCollection is used for Artworks that are neither Multiples (as prints are) nor kept in manuscripts
 - EdgeManuscriptCollection is used for complete Manuscripts
 - EdgeCopyCollection is used for individual copies of multiples (irrespective if they are single objects, e.g., single-leaf prints, or parts of books)
+
+
+- current indicates whether the Artwork or Manuscript is still deemed to be in the Collection or not. It is by default 'True' if the Collection is a Library, a Museum, or a Private Collection, and 'False' if the Collection is a Dealer or an Auction House. 
+- inventory_number_preferred and inventory_number_other (the latter repetible) need different names in the front-end depending on the type of the Collection. 
+  - "shelf mark" if the Collection is a Library (or an Archive, if I create this category)
+  - "inventory number" if the Collection is a Museum or a Private Collection
+  - "lot number" if the Collection is an Auction House
+  - "catalogue number" if the Collection is a Dealer (only in this case one would need the field catalogue for the number of the catalogue in a series of catalogues of this dealer). 
+- date means different things according to the type of Collection (this must be reflected in the FE, but I am not sure if this would be used for searches)
+  - for Archives, Libraries, Museums, and Private Collections it means the time-span the object is or was in this collection (if known)
+  - for Auction Houses it means the date of the Auction
+  - for Dealers it means the date given in the catalogue. 
+  
+  It must be possible to have several different Edges between the same Artwork (or Manuscript) and the same Collection (e.g., quite a few manuscripts have been auctioned several times by Sotheby's)
+
 - 
 
 **Additional criteria for creating links:**
@@ -397,6 +414,9 @@ owns this building / building of (e.g., for the connection between "Aldersbach A
 
 Every place has to be connected to a parent place (e.g., a building to a town). Naturally, this will not be possible for the top parent (e.g. "Earth" or "Universe", should one allow for extraterrestrial places). In virtually all places, there will be one and only one parent. The only exception would be records of the type 'Town' - they could be connected to one record of the type 'Modern Region' and one or more records of the type 'Historical Region' (e.g., Bonn would be linked to the modern region "Nordrhein-Westfalen", but probably to the Historical Region "Mittelrhein"). The former is used to locations of artworks, the latter for places of origin. In some cases, there might be several Historical Regions, e.g., the "Byzantium" and "Ottoman Empire" for Constantinople. (It might be possible that 'Historical Regions' might also have several other 'Historical Regions' as parents). 
 
+**Edge between Place and Artwork (EdgePlaceArtwork):**
+
+This Edge is used to connect Artworks to the Place where they are (or were). The current field indicates if they are still there; additionally, dates can be given (not sure if the latter are really needed, but a date field is a standard features of the Edge, anyway). 
 
 **Edge between Place and Iconography (EdgePlaceIconography):**
 
@@ -446,6 +466,8 @@ This Edge works similar to the Edge between Place and Iconography, but in this c
 **Edge between Place and Heading:**
 
 I am not sure about how this Edge could be used. Perhaps, one might group differenttypes of buildings or building parts together, e.g. Franciscan Churches, Libraries, or Pulpits. 
+
+
 
 **Additional criteria for creating links:**
 
@@ -630,19 +652,7 @@ The cardinality from Artwork to the Edge is now not 0..1 but 0..n - there are ca
 
 This Edge is the same as the Edge between Artworks and Collections. 
 
-(move the following to there, once I have a diagram for Artwork)
-- current indicates whether the Artwork or Manuscript is still deemed to be in the Collection or not. It is by default 'True' if the Collection is a Library, a Museum, or a Private Collection, and 'False' if the Collection is a Dealer or an Auction House. 
-- inventory_number_preferred and inventory_number_other (the latter repetible) need different names in the front-end depending on the type of the Collection. 
-  - "shelf mark" if the Collection is a Library (or an Archive, if I create this category)
-  - "inventory number" if the Collection is a Museum or a Private Collection
-  - "lot number" if the Collection is an Auction House
-  - "catalogue number" if the Collection is a Dealer (only in this case one would need the field catalogue for the number of the catalogue in a series of catalogues of this dealer). 
-- date means different things according to the type of Collection (this must be reflected in the FE, but I am not sure if this would be used for searches)
-  - for Archives, Libraries, Museums, and Private Collections it means the time-span the object is or was in this collection (if known)
-  - for Auction Houses it means the date of the Auction
-  - for Dealers it means the date given in the catalogue. 
-  
-  It must be possible to have several different Edges between the same Artwork (or Manuscript) and the same Collection (e.g., quite a few manuscripts have been auctioned several times by Sotheby's)
+
 
 **Additional criteria for creating links:**
 - An EdgeManuscriptArtwork can only be established if the Artwork has a Medium appropriate for a Manuscript (e.g. "Illumination", not "Mural Painting")
@@ -658,4 +668,117 @@ This Edge is the same as the Edge between Artworks and Collections.
 - The Manuscript must be connected to at least one Organisation of the type "Collection". 
 - If the Collection is a Library or an Archive, there must be an inventory_number_current. 
 - If the Collection is an Auction House, there must be a date (or a dummy for date not known??)
+
+
+
+# Individual Records
+
+## Artwork
+
+The Artwork record describes the Artwork as physical Object, hence primarily what it is made of (Medium), by whom, where and when it was made (MakingProcess), and where it is (Place, Manuscript, Book). 
+
+![Create](./class_diagrams/Artwork.png)
+
+**Attributes:**
+
+- ingest_id: This is the ID of the ingest process during which the record was created. I am not sure if it should be kept after the record has been published, but this might not do harm. 
+- published: default False, set to True when the record is complete, validated, and made available for public searches. If ingest_id is deleted after publication, this field is not necessary. 
+- medium: the material and technique of the artwork - it defines the appropriate types of MakingProcess objects and furthermore, to which locations (Manuscript, Book, Collection, Place) the artwork can be linked
+- name_preferred: In contrast to authority records, this field is not required, it is only used in two cases: 
+  - if there is a common name for the Artwork (e.g., Mona Lisa)
+  - if there are images depicting this Artwork so that the Artwork record has to be connected to an Iconography record (e.g., an engraving after the Hercules Farnese)
+
+**Edge between Artwork and MakingProcess (EdgeArtworkMakingProcess):**
+
+This Edge currently only contains the number of the MakingProcess, making sure that these processes are listed in the correct order (e.g., starting with 'design'). Since every MakingProcess is connected to one and only one Artwork, one could likewise keep the Edge empty and store this information as attribute of MakingProcess - I suggest here this solution to be consistent with other Edges. 
+The Edge between a Matrix and a MakingProcess record functions in the same way. 
+I am not sure if relationships are really needed here; if so, I could make some up. 
+
+**Edge between Artwork and Matrix:**
+
+This Edge is only used for printed book illustrations, it contains the Artwork Record to the Matrix record for the printing matrix. This means that the MakingProcess records linked the Matrix record will be treated for displaying and searching like MakingProcess records linked directly to the Artwork record. 
+
+**Edge between Artwork and Artwork:**
+
+This Edge is used in two situations:
+- if one Artwork is a copy of another Artwork, with the relationship copy/copy of as indicated in the diagram. 
+- if one Artwork was produced as part of the making of another Artwork. In this case, different relationships are possible, e.g.: 
+preparatory drawing / preparatory drawing for
+oil sketch / oil sketch for
+modello  / modello for
+ricordo / ricordo for
+
+**Edge between Place and Artwork (EdgePlaceArtwork):**
+**Edge between Collection and Artwork (EdgeArtworkCollection):**
+**Edge between Manuscript and Artwork (EdgeManuscriptArtwork):**
+**Edge between Book and Artwork (EdgeBookArtwork):**
+
+These four Edges are used to indicate where the Artwork is located - in a Place (e.g., in a church building), in a Collection (e.g., Museum or Dealer), or within a manuscript or within a book. 
+Depending of the type of location, they have different properties, e.g. the locations in books and manuscripts contains page numbers, the location in collections inventory numbers, etc. These Edges have been explained in greater detail above. 
+
+**Edge between Artwork and Text:**
+
+This Edge is used to indicate, which passage of a text is illustrated by the Artwork (this has nothing ot do with the iconography, but it means basically the passage of text the Artwork is in, e.g., a Crucifixion may be in a book of the Life of Christ, or in the Canon of a Missal, etc.). For details, especially the cardinality, see above. 
+
+**Edge between Artwork and Iconography (EdgeArtworkIconography):**
+**Edge between Artwork and Option (EdgeArtworkOption):**
+**Edge between Artwork and Cycle (EdgeARtworkCycle):**
+
+These three Edges are ony used if the Artwork is in turn the iconography for other Artworks (e.g., an engraving showing the Hercules Farnese). Of them, EdgeArtworkCycle will be needed very rarely, and for EdgeArtworkOption I cannot think of a use case, so I primarily added them for consistency (I didn't add a connection to Criterion because I think that this could really be ruled out)
+
+There might be an alternative set of relationships for EdgeArtworkIconography:
+reconstruction / reconstruction of 
+
+**Additional criteria for creating links:**
+- Links to MakingProcesses can only be made ife the type of the MakingProcess aligns with one of the medium attributes of the Artwork (e.g., a Fresco cannot be 'sculpted'). 
+- Links to locations (i.e. Places, Organisations (=Collections), Manuscripts and Books) can ony be made according if the location aligns with one of the medium attributes of the Artwork (e.g., a printed book image can only be linked with a Book, a fresco cannot linked with a Manuscript, etc.)
+- Links to Iconography, Option, and Cycle can only be made if the Artwork has a name_preferred. 
+
+
+**Additional criteria for validation for saving record:**
+
+The validation is here rather complex because it has to check combinations of linked records for contradictions. 
+
+- The MakingProcesses must not contradict one another. This means that it is not possible to have two MakingProcesses of the same type, with the qualifier 'no comments' and partial as False (what would mean that the same Artwork was wholly painted by two different people). It is, however, possible to have one 'no comments' and one 'formerly attributed', or several 'attributed'. For printed book illustrations, this includes the MakingProcesses linked to the Matrix record. 
+
+- The locations must not contradict one another. If it has more than two links to locations (Places, Organisations (= Collections), Manuscripts, Books), all but one must have the attribute current as False. A record linked to a Book must not have any other link to a location (this woud be under 'copy')
+
+**Additional criteria for validation for publishing record:**
+
+- An Artwork record can only be published with it has at least one MakingProcess connected to the original making of the Artwork (i.e., excluding types such as "destroyed" or 'reconstructed') that is linked to a place and at least one MakingProcess that has a Date field (it could be the same MakingProcess). 
+- An Artwork record can ony be published if it has at least one location (Place, Organisation (= Collection), Manuscript or Book), or if one of the related Copy records has a link to a Collection (the latter constellation would be used for printed material that is not part of a book). There is no need for a lcoation that has the attribute current as true, in many cases one only has former locations. 
+
+
+
+## MakingProcess
+
+Instances of this Class always appear linked to an Artwork record. Its purpose is to describe one step in the production of the artwork, thus one activity done by one person and/or in one place at one time. 
+When an Artwork record is created, one or more MakingProcess records are created, with types describing all steps typically needed to create an artwork in this medium (e.g., only one ('painting') for a fresco, but three ('designing', 'engraving', 'printing') for an engraving). Other processes could be added, if needed. 
+
+![Create](./class_diagrams/MakingProcess.png)
+
+**Attributes:**
+
+- type: this describe the type of process, e.g. designing, painting, restoring, destroying. This is selected automatically depending on the Medium of the artwork, or selected from list (the list contains only those types that are relevant for the Medium of this Artwork)
+- qualifier: indicating a securely the process described here took place. This is selected from a list, the default would be 'no comments', other entries might be 'attributed', 'follower of', or 'former attribution'
+- partial: indicating if this working process touched all the Artwork or only a part of it (for situations of collaboration, e.g. Virgin by Rubens surrounded with flowers by Breughel)
+- partial_detail: this field is only relevant when partial is True - one could indicate here which part is connected to this MakingProcess, e.g. "flowers"
+
+**Edge between Artwork and MakingProcess (EdgeArtworkMakingProcess):**
+see under Artwork
+
+**Edge between Matrix and MakingProcess (EdgeMatrixMakingProcess):**
+
+This works like the EdgeArtworkMakingProcess, see under Artwork
+
+
+**Additional criteria for creating links:**
+- A MakingProcess can only be linked to one Person or to one Organisation. 
+- A MakingProcess can only be linked to a Person of the type 'Artist'. 
+- A MakingProcess can ony linked to an Organisation of the type 'Group of Members' (One might also think of having a new Organisation type 'Workshop' and restrict the links to it, but I am not sure ife this is necessary)
+- A MakingProcess can only be linked to a Place of the type 'Historical Region' or 'Town'
+
+**Additional criteria for validation for saving record:**
+
+- A MakingProcess record that has neither a link to a Person, Organisation, or Place nor a date cannot be saved. Such records will be created regularly when all MakingProcesses relevant for the Medium of the Artwork are created, but not all of them are filled in - what is often the case (e.g., if one only knows the designer of a woodcut, not the blockcutter). In this case, the 'empty' records will be abandonned without an error message.  
 

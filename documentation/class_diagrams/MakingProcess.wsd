@@ -1,0 +1,39 @@
+@startuml
+class MakingProcess
+MakingProcess : type - str - o - nr
+MakingProcess : qualifier - str - o - nr
+MakingProcess : partial - bool - o - nr
+MakingProcess : partial_detail - str - nr
+MakingProcess : date - Date - nr
+
+class Person
+
+class Organisation
+
+class Place
+
+class Artwork
+
+class Matrix
+
+class EdgeArtworkMakingProcess
+EdgeArtworkMakingProcess : number - int - o - nr
+
+class EdgeMatrixMakingProcess
+EdgeMatrixMakingProcess : number - int - o - nr
+
+
+Matrix "1..n" -- "1" EdgeMatrixMakingProcess
+EdgeMatrixMakingProcess "1" -- "1" MakingProcess
+
+Artwork "1..n" -- "1" EdgeArtworkMakingProcess
+EdgeArtworkMakingProcess "1" -- "1" MakingProcess
+
+MakingProcess "0..1" -- "0..n" Person : > made by \n  made <
+
+MakingProcess "0..1" -- "0..n" Organisation : > made by \n  made <
+
+MakingProcess "1" -- "0..n" Place  : < made in \n was place of making of >
+
+@enduml
+

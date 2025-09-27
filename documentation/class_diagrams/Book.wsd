@@ -28,7 +28,6 @@ Book "0..n" --- "0..n" Person : > author was  \n author of <
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 
 Book "0..n" --- "1" EdgeBookArtwork : contains > 
-
 EdgeBookArtwork "1" --- "0..1" Artwork : in <
 
 @enduml 

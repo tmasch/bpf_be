@@ -1,0 +1,105 @@
+@startuml
+Class Artwork
+Artwork : ingest_id : str - o - nr
+Artwork : published : bool - o - nr
+Artwork : medium:: str - o - r
+Artwork : name_preferred: str -  nr 
+Artwork : name_variant: str - r
+
+
+
+class MakingProcess
+
+class Matrix
+
+class Manuscript
+
+class Book
+
+class Place
+
+class Organisation
+
+class Text
+
+class Iconography
+
+class Option
+
+class Cycle
+
+class EdgeArtworkMakingProcess
+EdgeArtworkMakingProcess : number - int - o - nr
+
+class EdgeManuscriptArtwork
+EdgeManuscriptArtwork : current : boolean - o - nr
+EdgeManuscriptArtwork : page number for display : str - nr
+EdgeManuscriptArtwork : sequence number : perhaps tuple \n              of two integers - nr
+
+class EdgeBookArtwork
+EdgeBookArtwork : page number for display : str - nr
+EdgeBookArtwork : sequence number : perhaps tuple \n                  of two integers - nr
+
+class EdgeArtworkCollection
+EdgeArtworkCollection : current? : boolean - o - nr
+EdgeArtworkCollection : catalogue : str - nr
+EdgeArtworkCollection : inventory_no_preferred : str - nr
+EdgeArtworkCollection : inventory_no_other : str - r
+EdgeArtworkCollection : date : Date - nr
+
+class EdgePlaceArtwork
+EdgePlaceArtwork : current : bool : o - nr
+EdgePlaceArtwork : date : Date - nr
+
+class EdgeArtworkIconography
+EdgeArtworkIconography : numberA : int - nr
+EdgeArtworkIconography : numberB : int - nr
+EdgeArtworkIconography : previewA : str - nr
+EdgeArtworkIconography : previewB : str - nr
+
+class EdgeArtworkOption
+EdgeArtworkOption : numberA : int - nr
+EdgeArtworkOption : numberB : int - nr
+EdgeArtworkOption : previewA : str - nr
+EdgeArtworkOption : previewB : str - nr
+
+class EdgeArtworkCycle
+EdgeArtworkCycle : numberA : int - nr
+EdgeArtworkCycle : numberB : int - nr
+EdgeArtworkCycle : previewA : str - nr
+EdgeArtworkCycle : previewB : str - nr
+
+Iconography "0..n" -- "1" EdgeArtworkIconography : image >
+EdgeArtworkIconography "1" -- "0..n" Artwork : image of <
+
+Option "0..n" -- "1" EdgeArtworkOption : additionally shown >
+EdgeArtworkOption "1" -- "0..n" Artwork : additional shown in <
+
+Cycle "0..n" -- "1" EdgeArtworkCycle : theme of cycle >
+EdgeArtworkCycle "1" -- "0..n" Artwork : related image cycle <
+
+Artwork "0..n" -- "1" EdgeArtworkMakingProcess
+EdgeArtworkMakingProcess "1" -- "1" MakingProcess
+
+Artwork "0..1" --- "1..n" Matrix : < impression of \n matrix of >
+
+Artwork "0..n" -- "1" EdgePlaceArtwork : < in
+EdgePlaceArtwork  "1" -- "0..n" Place :  location of  >
+
+Artwork "0..n" -- "1" EdgeArtworkCollection : in >
+EdgeArtworkCollection "1" -- "0..n" Organisation : has  <
+
+Artwork "0..n" -- "1" EdgeManuscriptArtwork : in > 
+EdgeManuscriptArtwork "1" -- "0..n" Manuscript : contains <
+
+Artwork "0..1" -- "1" EdgeBookArtwork : in > 
+EdgeBookArtwork "1" -- "0..n" Book : contains <
+
+Artwork "0..n" --- "0..1 or 0..n" Text : > illustrates \n illustration of <
+
+Artwork "0..1" -- "0..1" Artwork : < copy of \n copy >
+
+
+
+@enduml
+

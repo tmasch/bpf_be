@@ -36,6 +36,8 @@ class Heading
 
 class MakingProcess
 
+class Artwork
+
 class EdgePersonPlace
 EdgePersonPlace : date : Date - nr
 
@@ -65,6 +67,10 @@ EdgePlaceCycle : numberA : int - nr
 EdgePlaceCycle : numberB : int - nr
 EdgePlaceCycle : previewA : str - nr
 EdgePlaceCycle : previewB : str - nr
+
+class EdgePlaceArtwork
+EdgePlaceArtwork : current : bool : o - nr
+EdgePlaceArtwork : date : Date - nr
 
 Person "0..n" -- "1" EdgePersonPlace : born in >
 EdgePersonPlace "1" -- "0..n" Place : born here <
@@ -97,6 +103,7 @@ Place "0..n" --- "0..n" Heading : < is example for \n has example >
 
 Place "0..n" --- "1" MakingProcess : < made in \n was place of making of >
 
-Place "0..n" --- "0..n" Artwork : < in \n location of >
+Place "0..n" -- "1" EdgePlaceArtwork : < in
+EdgePlaceArtwork  "1" -- "0..n" Artwork :   location of >
 
 @enduml 
