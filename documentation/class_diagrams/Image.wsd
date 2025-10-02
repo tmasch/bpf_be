@@ -36,7 +36,7 @@ Artwork "0..n" -- "1" EdgeArtworkImage : displays >
 EdgeArtworkImage "1" -- "1" Image : displayed in <
 
 Image "0..n" -- "1" EdgeImageIconography : shows >
-EdgeImageIconography "1" -- Iconography : shown in <
+EdgeImageIconography "1" -- "0..n" Iconography : shown in <
 
 Image "0..n" -- "1" EdgeImageCycle : > belongs to
 EdgeImageCycle "1" -- "0..n" Cycle : member of <

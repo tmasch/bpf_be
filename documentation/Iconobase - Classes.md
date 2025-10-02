@@ -670,6 +670,54 @@ This Edge is the same as the Edge between Artworks and Collections.
 - If the Collection is an Auction House, there must be a date (or a dummy for date not known??)
 
 
+# Group Records
+
+This small group of records that contain shared information for a (normally small) group of individual records. 
+
+## Matrix
+
+In book illustrations, often the same Matrix (typically a woodblock or a copperplate) are used repeatedly, sometimes with different iconographic significance. 
+The Matrix record has two purposes: 
+- it contains the MakingProcess records that are connected to the Matrix and hence shared by all re-uses of it. 
+- it contains a list of all sections of Text Artworks using this Matrix illustrate, and a list of al Iconographies the connected Image records display. Its purpose is that this information can then copied quickly into records for a new use of this Matrix, if it illustrates the same text and/or has the same iconographic significance. 
+
+Normally, these records will be created, updated and linked automatically through the Process Identifying re-used printing matrices. 
+
+![Create](./class_diagrams/Matrix.png)
+
+**Attributes:**
+The attributes have been copied from the Artwork record, but this may be more than actually needed. 
+- medium: I kept it as repeatable, but in this case there will only be one Medium. 
+- name_preferred, name_variant: I really doubt if there are any individual book illustrations with a common name, so I wonder if these fields would ever be needed. 
+
+**Edge between Matrix and MakingProcess (EdgeMatrixMakingProcess):**
+
+This functions like EdgeArtworkMakingProcess (below). 
+There will be normally three MakingProcess items attached (though some might not have any data and hence will not be saved), one for the design, one for the making of the matrix, and the third for the first known printing (in practical terms this would normally mean the first printing already recorded in Iconobase. The latter is necessary because it normally provides a place and a date, whilst especially the production of woodcuts often has neither). 
+
+**Edge between Matrix and Text:**
+
+This is like the Edge between Artwork and Text (see below). However, here, the cardinality must be 0..n - a matrix can be printed as illustrations of different texts. 
+
+**Edge between Matrix and Iconography:** 
+
+This is like the EdgeImageIconography (see below)
+
+**Additional criteria for creating links:**
+
+An Artwork can only linked to a Matrix if the medium of the Matrix is also the medium (or one of the media) of the Artwork. 
+A Matrix can only be linked to MakingProcesses that are appropriate for its medium. 
+
+**Additional criteria for validation for saving record:**
+
+The MakingProcess record may not contradict one another (see below for Artwork records). 
+
+**Additional criteria for validation for publishing record:**
+
+
+- A Matrix record can only be published with it has at least one MakingProcess connected to the original making of the Matrix (i.e., excluding types such as "destroyed" or 'reconstructed', but including 'first printed') that is linked to a place and at least one MakingProcess that has a Date field (it could be the same MakingProcess). 
+
+
 
 # Individual Records
 
@@ -697,6 +745,7 @@ I am not sure if relationships are really needed here; if so, I could make some 
 **Edge between Artwork and Matrix:**
 
 This Edge is only used for printed book illustrations, it contains the Artwork Record to the Matrix record for the printing matrix. This means that the MakingProcess records linked the Matrix record will be treated for displaying and searching like MakingProcess records linked directly to the Artwork record. 
+Some printers combined images from more than one Matrix. In these (rare, but not extremely rare) cases, one Artwork would be combined with several Matrix records. 
 
 **Edge between Artwork and Artwork:**
 
@@ -782,7 +831,7 @@ This works like the EdgeArtworkMakingProcess, see under Artwork
 
 **Additional criteria for creating links:**
 - A MakingProcess can only be linked to one Person or to one Organisation. 
-- A MakingProcess can only be linked to a Person of the type 'Artist'. 
+- A MakingProcess can only be linked to a Person of the type 'Artist' (or, for some MakingProcesses, only 'Printer'). 
 - A MakingProcess can ony linked to an Organisation of the type 'Group of Members' (One might also think of having a new Organisation type 'Workshop' and restrict the links to it, but I am not sure ife this is necessary)
 - A MakingProcess can only be linked to a Place of the type 'Historical Region' or 'Town'
 

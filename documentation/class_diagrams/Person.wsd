@@ -102,7 +102,7 @@ Person "0..n" --- "0..n" Heading : < is example for \n has example >
 
 Person "0..n" --- "1" MakingProcess : < made \n was artist of >
 
-Person "0..n" ---- "0..n" Photo : < photographed by \n photographed >
+Person "0..n" --- "0..n" Photo : < photographed by \n photographed >
 
 Person "0..n" --- "0..n" Campaign : < responsible \n led campaign >
 

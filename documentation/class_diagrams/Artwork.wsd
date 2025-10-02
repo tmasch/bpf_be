@@ -87,7 +87,7 @@ EdgeArtworkCycle "1" -- "0..n" Artwork : related image cycle <
 Artwork "0..n" -- "1" EdgeArtworkMakingProcess
 EdgeArtworkMakingProcess "1" -- "1" MakingProcess
 
-Artwork "0..1" --- "1..n" Matrix : < impression of \n matrix of >
+Artwork "0..n" --- "1..n" Matrix : < impression of \n matrix of >
 
 Artwork "0..n" -- "1" EdgePlaceArtwork : < in
 EdgePlaceArtwork  "1" -- "0..n" Place :  location of  >
