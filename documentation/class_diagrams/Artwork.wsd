@@ -73,6 +73,7 @@ EdgeArtworkCycle : previewB : str - nr
 
 class EdgeArtworkImage
 EdgeArtworkImage : number : int - o - nr
+EdgeArtworkImage : preferred : bool - o - nr
 
 Iconography "0..n" -- "1" EdgeArtworkIconography : image >
 EdgeArtworkIconography "1" -- "0..n" Artwork : image of <

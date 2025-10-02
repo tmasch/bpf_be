@@ -2,6 +2,7 @@
 class MakingProcess
 MakingProcess : type - str - o - nr
 MakingProcess : qualifier - str - o - nr
+MakingProcess : qualifier_comment - str - nr
 MakingProcess : partial - bool - o - nr
 MakingProcess : partial_detail - str - nr
 MakingProcess : date - Date - nr

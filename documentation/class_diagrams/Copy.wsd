@@ -1,0 +1,35 @@
+@startuml
+class Copy 
+
+
+class Image
+
+class Photo
+
+class Organisation
+
+class EdgeImageCopy
+EdgeImageCopy : preferred : bool - o - nr
+
+class EdgeCopyPhoto
+EdgeCopyPhoto : preferred : bool - o - nr
+
+class EdgeCopyCollection
+EdgeCopyCollection : current? : boolean - o - nr
+EdgeCopyCollection : catalogue : str - nr
+EdgeCopyCollection : inventory_no_preferred : str - nr
+EdgeCopyCollection : inventory_no_other : str - r
+EdgeCopyCollection : date : Date - nr
+
+
+Image "0..n" -- "1" EdgeImageCopy : represented in >
+EdgeImageCopy "1" -- "1" Copy : represents <
+
+Copy "0..n"  -- "1" EdgeCopyPhoto : photographed in >
+EdgeCopyPhoto "1" -- "1" Photo : photograph of <
+
+Copy "0..n" -- "1" EdgeCopyCollection : in >
+EdgeCopyCollection "1" -- "0..n" Organisation : has <
+
+
+@enduml

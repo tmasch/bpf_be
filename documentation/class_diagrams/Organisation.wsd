@@ -31,6 +31,8 @@ class Copy
 
 class Heading
 
+class Campaign
+
 class EdgeOrganisationOrganisation
 EdgeOrganisationOrganisation : date : Date - nr
 
@@ -122,6 +124,6 @@ EdgeCopyCollection "1" --- "0..n" Copy : in <
 
 Organisation "0..n" --- "0..n" Heading : < is example for \n has example >
 
-
+Organisation "0..n" --- "0..n" Campaign : > has photos \n photos in <
 
 @enduml 

@@ -1,0 +1,19 @@
+@startuml 
+class Campaign
+Campaign : name :  str - o - nr
+Campaign : date : date - nr
+
+class Photo
+
+class Person
+
+class Organisation
+
+Person "0..n" --- "0..n" Campaign : < responsible \n led campaign >
+
+Organisation "0..n" --- "0..n" Campaign : < responsible \n led campaign >
+
+Photo "0..n" --- "0..n" Campaign : < made in \n product of >
+
+
+@enduml 

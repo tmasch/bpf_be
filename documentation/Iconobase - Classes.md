@@ -729,9 +729,12 @@ These three Edges are ony used if the Artwork is in turn the iconography for oth
 There might be an alternative set of relationships for EdgeArtworkIconography:
 reconstruction / reconstruction of 
 
-**Edge between Artwork and Image:**
+**Edge between Artwork and Image (EdgeArtworkImage):**
 
-This Edge currently only contains the number of the Images, making sure that the Images are listed in a sensible order (e.g., starting with an overview, and then perhaps from bottom left to top right in case of a big fresco, or so). Since every Image is connected to one and only one Artwork, one could likewise keep the Edge empty and store this information as attribute of Image - I suggest here this solution to be consistent with other Edges. 
+This Edge currently contains two elements:
+-  number: number oof the Images, making sure that the Images are listed in a sensible order (e.g., starting with an overview, and then perhaps from bottom left to top right in case of a big fresco, or so). 
+- preferred: true if this is the Image the photo connected with should be shown as result of a search for the Artwork (normally an overview photo) 
+Since every Image is connected to one and only one Artwork, one could likewise keep the Edge empty and store this information as attribute of Image - I suggest here this solution to be consistent with other Edges. 
 
 **Additional criteria for creating links:**
 
@@ -751,7 +754,7 @@ The validation is here rather complex because it has to check combinations of li
 **Additional criteria for validation for publishing record:**
 
 - An Artwork record can only be published with it has at least one MakingProcess connected to the original making of the Artwork (i.e., excluding types such as "destroyed" or 'reconstructed') that is linked to a place and at least one MakingProcess that has a Date field (it could be the same MakingProcess). 
-- An Artwork record can ony be published if it has at least one location (Place, Organisation (= Collection), Manuscript or Book), or if one of the related Copy records has a link to a Collection (the latter constellation would be used for printed material that is not part of a book). There is no need for a lcoation that has the attribute current as true, in many cases one only has former locations. 
+- An Artwork record can ony be published if it has at least one location (Place, Organisation (= Collection) or Manuscript, not Book), or if one of the related Copy records has a link to a Collection (the latter constellation would be used for printed material that is not part of a book). There is no need for a lcoation that has the attribute current as true, in many cases one only has former locations. 
 
 
 
@@ -765,7 +768,7 @@ When an Artwork record is created, one or more MakingProcess records are created
 **Attributes:**
 
 - type: this describe the type of process, e.g. designing, painting, restoring, destroying. This is selected automatically depending on the Medium of the artwork, or selected from list (the list contains only those types that are relevant for the Medium of this Artwork)
-- qualifier: indicating a securely the process described here took place. This is selected from a list, the default would be 'no comments', other entries might be 'attributed', 'follower of', or 'former attribution'
+- qualifier and qualifier_comments: indicating a securely the process described here took place. This is selected from a list, the default would be 'no comments', other entries might be 'attributed', 'follower of', or 'former attribution'. This can be described in greater detail in qualifier_comments
 - partial: indicating if this working process touched all the Artwork or only a part of it (for situations of collaboration, e.g. Virgin by Rubens surrounded with flowers by Breughel)
 - partial_detail: this field is only relevant when partial is True - one could indicate here which part is connected to this MakingProcess, e.g. "flowers"
 
@@ -786,4 +789,135 @@ This works like the EdgeArtworkMakingProcess, see under Artwork
 **Additional criteria for validation for saving record:**
 
 - A MakingProcess record that has neither a link to a Person, Organisation, or Place nor a date cannot be saved. Such records will be created regularly when all MakingProcesses relevant for the Medium of the Artwork are created, but not all of them are filled in - what is often the case (e.g., if one only knows the designer of a woodcut, not the blockcutter). In this case, the 'empty' records will be abandonned without an error message.  
+
+## Image
+
+The Image record describe what can be seen on a photo of the Artwork record, hence primarily the Iconography. 
+
+![Create](./class_diagrams/Image.png)
+
+**Attributes:**
+detail: indicates if the Image is a detail of the complete artwork or shows it in its entirety. 
+position: indicates the part of the artwork shown, e.g. "top left" or "NW corner, upper row". A controlled vocabulary probably does not make sense. Normally, this would be empty if detail is 'false', but perhaps not always, I am not totally sure. 
+
+**Edge between Artwork and Image (EdgeArtworkImage):**
+see above
+
+
+**Edge between Image and Image:**
+This Edge is probably used for two different scenarios. 
+- Several Artworks for together one 'Iconographic Unit' (e.g. an altarpiece showing the Asssumption of the Virgin, and the smaller painting above Christ welcoming Her to heaven). Since it is not foreseen (and this would probably cause chaos) to link one Image to several Artworks - each would have an Image, and they would be linked with such a function. If the Image appears in a search, related images will shown together (2 questions: should one also have a bool attribute for Image indicating that the Image shows only a part of the whole 'iconographic unit'? Should one solve this (pretty rare, but extant) problem otherwise?)
+ - If Images are typological or similar relationships, this will be expressed in a rather complicated way through the Iconography records (or rather, through specific Options of the Iconography). The question is if one should additionally link them diretly through this Edge (manually? or should this be inserted automatically?)
+  
+  **Edge between Image and Copy (EdgeImageCopy):**
+  
+  This works like the EdgeArtworkImage, but numbering is not necessary since there is no sensible way in which the copies should be ordered. 
+
+  **Edge between Image and Iconography (EdgeImageIconography):**
+- preferred: This means that this is the Image that should appear in a search for the connected iconography. For every combination of Artwork and Iconography, only one connection can be preferred. 
+- number: The number in which the iconographie are listed in the Image record (makes only sense in that direction)
+- qualifier and qualifier_comments: Indicates how certain the connection is. This would be selected from a list, with the default 'no comments', and other options e.g. 'according to source texts', 'tentative'. If needed, this may be explained in qualifier_comments.
+- options: A list of the IDs of all the Options of the selected Iconography that are pertinent for the Image
+
+**Edge between Image and Cycle (EdgeImageCycle):**
+This Edge connects the Image to a Cycle, i.e., a series of Images that are made to function as a unity and that have a common topic (simple example, Stations of the Cross in a certain church). I have not fully worked out what to do with the Cycles, but I assume that the only information needed on the Edge is a sequence number (so that the Images within a CYcle could be ordered correctly and, where it is indicated, a number for display (would be used if the Images bear these numbers))
+
+**Edge between Image and Inscription:**
+I am not yet sure what to do with inscriptions, but it is probably best not to repeat inscription records and create a new one for each Image. 
+
+
+**Additional criteria for creating links:**
+Every Image may only have one EdgeImageCopy that is 'preferred'. 
+Every Iconography may only be connected to one Image of an Artwork with EdgeImageIconography that is 'preferred'. 
+In either case, this would be ensured automatically: the first Edge is preferred True, all following Edges are preferred False, and if one of them is manually set to preferred True, all others are set to preferred False. 
+
+**Additional criteria for validation for saving record:**
+
+none
+
+**Additional criteria for validation for publishing record:**
+
+The Image needs to be connected to at least one Copy that is in turn connected to at least on Photo record. 
+
+## Copy
+
+The Copy record is needed for Artworks that are 'multiples', of which several copies exist (e.g., woodcuts). In this case, the link to the whereabouts of the Artwork is not given in the Artwork record but here. In contrast to the four Edges that can be used to connect Artworks to their whereabouts, here only one type is needed, EdgeCopyCollection. 
+
+Originally, I left out this node in all other cases and connected the Image node directly to the Photo node. However, it may be best to have the same structure in all cases and so to include a Copy node without any connection. 
+
+![Create](./class_diagrams/Copy.png)
+
+**Edge between Image and Copy (EdgeImageCopy):**
+
+see above
+
+**Edge between Copy and Photo (EdgeImagecopy):**
+works like EdgeImagecopy
+
+**Edge between Copy and Collection (EdgeCopyCollection):**
+works like EdgeArtworkCollection
+
+
+**Additional criteria for creating links:**
+
+Links to Organisations (= Collections) are only possible if the medium of the Artwork connected to this Copy record fits with a multiple (e.g., 'woodcut' but not 'fresco'). In this case, the Image record cannot have links to Place or Organisation records. 
+
+**Additional criteria for validation for saving record:**
+
+There must not be more than one Edge to a Collection with current as True. 
+
+**Additional criteria for validation for publishing record:**
+
+The record must be connected to a Photo record. 
+As stated under Artwork Record - an Artwork Record can only be published if either it or a connected Copy record is connected to a Collection, a Place, or a Manuscript. 
+
+## Photo
+
+The Photo records give information on the actual photograph shown in the database. As given here, it is relatively simple and rather geared towards born-digital images. Should Iconobase to be used for digital collections of historical photographs, there might be more informatioin necessary (material of negative, technique of printing etc.) Since I have no clue about historical photography, I cannot suggest such a structure. 
+There is a principal question if all photos should be stored locally, or if for photos on library and museum websites only links should be stored (the IIIF standard allows for links to specific parts of an image). I would prefer the first solution. Another possibility for book illustrations would be to save the whole pages, and to use IIIF or a similar concept to display only details in the records. 
+
+![Create](./class_diagrams/Photo.png)
+
+**Attributes:**
+
+- filename: the name of the file (if needed with path) of the actual photograph
+- uri: in case of photographs taken from websites, the uri of the website (for two reasons: in case of book illustrations, the photo file would only show the cropped image, and this would show the full page - in case of museum websites, there might be more metadata on the website.)
+- max_download_size: can be zero, if no download permitted
+- creative_commons_statement: one of the standardised conditions (normally CC0 - I reckon that modern copyright law does not permit more restrictive statements in most cases)
+- creditline: public information about provider of image
+- rights_internal: information about image rights for internal use only (e.g., contact details of photographer)
+- date: date of the photo campaign (if one wants to indicate it). If there is a date for a linked Campaign it may not be necessary to give a date here (unless the campaign went on for many years, and one wants to be more specific)
+
+**Edge to Person/Edge to Campaign:**
+If a Person is linked to a Campaign, it would be probably not needed to indicate the Person also here (or this could be done automatically)
+
+
+**Additional criteria for creating links:**
+none
+
+**Additional criteria for validation for saving record:**
+none
+
+**Additional criteria for validation for publishing record:**
+
+
+
+## Campaign 
+
+The Campaign records join together photos made for a particular project (or photos kept in a particular collection). There might be use-cases for a rather elaborate record, but here I suggest keeping it simple. 
+
+![Create](./class_diagrams/Campaign.png)
+
+**Additional criteria for creating links:**
+
+Links to a Person can only be created if the Person has the type "Photographer"
+Links to an Organisation can only be created if the Organisation has the type "Collection"
+
+**Additional criteria for validation for saving record:**
+none (it may be that a campaign is linked to several persons or organisations. )
+
+**Additional criteria for validation for publishing record:**
+
+A campaign record can only be published if there are Photo records connected to it. 
+
 

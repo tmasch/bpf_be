@@ -1,0 +1,28 @@
+@startuml
+
+class Photo
+Photo : filename : str - o - nr
+Photo : uri: str - nr
+Photo : max_download_size : int - o - nr
+Photo : creditline : str - nr
+Photo : rights_internal : str - nr
+Photo : date : date - nr
+
+class Copy 
+
+class Person 
+
+class Campaign
+
+class EdgeCopyPhoto
+EdgeCopyPhoto : preferred : bool - o - nr
+
+
+Copy "0..n"  -- "1" EdgeCopyPhoto : photographed in >
+EdgeCopyPhoto "1" -- "1" Photo : photograph of <
+
+Photo "0..n" --- "0..n" Person : < photographed  \n photographed by >
+
+Photo "0..n" --- "0..n" Campaign : < made in \n product of >
+
+@enduml
