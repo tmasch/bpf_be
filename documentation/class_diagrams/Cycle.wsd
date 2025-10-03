@@ -1,0 +1,124 @@
+@startuml 
+class Cycle 
+Cycle : medium : str - o - r
+Cycle : name_preferred: str -  nr 
+Cycle : name_variant: str - r
+
+class MakingProcess
+
+class Person
+
+class Family
+
+class Office
+
+class Organisation
+
+class OrganisationTheme
+
+class Place 
+
+class PlaceTheme
+
+class Image
+
+class EdgePersonCycleTheme
+EdgePersonCycleTheme : numberA : int - nr
+EdgePersonCycleTheme : numberB : int - nr
+EdgePersonCycleTheme : previewA : str - nr
+EdgePersonCycleTheme : previewB : str - nr
+
+class EdgeFamilyCycleTheme
+EdgeFamilyCycleTheme : numberA : int - nr
+EdgeFamilyCycleTheme : numberB : int - nr
+EdgeFamilyCycleTheme : previewA : str - nr
+EdgeFamilyCycleTheme : previewB : str - nr
+
+class EdgeOfficeCycleTheme
+EdgeOfficeCycleTheme : numberA : int - nr
+EdgeOfficeCycleTheme : numberB : int - nr
+EdgeOfficeCycleTheme : previewA : str - nr
+EdgeOfficeCycleTheme : previewB : str - nr
+
+class EdgeOrganisationCycleTheme
+EdgeOrganisationCycleTheme : numberA : int - nr
+EdgeOrganisationCycleTheme : numberB : int - nr
+EdgeOrganisationCycleTheme : previewA : str - nr
+EdgeOrganisationCycleTheme : previewB : str - nr
+
+class EdgePlaceCycleTheme
+EdgePlaceCycleTheme : numberA : int - nr
+EdgePlaceCycleTheme : numberB : int - nr
+EdgePlaceCycleTheme : previewA : str - nr
+EdgePlaceCycleTheme : previewB : str - nr
+
+class EdgeCycleMakingProcess
+EdgeCycleMakingProcess : number - int - o - nr
+EdgeCycleMakingProcess : partial - bool - o - nr
+
+class EdgeManuscriptCycle
+EdgeManuscriptCycle : current : boolean - o - nr
+EdgeManuscriptCycle : partial : boolean - o - nr
+EdgeManuscriptCycle : page number for display : str - nr
+EdgeManuscriptCycle : sequence number : perhaps tuple \n              of two integers - nr
+
+class EdgeBookCycle
+EdgeBookCycle : page number for display : str - nr
+EdgeBookCycle : sequence number : perhaps tuple \n                  of two integers - nr
+
+class EdgeCycleCollection
+EdgeCycleCollection : current? : boolean - o - nr
+EdgeCycleCollection : partial : boolean - o - nr
+EdgeCycleCollection : catalogue : str - nr
+EdgeCycleCollection : inventory_no_preferred : str - nr
+EdgeCycleCollection : inventory_no_other : str - r
+EdgeCycleCollection : date : Date - nr
+
+class EdgePlaceCycle
+EdgePlaceCycle : current : bool -  o - nr
+EdgePlaceCycle : partial : bool - o - nr
+EdgePlaceCycle : date : Date - nr
+
+class EdgeImageCycle
+EdgeImageCycle : sequence_number : int - o - nr
+EdgeImageCycle : number : str
+
+
+
+
+Person "0..n" -- "1" EdgePersonCycleTheme : related image cycles >
+EdgePersonCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+Family "0..n" -- "1" EdgeFamilyCycleTheme : related image cycles >
+EdgeFamilyCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+Office "0..n" -- "1" EdgeOfficeCycleTheme : related image cycles >
+EdgeOfficeCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+OrganisationTheme "0..n" -- "1" EdgeOrganisationCycleTheme : related image cycles >
+EdgeOrganisationCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+PlaceTheme "0..n" -- "1" EdgePlaceCycleTheme : related image cycles >
+EdgePlaceCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+Cycle "0..n" -- "1" EdgeCycleMakingProcess 
+EdgeCycleMakingProcess "1" -- "0..n" MakingProcess
+
+Cycle "0..n" -- "1" EdgePlaceCycle : < in
+EdgePlaceCycle  "1" -- "0..n" Place :  location of  >
+
+Cycle "0..n" -- "1" EdgeCycleCollection : in >
+EdgeCycleCollection "1" -- "0..n" Organisation : has  <
+
+Cycle "0..n" -- "1" EdgeManuscriptCycle : in > 
+EdgeManuscriptCycle "1" -- "0..n" Manuscript : contains <
+
+Cycle "0..1" -- "1" EdgeBookCycle : in > 
+EdgeBookCycle "1" -- "0..n" Book : contains <
+
+Cycle "0..n" -- "1" EdgeImageCycle : > contains
+EdgeImageCycle "1" -- "0..n" Image : belongs to <
+
+
+
+@enduml

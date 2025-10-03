@@ -670,6 +670,37 @@ This Edge is the same as the Edge between Artworks and Collections.
 - If the Collection is an Auction House, there must be a date (or a dummy for date not known??)
 
 
+## Inscription
+
+I am still somewhat uncertain about this record. In general, I would only record inscriptions if this gives relevant information (e.g., having "SCS GEORGIUS" next to an image of St George doesn't tell us much, one could then tick the qualifier 'inscription' next to the Iconography and would not have to bother transcribe the text. On the other hand, such transcriptions, even if not relevant from other perspectives, could make sense for single-leaf prints because they can help with the identification.) 
+Some inscriptions are regular parts of iconographies (e.g., Apostles holdings scrolls with passages of the Creed, whereas others appear only once). Hence, it looks as if Inscription records should be connected both with Iconography and (more commonly) Option records, but also with Image records. If Inscriptions are quotations (this would normally the case in this situation), a link to the Text would be made. In this case, one would not transcribe the text, since it may be slightly different in every occurrence - if one wanted the wording, one would have to add a separate Inscription node to the Image record. 
+
+When thinking of it, I wonder if one should not restrict Inscription to connections to Image record and connect Iconography and Option records directly with the text instead. 
+
+**Attributes:**
+
+- text: This is the field that would normally be filled, it has the text in original language but in normalised spelling (e.g., without abbreviations)
+- text_diplomatic: This would be the field for exact ('diplomatic') transcriptions, if desired (I wouldn't use them, but some people might want to). This would probably need Unicode (I have no idea if Unicode is now the standard, anyway)
+- text_translated: For a translation of the text, if desired
+- lemma: by default False, set to True if one Iconography of the connected Image is of the type "Emblem" (can be undone manually, if needed). 
+
+**Edges:**
+To be added later, when I have worked out what to do. 
+
+**Additional criteria for creating links:**
+
+A link to a Text is only possible if the Text has the type "Quotation". This would mean that is actually quoted in the Text record. 
+
+
+**Additional criteria for validation for saving record:**
+
+There must be either a link to a Text record, or the text field must be filled (or as condition for publishing?)
+
+**Additional criteria for validation for publishing record:**
+
+The record must be connected to an Image record (or, if I use that, to an Iconography record)
+
+
 # Group Records
 
 This small group of records that contain shared information for a (normally small) group of individual records. 
@@ -716,6 +747,49 @@ The MakingProcess record may not contradict one another (see below for Artwork r
 
 
 - A Matrix record can only be published with it has at least one MakingProcess connected to the original making of the Matrix (i.e., excluding types such as "destroyed" or 'reconstructed', but including 'first printed') that is linked to a place and at least one MakingProcess that has a Date field (it could be the same MakingProcess). 
+
+## Cycle
+
+A Cycle is a group of Images that belong to Artworks made to belong together (though not necessary by the same making processes) and that have a common iconographic theme (e.g., tapestries of the Labours of Hercules). 
+
+![Create](./class_diagrams/Cycle.png)
+
+**Attributes:**
+- medium: a list of all media of the Artworks of the connected Images, deduplicated (normally, all have the same medium, anyway.)
+- name_preferred, name_variant: once again, this is only used in the case the whole cycle has a commonly quoted name, e.g. "Triumph of Caesar", or "Raphael Cartoons". 
+
+**Edge between Cycle and MakingProcess (EdgeCycleMakingProcess):**
+
+This is the same as the EdgeArtworkMakingProcess (see below). I am not sure how it will be used, the simplest thing would be to have here all MakingProcess information that is shared by all members of the group. One could, however, also give information relevant only for some members of the cycle - in this case, the boolean 'partial' in the Edge would be True (one could also add it to the MakingProcess node in this case.)
+
+**Edge between Cycle and Whereabouts (EdgeManuscriptCycle, EdgeBookCycle, EdgeCycleCollection, EdgePlaceCycle):**
+
+These Edges function in the same way as the corresponding Edges of the Artwork node. They would probably contain whereabouts information shared by all members of the cycle, details have to be sorted out. 
+The only addition is the boolean 'partial' that could be used to indicate if a Cycle is split over several locations (one could also forego it and only indicate the former locations where all used to be together, I ahve to think about it). 
+
+**Edge between Cycle and Themes (EdgePersonCYcleTheme, EdgeFamilyCycleTheme, EdgeOfficeCycleTheme, EdgeOrganisationCycleTheme, EdgePlaceCycleTheme):**
+
+These Edges connect the Cycle to the Object that is depicted, e.g. if the cycle is scenes from the Life of Christ it would be connected to Christ, if it is portraits of all Bohemian Kings, it would be connected to Office. Probably, there would be an element between the Themes and Cycle, e.g. to define if something is a cycle of the Infancy of Christ, a cycle on the Passion, etc. I wonder if one would put a 'theme' as an attribute into the Cycle record, or connect to the Persons, Organisations etc. Heading records with headings such as "Cycles - Infancy", and only these to the individual cycles, or find again another solution. 
+NB: OrganisationTheme and PlaceTheme nodes are simply Organisation and Place nodes - only, I have them elsewhere in the diagram, and I didn't want it to become too confusing. 
+
+**Edge between Cycle and Image (EdgeImageCycle):**
+
+see below under Image. 
+
+**Additional criteria for creating links:**
+
+Most of the links would not be created from scratch - rather, one would select a number of records and create a cycle of out them, so that MakingProcesses, whereabouts etc. would be taken from the individual Artwork records. Hence, only combinations already appearing there would be used here, and hence the criteria for creating links would be fulfilled: 
+- MakingProcess records have to be appropriate for at least one of the media given
+- Whereabouts (Place, Collection (=Organisation), Manuscript, Book) records hav to be appropriate for at least one of the media given. 
+
+**Additional criteria for validation for saving record:**
+
+  - The MakingProcess records may not contradict each other (if 'partial') in the Edge (as shown here, or in the MakingProcess record) is used and set to True, it does not count as contradiction. 
+  - Only one connection to whereabouts (Place, Collection (=Organisation), Manuscript, Book) with the attributes current True may be given (exception: if all have the attribute partial True)
+
+**Additional criteria for validation for publishing record:**
+
+Only cycles connected to at least one Image record will be published. 
 
 
 

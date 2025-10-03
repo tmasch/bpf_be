@@ -1,0 +1,41 @@
+@startuml 
+
+class Inscription
+Inscription : text : str - nr 
+Inscription : text_diplomatic : str - nr 
+Inscription : text_translated : str - nr 
+Inscription : lemma : bool - o - nr
+
+class Text 
+
+class Image 
+
+class Iconography 
+
+class Option 
+
+class EdgeInscriptionIconography
+EdgeInscriptionIconography : numberA : int - nr
+EdgeInscriptionIconography : numberB : int - nr
+EdgeInscriptionIconography : previewA : str - nr
+EdgeInscriptionIconography : previewB : str - nr
+
+class EdgeInscriptionOption
+EdgeInscriptionOption : numberA : int - nr
+EdgeInscriptionOption : numberB : int - nr
+EdgeInscriptionOption : previewA : str - nr
+EdgeInscriptionOption : previewB : str - nr
+
+
+Inscription "0..n" --- "1" Image : > inscribed here \n inscribed  <
+
+Text "0..n" --- "0..n" Inscription : < quoted in \n quotes >
+
+Inscription "0..n" -- "1" EdgeInscriptionIconography : > quoted in 
+EdgeInscriptionIconography "1" -- "0..n" Iconography : quotes <
+
+Inscription "0..n" -- "1" EdgeInscriptionOption : > quoted in 
+EdgeInscriptionOption "1" -- "0..n" Option : quotes <
+
+
+@enduml

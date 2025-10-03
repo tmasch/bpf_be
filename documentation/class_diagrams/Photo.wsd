@@ -4,6 +4,7 @@ class Photo
 Photo : filename : str - o - nr
 Photo : uri: str - nr
 Photo : max_download_size : int - o - nr
+Photo : creative_commons_statement : str - o - nr
 Photo : creditline : str - nr
 Photo : rights_internal : str - nr
 Photo : date : date - nr

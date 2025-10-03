@@ -39,7 +39,7 @@ Image "0..n" -- "1" EdgeImageIconography : shows >
 EdgeImageIconography "1" -- "0..n" Iconography : shown in <
 
 Image "0..n" -- "1" EdgeImageCycle : > belongs to
-EdgeImageCycle "1" -- "0..n" Cycle : member of <
+EdgeImageCycle "1" -- "0..n" Cycle : contains <
 
 Image "0..n" -- "0..n" Image : < belongs together with \n belongs together with >
 
