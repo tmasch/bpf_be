@@ -55,6 +55,7 @@ EdgePlaceIconography : numberA : int - nr
 EdgePlaceIconography : numberB : int - nr
 EdgePlaceIconography : previewA : str - nr
 EdgePlaceIconography : previewB : str - nr
+EdgePlaceIconography : copy_variants : bool - o - nr
 
 class EdgePlaceOption
 EdgePlaceOption : numberA : int - nr

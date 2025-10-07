@@ -58,6 +58,7 @@ EdgeArtworkIconography : numberA : int - nr
 EdgeArtworkIconography : numberB : int - nr
 EdgeArtworkIconography : previewA : str - nr
 EdgeArtworkIconography : previewB : str - nr
+EdgeArtworkIconography : copy_variants : bool - o - nr
 
 class EdgeArtworkOption
 EdgeArtworkOption : numberA : int - nr

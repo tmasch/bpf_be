@@ -136,6 +136,8 @@ arms of / arms (for heraldry)
 
 The attributes given on the Edge are the standard attributes for everything connected to iconography. Since they go in directions, one could also write them onto the arrows. 
 
+The attribute copy_variants determines if any variants (i.e., Criteria and Options) linked to the Person record should be made available in this Iconography record. 
+
 
 **Edge between Person and Option (EdgePersonOption)**
 
@@ -214,6 +216,8 @@ The Edge to Iconography would be used with different relationships for different
 portrait of members / family of portrayed persons (for a group portrait). 
 
 The Edge to Option would function similarly, but it is hard to think of real use-cases, so I primarily included it for the sake of consistency. 
+
+The attribute copy_variants determines if any variants (i.e., Criteria and Options) linked to the Family record should be made available in this Iconography record. 
 
 
 **Edge between Family and Cycle (EdgeFamilyCycle):**
@@ -316,6 +320,10 @@ emblem about / organisation alluded to in this emblem (for emblems)
 coat of arms of / organisation bearing these arms (for heraldic images)
 
 The attributes given on the Edge are the standard attributes for everything connected to iconography. Since they go in directions, one could also write them onto the arrows. 
+
+The attribute copy_variants determines if any variants (i.e., Criteria and Options) linked to the Organisation record should be made available in this Iconography record (is rather unlikely to happen for Organisations). 
+
+
 
 
 **Edge between Organisation and Option (EdgeOrganisationOption)**
@@ -449,6 +457,10 @@ plan / plan of
 for Iconography "Narrative Scene" 
 action happening here / place of action (Here is a problem: this would only indicate where an action took place, not if the place is really shown there, the latter would be rather under EdgePlaceOption)
 
+The attribute copy_variants determines if any variants (i.e., Criteria and Options) linked to the Place record should be made available in this Iconography record. 
+
+
+
 **Edge between Place and Option (EdgePlaceOption):**
 
 This is in principle similar to EdgePlaceIconograhy. It will probably be largely used if a building or a building part can feature in a narrative scene or not (e.g., if the Meta Romuli appears in the Crucifixion of St Peter)
@@ -560,6 +572,14 @@ These two Edges could be used to show for every text the illustrated manuscripts
 **Edge between Text and Artwork:**
 
 Here, the cardinality from Artwork to Text is normally 0..1 (an Artwork may can only illustrate one Text, the text written next to it). However, there can be additional connections to texts with duplicate as True, hence 0..n in this situation. 
+
+**Edge between Text and Iconography (EdgeTextIconography):**
+**Edge between Text and Option (EdgeTextOption):**
+
+This Edge is used for two different scenarios
+- with the Text being the literary source of the iconography (relation source of / source as shown in the digram)
+- with the Text (normally a Text with the type "Quotation") being actually quoted as part of the Iconography (this will happen more often wiht Option records) (relation quoted in / quotes)
+
 
 **Additional criteria for creating links:**
 - Links between Texts and Texts: The following "part of" connections are possible. One should not that "Chapters" are not hierarchically higher than "Passages". In the Bible, for instance, one might have a "Passage" "Story of Abraham" comprising some 10 chapters of Genesis. 
@@ -677,6 +697,8 @@ Some inscriptions are regular parts of iconographies (e.g., Apostles holdings sc
 
 When thinking of it, I wonder if one should not restrict Inscription to connections to Image record and connect Iconography and Option records directly with the text instead. 
 
+![Create](./class_diagrams/Inscription.png)
+
 **Attributes:**
 
 - text: This is the field that would normally be filled, it has the text in original language but in normalised spelling (e.g., without abbreviations)
@@ -700,6 +722,50 @@ There must be either a link to a Text record, or the text field must be filled (
 
 The record must be connected to an Image record (or, if I use that, to an Iconography record)
 
+## Iconography
+
+This record is the central record on subject-matter of an Image, and as such it has numerous connections: firstly to Object records describing the depicted Objects (Persons, Places, etc.), secondly to Criterion records describing potential variations, and thirdly to Image records. 
+
+![Create](./class_diagrams/Iconography.png)
+
+**Attributes:**
+
+- type: in this case (and contrary to, e.g., Person records), here the type is non-repeatable. 
+- references: This refers primarily to Iconclass notations. One could also refer here to Warburg or Princeton Index URIs.
+
+**Edge between Iconography and Person (EdgePersonIconography):**
+**Edge between Iconography and Family (EdgeFamilyIconography):**
+**Edge between Iconography and Organisation (EdgeOrganisationIconography):**
+**Edge between Iconography and Place (EdgePlaceIconography):**
+**Edge between Iconography and Natural Object (EdgeNaturalObjectIconography):**
+**Edge between Iconography and Text (EdgeTextIconography):**
+**Edge between Iconography and Action (EdgeActionIconography):**
+**Edge between Iconography and Artwork (EdgeArtworkIconography):**
+
+These Edges connect the Iconography record to records for the Objects shown in the Iconography. All Edges are explained with the respective Objects. Several more such Edges will be added later. 
+
+**Edge between Iconography and Criterion (EdgeIconographyCriterion):**
+
+This Edge connects the Iconography record with a Criterion record that specifies an element where variants occur, e.g., a specific attribute that may be present or not. 
+Its only attribute, the number, is a means to bring the Criterion records into a meaningful order. 
+
+**Edge between Iconography and Image (EdgeImageIconography):**
+see above
+
+**Additional criteria for creating links:**
+
+Links to Object records can only be made if the Object is appropriate for the type of the Iconography record, e.g., a Portrait record can only be linked to Person and Organisation records (portrait and group portrait), not to Places or Actions. 
+
+
+**Additional criteria for validation for saving record:**
+
+none
+
+**Additional criteria for validation for publishing record:**
+
+- the record must be linked to at least one Object record. 
+- the record must be linked to at least one Iconography record. 
+- according to some preliminary discussions with the editors of Iconclass: if the record has no Iconclass ID in external references, an automatic message will be sent to Iconclass. If Iconclass assigns a notation to this iconography, this ID will be sent to Iconobase (if possible, it should be added to the record automatically, otherwise manually). 
 
 # Group Records
 

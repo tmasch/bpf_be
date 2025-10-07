@@ -33,6 +33,7 @@ EdgeFamilyIconography : numberA : int - nr
 EdgeFamilyIconography : numberB : int - nr
 EdgeFamilyIconography : previewA : str - nr
 EdgeFamilyIconography : previewB : str - nr
+EdgeFamilyIconography : copy_variants - bool - nr
 
 class EdgeFamilyOption
 EdgeFamilyOption : numberA : int - nr

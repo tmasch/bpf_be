@@ -52,6 +52,7 @@ EdgeOrganisationIconography : numberA : int - nr
 EdgeOrganisationIconography : numberB : int - nr
 EdgeOrganisationIconography : previewA : str - nr
 EdgeOrganisationIconography : previewB : str - nr
+EdgeOrganisationIconography : copy_variants : bool - o - nr
 
 class EdgeOrganisationOption
 EdgeOrganisationOption : numberA : int - nr
