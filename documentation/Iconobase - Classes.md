@@ -511,7 +511,85 @@ Most links only make sense with certain types of Place records:
 - The Place must be 'part of' a parent place. 
   - If the Place is connected with an Artwork or an Organisation with the type "Collection", it must be connected to a upwards through "Modern Regions". 
   - If it is connected with a Person, a Family, an Office, an Organisation that is not a collection, a Book, an Iconography, an Option, a Criterion, or a MakingProcess, it must be connected upwards through "Historical Regions"
-- In addtion, the Place must be conPnected to at least another node. 
+- In addtion, the Place must be connected to at least another node. 
+
+
+## NaturalObject
+
+This class is primarily used for plants and animals. Like the Place and Text classes, it is stacked hierarchically, from large units (e.g., 'Insects' down to species, or even named individual animals). 
+
+Describing animals and plants will bring a number of problems. Firstly, they appear in art in two very different contexts. In most cases, only a small number of species appear (e.g., animals in fables, or as attributes), but in some large quantities (perhaps some 2000 plants in some 16th-century herbals). In the former situation, the animals are either not named at all, or with rather generic names ('a fox'), the the latter, they typically come with specific names that are in practially all cases not the scientific names used today; often, dictionaries offer identification, but these can be wrong (what only specialist could determine). 
+Secondly, there is a traditional biological systematic that is both complex and counter-intuitive (especially regarding botany), and a modern systematic ('cladistic') that is even more complex. Either of them would overwhelm Iconobase, yet the great number of animals and plants necessitates some structuring. Hence, one would probably use a somewhat simplified system with only few levels of hierarchy (e.g. Chordate > Mammal > Carnivore > Lion). 
+
+![Create](./class_diagrams/NaturalObject.png)
+
+**Attributes:**
+
+- type: Here should be relatively few types, not the entire biological hierarchy: 
+  - group (for anything genus or above)
+  - species (also for subspecies, variant as far as there are any relevant images)
+  - species old name (used for historical names of species appearing in labels)
+  - breed (used e.g. for dogs, horses)
+  - individuum (used e.g. for portraits of race-horses or dogs)
+
+- name_preferred: for the types group and species, this is normally a scientific binomial name
+- name_translated: for the types group and species, one could use this field to give a preferred vernacular name I(probably, both the Latin and the vernacular name would be displayed together)
+- references: for some common animals, there might be references in Iconclass I(but there are only few); furthermore, one could make references to scientific databases, although I am not sure to which ones. 
+
+**Edge between Natural Objects (EdgeNaturalObjectNaturalObject):**
+There are several possible relationships, depending on the type of the two Objects: 
+has part / part of: for group > group, group > species, species > species, species > breed
+formerly named / today named: for species > species old name
+individuum / belongs to: for species > individuum, breed > individuum
+
+The cardinality 'upwards' is normally "1". "0" only appears for the very top levels (e.g., record "Animals"). Cardinalities of higher than "1" would only be needed in exceptional cases, e.g., if a "species old name" can be attributed to several modern species. If it is worth introducing this complication (since Text and Place records normally have here cardinality "1" I am not sure)
+
+**Edge between Natural Object and Iconography (EdgeNaturalObjectIconography):**
+
+This Edge would probably be not used for records of the type 'group' (I reckon that one would rather have e.g. a 'species' record for 'not-further-defined snake'). 
+
+There could be different relationships
+
+view / view of
+skeleton / skeleton of
+detail / detail of (e.g., fruits, teeth etc.)
+group / group of 
+with other species / view of (with other species)
+shown in / acting animal (for Narrative Scenes)
+in emblem / acting animal (for Emblems)
+as attribute / object from nature as attribute (for Image with no narrative content / Allegorical Scene) (This is rare, more commonly, this would appear in connection with Options, see below)
+
+
+**Edge between Natural Object and Option (EdgeNaturalObjectOption):**
+
+There would be similar relationships as above (with something like 'additional' added). 
+Here, probably the relationship "as attribute / object from nature as attribute" would be the standard. It would be used for not only for Options of Criteria connected to Image with no narrative content and Allegorical scene, but also for Options of Criteria connected to Persons and Personifications. 
+
+**Edge between Natural Object and Heraldic Object:**
+
+Since Objects in Heraldry will need some special treatment, I will use a separate class for them that will be cross-referenced to the normal Object classes, as here. 
+In most cases, the cardinality will be 0..1 -- 0..1, but there are sometimes several Heraldic Objects for a Natural Object (e.g., Bear and Bear's claw), and who knows if the opposite might not also happen sometimes.
+
+**Additional criteria for creating links:**
+
+- links 'downwards' within the group of Natural Objects will only be possible between certain types. 
+  - groups can link to groups and species
+  - species can link to species, species old name, breed, and individual
+  - breed can linke to individual
+
+All records can be linked to Iconography and Object records - with exception of records of the type group (for 'any snake' in an image one would attach to the group record snake a fictive species record 'any snake'). This restriction prboably also applies for links to Heraldic Objects, but not to Cycle records. 
+
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- The record must be linked to a parent record (unless it is already e.g. 'Animals'). 
+- The record must be linkedto an Iconography, Option, Cycle or HeraldicObject record. 
+
 
 
 ## Text
@@ -602,6 +680,38 @@ This Edge is used for two different scenarios
 - The Text must be 'part of' a parent Text (unless it has the type "Text")  
 - In addtion, the Text must be connected to at least another node. 
 
+## Action
+
+This class is used for describing actions, it is normally connected to Iconographies of the type 'Narrative Scene' or "Emblem", occassionally it might also be connected to Option or even Cycle records. 
+
+![Create](./class_diagrams/Action.png)
+
+**Attributes:**
+- types: Currently, I do not think that one needs to divide Action records into individual types. 
+- references: Potential sources for external references would be Iconclass or Getty vocabularies. 
+
+**Edge between Actions (EdgeActionAction):**
+
+Action records are not as strictly hierarchical as Place, Text, or NaturalObject records, but in some places there might be subtypes of Actions (e.g., the action 'Beheading' could have the subtypes 'Beheading as Martyrdom', "Beheading as (organised) execution, 'Beheading as (unorganised) murder"). An alternative would be to classify only the subtypes as true actions, and the more abstract higher types as headings. 
+
+**Edge between Heading and Action (EdgeHeadingAction):**
+
+The Heading can signify general themes (e.g., liturgy, teaching, execution of justice) but also tools used for this action. 
+
+**Edge between Action and Criterion:**
+
+This is useful for recording different variants of an action, it would need to be inherited through 'copy_variant'. To use the bloodthirsty example from above, one could perhaps ask here, if a sword, and axe, or a guillotine is used. If there are Actions that are children of Actions, there is naturally a risk of the inheritance becoming chaotic. 
+
+
+**Additional criteria for creating links:**
+- Actions could only be linked to Iconographies including actions, thus e..g Narrative Scene or Emblem, but not Portrait. 
+  
+**Additional criteria for saving record:**
+none
+
+**Additional criteria for validation for publishing record:**
+- The record must be connected to another Action record or to a Heading
+- The record must be connected to an Iconography or an Option, or a Cycle
 
 
 ## Book 
@@ -640,8 +750,6 @@ This connection is for the case that a copy of a printed book has painted decora
 
 The sequence number is the number of the Artwork within the Book. If there were only one Artwork per page, it could be the canvas number of the IIIF manifest, but if there are several images on a page, it would need a suffix so that the images appear in correct narrative order. This could be a tuple of two integers, a float with the image number on the page after the decimal point, or a string consisting of the canvas number and a letter - but this may be harder for sorting. 
 The cardinality from Artwork to the Edge is 0..1 - by definition, a re-impression of an image in a different book is a different Artwork (since other connections from Artworks to Edges denoting Locations would be 0..n, it might be easier to also set 0..n here, too)
-
-
 
 
 **Additional criteria for validation for publishing record:**

@@ -1,4 +1,4 @@
-@startuml 
+@startuml Person
 class Person
 Person : type : str - o - r
 Person : references : ExternalReference - r
@@ -56,6 +56,7 @@ EdgePersonIconography : numberA : int - nr
 EdgePersonIconography : numberB : int - nr
 EdgePersonIconography : previewA : str - nr
 EdgePersonIconography : previewB : str - nr
+EdgePersonIconography : copy_variants : bool - o - nr
 
 class EdgePersonOption
 EdgePersonOption : numberA : int - nr

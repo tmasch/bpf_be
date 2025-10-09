@@ -1,4 +1,4 @@
-@startuml 
+@startuml Iconography
 class Iconography
 Iconography : type : str - o - nr
 Iconography : references : ExternalReference - r

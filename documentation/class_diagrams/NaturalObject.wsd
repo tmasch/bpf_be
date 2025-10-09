@@ -1,0 +1,28 @@
+@startuml 
+class NaturalObject
+NaturalObject : type : str - o - nr 
+NaturalObject : name_preferred : str - o - nr 
+NaturalObject : name_translated : str - nr 
+NaturalObject : name_variant : str - r 
+NaturalObject : references : ExternalReference - r 
+
+class Iconography
+
+class EdgeNaturalObjectNaturalObject
+EdgeNaturalObjectNaturalObject : number : int - o - nr 
+
+class EdgeNaturalObjectIconography
+EdgeNaturalObjectIconography : numberA : int - nr
+EdgeNaturalObjectIconography : numberB : int - nri
+EdgeNaturalObjectIconography : previewA : str - nr
+EdgeNaturalObjectIconography : previewB : str - nr
+EdgeNaturalObjectIconography : copy_variants : bool - o - nr
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectNaturalObject : has part >
+EdgeNaturalObjectNaturalObject "1" -- "0..n or 1" NaturalObject: part of >
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectIconography : view >
+EdgeNaturalObjectIconography "1" -- "0..n" Iconography : view of <
+
+
+@enduml

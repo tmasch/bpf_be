@@ -31,6 +31,10 @@ class Artwork
 
 class Inscription
 
+class Iconography
+
+class Option
+
 class EdgeTextText
 EdgeTextText : number : int - nr
 
@@ -39,6 +43,7 @@ EdgeTextIconography : numberA : int - nr
 EdgeTextIconography : numberB : int - nr
 EdgeTextIconography : previewA : str - nr
 EdgeTextIconography : previewB : str - nr
+EdgeTextIconography : copy_variants : bool - o - nr
 
 class EdgeTextOption
 EdgeTextOption : numberA : int - nr
@@ -51,6 +56,8 @@ EdgeTextCycle : numberA : int - nr
 EdgeTextCycle : numberB : int - nr
 EdgeTextCycle : previewA : str - nr
 EdgeTextCycle : previewB : str - nr
+
+
 
 Person "0..n" --- "0..n" Text : > wrote \n written by <
 

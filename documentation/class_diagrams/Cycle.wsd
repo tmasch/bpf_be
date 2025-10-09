@@ -1,4 +1,4 @@
-@startuml 
+@startuml Cycle
 class Cycle 
 Cycle : medium : str - o - r
 Cycle : name_preferred: str -  nr 
@@ -19,6 +19,8 @@ class OrganisationTheme
 class Place 
 
 class PlaceTheme
+
+class NaturalObject
 
 class Image
 
@@ -51,6 +53,12 @@ EdgePlaceCycleTheme : numberA : int - nr
 EdgePlaceCycleTheme : numberB : int - nr
 EdgePlaceCycleTheme : previewA : str - nr
 EdgePlaceCycleTheme : previewB : str - nr
+
+class EdgeNaturalObjectCycleTheme
+EdgeNaturalObjectCycleTheme : numberA : int - nr
+EdgeNaturalObjectCycleTheme : numberB : int - nri
+EdgeNaturalObjectCycleTheme : previewA : str - nr
+EdgeNaturalObjectCycleTheme : previewB : str - nr
 
 class EdgeCycleMakingProcess
 EdgeCycleMakingProcess : number - int - o - nr
@@ -100,6 +108,9 @@ EdgeOrganisationCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
 PlaceTheme "0..n" -- "1" EdgePlaceCycleTheme : related image cycles >
 EdgePlaceCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectCycleTheme : related image cycles >
+EdgeNaturalObjectCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
 Cycle "0..n" -- "1" EdgeCycleMakingProcess 
 EdgeCycleMakingProcess "1" -- "0..n" MakingProcess
