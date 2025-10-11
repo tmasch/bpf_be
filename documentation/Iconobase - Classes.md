@@ -975,6 +975,10 @@ The class is very simple, the only attribute being a name.
 
 These Edges only contain a number so that Criteria (if there are several) can be arranged in the most user-friendly way. Since every Criterion is only linked to one record of this kind, one could likewise place this number as attribute of the Criterion record, it is here in the Edge for the sake of consistency with other Edges. 
 
+**Edge between Criterion and Option (EdgeCriterionOption):**
+
+This Edge only has a number so that the Options are listed in the most user-friendly way. This number could also be made an attribute of the Option, it is placed here for the sake of consistency with other Edges. 
+
 **Additional criteria for creating links:**
 
 A Criterion record has one and only one link to an Iconography, a Heraldic Object, or an Object record (Person, Family, Personification, Natural Object, Organisation, Place, Text). Since these records will most probably be created as part of editing an Iconography etc. record, this criterion should be fulfilled automatically (but, there must be some provisions for relinking it to another record, this could happen sometimes)
@@ -991,6 +995,49 @@ A Criterion record would be published together with the Iconography record (it w
 ## Option
 
 The Option record is the second part of describing iconographical variants, if the Criterion record poses a question, the Option record suggests a potential answer. This record is more complex than the Criterion record, since it is - like the Iconography record, linked to Option records. 
+
+![Create](./class_diagrams/option.png)
+
+**Attributes:**
+- external references can exist, sometimes Iconclass calls has separate notations for what would here be variants. 
+- name_preferred and name_short are two different variants of the name. name_preferred is used as a stand-alone name, and name_short together with the name of the Criterion, e.g. there may be the Criterion "with Joseph", name_short of one option would be 'no', and name_preferred 'without Joseph'
+- search_term: terms used for search, e.g., in the above example, the Option 'with Joseph' might have 'Joseph' as additional search tame, e.g. for a search "Adoration Magi Joseph", whereas "without Joseph" would not have this search term (and it should not be found in searches for 'Joseph'). 
+
+**Edge between Criterion and Option (EdgeCriterionOption):**
+
+see above
+
+**Edge between Person and Option (EdgePersonOption):**
+**Edge between Family and Option (EdgeFamilyOption):**
+**Edge between Personification and Option (EdgePersonificationOption):**
+**Edge between Organisation and Option (EdgeOrganisationOption):**
+**Edge between Natural Object and Option (EdgeNaturalObjectOption):**
+**Edge between Thing and Option (EdgeThingOption):**
+**Edge between Place and Option (EdgePlaceOption):**
+**Edge between Text and Option (EdgeTextOption):**
+
+These Edges function similar to the Edges between this Object records and the Iconographies. The exception is the attribute 'copy_variants'. If it is set on True, the screen for connect an Image to an Iconography will not only be shown the variants offered by this Iconography, but also the variants offered by this linked Object record (e.g., if the Person record for St Peter has the attribute 'with keys', one could decide whether this should be shown for any Iconographies connected with St Peter - it would probably make sense for 'No narrative context', but not for 'Crucifixion of St Peter'). 
+
+I have not made an Edge between Artwork and Option records since I can hardly envisage when an Artwork appear in a variant of an Iconography (this would be like 'Death of Caesar with or without the Laoocoon Group behind'). 
+
+**Edge between Iconography, Option and Image (EdgeImageIconography):**
+
+This Edge is unusual by connecting not two, but three (or more) Edges. There is the normal connection to *one* Image record and *one* Iconography record. However, it is also connected to all Option records pertiment to the Image. 
+
+**Additional criteria for creating links:**
+
+- An Option record must be linked to one and only one Criterion record. Since these records will most probably be created as part of editing an Iconography etc. record, this criterion should be fulfilled automatically (but, there must be some provisions for relinking it to another record, this could happen sometimes). 
+- An Image record may only be connected to an Option record through the EdgeImageIconography record if either this Option is linked to a Criterion linked to this Iconography; or if this Option is linked to a Criterion linked to an Object (Person etc.) record that is in turn linked to the Iconography record linked to the Option record with an Edge that has copy_variants True. 
+
+**Additional criteria for validation for saving record:**
+
+see above. 
+
+**Additional criteria for validation for publishing record:**
+
+It would probably make most sense to publish Options together with the linked Criterion record. 
+Different from Iconography records, there is no need for Option records to be linked to an Object (Person etc.) record, there may well be Criteria and Options without such links (e.g., if there is an Option 'Angel at the right' for an Annunciation). 
+
 
 ## Campaign 
 

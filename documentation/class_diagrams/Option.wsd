@@ -3,7 +3,9 @@
 class Option 
 Option : references : ExternalReference - r
 Option : name_preferred : str - o - nr
-Option : name_alterantive : str - r
+Option : name_short : str - o - nr
+Option : search_term : str - nr
+
 
 class Person
 
@@ -24,6 +26,7 @@ EdgePersonOption : numberA : int - nr
 EdgePersonOption : numberB : int - nr
 EdgePersonOption : previewA : str - nr
 EdgePersonOption : previewB : str - nr
+EdgePersonOption : copy_variants : bool - o - nr
 
 class EdgeFamilyOption
 EdgeFamilyOption : numberA : int - nr
@@ -46,16 +49,6 @@ EdgeOrganisationOption : previewA : str - nr
 EdgeOrganisationOption : previewB : str - nr
 EdgeOrganisationOption : copy_variants : bool - o - nr
 
-
-
-class EdgeImageIconography
-EdgeImageIconography : preferred : bool - o - nr
-EdgeImageIconography : number : int - o - nr
-EdgeImageIconography : qualifier : str - o - nr
-EdgeImageIconography : qualifier_comment : str - nr
-EdgeImageIconography : qualifier_comments : str - nr
-EdgeImageIconography : options : id  - r
-
 class EdgeNaturalObjectOption
 EdgeNaturalObjectOption : numberA : int - nr
 EdgeNaturalObjectOption : numberB : int - nri
@@ -75,7 +68,7 @@ EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
 EdgePlaceOption : previewA : str - nr
 EdgePlaceOption : previewB : str - nr
-EdgePlaceOption : copy_variant : bool - o - nr
+EdgePlaceOption : copy_variants : bool - o - nr
 
 class EdgeTextOption
 EdgeTextOption : numberA : int - nr
@@ -83,6 +76,14 @@ EdgeTextOption : numberB : int - nr
 EdgeTextOption : previewA : str - nr
 EdgeTextOption : previewB : str - nr
 EdgeTextOption : copy_variants : bool - o - nr
+
+class EdgeImageIconography
+EdgeImageIconography : preferred : bool - o - nr
+EdgeImageIconography : number : int - o - nr
+EdgeImageIconography : qualifier : str - o - nr
+EdgeImageIconography : qualifier_comment : str - nr
+EdgeImageIconography : qualifier_comments : str - nr
+EdgeImageIconography : options : id  - r
 
 
 

@@ -66,7 +66,7 @@ EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
 EdgePlaceOption : previewA : str - nr
 EdgePlaceOption : previewB : str - nr
-EdgePlaceOption : copy_variant : bool - o - nr
+EdgePlaceOption : copy_variants : bool - o - nr
 
 class EdgePlaceCycle
 EdgePlaceCycle : numberA : int - nr
