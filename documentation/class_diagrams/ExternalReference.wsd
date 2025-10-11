@@ -1,4 +1,5 @@
-@startuml 
+@startuml ExternalReference
+
 class ExternalReference
 
 ExternalReference : number : int - nr

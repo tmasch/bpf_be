@@ -56,13 +56,16 @@ EdgePersonIconography : numberA : int - nr
 EdgePersonIconography : numberB : int - nr
 EdgePersonIconography : previewA : str - nr
 EdgePersonIconography : previewB : str - nr
-EdgePersonIconography : copy_variants : bool - o - nr
 
 class EdgePersonOption
 EdgePersonOption : numberA : int - nr
 EdgePersonOption : numberB : int - nr
 EdgePersonOption : previewA : str - nr
 EdgePersonOption : previewB : str - nr
+EdgePersonIconography : copy_variants : bool - o - nr
+
+class EdgePersonCriterion
+EdgePersonCriterion : number : int - nr - o 
 
 class EdgePersonCycle
 EdgePersonCycle : numberA : int - nr
@@ -90,7 +93,8 @@ EdgePersonIconography "1" -- "0..n" Iconography : portrayed person <
 Person "0..n" -- "1" EdgePersonOption : additionally portrayed in >
 EdgePersonOption "1" -- "0..n" Option : additional portrayed person <
 
-Person "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
+Person "0..n" -- "1" EdgePersonCriterion : > can be connected to \n these Criteria 
+EdgePersonCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
 Person "0..n" -- "1" EdgePersonCycle : related image cycles >
 EdgePersonCycle "1" -- "0..n" Cycle : theme of cycle <

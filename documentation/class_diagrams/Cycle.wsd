@@ -1,4 +1,5 @@
 @startuml Cycle
+
 class Cycle 
 Cycle : medium : str - o - r
 Cycle : name_preferred: str -  nr 
@@ -42,6 +43,12 @@ EdgeOfficeCycleTheme : numberB : int - nr
 EdgeOfficeCycleTheme : previewA : str - nr
 EdgeOfficeCycleTheme : previewB : str - nr
 
+class EdgePersonificationCycle
+EdgePersonificationCycle : numberA : int - nr
+EdgePersonificationCycle : numberB : int - nr
+EdgePersonificationCycle : previewA : str - nr
+EdgePersonificationCycle : previewB : str - nr
+
 class EdgeOrganisationCycleTheme
 EdgeOrganisationCycleTheme : numberA : int - nr
 EdgeOrganisationCycleTheme : numberB : int - nr
@@ -59,6 +66,20 @@ EdgeNaturalObjectCycleTheme : numberA : int - nr
 EdgeNaturalObjectCycleTheme : numberB : int - nri
 EdgeNaturalObjectCycleTheme : previewA : str - nr
 EdgeNaturalObjectCycleTheme : previewB : str - nr
+
+class EdgeThingCycle
+EdgeThingCycle : numberA : int - nr
+EdgeThingCycle : numberB : int - nr
+EdgeThingCycle : previewA : str - nr
+EdgeThingCycle : previewB : str - nr
+
+class EdgeActionCycle
+EdgeActionCycle : numberA : int - nr
+EdgeActionCycle : numberB : int - nr
+EdgeActionCycle : previewA : str - nr
+EdgeActionCycle : previewB : str - nr
+
+
 
 class EdgeCycleMakingProcess
 EdgeCycleMakingProcess : number - int - o - nr
@@ -100,6 +121,9 @@ EdgePersonCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 Family "0..n" -- "1" EdgeFamilyCycleTheme : related image cycles >
 EdgeFamilyCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
+Personification "0..n" -- "1" EdgePersonificationCycle : related image cycles >
+EdgePersonificationCycle "1" -- "0..n" Cycle : theme of cycle <
+
 Office "0..n" -- "1" EdgeOfficeCycleTheme : related image cycles >
 EdgeOfficeCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
@@ -111,6 +135,12 @@ EdgePlaceCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
 NaturalObject "0..n" -- "1" EdgeNaturalObjectCycleTheme : related image cycles >
 EdgeNaturalObjectCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+Thing "0..n" -- "1" EdgeThingCycle : related image cycles >
+EdgeThingCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Action "0..n" -- "1" EdgeActionCycle : related image cycles >
+EdgeActionCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Cycle "0..n" -- "1" EdgeCycleMakingProcess 
 EdgeCycleMakingProcess "1" -- "0..n" MakingProcess
@@ -129,7 +159,5 @@ EdgeBookCycle "1" -- "0..n" Book : contains <
 
 Cycle "0..n" -- "1" EdgeImageCycle : > contains
 EdgeImageCycle "1" -- "0..n" Image : belongs to <
-
-
 
 @enduml

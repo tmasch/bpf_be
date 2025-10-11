@@ -1,4 +1,4 @@
-@startuml action
+@startuml Action
 
 class Action
 Action : name_preferred : str - o - nr
@@ -6,6 +6,8 @@ Action : name_variant : str - r
 Action : references : ExternalReference - r 
 
 class Heading
+
+class Thing
 
 class Iconography
 
@@ -21,6 +23,12 @@ EdgeHeadingAction : numberB : int - nri
 EdgeHeadingAction : previewA : str - nr
 EdgeHeadingAction : previewB : str - nr
 
+class EdgeThingAction
+EdgeThingAction : numberA : int - nr
+EdgeThingAction : numberB : int - nri
+EdgeThingAction : previewA : str - nr
+EdgeThingAction : previewB : str - nr
+
 class EdgeActionAction
 EdgeActionAction : numberA : int - nr
 EdgeActionAction : numberB : int - nri
@@ -34,6 +42,9 @@ EdgeActionIconography : numberB : int - nri
 EdgeActionIconography : previewA : str - nr
 EdgeActionIconography : previewB : str - nr
 EdgeActionIconography : copy_variants : bool - o - nr
+
+class EdgeActionCriterion
+EdgeActionCriterion : number : int - nr - o 
 
 class EdgeActionOption
 EdgeActionOption : numberA : int - nr
@@ -51,6 +62,9 @@ EdgeActionCycle : previewB : str - nr
 Heading "0..n" -- "1" EdgeHeadingAction: related action >
 EdgeHeadingAction "1" -- "0..n" Action: related concept <
 
+Thing "0..n" -- "1" EdgeThingAction: used for >
+EdgeThingAction "1" -- "0..n" Action: tool <
+
 Action "0..n" -- "1" EdgeActionAction: child action >
 EdgeActionAction "1" -- "0..n" Action: parent action <
 
@@ -60,7 +74,8 @@ EdgeActionIconography "1" -- "0..n" Iconography : example for <
 Action "0..n" -- "1" EdgeActionOption : additional action in >
 EdgeActionOption "1" -- "0..n" Option : additionally shown Action <
 
-Action "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
+Action "0..n" -- "1" EdgeActionCriterion : > can be connected to \n these Criteria 
+EdgeActionCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
 Action "0..n" -- "1" EdgeActionCycle : related image cycles >
 EdgeActionCycle "1" -- "0..n" Cycle : theme of cycle <

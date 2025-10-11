@@ -1,4 +1,4 @@
-@startuml 
+@startuml Image
 
 class Image
 
@@ -37,6 +37,8 @@ EdgeArtworkImage "1" -- "1" Image : displayed in <
 
 Image "0..n" -- "1" EdgeImageIconography : shows >
 EdgeImageIconography "1" -- "0..n" Iconography : shown in <
+
+EdgeImageIconography "0..n" -- "0..n" Option: > shows variant \n variant shown in <
 
 Image "0..n" -- "1" EdgeImageCycle : > belongs to
 EdgeImageCycle "1" -- "0..n" Cycle : contains <

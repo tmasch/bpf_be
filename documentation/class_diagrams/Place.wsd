@@ -1,4 +1,5 @@
-@startuml 
+@startuml Place 
+
 class Place
 Place : type : str - o - nr
 Place : references : ExternalReference - r
@@ -57,11 +58,15 @@ EdgePlaceIconography : previewA : str - nr
 EdgePlaceIconography : previewB : str - nr
 EdgePlaceIconography : copy_variants : bool - o - nr
 
+class EdgePlaceCriterion
+EdgePlaceCriterion : number : int - nr - o 
+
 class EdgePlaceOption
 EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
 EdgePlaceOption : previewA : str - nr
 EdgePlaceOption : previewB : str - nr
+EdgePlaceOption : copy_variant : bool - o - nr
 
 class EdgePlaceCycle
 EdgePlaceCycle : numberA : int - nr
@@ -90,10 +95,12 @@ EdgePlacePlace "1" -- "1 or 1..n" Place : part of <
 Place "0..n" -- "1" EdgePlaceIconography : view >
 EdgePlaceIconography "1" -- "0..n" Iconography : view of <
 
+Place "0..n" -- "1" EdgePlaceCriterion : > can be connected to \n these Criteria 
+EdgePlaceCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
 Place "0..n" -- "1" EdgePlaceOption : additionally depicted in >
 EdgePlaceOption "1" -- "0..n" Option : additional depicted place <
 
-Place "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
 
 Place "0..n" -- "1" EdgePlaceCycle : related image cycles >
 EdgePlaceCycle "1" -- "0..n" Cycle : theme of cycle <

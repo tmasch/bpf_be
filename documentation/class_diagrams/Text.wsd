@@ -1,4 +1,4 @@
-@startuml 
+@startuml Text
 class Text
 Text : type : str - o - nr
 Text : references : ExternalReference - r
@@ -45,11 +45,15 @@ EdgeTextIconography : previewA : str - nr
 EdgeTextIconography : previewB : str - nr
 EdgeTextIconography : copy_variants : bool - o - nr
 
+class EdgeTextCriterion
+EdgeTextCriterion : number : int - nr - o 
+
 class EdgeTextOption
 EdgeTextOption : numberA : int - nr
 EdgeTextOption : numberB : int - nr
 EdgeTextOption : previewA : str - nr
 EdgeTextOption : previewB : str - nr
+EdgeTextOption : copy_variants : bool - o - nr
 
 class EdgeTextCycle
 EdgeTextCycle : numberA : int - nr
@@ -69,6 +73,9 @@ EdgeTextText "1" -- "0 or 1" Text :  part of >
 
 Text "0..n" -- "1" EdgeTextIconography : source of >
 EdgeTextIconography "1" -- "0..n" Iconography : source <
+
+Text "0..n" -- "1" EdgeTextCriterion : > can be connected to \n these Criteria 
+EdgeTextCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
 Text "0..n" -- "1" EdgeTextOption : addition source of >
 EdgeTextOption "1" -- "0..n" Option : additional source <

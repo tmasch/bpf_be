@@ -1,5 +1,42 @@
 Iconobase - Classes
 
+# Table of contents
+
+- [Table of contents](#table-of-contents)
+- [Abbreviations](#abbreviations)
+- [Ancillary classes](#ancillary-classes)
+  - [Date](#date)
+  - [ExternalReference](#externalreference)
+  - [Bibliography](#bibliography)
+- [Authority records](#authority-records)
+  - [Person](#person)
+  - [Family](#family)
+  - [Office](#office)
+  - [Personification](#personification)
+  - [Organisation](#organisation)
+  - [Place](#place)
+  - [NaturalObject](#naturalobject)
+  - [Thing](#thing)
+  - [Text](#text)
+  - [Action](#action)
+  - [Book](#book)
+  - [Manuscript](#manuscript)
+  - [Iconography](#iconography)
+  - [Criterion](#criterion)
+  - [Option](#option)
+  - [Campaign](#campaign)
+- [Group records](#group-records)
+  - [Matrix](#matrix)
+  - [Cycle](#cycle)
+- [Individual Records](#individual-records)
+  - [Artwork](#artwork)
+  - [MakingProcess](#makingprocess)
+  - [Image](#image)
+  - [Inscription](#inscription)
+  - [Copy](#copy)
+  - [Photo](#photo)
+
+
 # Abbreviations
 
 r: repeatable
@@ -271,6 +308,26 @@ This is meant e.g. for portrait series of all bishops of a certain see. Perhaps,
 - each EdgePersonOffice must contain a date - to allow sorting of office-holders. 
 
 
+## Personification
+
+This record is only used as Object record for iconographical descriptions. The conceptual problem is that, whilst Persons are individuals so that references to Persons either mean the same Person or different Person, Personifications are mere figments and not clearly marked individuals. Frequently, Personifications will be named, but especially in Post-medieval images outside of books they are often without names and have to be identified by comparing their attributes to personifications in iconographic handbooks such as Cesare Ripa's *Iconographia* 
+Hence, there will be needs for either linking together Personification records with relationships such as "similar concept" and/or parent/child relations as with the types "species" and "species old name" in the NaturalObject records (see below), the latter would be used for Personifications appearing in artworks with names, the former as general parent term, and Personifications appearing without names would be connected directly to it. 
+
+![Create](./class_diagrams/Personification.png)
+
+**Attributes:**
+- "type": This field would be needed if one had something akin the "species old name" system, then those and the 'Primary' personifications should be distinguishes. Otherwise, it is not needed. 
+- "name_preferred" / "name_variant": If the 'species old name' concept is used, these records would have as 'name_preferred' the name as written in the source, otherwise it would have the name of the Personification in a standard language (if possible, I would say, for some many the standard would be Latin, but for others Italian or French??). It would perhaps make sense to have the possibility of giving names together with sources (i.e., the names used in certain iconographical dictionaries) - only how? Tuples of name and ID of a Text record would make most sense buit iupset the overall structure, hence perhaps clumsily the name and the title of the text in brackets?, or something in the coments section?
+  
+**Edge between Heading and Personification:**
+**Edge between Organisation and Personification:**
+**Edge between Place and Personification:**
+
+These Edges link the Personifications to the concepts they show, Heading would be used e.g. for Personifications of virtues and vices, Organisations for Personifications of Organisations, and Place for geographical Personifications. It is possible that several additional entities, e.g., Family and Office, also need to be included here 
+
+**Edge between Personification and Personification:**
+
+Depending on the structure of the Personification records (see above) this would either have the simple relationship 'related concept / related concept' (a relationship 'opposite concept / opposite concept' might also be possible), or, if there something like 'species old name' in use, there would be a hierarchical relationship, e.g. 'named example / main entry'. 
 
 
 ## Organisation 
@@ -532,7 +589,7 @@ Secondly, there is a traditional biological systematic that is both complex and 
   - breed (used e.g. for dogs, horses)
   - individuum (used e.g. for portraits of race-horses or dogs)
 
-- name_preferred: for the types group and species, this is normally a scientific binomial name
+- name_preferred: for the types group and species, this is normally a scientific name consisting in most cases of one or two latin words and the name of the author who described it. A problem: according to a custom even observed by Wikipedia, the Latin words are in italics, the author's name is in small caps. How could this be done? by having two different attributes? but what if there are variant names of the same structure? 
 - name_translated: for the types group and species, one could use this field to give a preferred vernacular name I(probably, both the Latin and the vernacular name would be displayed together)
 - references: for some common animals, there might be references in Iconclass I(but there are only few); furthermore, one could make references to scientific databases, although I am not sure to which ones. 
 
@@ -589,6 +646,34 @@ All records can be linked to Iconography and Object records - with exception of 
 
 - The record must be linked to a parent record (unless it is already e.g. 'Animals'). 
 - The record must be linkedto an Iconography, Option, Cycle or HeraldicObject record. 
+
+## Thing
+
+Thing records are Object records used for anything that is neither a Person nor a Family, nor a Personification nor an Organisation nor a Place nor an Option for Nature. Hence, it may describe things ranging from zodiac signs to surgical tools. I am still relatively vague about how it could be used. 
+
+![Create](./class_diagrams/Thing.png)
+
+**Attributes**
+
+- type: one probably will have to use different types - although one has to work out to what extent these records should be placed into context by types versus by headings. Hence, maybe the type section will remain rudimentary or can even go. 
+
+**Edge between Heading and Type (EdgeHeadingType):**
+
+This Edge will be primarily used to put the Things into groups - it is possible to give several headings to a Thing. One has to think if there would be more specific relationships. 
+
+**Edge between Thing and Action (EdgeThingAction):**
+
+Here, different relationships would be possible
+used for / tool
+used in / raw material
+made in / product
+
+**Edge beween Thing and Option (EdgeThingOptioin):**
+Here, different relationships would be possible
+attribute / object used as attribute
+additionally depicted / additionally depicted object. 
+
+The 'attribute' relationship is of special interest - there will be a search function for Images (thus Options) connected to a specific Thing (or NaturalObject) via the relationship 'attribute', e.g., all Personifications that have a lightning-bolt as attribute. 
 
 
 
@@ -696,7 +781,9 @@ Action records are not as strictly hierarchical as Place, Text, or NaturalObject
 
 **Edge between Heading and Action (EdgeHeadingAction):**
 
-The Heading can signify general themes (e.g., liturgy, teaching, execution of justice) but also tools used for this action. 
+The Heading can signify general themes (e.g., liturgy, teaching, execution of justice)
+
+**Edge between Thing and Action  (Edge)
 
 **Edge between Action and Criterion:**
 
@@ -798,37 +885,6 @@ This Edge is the same as the Edge between Artworks and Collections.
 - If the Collection is an Auction House, there must be a date (or a dummy for date not known??)
 
 
-## Inscription
-
-I am still somewhat uncertain about this record. In general, I would only record inscriptions if this gives relevant information (e.g., having "SCS GEORGIUS" next to an image of St George doesn't tell us much, one could then tick the qualifier 'inscription' next to the Iconography and would not have to bother transcribe the text. On the other hand, such transcriptions, even if not relevant from other perspectives, could make sense for single-leaf prints because they can help with the identification.) 
-Some inscriptions are regular parts of iconographies (e.g., Apostles holdings scrolls with passages of the Creed, whereas others appear only once). Hence, it looks as if Inscription records should be connected both with Iconography and (more commonly) Option records, but also with Image records. If Inscriptions are quotations (this would normally the case in this situation), a link to the Text would be made. In this case, one would not transcribe the text, since it may be slightly different in every occurrence - if one wanted the wording, one would have to add a separate Inscription node to the Image record. 
-
-When thinking of it, I wonder if one should not restrict Inscription to connections to Image record and connect Iconography and Option records directly with the text instead. 
-
-![Create](./class_diagrams/Inscription.png)
-
-**Attributes:**
-
-- text: This is the field that would normally be filled, it has the text in original language but in normalised spelling (e.g., without abbreviations)
-- text_diplomatic: This would be the field for exact ('diplomatic') transcriptions, if desired (I wouldn't use them, but some people might want to). This would probably need Unicode (I have no idea if Unicode is now the standard, anyway)
-- text_translated: For a translation of the text, if desired
-- lemma: by default False, set to True if one Iconography of the connected Image is of the type "Emblem" (can be undone manually, if needed). 
-
-**Edges:**
-To be added later, when I have worked out what to do. 
-
-**Additional criteria for creating links:**
-
-A link to a Text is only possible if the Text has the type "Quotation". This would mean that is actually quoted in the Text record. 
-
-
-**Additional criteria for validation for saving record:**
-
-There must be either a link to a Text record, or the text field must be filled (or as condition for publishing?)
-
-**Additional criteria for validation for publishing record:**
-
-The record must be connected to an Image record (or, if I use that, to an Iconography record)
 
 ## Iconography
 
@@ -839,6 +895,20 @@ This record is the central record on subject-matter of an Image, and as such it 
 **Attributes:**
 
 - type: in this case (and contrary to, e.g., Person records), here the type is non-repeatable. 
+
+  - The following types would be used: 
+  - Portrait
+  - Allegorical Portrait
+  - No Narrative Context (e.g., images of Saints)
+  - Narrative Scene (probably with some subdivisions: one-off event, 'typical' scene, e.g. Toilet of Venus, allegorical scene)
+  - Image of Artwork
+  - Topographical View
+  - Object from Nature
+  - Diagram
+  - Emblem
+  - Coat-of-Arms
+  
+
 - references: This refers primarily to Iconclass notations. One could also refer here to Warburg or Princeton Index URIs.
 
 **Edge between Iconography and Person (EdgePersonIconography):**
@@ -862,8 +932,16 @@ see above
 
 **Additional criteria for creating links:**
 
-Links to Object records can only be made if the Object is appropriate for the type of the Iconography record, e.g., a Portrait record can only be linked to Person and Organisation records (portrait and group portrait), not to Places or Actions. 
-
+Links to Object records can only be made if the Object is appropriate for the type of the Iconography record, e.g., 
+  - Portrait records can only be linked to Persons
+  - Allegorical Portrait records can be linked to Persons and Personifications
+  - No narrative Conext records can be linked to Persons and Personifications
+  - Narrative Scene and Emblem records can be linked to Persons, Personifications (at least for allegorical scenes), Natural Objects, Things, Places, Actions, and Texts. 
+  - Images of Artworks can be linked to Artwork and Place records
+  - Topographical View records can be linked to Place and Thing records (Thing records if it is something not identified, e.g. 'a river')
+  - Object from Nature records can be linked to Natural Object and Thing records.
+  - Diagram records can be linked to Thing records (I haven't thought much about them - there would probably two different links, one to a Thing describing the shape of the Diagram, e.g. tree, the other describing the topic)
+  - Coat-of-Arms records can be linked to Heraldic Object records (here, the linking will work differently from normal)
 
 **Additional criteria for validation for saving record:**
 
@@ -875,7 +953,66 @@ none
 - the record must be linked to at least one Iconography record. 
 - according to some preliminary discussions with the editors of Iconclass: if the record has no Iconclass ID in external references, an automatic message will be sent to Iconclass. If Iconclass assigns a notation to this iconography, this ID will be sent to Iconobase (if possible, it should be added to the record automatically, otherwise manually). 
 
-# Group Records
+## Criterion
+
+Criterion records are one of the two elements of the innovative system to describe variants of works of art. The Criterion record names one aspect of the Image, and the Option records describe different ways this aspect is shown, e.g., a Criterion record could be "with attribute key?", and the Options would be "yes", "now", "unclear" and "not yet determined". 
+Criterion records can appear in three places: most commonly, they are connected to Iconography records and name an aspect of the icongraphy. However, it is also possible to affix them to records for some Objects linked to Iconography records, most commonly Person or Personification records. They would then describe aspects of depictions of this Person or Personification and would be inherited to linked Iconography records, with the Edge has copy_variants as True. Lastly, they can be connected to Heraldic Objects, since in coats-of-arms not the iconography of the Objects have variants (e.g., lion rampant or). 
+
+![Create](./class_diagrams/Criterion.png)
+
+**Attributes:**
+The class is very simple, the only attribute being a name. 
+
+**Edge between Iconography and Criterion (EdgeIconographyCriterion):**
+**Edge between Heraldic Object and Criterion (EdgeHeraldicObjectCriterion):**
+**Edge between Person and Criterion (EdgePersonCriterion):**
+**Edge between Family and Criterion (EdgeFamilyCriterion):**
+**Edge between Personification and Criterion (EdgePersonificationCriterion):**
+**Edge between Natural Object and Criterion (EdgeNaturalObjectCriterion):**
+**Edge between Organisation and Criterion (EdgeOrganisationCriterion):**
+**Edge between Place and Criterion (EdgePlaceCriterion):**
+**Edge between Text and Criterion (EdgeTextCriterion):**
+
+These Edges only contain a number so that Criteria (if there are several) can be arranged in the most user-friendly way. Since every Criterion is only linked to one record of this kind, one could likewise place this number as attribute of the Criterion record, it is here in the Edge for the sake of consistency with other Edges. 
+
+**Additional criteria for creating links:**
+
+A Criterion record has one and only one link to an Iconography, a Heraldic Object, or an Object record (Person, Family, Personification, Natural Object, Organisation, Place, Text). Since these records will most probably be created as part of editing an Iconography etc. record, this criterion should be fulfilled automatically (but, there must be some provisions for relinking it to another record, this could happen sometimes)
+
+**Additional criteria for validation for saving record:**
+
+see above
+
+**Additional criteria for validation for publishing record:**
+
+A Criterion record would be published together with the Iconography record (it wouldn't make sense to publish it when there are no Option records attached to, but this makes little sense, anyway). 
+
+
+## Option
+
+The Option record is the second part of describing iconographical variants, if the Criterion record poses a question, the Option record suggests a potential answer. This record is more complex than the Criterion record, since it is - like the Iconography record, linked to Option records. 
+
+## Campaign 
+
+The Campaign records join together photos made for a particular project (or photos kept in a particular collection). There might be use-cases for a rather elaborate record, but here I suggest keeping it simple. 
+
+![Create](./class_diagrams/Campaign.png)
+
+**Additional criteria for creating links:**
+
+Links to a Person can only be created if the Person has the type "Photographer"
+Links to an Organisation can only be created if the Organisation has the type "Collection"
+
+**Additional criteria for validation for saving record:**
+none (it may be that a campaign is linked to several persons or organisations. )
+
+**Additional criteria for validation for publishing record:**
+
+A campaign record can only be published if there are Photo records connected to it. 
+
+
+
+# Group records
 
 This small group of records that contain shared information for a (normally small) group of individual records. 
 
@@ -1136,6 +1273,41 @@ none
 
 The Image needs to be connected to at least one Copy that is in turn connected to at least on Photo record. 
 
+## Inscription
+
+I am still somewhat uncertain about this record. In general, I would only record inscriptions if this gives relevant information (e.g., having "SCS GEORGIUS" next to an image of St George doesn't tell us much, one could then tick the qualifier 'inscription' next to the Iconography and would not have to bother transcribe the text. On the other hand, such transcriptions, even if not relevant from other perspectives, could make sense for single-leaf prints because they can help with the identification.) 
+
+If Inscriptions quote standardised texts, it is enough to give a link to the Text, it is not necessary to transcribe it here. If the inscription is a standard part of the Iconography (e.g., Isaias holding a scroll with 'Ecce virgo concipiet'), one would not create any Inscription records at all but create the Text record directly to the Iconography or Option record (if one wants to put the wording into an Inscription record, this would be possible, but it would not make much sense - I wonder if one should then make another link to the Text record). If there is a search for Inscription records, there should be a warning that it makes more sense to search for Texts. 
+A lemma in an Emblem would be probably catalogued as Inscription
+
+
+
+![Create](./class_diagrams/Inscription.png)
+
+**Attributes:**
+
+- text: This is the field that would normally be filled, it has the text in original language but in normalised spelling (e.g., without abbreviations)
+- text_diplomatic: This would be the field for exact ('diplomatic') transcriptions, if desired (I wouldn't use them, but some people might want to). This would probably need Unicode (I have no idea if Unicode is now the standard, anyway)
+- text_translated: For a translation of the text, if desired
+- lemma: by default False, set to True if one Iconography of the connected Image is of the type "Emblem" (can be undone manually, if needed). 
+
+**Edges:**
+They would be rather simple connections. One could perhaps add a Boolean field marking the identification of a text as 'tentative', but I am not sure if this is necessary. 
+
+**Additional criteria for creating links:**
+
+A link to a Text is only possible if the Text has the type "Quotation". This would mean that is actually quoted in the Text record. 
+
+
+**Additional criteria for validation for saving record:**
+
+There must be either a link to a Text record, or the text field must be filled (or as condition for publishing?)
+
+**Additional criteria for validation for publishing record:**
+
+The record must be connected to an Image record (or, if I use that, to an Iconography record)
+
+
 ## Copy
 
 The Copy record is needed for Artworks that are 'multiples', of which several copies exist (e.g., woodcuts). In this case, the link to the whereabouts of the Artwork is not given in the Artwork record but here. In contrast to the four Edges that can be used to connect Artworks to their whereabouts, here only one type is needed, EdgeCopyCollection. 
@@ -1198,23 +1370,5 @@ none
 **Additional criteria for validation for publishing record:**
 
 
-
-## Campaign 
-
-The Campaign records join together photos made for a particular project (or photos kept in a particular collection). There might be use-cases for a rather elaborate record, but here I suggest keeping it simple. 
-
-![Create](./class_diagrams/Campaign.png)
-
-**Additional criteria for creating links:**
-
-Links to a Person can only be created if the Person has the type "Photographer"
-Links to an Organisation can only be created if the Organisation has the type "Collection"
-
-**Additional criteria for validation for saving record:**
-none (it may be that a campaign is linked to several persons or organisations. )
-
-**Additional criteria for validation for publishing record:**
-
-A campaign record can only be published if there are Photo records connected to it. 
 
 

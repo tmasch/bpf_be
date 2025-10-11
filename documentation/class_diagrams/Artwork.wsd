@@ -1,4 +1,4 @@
-@startuml
+@startuml Artwork
 Class Artwork
 Artwork : ingest_id : str - o - nr
 Artwork : published : bool - o - nr

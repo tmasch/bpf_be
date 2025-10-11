@@ -15,6 +15,8 @@ class Place
 
 class NaturalObject
 
+class Thing
+
 class Text
 
 class Action
@@ -39,6 +41,13 @@ EdgeFamilyIconography : previewA : str - nr
 EdgeFamilyIconography : previewB : str - nr
 EdgeFamilyIconography : copy_variants - bool - nr
 
+class EdgePersonificationIconography
+EdgePersonificationIconography : numberA : int - nr
+EdgePersonificationIconography : numberB : int - nri
+EdgePersonificationIconography : previewA : str - nr
+EdgePersonificationIconography : previewB : str - nr
+EdgePersonificationIconography : copy_variants : bool - o - nr
+
 class EdgeOrganisationIconography
 EdgeOrganisationIconography : numberA : int - nr
 EdgeOrganisationIconography : numberB : int - nr
@@ -59,6 +68,13 @@ EdgeNaturalObjectIconography : numberB : int - nri
 EdgeNaturalObjectIconography : previewA : str - nr
 EdgeNaturalObjectIconography : previewB : str - nr
 EdgeNaturalObjectIconography : copy_variants : bool - o - nr
+
+class EdgeThingIconography
+EdgeThingIconography : numberA : int - nr
+EdgeThingIconography : numberB : int - nri
+EdgeThingIconography : previewA : str - nr
+EdgeThingIconography : previewB : str - nr
+EdgeThingIconography : copy_variants : bool - o - nr
 
 class EdgeTextIconography
 EdgeTextIconography : numberA : int - nr
@@ -89,7 +105,6 @@ EdgeImageIconography : preferred : bool - o - nr
 EdgeImageIconography : number : int - o - nr
 EdgeImageIconography : qualifier : str - o - nr
 EdgeImageIconography : qualifier_comment : str - nr
-EdgeImageIconography : qualifier_comments : str - nr
 EdgeImageIconography : options : id  - r
 
 
@@ -100,6 +115,9 @@ EdgePersonIconography "1" -- "0..n" Iconography : portrayed person <
 Family "0..n" -- "1" EdgeFamilyIconography : coat-of-arms >
 EdgeFamilyIconography "1" -- "0..n" Iconography : coat-of-arms of <
 
+Personification "0.n" -- "1" EdgePersonificationIconography : shown in >
+EdgePersonificationIconography "1" -- "0..n" Iconography : shows <
+
 Organisation "0..n" -- "1" EdgeOrganisationIconography : shows members of >
 EdgeOrganisationIconography "1" -- "0..n" Iconography : portrayed persons belong to <
 
@@ -108,6 +126,9 @@ EdgePlaceIconography "1" -- "0..n" Iconography : view of <
 
 NaturalObject "0..n" -- "1" EdgeNaturalObjectIconography : view >
 EdgeNaturalObjectIconography "1" -- "0..n" Iconography : view of <
+
+Thing "0..n" -- "1" EdgeThingIconography : view >
+EdgeThingIconography "1" -- "0..n" Iconography : view of <
 
 Text "0..n" -- "1" EdgeTextIconography : source of >
 EdgeTextIconography "1" -- "0..n" Iconography : source <
@@ -119,7 +140,7 @@ Artwork "0..n" -- "1" EdgeArtworkIconography : image of>
 EdgeArtworkIconography "1" -- "0..n" Iconography : image image <
 
 Iconography "0..n" -- "1" EdgeIconographyCriterion : has variants >
-EdgeIconographyCriterion "1" -- Criterion : variant of <
+EdgeIconographyCriterion "1" -- "1" Criterion : variant of <
 
 Iconography "0..n" -- "1" EdgeImageIconography : shown in >
 EdgeImageIconography "1" -- "0..n" Image : showns  <

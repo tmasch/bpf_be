@@ -1,4 +1,4 @@
-@startuml 
+@startuml Matrix
 
 class Matrix 
 Matrix : medium:: str - o - r

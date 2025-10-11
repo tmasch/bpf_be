@@ -1,4 +1,4 @@
-@startuml 
+@startuml Book 
 class Book 
 Book : references : ExternalReference - r
 Book : title : str - o - nr

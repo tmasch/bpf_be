@@ -1,0 +1,123 @@
+@startuml Option
+
+class Option 
+Option : references : ExternalReference - r
+Option : name_preferred : str - o - nr
+Option : name_alterantive : str - r
+
+class Person
+
+class Iconography
+
+class Criterion
+
+class Image
+
+class EdgeIconographyCriterion
+EdgeIconographyCriterion : number : int - o - nr 
+
+class EdgeCriterionOption
+EdgeCriterionOption : number : int - o - nr
+
+class EdgePersonOption
+EdgePersonOption : numberA : int - nr
+EdgePersonOption : numberB : int - nr
+EdgePersonOption : previewA : str - nr
+EdgePersonOption : previewB : str - nr
+
+class EdgeFamilyOption
+EdgeFamilyOption : numberA : int - nr
+EdgeFamilyOption : numberB : int - nr
+EdgeFamilyOption : previewA : str - nr
+EdgeFamilyOption : previewB : str - nr
+EdgeFamilyOption : copy_variants : bool - o - nr
+
+class EdgePersonificationOption
+EdgePersonificationOption : numberA : int - nr
+EdgePersonificationOption : numberB : int - nri
+EdgePersonificationOption : previewA : str - nr
+EdgePersonificationOption : previewB : str - nr
+EdgePersonificationOption : copy_variants : bool - o - nr
+
+class EdgeOrganisationOption
+EdgeOrganisationOption : numberA : int - nr
+EdgeOrganisationOption : numberB : int - nr
+EdgeOrganisationOption : previewA : str - nr
+EdgeOrganisationOption : previewB : str - nr
+EdgeOrganisationOption : copy_variants : bool - o - nr
+
+
+
+class EdgeImageIconography
+EdgeImageIconography : preferred : bool - o - nr
+EdgeImageIconography : number : int - o - nr
+EdgeImageIconography : qualifier : str - o - nr
+EdgeImageIconography : qualifier_comment : str - nr
+EdgeImageIconography : qualifier_comments : str - nr
+EdgeImageIconography : options : id  - r
+
+class EdgeNaturalObjectOption
+EdgeNaturalObjectOption : numberA : int - nr
+EdgeNaturalObjectOption : numberB : int - nri
+EdgeNaturalObjectOption : previewA : str - nr
+EdgeNaturalObjectOption : previewB : str - nr
+EdgeNaturalObjectOption : copy_variants : bool - o - nr
+
+class EdgeThingOption
+EdgeThingOption : numberA : int - nr
+EdgeThingOption : numberB : int - nri
+EdgeThingOption : previewA : str - nr
+EdgeThingOption : previewB : str - nr
+EdgeThingOption : copy_variants : bool - o - nr
+
+class EdgePlaceOption
+EdgePlaceOption : numberA : int - nr
+EdgePlaceOption : numberB : int - nr
+EdgePlaceOption : previewA : str - nr
+EdgePlaceOption : previewB : str - nr
+EdgePlaceOption : copy_variant : bool - o - nr
+
+class EdgeTextOption
+EdgeTextOption : numberA : int - nr
+EdgeTextOption : numberB : int - nr
+EdgeTextOption : previewA : str - nr
+EdgeTextOption : previewB : str - nr
+EdgeTextOption : copy_variants : bool - o - nr
+
+
+
+Iconography "0..n" -- "1" EdgeIconographyCriterion : has variants >
+EdgeIconographyCriterion "1" -- "01" Criterion : variant of <
+
+Criterion "1..n" -- "1" EdgeCriterionOption : option >
+EdgeCriterionOption "1" -- "1" Option : < option for
+
+Person "0..n" -- "1" EdgePersonOption : additionally portrayed in >
+EdgePersonOption "1" -- "0..n" Option : additional portrayed person <
+
+Family "0..n" -- "1" EdgeFamilyOption : additionally portrayed in >
+EdgeFamilyOption "1" -- "0..n" Option : additional portrayed person <
+
+Personification "0.n" -- "1" EdgePersonificationOption : additionally shown in >
+EdgePersonificationOption "1" -- "0..n" Option : additionally shows <
+
+Organisation "0..n" -- "1" EdgeOrganisationOption : shows additionally members of >
+EdgeOrganisationOption "1" -- "0..n" Option : additional portrayed persons belong to <
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectOption : shown as attribute >
+EdgeNaturalObjectOption "1" -- "0..n" Option : attribute <
+
+Thing "0..n" -- "1" EdgeThingOption : attribute >
+EdgeThingOption "1" -- "0..n" Option : object used as attribute <
+
+Place "0..n" -- "1" EdgePlaceOption : additionally depicted in >
+EdgePlaceOption "1" -- "0..n" Option : additional depicted place <
+
+Text "0..n" -- "1" EdgeTextOption : addition source of >
+EdgeTextOption "1" -- "0..n" Option : additional source <
+
+Iconography "0..n" ---- "1" EdgeImageIconography: shown in >
+
+Option "0..n" -- "0..n" EdgeImageIconography : > variant shown in \n shows variant <
+EdgeImageIconography "1" -- "0..n" Image : shows  <
+@enduml

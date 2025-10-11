@@ -1,4 +1,5 @@
-@startuml
+@startuml Family
+
 class Family
 Family : references : ExternalReference - r
 Family : name_preferred : str - o - nr
@@ -18,6 +19,8 @@ class Text
 
 class Iconography 
 
+class Criterion
+
 class Option 
 
 class Cycle 
@@ -35,11 +38,15 @@ EdgeFamilyIconography : previewA : str - nr
 EdgeFamilyIconography : previewB : str - nr
 EdgeFamilyIconography : copy_variants - bool - nr
 
+class EdgeFamilyCriterion
+EdgeFamilyCriterion : number : int - nr - o 
+
 class EdgeFamilyOption
 EdgeFamilyOption : numberA : int - nr
 EdgeFamilyOption : numberB : int - nr
 EdgeFamilyOption : previewA : str - nr
 EdgeFamilyOption : previewB : str - nr
+EdgeFamilyOption : copy_variants : bool - o - nr
 
 class EdgeFamilyCycle
 EdgeFamilyCycle : numberA : int - nr
@@ -61,6 +68,9 @@ EdgeFamilyOffice "1" -- "0..n" Office : office was held frequently by <
 
 Family "0..n" -- "1" EdgeFamilyIconography : coat-of-arms >
 EdgeFamilyIconography "1" -- "0..n" Iconography : coat-of-arms of <
+
+Family "0..n" -- "1" EdgeFamilyCriterion : > can be connected to \n these Criteria 
+EdgeFamilyCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
 Family "0..n" -- "1" EdgeFamilyOption : additionally portrayed in >
 EdgeFamilyOption "1" -- "0..n" Option : additional portrayed person <

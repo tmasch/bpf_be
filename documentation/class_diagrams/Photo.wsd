@@ -1,4 +1,4 @@
-@startuml
+@startuml Photo
 
 class Photo
 Photo : filename : str - o - nr

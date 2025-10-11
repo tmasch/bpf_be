@@ -1,4 +1,4 @@
-@startuml 
+@startuml Organisation
 class Organisation
 Organisation : type : str - o - r
 Organisation : references : ExternalReference - r
@@ -19,7 +19,6 @@ class Iconography
 class Option 
     
 class Criterion
-
 
 class Cycle
 
@@ -43,7 +42,6 @@ EdgePersonOrganisation : date : Date - nr
 class EdgeOfficeOrganisation
 EdgeOfficeOrganisation : date : Date - nr
 
-
 class EdgeOrganisationPlace
 EdgeOrganisationPlace : date : Date - nr
 
@@ -54,11 +52,15 @@ EdgeOrganisationIconography : previewA : str - nr
 EdgeOrganisationIconography : previewB : str - nr
 EdgeOrganisationIconography : copy_variants : bool - o - nr
 
+class EdgeOrganisationCriterion
+EdgeOrganisationCriterion : number : int - nr - o 
+
 class EdgeOrganisationOption
 EdgeOrganisationOption : numberA : int - nr
 EdgeOrganisationOption : numberB : int - nr
 EdgeOrganisationOption : previewA : str - nr
 EdgeOrganisationOption : previewB : str - nr
+EdgeOrganisationOption : copy_variants : bool - o - nr
 
 class EdgeOrganisationCycle
 EdgeOrganisationCycle : numberA : int - nr
@@ -100,15 +102,16 @@ EdgeOfficeOrganisation "1" --- "0..n" Office : belongs to <
 
 
 Organisation "0..n" --- "1" EdgeOrganisationPlace : located in >
-EdgeOrganisationPlace "1" ---- "0..n" Place : located here <
+EdgeOrganisationPlace "1" --- "0..n" Place : located here <
 
 Organisation "0..n" --- "1" EdgeOrganisationIconography : shows members of >
 EdgeOrganisationIconography "1" --- "0..n" Iconography : portrayed persons belong to <
 
+Organisation "0..n" -- "1" EdgeOrganisationCriterion : > can be connected to \n these Criteria 
+EdgeOrganisationCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
 Organisation "0..n" --- "1" EdgeOrganisationOption : shows additionally members of >
 EdgeOrganisationOption "1" --- "0..n" Option : additional portrayed persons belong to <
-
-Organisation "0..n" --- "1" Criterion : > Can be connected to \n these Criteria \n Criterion linked to <
 
 Organisation "0..n" --- "1" EdgeOrganisationCycle : related image cycles >
 EdgeOrganisationCycle "1" --- "0..n" Cycle : theme of cycle <

@@ -1,4 +1,5 @@
-@startuml 
+@startuml Campaign 
+
 class Campaign
 Campaign : name :  str - o - nr
 Campaign : date : date - nr

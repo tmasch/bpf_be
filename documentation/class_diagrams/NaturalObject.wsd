@@ -1,4 +1,4 @@
-@startuml 
+@startuml  NaturalObject
 class NaturalObject
 NaturalObject : type : str - o - nr 
 NaturalObject : name_preferred : str - o - nr 
@@ -7,6 +7,14 @@ NaturalObject : name_variant : str - r
 NaturalObject : references : ExternalReference - r 
 
 class Iconography
+
+class Criterion
+
+class Option 
+
+class Cycle    
+
+class HeraldicObject
 
 class EdgeNaturalObjectNaturalObject
 EdgeNaturalObjectNaturalObject : number : int - o - nr 
@@ -18,11 +26,38 @@ EdgeNaturalObjectIconography : previewA : str - nr
 EdgeNaturalObjectIconography : previewB : str - nr
 EdgeNaturalObjectIconography : copy_variants : bool - o - nr
 
+class EdgeNaturalObjectCriterion
+EdgeNaturalObjectCriterion : number : int - o - nr
+
+class EdgeNaturalObjectOption
+EdgeNaturalObjectOption : numberA : int - nr
+EdgeNaturalObjectOption : numberB : int - nri
+EdgeNaturalObjectOption : previewA : str - nr
+EdgeNaturalObjectOption : previewB : str - nr
+EdgeNaturalObjectOption : copy_variants : bool - o - nr
+
+class EdgeNaturalObjectCycleTheme
+EdgeNaturalObjectCycleTheme : numberA : int - nr
+EdgeNaturalObjectCycleTheme : numberB : int - nri
+EdgeNaturalObjectCycleTheme : previewA : str - nr
+EdgeNaturalObjectCycleTheme : previewB : str - nr
+
+
 NaturalObject "0..n" -- "1" EdgeNaturalObjectNaturalObject : has part >
 EdgeNaturalObjectNaturalObject "1" -- "0..n or 1" NaturalObject: part of >
 
 NaturalObject "0..n" -- "1" EdgeNaturalObjectIconography : view >
 EdgeNaturalObjectIconography "1" -- "0..n" Iconography : view of <
 
+NaturalObject "0..n" -- "1" EdgeNaturalObjectCriterion : > can be connected to \n these Criteria 
+EdgeNaturalObjectCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectOption : shown as attribute >
+EdgeNaturalObjectOption "1" -- "0..n" Option : attribute <
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectCycleTheme : related image cycles >
+EdgeNaturalObjectCycleTheme "1" -- "0..n" Cycle : theme of cycle <
+
+NaturalObject "0..n" --- "0..n" HeraldicObject: < Object from nature \n in heraldry >
 
 @enduml
