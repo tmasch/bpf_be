@@ -4,9 +4,9 @@ This module has functions for parsing records of both VD17 and VD18
 import re
 from lxml import etree
 
-import classes
-import get_external_data
-import parsing_helpers
+from . import classes
+from . import get_external_data
+from . import parsing_helpers
 
 
 @classes.func_logger

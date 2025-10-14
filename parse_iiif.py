@@ -6,13 +6,13 @@ import re
 #import beanie
 #from beanie import WriteRules
 #from lxml import etree
-import classes
-import parse_istc
-import parse_manifests
-import books_parsing_bibliographies
-import get_external_data
-import parse_gnd
-import parse_vd17_vd18
+from . import classes
+from . import parse_istc
+from . import parse_manifests
+from . import books_parsing_bibliographies
+from . import get_external_data
+from . import parse_gnd
+from . import parse_vd17_vd18
 
 
 #URI_entered = "abc"

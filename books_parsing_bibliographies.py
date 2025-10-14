@@ -13,8 +13,8 @@ import re
 from lxml import etree
 
 # import requests
-import classes
-import parsing_helpers
+from . import classes
+from . import parsing_helpers
 
 
 

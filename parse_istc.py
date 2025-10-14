@@ -3,8 +3,8 @@
 \todo
 """
 import re
-import classes
-import get_external_data
+from . import classes
+from . import get_external_data
 
 
 

@@ -19,8 +19,8 @@ from rich import print
 
 #import get_external_data
 #import classes
-import db_actions
-import parse_iiif
+from . import db_actions
+from . import parse_iiif
 #import test_get_external_data
 
 load_dotenv()

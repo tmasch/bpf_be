@@ -308,6 +308,7 @@ class Graph(Document):
         for n in self.nodes:
             if n.type == node_type:
                 return n
+    root: Optional[Link[Node]] = []
     nodes: Optional[List[Link[Node]]] = []
     edges: Optional[List[Link[Edge]]] = []
     class Settings:

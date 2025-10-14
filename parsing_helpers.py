@@ -5,8 +5,8 @@ Collection of routines for general parsing issues
 
 import re
 
-import classes
-import person_relations
+from . import classes
+from . import person_relations
 
 roman_numerals = {"M", "m", "D", "d", "C", "c", "X", "x", "V", "v", "I", "i", "J", "j"}
 

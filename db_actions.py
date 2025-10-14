@@ -13,7 +13,7 @@ from pymongo import MongoClient
 from beanie import init_beanie
 import motor.motor_asyncio
 
-import classes
+from . import classes
 #import person_relations
 
 

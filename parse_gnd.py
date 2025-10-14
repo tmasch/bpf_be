@@ -15,11 +15,11 @@ from pymongo import MongoClient
 #from dates_parsing import date_overall_parsing
 from rich import print
 
-import classes
-import db_actions
-import get_external_data
-import parse_date
-import parsing_helpers
+from . import classes
+from . import db_actions
+from . import get_external_data
+from . import parse_date
+from . import parsing_helpers
 
 #This is only for stand-alone execution of functions in this module, in other cases,
 #  a connection to the database has already been made.

@@ -11,9 +11,9 @@ import asyncio
 import aiohttp
 import requests
 
-import classes
-import parse_artist_record
-import  parsing_helpers
+from . import classes
+from . import parse_artist_record
+from . import parsing_helpers
 
 
 #logger = logging.getLogger(__name__)

@@ -4,8 +4,8 @@ Testing of db_actions.py
 import pytest
 from dotenv import load_dotenv
 
-import classes
-import db_actions
+from . import classes
+from . import db_actions
 
 load_dotenv()
 

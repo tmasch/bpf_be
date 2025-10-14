@@ -2,8 +2,8 @@
 
 import ast
 
-import classes
-import parse_date
+from . import classes
+from . import parse_date
 
 
 

@@ -14,9 +14,9 @@ import requests
 from lxml import etree
 from rich import print
 
-import classes
-import parse_canvas
-import parsing_helpers
+from . import classes
+from . import parse_canvas
+from . import parsing_helpers
 
 @classes.func_logger
 def parse_manifests_bsb(manifest) -> classes.Graph:

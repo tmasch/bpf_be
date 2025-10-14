@@ -9,8 +9,8 @@ The resulting information (in a number of individual fields) is then assessed an
 Tuples are used instead of standard datetime objects because (a) they allow dates BC without difficulty and (b) there is no need for timedelta functions. 
 """
 import re
-import classes
-import parsing_helpers
+from . import classes
+from . import parsing_helpers
 
 @classes.func_logger
 def parse_single_date(datestring_raw):

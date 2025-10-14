@@ -1,6 +1,6 @@
 #import db_actions
 
-import classes
+from . import classes
 
 @classes.func_logger
 def parse_canvas(canvas_list):
