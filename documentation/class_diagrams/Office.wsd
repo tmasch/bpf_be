@@ -1,0 +1,41 @@
+@startuml
+class Office
+
+Office : references : ExternalReference - r
+Office : name_preferred : str - o - nr
+Office : name_variant : str - r
+Office : date : Date - nr
+Office : bibliography : Bibliography - r
+
+
+
+class Person
+
+class Organisation
+
+class Place 
+
+class EdgePersonOffice
+EdgePersonOffice : date : Date - nr
+
+class EdgeOfficeCycle
+EdgeOfficeCycle : numberA : int - nr
+EdgeOfficeCycle : numberB : int - nr
+EdgeOfficeCycle : previewA : str - nr
+EdgeOfficeCycle : previewB : str - nr
+
+
+Organisation "0..n" --- "0..1" Office : > has Office \n Office in <
+
+Place "0..n" --- "0..1" Office : > has Office \n Office in <
+
+Office "0..n" -- "1" EdgePersonOffice : > Office held by
+EdgePersonOffice "1" -- "0..n" Person : > has office
+
+Office "0..n" --- "0..n" Office : > succeeded by \n preceded by <
+
+Office "0..n" -- "1" EdgeOfficeCycle : related image cycles >
+EdgeOfficeCycle "1" -- "0..n" Cycle : theme of cycle <
+
+
+@enduml

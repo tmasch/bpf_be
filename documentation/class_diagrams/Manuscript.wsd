@@ -1,0 +1,40 @@
+@startuml 
+class Manuscript 
+Manuscript : type : str - o - nr
+Manuscript : references : ExternalReference - r
+Manuscript : common_name_preferred : str - nr
+Manuscript : common_name_variant : str - r
+Manuscript : all_catalogued : boolean - o - nr
+Manuscript : all_catalogued_comments : str - nr
+Manuscript : bibliography : Bibliography - r
+
+
+class EdgeManuscriptArtwork
+EdgeManuscriptArtwork : current : boolean - o - nr
+EdgeManuscriptArtwork : page number for display : str - nr
+EdgeManuscriptArtwork : sequence number : perhaps tuple \n                  of two integers - nr
+
+class Artwork
+
+class Book
+
+class EdgeManuscriptCollection
+EdgeManuscriptCollection : current? : boolean - o - nr
+EdgeManuscriptCollection : catalogue : str - nr
+EdgeManuscriptCollection : inventory_no_preferred : str - nr
+EdgeManuscriptCollection : inventory_no_other : str - r
+EdgeManuscriptCollection : date : Date - nr
+
+class Organisation
+
+Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
+
+Manuscript "0..n" --- "1" EdgeManuscriptArtwork : contains > 
+
+EdgeManuscriptArtwork "1" --- "0..n" Artwork : in <
+
+Manuscript "0..n" --- "1" EdgeManuscriptCollection : kept in >
+
+EdgeManuscriptCollection "1" --- "0..n" Organisation : has <
+
+@enduml 

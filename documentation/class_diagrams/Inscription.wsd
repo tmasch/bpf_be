@@ -1,0 +1,22 @@
+@startuml Inscription
+
+class Inscription
+Inscription : text : str - nr 
+Inscription : text_diplomatic : str - nr 
+Inscription : text_translated : str - nr 
+Inscription : lemma : bool - o - nr
+
+class Text 
+
+class Image 
+
+
+
+
+Inscription "0..n" --- "1" Image : > inscribed here \n inscribed  <
+
+Text "0..n" --- "0..n" Inscription : < quoted in \n quotes >
+
+
+
+@enduml

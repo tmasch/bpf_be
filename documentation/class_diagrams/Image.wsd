@@ -1,0 +1,53 @@
+@startuml Image
+
+class Image
+
+Image : position : str - nr 
+Image : detail : bool - o - nr
+
+
+class EdgeArtworkImage
+
+class Iconography
+
+class Inscription
+
+class EdgeArtworkImage
+EdgeArtworkImage : number : int - o - nr
+EdgeArtworkImage : preferred : bool - o - nr
+
+class EdgeImageCopy
+EdgeImageCopy : preferred : bool - o - nr
+
+class EdgeImageIconography
+EdgeImageIconography : preferred : bool - o - nr
+EdgeImageIconography : number : int - o - nr
+EdgeImageIconography : qualifier : str - o - nr
+EdgeImageIconography : qualifier_comment : str - nr
+EdgeImageIconography : qualifier_comments : str - nr
+EdgeImageIconography : options : id  - r
+
+
+class EdgeImageCycle
+EdgeImageCycle : sequence_number : int - o - nr
+EdgeImageCycle : number : str
+
+Artwork "0..n" -- "1" EdgeArtworkImage : displays >
+EdgeArtworkImage "1" -- "1" Image : displayed in <
+
+Image "0..n" -- "1" EdgeImageIconography : shows >
+EdgeImageIconography "1" -- "0..n" Iconography : shown in <
+
+EdgeImageIconography "0..n" -- "0..n" Option: > shows variant \n variant shown in <
+
+Image "0..n" -- "1" EdgeImageCycle : > belongs to
+EdgeImageCycle "1" -- "0..n" Cycle : contains <
+
+Image "0..n" -- "0..n" Image : < belongs together with \n belongs together with >
+
+Image "0..n" -- "1" EdgeImageCopy : represented in >
+EdgeImageCopy "1" -- "1" Copy : represents <
+
+Image "0..n" --- "1" Inscription : > inscribed \n inscribed here <
+
+@enduml

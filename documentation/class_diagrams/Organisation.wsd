@@ -1,0 +1,133 @@
+@startuml Organisation
+class Organisation
+Organisation : type : str - o - r
+Organisation : references : ExternalReference - r
+Organisation : name_preferred : str - o - nr
+Organisation : name_variant : str - r
+Organisation : date : Date - nr
+Organisation : bibliography : Bibliography - r
+
+
+class Person 
+
+class Office
+
+class Place 
+
+class Iconography
+
+class Option 
+    
+class Criterion
+
+class Cycle
+
+class Artwork 
+
+class Manuscript
+
+class Copy
+
+class Heading
+
+class Campaign
+
+class EdgeOrganisationOrganisation
+EdgeOrganisationOrganisation : date : Date - nr
+
+
+class EdgePersonOrganisation
+EdgePersonOrganisation : date : Date - nr
+
+class EdgeOfficeOrganisation
+EdgeOfficeOrganisation : date : Date - nr
+
+class EdgeOrganisationPlace
+EdgeOrganisationPlace : date : Date - nr
+
+class EdgeOrganisationIconography
+EdgeOrganisationIconography : numberA : int - nr
+EdgeOrganisationIconography : numberB : int - nr
+EdgeOrganisationIconography : previewA : str - nr
+EdgeOrganisationIconography : previewB : str - nr
+EdgeOrganisationIconography : copy_variants : bool - o - nr
+
+class EdgeOrganisationCriterion
+EdgeOrganisationCriterion : number : int - nr - o 
+
+class EdgeOrganisationOption
+EdgeOrganisationOption : numberA : int - nr
+EdgeOrganisationOption : numberB : int - nr
+EdgeOrganisationOption : previewA : str - nr
+EdgeOrganisationOption : previewB : str - nr
+EdgeOrganisationOption : copy_variants : bool - o - nr
+
+class EdgeOrganisationCycle
+EdgeOrganisationCycle : numberA : int - nr
+EdgeOrganisationCycle : numberB : int - nr
+EdgeOrganisationCycle : previewA : str - nr
+EdgeOrganisationCycle : previewB : str - nr
+
+
+class EdgeManuscriptCollection
+EdgeManuscriptCollection : current? : boolean - o - nr
+EdgeManuscriptCollection : catalogue : str - nr
+EdgeManuscriptCollection : inventory_no_preferred : str - nr
+EdgeManuscriptCollection : inventory_no_other : str - r
+EdgeManuscriptCollection : date : Date - nr
+
+class EdgeArtworkCollection
+EdgeArtworkCollection : current? : boolean - o - nr
+EdgeArtworkCollection : catalogue : str - nr
+EdgeArtworkCollection : inventory_no_preferred : str - nr
+EdgeArtworkCollection : inventory_no_other : str - r
+EdgeArtworkCollection : date : Date - nr
+
+class EdgeCopyCollection
+EdgeCopyCollection : current? : boolean - o - nr
+EdgeCopyCollection : catalogue : str - nr
+EdgeCopyCollection : inventory_no_preferred : str - nr
+EdgeCopyCollection : inventory_no_other : str - r
+EdgeCopyCollection : date : Date - nr
+
+Organisation "0..n" --- "1" EdgeOrganisationOrganisation : affiliated to >
+EdgeOrganisationOrganisation "1" --- "0..n" Organisation : has affiliate >
+
+
+Organisation "0..n" --- "1" EdgePersonOrganisation : has member >
+EdgePersonOrganisation "1" --- "0..n" Person : member of <
+
+Organisation "0..n" --- "1" EdgeOfficeOrganisation : connected \n to office >
+EdgeOfficeOrganisation "1" --- "0..n" Office : belongs to <
+
+
+Organisation "0..n" --- "1" EdgeOrganisationPlace : located in >
+EdgeOrganisationPlace "1" --- "0..n" Place : located here <
+
+Organisation "0..n" --- "1" EdgeOrganisationIconography : shows members of >
+EdgeOrganisationIconography "1" --- "0..n" Iconography : portrayed persons belong to <
+
+Organisation "0..n" -- "1" EdgeOrganisationCriterion : > can be connected to \n these Criteria 
+EdgeOrganisationCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
+Organisation "0..n" --- "1" EdgeOrganisationOption : shows additionally members of >
+EdgeOrganisationOption "1" --- "0..n" Option : additional portrayed persons belong to <
+
+Organisation "0..n" --- "1" EdgeOrganisationCycle : related image cycles >
+EdgeOrganisationCycle "1" --- "0..n" Cycle : theme of cycle <
+
+
+Organisation "0..n" --- "1" EdgeArtworkCollection : has >
+EdgeArtworkCollection "1" --- "0..n" Artwork : in <
+
+Organisation "0..n" --- "1" EdgeManuscriptCollection : has >
+EdgeManuscriptCollection "1" --- "0..n" Manuscript : in <
+
+Organisation "0..n" --- "1" EdgeCopyCollection : has >
+EdgeCopyCollection "1" --- "0..n" Copy : in <
+
+Organisation "0..n" --- "0..n" Heading : < is example for \n has example >
+
+Organisation "0..n" --- "0..n" Campaign : > has photos \n photos in <
+
+@enduml 

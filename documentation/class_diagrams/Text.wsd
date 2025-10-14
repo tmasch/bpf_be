@@ -1,0 +1,96 @@
+@startuml Text
+class Text
+Text : type : str - o - nr
+Text : references : ExternalReference - r
+Text : numbering : str - nr
+Text : name_preferred : str - nr
+Text : name_translated : str - nr
+Text : name_variant : str - r
+Text : date : Date - nr
+Text : bibliography : Bibliography - r
+Text : duplicate : bool - o - nr
+
+
+class Person 
+
+class Family
+
+class Iconography
+
+class Option 
+    
+class Cycle
+
+class Book
+
+class Manuscript
+
+class Heading
+
+class Artwork
+
+class Inscription
+
+class Iconography
+
+class Option
+
+class EdgeTextText
+EdgeTextText : number : int - nr
+
+class EdgeTextIconography
+EdgeTextIconography : numberA : int - nr
+EdgeTextIconography : numberB : int - nr
+EdgeTextIconography : previewA : str - nr
+EdgeTextIconography : previewB : str - nr
+EdgeTextIconography : copy_variants : bool - o - nr
+
+class EdgeTextCriterion
+EdgeTextCriterion : number : int - nr - o 
+
+class EdgeTextOption
+EdgeTextOption : numberA : int - nr
+EdgeTextOption : numberB : int - nr
+EdgeTextOption : previewA : str - nr
+EdgeTextOption : previewB : str - nr
+EdgeTextOption : copy_variants : bool - o - nr
+
+class EdgeTextCycle
+EdgeTextCycle : numberA : int - nr
+EdgeTextCycle : numberB : int - nr
+EdgeTextCycle : previewA : str - nr
+EdgeTextCycle : previewB : str - nr
+
+
+
+Person "0..n" --- "0..n" Text : > wrote \n written by <
+
+Text "0..n" --- "0..n" Family : > describes \n appears in by <
+
+Text "0..n" -- "1" EdgeTextText : has part >
+EdgeTextText "1" -- "0 or 1" Text :  part of >
+
+
+Text "0..n" -- "1" EdgeTextIconography : source of >
+EdgeTextIconography "1" -- "0..n" Iconography : source <
+
+Text "0..n" -- "1" EdgeTextCriterion : > can be connected to \n these Criteria 
+EdgeTextCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
+Text "0..n" -- "1" EdgeTextOption : addition source of >
+EdgeTextOption "1" -- "0..n" Option : additional source <
+
+Text "0..n" -- "1" EdgeTextCycle : related image cycles >
+EdgeTextCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Text "0..n" --- "0..n" Heading : < is example for \n has example >
+
+Text "0..n" --- "0..n" Manuscript: < illustrated in \n contains illustrations of
+
+Text "0..n" --- "0..n" Book: < illustrated in \n contains illustrations of
+
+Text "0..n" --- "0..1 or 0..n" Artwork : < illustrates \n illustration of >
+
+Text "0..n" --- "0..1 or 0..n" Inscription : < quoted in \n quotes >
+
+@enduml 

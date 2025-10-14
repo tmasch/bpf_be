@@ -1,0 +1,114 @@
+@startuml Person
+class Person
+Person : type : str - o - r
+Person : references : ExternalReference - r
+Person : name_preferred : str - o - nr
+Person : name_variant : str - r
+Person : sex : str - nr
+Person : date : Date - nr
+Person : bibliography : Bibliography - r
+
+
+class Person 
+
+class Family
+
+class Office
+
+class Organisation
+
+class Place 
+
+class Iconography
+
+class Option 
+    
+class Criterion
+
+class Cycle
+
+class Text 
+
+class Book
+
+class Heading
+
+class MakingProcess
+
+class Photo
+
+class Campaign
+
+class EdgePersonPerson
+EdgePersonPerson : date : Date - nr
+
+class EdgePersonOffice
+EdgePersonOffice : date : Date - nr
+
+class EdgePersonOrganisation
+EdgePersonOrganisation : date : Date - nr
+
+class EdgePersonPlace
+EdgePersonPlace : date : Date - nr
+
+class EdgePersonIconography
+EdgePersonIconography : numberA : int - nr
+EdgePersonIconography : numberB : int - nr
+EdgePersonIconography : previewA : str - nr
+EdgePersonIconography : previewB : str - nr
+
+class EdgePersonOption
+EdgePersonOption : numberA : int - nr
+EdgePersonOption : numberB : int - nr
+EdgePersonOption : previewA : str - nr
+EdgePersonOption : previewB : str - nr
+EdgePersonIconography : copy_variants : bool - o - nr
+
+class EdgePersonCriterion
+EdgePersonCriterion : number : int - nr - o 
+
+class EdgePersonCycle
+EdgePersonCycle : numberA : int - nr
+EdgePersonCycle : numberB : int - nr
+EdgePersonCycle : previewA : str - nr
+EdgePersonCycle : previewB : str - nr
+
+Person "0..n" -- "1" EdgePersonPerson : father of >
+EdgePersonPerson "1" -- "0..n" Person : son of >
+
+Person "0..n" --- "0..n" Family : > member of \n has member <
+
+Person "0..n" -- "1" EdgePersonOffice : has office >
+EdgePersonOffice "1" -- "0..n" Office : office held by <
+
+Person "0..n" -- "1" EdgePersonOrganisation : member of >
+EdgePersonOrganisation "1" -- "0..n" Organisation : has member <
+
+Person "0..n" -- "1" EdgePersonPlace : born in >
+EdgePersonPlace "1" -- "0..n" Place : born here <
+
+Person "0..n" -- "1" EdgePersonIconography : portrayed in >
+EdgePersonIconography "1" -- "0..n" Iconography : portrayed person <
+
+Person "0..n" -- "1" EdgePersonOption : additionally portrayed in >
+EdgePersonOption "1" -- "0..n" Option : additional portrayed person <
+
+Person "0..n" -- "1" EdgePersonCriterion : > can be connected to \n these Criteria 
+EdgePersonCriterion "1" -- "1" Criterion : \n Criterion linked to <
+
+Person "0..n" -- "1" EdgePersonCycle : related image cycles >
+EdgePersonCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Person "0..n" --- "0..n" Text : > Author of \n Author was < 
+
+Person "0..n" --- "0..n" Book : > Author of \n Author was < 
+
+Person "0..n" --- "0..n" Heading : < is example for \n has example >
+
+Person "0..n" --- "1" MakingProcess : < made \n was artist of >
+
+Person "0..n" --- "0..n" Photo : < photographed by \n photographed >
+
+Person "0..n" --- "0..n" Campaign : < responsible \n led campaign >
+
+@enduml 

@@ -1,0 +1,82 @@
+@startuml Criterion 
+class Criterion 
+Criterion : name : str - o - nr 
+
+class Iconography
+
+class HeraldicObject
+
+class NaturalObject
+
+class Person 
+
+class Personification
+
+class Place
+
+class Option
+
+class EdgeIconographyCriterion
+EdgeIconographyCriterion : number : int - o - nr 
+
+class EdgeHeraldicObjectCriterion
+EdgeHeraldicObjectCriterion : number : int - o - nr 
+    
+class EdgePersonCriterion
+EdgePersonCriterion : number : int - nr - o 
+
+class EdgeFamilyCriterion
+EdgeFamilyCriterion : number : int - nr - o 
+
+class EdgePersonificationCriterion
+EdgePersonificationCriterion : number : int - nr - o 
+
+class EdgeNaturalObjectCriterion
+EdgeNaturalObjectCriterion : number : int - o - nr
+
+class EdgeOrganisationCriterion
+EdgeOrganisationCriterion : number : int - nr - o 
+
+class EdgePlaceCriterion
+EdgePlaceCriterion : number : int - nr - o 
+
+class EdgeTextCriterion
+EdgeTextCriterion : number : int - nr - o 
+
+class EdgeCriterionOption
+EdgeCriterionOption : number : int - o - nr
+
+Iconography "0..n" -- "1" EdgeIconographyCriterion : has variants >
+EdgeIconographyCriterion "1" -- "01" Criterion : variant of <
+
+HeraldicObject "0..n" -- "1" EdgeHeraldicObjectCriterion : has variants >
+EdgeHeraldicObjectCriterion "1" -- "1" Criterion : variant of <
+
+Criterion "1..n" -- "1" EdgeCriterionOption : option >
+EdgeCriterionOption "1" -- "1" Option : < option for
+
+Person "0..n" -- "1" EdgePersonCriterion : > can be connected to \n these Criteria 
+EdgePersonCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Family "0..n" -- "1" EdgeFamilyCriterion : > can be connected to \n these Criteria 
+EdgeFamilyCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Organisation "0..n" -- "1" EdgeOrganisationCriterion : > can be connected to \n these Criteria 
+EdgeOrganisationCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Personification "0..n" -- "1" EdgePersonificationCriterion : > can be connected to \n these Criteria 
+EdgePersonificationCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+NaturalObject "0..n" -- "1" EdgeNaturalObjectCriterion : > can be connected to \n these Criteria 
+EdgeNaturalObjectCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Place "0..n" -- "1" EdgePlaceCriterion : > can be connected to \n these Criteria 
+EdgePlaceCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Text "0..n" -- "1" EdgeTextCriterion : > can be connected to \n these Criteria 
+EdgeTextCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+
+
+@enduml
+

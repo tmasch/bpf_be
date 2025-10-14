@@ -1,0 +1,87 @@
+@startuml Thing 
+
+class Thing
+Thing : type : str - o - r
+Thing : references : ExternalReference - r
+Thing : name_preferred : str - o - nr
+Thing : name_variant : str - o - nr
+Thing : bibliography : Bibliography - r
+
+class Action
+
+class Heading
+
+class Iconography
+
+class Criterion
+
+class Option
+
+class Cycle
+
+class EdgeHeadingThing
+EdgeHeadingThing : numberA : int - nr
+EdgeHeadingThing : numberB : int - nri
+EdgeHeadingThing : previewA : str - nr
+EdgeHeadingThing : previewB : str - nr
+
+class EdgeThingThing
+EdgeThingThing : numberA : int - nr
+EdgeThingThing : numberB : int - nri
+EdgeThingThing : previewA : str - nr
+EdgeThingThing : previewB : str - nr
+
+class EdgeThingAction
+EdgeThingAction : numberA : int - nr
+EdgeThingAction : numberB : int - nri
+EdgeThingAction : previewA : str - nr
+EdgeThingAction : previewB : str - nr
+
+class EdgeThingIconography
+EdgeThingIconography : numberA : int - nr
+EdgeThingIconography : numberB : int - nri
+EdgeThingIconography : previewA : str - nr
+EdgeThingIconography : previewB : str - nr
+EdgeThingIconography : copy_variants : bool - o - nr
+
+class EdgeThingCriterion
+EdgeThingCriterion : number : int - nr - o 
+
+
+class EdgeThingOption
+EdgeThingOption : numberA : int - nr
+EdgeThingOption : numberB : int - nri
+EdgeThingOption : previewA : str - nr
+EdgeThingOption : previewB : str - nr
+EdgeThingOption : copy_variants : bool - o - nr
+
+class EdgeThingCycle
+EdgeThingCycle : numberA : int - nr
+EdgeThingCycle : numberB : int - nr
+EdgeThingCycle : previewA : str - nr
+EdgeThingCycle : previewB : str - nr
+
+Heading "0..n" -- "1" EdgeHeadingThing: example for >
+EdgeHeadingThing "1" -- "0..n" Thing: common term <
+
+Thing "0..n" -- "1" EdgeThingThing : related to >
+EdgeThingThing "1" -- "0..n" Thing : related to
+
+Thing "0..n" -- "1" EdgeThingAction: used for >
+EdgeThingAction "1" -- "0..n" Action: tool <
+
+Thing "0..n" -- "1" EdgeThingIconography : view >
+EdgeThingIconography "1" -- "0..n" Iconography : view of <
+
+Thing "0..n" -- "1" EdgeThingCriterion : > can be connected to \n these Criteria 
+EdgeThingCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Thing "0..n" -- "1" EdgeThingOption : attribute >
+EdgeThingOption "1" -- "0..n" Option : object used as attribute <
+
+Thing "0..n" -- "1" EdgeThingCycle : related image cycles >
+EdgeThingCycle "1" -- "0..n" Cycle : theme of cycle <
+
+
+
+@enduml

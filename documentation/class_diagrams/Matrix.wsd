@@ -1,0 +1,40 @@
+@startuml Matrix
+
+class Matrix 
+Matrix : medium:: str - o - r
+Matrix : name_preferred: str -  nr 
+Matrix : name_variant: str - r
+
+class Artwork
+
+class MakingProcess
+
+class Text
+
+class EdgeMatrixMakingProcess
+EdgeMatrixMakingProcess : number - int - o - nr
+
+class EdgeMatrixIconography
+EdgeMatrixIconography : preferred : bool - o - nr
+EdgeMatrixIconography : number : int - o - nr
+EdgeMatrixIconography : qualifier : str - o - nr
+EdgeMatrixIconography : qualifier_comment : str - nr
+EdgeMatrixIconography : qualifier_comments : str - nr
+EdgeMatrixIconography : options : id  - r
+
+
+
+Matrix "0..n" -- "1" EdgeMatrixMakingProcess
+EdgeMatrixMakingProcess "1" -- "1" MakingProcess
+
+Artwork "0..n" --- "1..n" Matrix : < impression of \n matrix of >
+
+Matrix "0..n" --- "0..n" Text : > can illustrate \n can be illustration of <
+
+Matrix "0..n" -- "1" EdgeMatrixIconography : can show >
+EdgeMatrixIconography "1" -- Iconography : can be shown in <
+
+
+
+@enduml 
+

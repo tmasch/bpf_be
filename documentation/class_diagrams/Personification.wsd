@@ -1,0 +1,73 @@
+@startuml Personification 
+class Personification
+Personification : type : str - o - nr
+Personification : references : ExternalReference - r
+Personification : name_preferred : str - o - nr
+Personification : name_variant : str - o - nr
+Personification : bibliography : Bibliography - r
+
+class Heading
+
+class Organisation
+
+class Place
+
+class Iconography
+
+class Criterion
+
+class Option 
+
+class Cycle
+
+class HeraldicObject
+
+
+class EdgePersonificationIconography
+EdgePersonificationIconography : numberA : int - nr
+EdgePersonificationIconography : numberB : int - nri
+EdgePersonificationIconography : previewA : str - nr
+EdgePersonificationIconography : previewB : str - nr
+
+class EdgePersonificationCriterion
+EdgePersonificationCriterion : number : int - nr - o 
+
+class EdgePersonificationOption
+EdgePersonificationOption : numberA : int - nr
+EdgePersonificationOption : numberB : int - nri
+EdgePersonificationOption : previewA : str - nr
+EdgePersonificationOption : previewB : str - nr
+EdgePersonificationOption : copy_variants : bool - o - nr
+
+class EdgePersonificationCycle
+EdgePersonificationCycle : numberA : int - nr
+EdgePersonificationCycle : numberB : int - nr
+EdgePersonificationCycle : previewA : str - nr
+EdgePersonificationCycle : previewB : str - nr
+
+
+Heading "0..n" --- "0..1" Personification: > personification \n personification of <
+
+Organisation "0..n" --- "0..1" Personification: > personification \n personification of <
+
+Place "0..n" --- "0..1" Personification: > personification \n personification of <
+
+Personification "0..n" -- "0..n" Personification : > related concept \n related concept <
+
+Personification "0.n" -- "1" EdgePersonificationIconography : shown in >
+EdgePersonificationIconography "1" -- "0..n" Iconography : shows <
+
+Personification "0..n" -- "1" EdgePersonificationCriterion : > can be connected to \n these Criteria 
+EdgePersonificationCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Personification "0.n" -- "1" EdgePersonificationOption : additionally shown in >
+EdgePersonificationOption "1" -- "0..n" Option : additionally shows <
+
+Personification "0..n" -- "1" EdgePersonificationCycle : related image cycles >
+EdgePersonificationCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Personification "0..n" --- "0..1" HeraldicObject : > used in heraldry \n personification <
+
+
+
+@enduml
