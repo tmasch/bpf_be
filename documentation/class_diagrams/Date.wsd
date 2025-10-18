@@ -1,6 +1,6 @@
 @startuml Date
  
- class Date 
+ class Date <<(n,cyan)>>
 
  Date : active : bool - o - nr
  Date : date_string : string - o - nr 

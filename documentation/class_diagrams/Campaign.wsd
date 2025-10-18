@@ -1,20 +1,21 @@
 @startuml Campaign 
 
-class Campaign
+class Campaign <<(A,green)>>
 Campaign : name :  str - o - nr
 Campaign : date : date - nr
+Campaign : bibliographical_references : Citation - r
 
-class Photo
+class Photo <<(I,red)>>
 
-class Person
+class Person <<(O,lime)>>
 
-class Organisation
+class Organisation <<(O,lime)>>
 
 Person "0..n" --- "0..n" Campaign : < responsible \n led campaign >
 
 Organisation "0..n" --- "0..n" Campaign : < responsible \n led campaign >
 
-Photo "0..n" --- "0..n" Campaign : < made in \n product of >
+Campaign "0..n" --- "0..n" Photo : < product of  \n  made in >
 
 
 @enduml 

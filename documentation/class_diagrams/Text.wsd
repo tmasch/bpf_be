@@ -1,5 +1,5 @@
 @startuml Text
-class Text
+class Text <<(O,lime)>>
 Text : type : str - o - nr
 Text : references : ExternalReference - r
 Text : numbering : str - nr
@@ -9,53 +9,55 @@ Text : name_variant : str - r
 Text : date : Date - nr
 Text : bibliography : Bibliography - r
 Text : duplicate : bool - o - nr
+Text : bibliographical_references : Citation - r
 
+class Person <<(O,lime)>>
 
-class Person 
+class Family <<(O,lime)>>
 
-class Family
+class Iconography <<(A,green)>>
 
-class Iconography
-
-class Option 
+class Option <<(A,green)>>
     
-class Cycle
+class Cycle <<(G,blue)>>
 
-class Book
+class Book <<(A,green)>>
 
-class Manuscript
+class Manuscript <<(A,green)>>
 
-class Heading
+class Heading <<(A,green)>>
 
-class Artwork
+class Artwork <<(I,red)>>
 
-class Inscription
+class Inscription <<(I,red)>>
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class Option
+class Criterion <<(A,green)>>
 
-class EdgeTextText
+class Option <<(A,green)>>
+
+class EdgeTextText <<(E,yellow)>>
 EdgeTextText : number : int - nr
 
-class EdgeTextIconography
+class EdgeTextIconography <<(E,yellow)>>
 EdgeTextIconography : numberA : int - nr
 EdgeTextIconography : numberB : int - nr
 EdgeTextIconography : previewA : str - nr
 EdgeTextIconography : previewB : str - nr
 EdgeTextIconography : copy_variants : bool - o - nr
 
-class EdgeTextCriterion
+class EdgeTextCriterion <<(E,yellow)>>
 EdgeTextCriterion : number : int - nr - o 
 
-class EdgeTextOption
+class EdgeTextOption <<(E,yellow)>>
 EdgeTextOption : numberA : int - nr
 EdgeTextOption : numberB : int - nr
 EdgeTextOption : previewA : str - nr
 EdgeTextOption : previewB : str - nr
 EdgeTextOption : copy_variants : bool - o - nr
 
-class EdgeTextCycle
+class EdgeTextCycle <<(E,yellow)>>
 EdgeTextCycle : numberA : int - nr
 EdgeTextCycle : numberB : int - nr
 EdgeTextCycle : previewA : str - nr
@@ -65,9 +67,9 @@ EdgeTextCycle : previewB : str - nr
 
 Person "0..n" --- "0..n" Text : > wrote \n written by <
 
-Text "0..n" --- "0..n" Family : > describes \n appears in by <
+Family "0..n" --- "0..n" Text :  > appears in by\n  describes <
 
-Text "0..n" -- "1" EdgeTextText : has part >
+EdgeTextText "1" -- "0..n" Text : has part <
 EdgeTextText "1" -- "0 or 1" Text :  part of >
 
 
@@ -83,7 +85,7 @@ EdgeTextOption "1" -- "0..n" Option : additional source <
 Text "0..n" -- "1" EdgeTextCycle : related image cycles >
 EdgeTextCycle "1" -- "0..n" Cycle : theme of cycle <
 
-Text "0..n" --- "0..n" Heading : < is example for \n has example >
+Heading "0..n" --- "0..n" Text : < has example \n is example for >
 
 Text "0..n" --- "0..n" Manuscript: < illustrated in \n contains illustrations of
 

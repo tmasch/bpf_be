@@ -1,130 +1,129 @@
 @startuml Organisation
-class Organisation
+class Organisation <<(O,lime)>>
 Organisation : type : str - o - r
 Organisation : references : ExternalReference - r
 Organisation : name_preferred : str - o - nr
 Organisation : name_variant : str - r
 Organisation : date : Date - nr
-Organisation : bibliography : Bibliography - r
+Organisation : bibliographical_references : Citation - r
 
 
-class Person 
+class Person <<(O,lime)>> 
 
-class Office
+class Office <<(A,green)>>
 
-class Place 
+class Place <<(O,lime)>>
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class Option 
+class Option <<(A,green)>>
     
-class Criterion
+class Criterion <<(A,green)>>
 
-class Cycle
+class Cycle <<(G,blue)>>
 
-class Artwork 
+class Artwork <<(I,red)>>
 
-class Manuscript
+class Manuscript <<(A,green)>>
 
-class Copy
+class Copy <<(I,red)>>
 
-class Heading
+class Heading <<(A,green)>>
 
-class Campaign
+class Campaign <<(A,green)>>
 
-class EdgeOrganisationOrganisation
+class EdgeOrganisationOrganisation <<(E,yellow)>>
 EdgeOrganisationOrganisation : date : Date - nr
 
 
-class EdgePersonOrganisation
+class EdgePersonOrganisation <<(E,yellow)>>
 EdgePersonOrganisation : date : Date - nr
 
-class EdgeOfficeOrganisation
+class EdgeOfficeOrganisation <<(E,yellow)>>
 EdgeOfficeOrganisation : date : Date - nr
 
-class EdgeOrganisationPlace
+class EdgeOrganisationPlace <<(E,yellow)>>
 EdgeOrganisationPlace : date : Date - nr
 
-class EdgeOrganisationIconography
+class EdgeOrganisationIconography <<(E,yellow)>>
 EdgeOrganisationIconography : numberA : int - nr
 EdgeOrganisationIconography : numberB : int - nr
 EdgeOrganisationIconography : previewA : str - nr
 EdgeOrganisationIconography : previewB : str - nr
 EdgeOrganisationIconography : copy_variants : bool - o - nr
 
-class EdgeOrganisationCriterion
+class EdgeOrganisationCriterion <<(E,yellow)>>
 EdgeOrganisationCriterion : number : int - nr - o 
 
-class EdgeOrganisationOption
+class EdgeOrganisationOption <<(E,yellow)>>
 EdgeOrganisationOption : numberA : int - nr
 EdgeOrganisationOption : numberB : int - nr
 EdgeOrganisationOption : previewA : str - nr
 EdgeOrganisationOption : previewB : str - nr
 EdgeOrganisationOption : copy_variants : bool - o - nr
 
-class EdgeOrganisationCycle
+class EdgeOrganisationCycle <<(E,yellow)>>
 EdgeOrganisationCycle : numberA : int - nr
 EdgeOrganisationCycle : numberB : int - nr
 EdgeOrganisationCycle : previewA : str - nr
 EdgeOrganisationCycle : previewB : str - nr
 
 
-class EdgeManuscriptCollection
+class EdgeManuscriptCollection <<(E,yellow)>>
 EdgeManuscriptCollection : current? : boolean - o - nr
 EdgeManuscriptCollection : catalogue : str - nr
 EdgeManuscriptCollection : inventory_no_preferred : str - nr
 EdgeManuscriptCollection : inventory_no_other : str - r
 EdgeManuscriptCollection : date : Date - nr
 
-class EdgeArtworkCollection
+class EdgeArtworkCollection <<(E,yellow)>>
 EdgeArtworkCollection : current? : boolean - o - nr
 EdgeArtworkCollection : catalogue : str - nr
 EdgeArtworkCollection : inventory_no_preferred : str - nr
 EdgeArtworkCollection : inventory_no_other : str - r
 EdgeArtworkCollection : date : Date - nr
 
-class EdgeCopyCollection
+class EdgeCopyCollection <<(E,yellow)>>
 EdgeCopyCollection : current? : boolean - o - nr
 EdgeCopyCollection : catalogue : str - nr
 EdgeCopyCollection : inventory_no_preferred : str - nr
 EdgeCopyCollection : inventory_no_other : str - r
 EdgeCopyCollection : date : Date - nr
 
-Organisation "0..n" --- "1" EdgeOrganisationOrganisation : affiliated to >
-EdgeOrganisationOrganisation "1" --- "0..n" Organisation : has affiliate >
+EdgeOrganisationOrganisation "1" -- "0..n" Organisation : affiliated to >
+EdgeOrganisationOrganisation "1" -- "0..n" Organisation : has affiliate >
 
 
-Organisation "0..n" --- "1" EdgePersonOrganisation : has member >
-EdgePersonOrganisation "1" --- "0..n" Person : member of <
+Person "0..n" -- "1" EdgePersonOrganisation : has member >
+EdgePersonOrganisation "1" -- "0..n" Organisation : member of <
 
-Organisation "0..n" --- "1" EdgeOfficeOrganisation : connected \n to office >
-EdgeOfficeOrganisation "1" --- "0..n" Office : belongs to <
+Office "0..n" -- "1" EdgeOfficeOrganisation : belongs to >
+EdgeOfficeOrganisation "1" -- "0..n" Organisation : connected \n to office <
 
+Place "0..n" -- "1" EdgeOrganisationPlace : located here >
+EdgeOrganisationPlace "1" -- "0..n" Organisation : located in <
 
-Organisation "0..n" --- "1" EdgeOrganisationPlace : located in >
-EdgeOrganisationPlace "1" --- "0..n" Place : located here <
-
-Organisation "0..n" --- "1" EdgeOrganisationIconography : shows members of >
-EdgeOrganisationIconography "1" --- "0..n" Iconography : portrayed persons belong to <
+Organisation "0..n" -- "1" EdgeOrganisationIconography : shows members of >
+EdgeOrganisationIconography "1" -- "0..n" Iconography : portrayed persons belong to <
 
 Organisation "0..n" -- "1" EdgeOrganisationCriterion : > can be connected to \n these Criteria 
 EdgeOrganisationCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
-Organisation "0..n" --- "1" EdgeOrganisationOption : shows additionally members of >
-EdgeOrganisationOption "1" --- "0..n" Option : additional portrayed persons belong to <
+Organisation "0..n" -- "1" EdgeOrganisationOption : shows additionally members of >
+EdgeOrganisationOption "1" -- "0..n" Option : additional portrayed persons belong to <
 
-Organisation "0..n" --- "1" EdgeOrganisationCycle : related image cycles >
-EdgeOrganisationCycle "1" --- "0..n" Cycle : theme of cycle <
+Organisation "0..n" -- "1" EdgeOrganisationCycle : related image cycles >
+EdgeOrganisationCycle "1" -- "0..n" Cycle : theme of cycle <
 
 
-Organisation "0..n" --- "1" EdgeArtworkCollection : has >
-EdgeArtworkCollection "1" --- "0..n" Artwork : in <
+Organisation "0..n" -- "1" EdgeArtworkCollection : has >
+EdgeArtworkCollection "1" -- "0..n" Artwork : in <
 
-Organisation "0..n" --- "1" EdgeManuscriptCollection : has >
-EdgeManuscriptCollection "1" --- "0..n" Manuscript : in <
+Organisation "0..n" -- "1" EdgeManuscriptCollection : has >
+EdgeManuscriptCollection "1" -- "0..n" Manuscript : in <
 
-Organisation "0..n" --- "1" EdgeCopyCollection : has >
-EdgeCopyCollection "1" --- "0..n" Copy : in <
+Organisation "0..n" -- "1" EdgeCopyCollection : has >
+EdgeCopyCollection "1" -- "0..n" Copy : in <
 
 Organisation "0..n" --- "0..n" Heading : < is example for \n has example >
 

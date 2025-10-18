@@ -1,31 +1,31 @@
 @startuml 
-class Manuscript 
+class Manuscript <<(A,green)>>
 Manuscript : type : str - o - nr
 Manuscript : references : ExternalReference - r
 Manuscript : common_name_preferred : str - nr
 Manuscript : common_name_variant : str - r
 Manuscript : all_catalogued : boolean - o - nr
 Manuscript : all_catalogued_comments : str - nr
-Manuscript : bibliography : Bibliography - r
+Manuscript : bibliographical_references : Citation - r
 
 
-class EdgeManuscriptArtwork
+class EdgeManuscriptArtwork <<(E,yellow)>>
 EdgeManuscriptArtwork : current : boolean - o - nr
 EdgeManuscriptArtwork : page number for display : str - nr
 EdgeManuscriptArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
-class Artwork
+class Artwork <<(I,red)>>
 
-class Book
+class Book <<(A,green)>>
 
-class EdgeManuscriptCollection
+class EdgeManuscriptCollection <<(E,yellow)>>
 EdgeManuscriptCollection : current? : boolean - o - nr
 EdgeManuscriptCollection : catalogue : str - nr
 EdgeManuscriptCollection : inventory_no_preferred : str - nr
 EdgeManuscriptCollection : inventory_no_other : str - r
 EdgeManuscriptCollection : date : Date - nr
 
-class Organisation
+class Organisation <<(O,lime)>>
 
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 

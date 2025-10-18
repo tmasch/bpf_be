@@ -1,0 +1,19 @@
+@startuml Citation 
+
+Class Citation <<(N,cyan)>>
+Citation : page_name : str - nr 
+Citation : page_number : str - nr 
+Citation : image_name : str - str
+Citation : image_number : str - nr
+Citation : catalogue_number : str - nr
+Citation : catalogue_number_sequence : tuple of ints - nr 
+
+Class Bibliography <<(A,green)>>
+
+Class Other_classes <<(C,white)>>
+
+Bibliography "0..n" --- "1" Citation: < source \n quoted in >
+
+Citation -- Other_classes
+
+@enduml

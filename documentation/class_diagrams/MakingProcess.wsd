@@ -1,5 +1,5 @@
 @startuml
-class MakingProcess
+class MakingProcess <<(I,red)>>
 MakingProcess : type - str - o - nr
 MakingProcess : qualifier - str - o - nr
 MakingProcess : qualifier_comment - str - nr
@@ -7,20 +7,20 @@ MakingProcess : partial - bool - o - nr
 MakingProcess : partial_detail - str - nr
 MakingProcess : date - Date - nr
 
-class Person
+class Person <<(O,lime)>>
 
-class Organisation
+class Organisation <<(O,lime)>>
 
-class Place
+class Place <<(O,lime)>>
 
-class Artwork
+class Artwork <<(I,red)>>
 
-class Matrix
+class Matrix <<(G,blue)>>
 
-class EdgeArtworkMakingProcess
+class EdgeArtworkMakingProcess <<(E,yellow)>>
 EdgeArtworkMakingProcess : number - int - o - nr
 
-class EdgeMatrixMakingProcess
+class EdgeMatrixMakingProcess <<(E,yellow)>>
 EdgeMatrixMakingProcess : number - int - o - nr
 
 

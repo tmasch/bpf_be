@@ -1,54 +1,54 @@
 @startuml Family
 
-class Family
+class Family <<(O,lime)>>
 Family : references : ExternalReference - r
 Family : name_preferred : str - o - nr
 Family : name_variant : str - r
 Family : date : Date - nr
-Family : bibliography : Bibliography - r
+Family : bibliographical_references : Citation - r
 
-class Person
+class Person <<(O,lime)>>
 
-class Heading
+class Heading <<(A,green)>>
 
-class Place
+class Place <<(O,lime)>>
 
-class Office
+class Office <<(O,lime)>>
 
-class Text
+class Text <<(O,lime)>>
 
-class Iconography 
+class Iconography <<(A,green)>>
 
-class Criterion
+class Criterion <<(A,green)>>
 
-class Option 
+class Option <<(A,green)>>
 
-class Cycle 
+class Cycle <<(G,blue)>>
 
-class EdgeFamilyPlace
+class EdgeFamilyPlace <<(E,yellow)>>
 EdgeFamilyPlace : date : Date - nr
 
-class EdgeFamilyOffice
+class EdgeFamilyOffice <<(E,yellow)>>
 EdgeFamilyOffice : date : Date - nr
 
-class EdgeFamilyIconography
+class EdgeFamilyIconography <<(E,yellow)>>
 EdgeFamilyIconography : numberA : int - nr
 EdgeFamilyIconography : numberB : int - nr
 EdgeFamilyIconography : previewA : str - nr
 EdgeFamilyIconography : previewB : str - nr
 EdgeFamilyIconography : copy_variants - bool - nr
 
-class EdgeFamilyCriterion
+class EdgeFamilyCriterion <<(E,yellow)>>
 EdgeFamilyCriterion : number : int - nr - o 
 
-class EdgeFamilyOption
+class EdgeFamilyOption <<(E,yellow)>>
 EdgeFamilyOption : numberA : int - nr
 EdgeFamilyOption : numberB : int - nr
 EdgeFamilyOption : previewA : str - nr
 EdgeFamilyOption : previewB : str - nr
 EdgeFamilyOption : copy_variants : bool - o - nr
 
-class EdgeFamilyCycle
+class EdgeFamilyCycle <<(E,yellow)>>
 EdgeFamilyCycle : numberA : int - nr
 EdgeFamilyCycle : numberB : int - nr
 EdgeFamilyCycle : previewA : str - nr
@@ -58,13 +58,13 @@ Person "0..n" --- "0..n" Family : > member of \n has member <
 
 Text "0..n" --- "0..n" Family : > describes \n appears in by <
 
-Family "0..n" --- "0..n" Heading : < is example for \n has example >
+Heading "0..n" --- "0..n" Family :  > has example \n is example for <
 
-Family "0..n" -- "1" EdgeFamilyPlace : lived in >
-EdgeFamilyPlace "1" -- "0..n" Place : lived here <
+Place "0..n" -- "1" EdgeFamilyPlace : lived here >
+EdgeFamilyPlace "1" -- "0..n" Family : lived in <
 
-Family "0..n" -- "1" EdgeFamilyOffice : had frequently office >
-EdgeFamilyOffice "1" -- "0..n" Office : office was held frequently by <
+Office "0..n" -- "1" EdgeFamilyOffice : office was held frequently by >
+EdgeFamilyOffice "1" -- "0..n" Family : had frequently office <
 
 Family "0..n" -- "1" EdgeFamilyIconography : coat-of-arms >
 EdgeFamilyIconography "1" -- "0..n" Iconography : coat-of-arms of <

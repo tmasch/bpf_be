@@ -1,49 +1,55 @@
 @startuml Criterion 
-class Criterion 
+class Criterion <<(A,green)>>
 Criterion : name : str - o - nr 
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class HeraldicObject
+class HeraldicObject <<(O,lime)>>
 
-class NaturalObject
+class NaturalObject <<(O,lime)>>
 
-class Person 
+class Person <<(O,lime)>>
 
-class Personification
+class Family <<(O,lime)>>
 
-class Place
+class Personification <<(O,lime)>>
 
-class Option
+class Organisation <<(O,lime)>>
 
-class EdgeIconographyCriterion
+class Place <<(O,lime)>>
+
+class Text <<(O,lime)>>
+
+class Option <<(A,green)>>
+
+class EdgeIconographyCriterion <<(E,yellow)>>
 EdgeIconographyCriterion : number : int - o - nr 
 
-class EdgeHeraldicObjectCriterion
+class EdgeHeraldicObjectCriterion <<(E,yellow)>>
 EdgeHeraldicObjectCriterion : number : int - o - nr 
     
-class EdgePersonCriterion
+class EdgePersonCriterion <<(E,yellow)>>
 EdgePersonCriterion : number : int - nr - o 
 
-class EdgeFamilyCriterion
+class EdgeFamilyCriterion <<(E,yellow)>>
 EdgeFamilyCriterion : number : int - nr - o 
 
-class EdgePersonificationCriterion
+class EdgePersonificationCriterion <<(E,yellow)>>
 EdgePersonificationCriterion : number : int - nr - o 
 
-class EdgeNaturalObjectCriterion
+class EdgeNaturalObjectCriterion <<(E,yellow)>>
 EdgeNaturalObjectCriterion : number : int - o - nr
 
-class EdgeOrganisationCriterion
+class EdgeOrganisationCriterion <<(E,yellow)>>
 EdgeOrganisationCriterion : number : int - nr - o 
 
-class EdgePlaceCriterion
+class EdgePlaceCriterion <<(E,yellow)>>
 EdgePlaceCriterion : number : int - nr - o 
 
-class EdgeTextCriterion
+class EdgeTextCriterion <<(E,yellow)>>
 EdgeTextCriterion : number : int - nr - o 
 
-class EdgeCriterionOption
+class EdgeCriterionOption <<(E,yellow)>>
 EdgeCriterionOption : number : int - o - nr
 
 Iconography "0..n" -- "1" EdgeIconographyCriterion : has variants >

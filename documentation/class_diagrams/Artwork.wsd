@@ -1,78 +1,79 @@
 @startuml Artwork
-Class Artwork
+Class Artwork << (I,red)>>
 Artwork : ingest_id : str - o - nr
 Artwork : published : bool - o - nr
 Artwork : medium:: str - o - r
 Artwork : name_preferred: str -  nr 
 Artwork : name_variant: str - r
+Artwork : bibliographical_references : Citation - r
 
 
 
-class MakingProcess
+class MakingProcess <<(I,red)>>
 
-class Matrix
+class Matrix << (G,blue)>>
 
-class Manuscript
+class Manuscript <<(A,Green)>>
 
-class Book
+class Book <<(A,Green)>>
 
-class Place
+class Place <<(O,lime)>>
 
-class Organisation
+class Organisation <<(O,Lime)>>
 
-class Text
+class Text <<(O,Lime)>>
 
-class Iconography
+class Iconography <<(A,Green)>>
 
-class Option
+class Option <<(A,Green)>>
 
-class Cycle
+class Cycle << (G,blue)>>
 
-class Image
+class Image << (I,red)>>
 
-class EdgeArtworkMakingProcess
+class EdgeArtworkMakingProcess << (E,yellow) >>
 EdgeArtworkMakingProcess : number - int - o - nr
 
-class EdgeManuscriptArtwork
+class EdgeManuscriptArtwork << (E,yellow) >>
 EdgeManuscriptArtwork : current : boolean - o - nr
 EdgeManuscriptArtwork : page number for display : str - nr
 EdgeManuscriptArtwork : sequence number : perhaps tuple \n              of two integers - nr
 
-class EdgeBookArtwork
+class EdgeBookArtwork << (E,yellow) >>
 EdgeBookArtwork : page number for display : str - nr
 EdgeBookArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
-class EdgeArtworkCollection
+class EdgeArtworkCollection << (E,yellow) >>
 EdgeArtworkCollection : current? : boolean - o - nr
 EdgeArtworkCollection : catalogue : str - nr
 EdgeArtworkCollection : inventory_no_preferred : str - nr
 EdgeArtworkCollection : inventory_no_other : str - r
 EdgeArtworkCollection : date : Date - nr
 
-class EdgePlaceArtwork
+class EdgePlaceArtwork << (E,yellow) >>
 EdgePlaceArtwork : current : bool : o - nr
 EdgePlaceArtwork : date : Date - nr
 
-class EdgeArtworkIconography
+class EdgeArtworkIconography << (E,yellow) >>
 EdgeArtworkIconography : numberA : int - nr
 EdgeArtworkIconography : numberB : int - nr
 EdgeArtworkIconography : previewA : str - nr
 EdgeArtworkIconography : previewB : str - nr
 EdgeArtworkIconography : copy_variants : bool - o - nr
 
-class EdgeArtworkOption
+class EdgeArtworkOption << (E,yellow) >>
 EdgeArtworkOption : numberA : int - nr
 EdgeArtworkOption : numberB : int - nr
 EdgeArtworkOption : previewA : str - nr
 EdgeArtworkOption : previewB : str - nr
 
-class EdgeArtworkCycle
+class EdgeArtworkCycle << (E,yellow) >>
 EdgeArtworkCycle : numberA : int - nr
 EdgeArtworkCycle : numberB : int - nr
 EdgeArtworkCycle : previewA : str - nr
 EdgeArtworkCycle : previewB : str - nr
 
-class EdgeArtworkImage
+class EdgeArtworkImage << (E,yellow) >>
 EdgeArtworkImage : number : int - o - nr
 EdgeArtworkImage : preferred : bool - o - nr
 

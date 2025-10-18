@@ -1,20 +1,20 @@
 @startuml Copy
-class Copy 
+class Copy <<(I,red)>>
+ Copy : bibliographical_references : Citation - r
 
+class Image <<(I,red)>>
 
-class Image
+class Photo <<(I,red)>>
 
-class Photo
+class Organisation <<(O,lime)>>
 
-class Organisation
-
-class EdgeImageCopy
+class EdgeImageCopy <<(E,yellow)>>
 EdgeImageCopy : preferred : bool - o - nr
 
-class EdgeCopyPhoto
+class EdgeCopyPhoto <<(E,yellow)>>
 EdgeCopyPhoto : preferred : bool - o - nr
 
-class EdgeCopyCollection
+class EdgeCopyCollection <<(E,yellow)>>
 EdgeCopyCollection : current? : boolean - o - nr
 EdgeCopyCollection : catalogue : str - nr
 EdgeCopyCollection : inventory_no_preferred : str - nr

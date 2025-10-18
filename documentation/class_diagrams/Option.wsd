@@ -1,83 +1,98 @@
 @startuml Option
 
-class Option 
+class Option <<(A,green)>>
 Option : references : ExternalReference - r
 Option : name_preferred : str - o - nr
 Option : name_short : str - o - nr
 Option : search_term : str - nr
+Option : bibliographical_references : Citation - r
 
 
-class Person
+class Person <<(O,lime)>>
 
-class Iconography
+class Family <<(O,lime)>>
 
-class Criterion
+class Personification <<(O,lime)>>
 
-class Image
+class Organisation <<(O,lime)>>
 
-class EdgeIconographyCriterion
+class NaturalObject <<(O,lime)>>
+
+class Thing <<(O,lime)>>
+
+class Place <<(O,lime)>>
+
+class Text <<(O,lime)>>
+
+class Iconography <<(A,green)>>
+
+class Criterion <<(A,green)>>
+
+class Image <<(I,red)>>
+
+class EdgeIconographyCriterion <<(E,yellow)>>
 EdgeIconographyCriterion : number : int - o - nr 
 
-class EdgeCriterionOption
+class EdgeCriterionOption <<(E,yellow)>>
 EdgeCriterionOption : number : int - o - nr
 
-class EdgePersonOption
+class EdgePersonOption <<(E,yellow)>>
 EdgePersonOption : numberA : int - nr
 EdgePersonOption : numberB : int - nr
 EdgePersonOption : previewA : str - nr
 EdgePersonOption : previewB : str - nr
 EdgePersonOption : copy_variants : bool - o - nr
 
-class EdgeFamilyOption
+class EdgeFamilyOption <<(E,yellow)>>
 EdgeFamilyOption : numberA : int - nr
 EdgeFamilyOption : numberB : int - nr
 EdgeFamilyOption : previewA : str - nr
 EdgeFamilyOption : previewB : str - nr
 EdgeFamilyOption : copy_variants : bool - o - nr
 
-class EdgePersonificationOption
+class EdgePersonificationOption <<(E,yellow)>>
 EdgePersonificationOption : numberA : int - nr
 EdgePersonificationOption : numberB : int - nri
 EdgePersonificationOption : previewA : str - nr
 EdgePersonificationOption : previewB : str - nr
 EdgePersonificationOption : copy_variants : bool - o - nr
 
-class EdgeOrganisationOption
+class EdgeOrganisationOption <<(E,yellow)>>
 EdgeOrganisationOption : numberA : int - nr
 EdgeOrganisationOption : numberB : int - nr
 EdgeOrganisationOption : previewA : str - nr
 EdgeOrganisationOption : previewB : str - nr
 EdgeOrganisationOption : copy_variants : bool - o - nr
 
-class EdgeNaturalObjectOption
+class EdgeNaturalObjectOption <<(E,yellow)>>
 EdgeNaturalObjectOption : numberA : int - nr
 EdgeNaturalObjectOption : numberB : int - nri
 EdgeNaturalObjectOption : previewA : str - nr
 EdgeNaturalObjectOption : previewB : str - nr
 EdgeNaturalObjectOption : copy_variants : bool - o - nr
 
-class EdgeThingOption
+class EdgeThingOption <<(E,yellow)>>
 EdgeThingOption : numberA : int - nr
 EdgeThingOption : numberB : int - nri
 EdgeThingOption : previewA : str - nr
 EdgeThingOption : previewB : str - nr
 EdgeThingOption : copy_variants : bool - o - nr
 
-class EdgePlaceOption
+class EdgePlaceOption <<(E,yellow)>>
 EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
 EdgePlaceOption : previewA : str - nr
 EdgePlaceOption : previewB : str - nr
 EdgePlaceOption : copy_variants : bool - o - nr
 
-class EdgeTextOption
+class EdgeTextOption <<(E,yellow)>>
 EdgeTextOption : numberA : int - nr
 EdgeTextOption : numberB : int - nr
 EdgeTextOption : previewA : str - nr
 EdgeTextOption : previewB : str - nr
 EdgeTextOption : copy_variants : bool - o - nr
 
-class EdgeImageIconography
+class EdgeImageIconography <<(E,yellow)>>
 EdgeImageIconography : preferred : bool - o - nr
 EdgeImageIconography : number : int - o - nr
 EdgeImageIconography : qualifier : str - o - nr

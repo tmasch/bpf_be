@@ -1,50 +1,51 @@
 @startuml  NaturalObject
-class NaturalObject
+class NaturalObject <<(O,lime)>>
 NaturalObject : type : str - o - nr 
 NaturalObject : name_preferred : str - o - nr 
 NaturalObject : name_translated : str - nr 
 NaturalObject : name_variant : str - r 
 NaturalObject : references : ExternalReference - r 
+NaturalObject : bibliographical_references : Citation - r
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class Criterion
+class Criterion <<(A,green)>>
 
-class Option 
+class Option <<(A,green)>>
 
-class Cycle    
+class Cycle <<(G,blue)>>
 
-class HeraldicObject
+class HeraldicObject <<(O,lime)>>
 
-class EdgeNaturalObjectNaturalObject
+class EdgeNaturalObjectNaturalObject <<(E,yellow)>>
 EdgeNaturalObjectNaturalObject : number : int - o - nr 
 
-class EdgeNaturalObjectIconography
+class EdgeNaturalObjectIconography <<(E,yellow)>>
 EdgeNaturalObjectIconography : numberA : int - nr
 EdgeNaturalObjectIconography : numberB : int - nri
 EdgeNaturalObjectIconography : previewA : str - nr
 EdgeNaturalObjectIconography : previewB : str - nr
 EdgeNaturalObjectIconography : copy_variants : bool - o - nr
 
-class EdgeNaturalObjectCriterion
+class EdgeNaturalObjectCriterion <<(E,yellow)>>
 EdgeNaturalObjectCriterion : number : int - o - nr
 
-class EdgeNaturalObjectOption
+class EdgeNaturalObjectOption <<(E,yellow)>>
 EdgeNaturalObjectOption : numberA : int - nr
 EdgeNaturalObjectOption : numberB : int - nri
 EdgeNaturalObjectOption : previewA : str - nr
 EdgeNaturalObjectOption : previewB : str - nr
 EdgeNaturalObjectOption : copy_variants : bool - o - nr
 
-class EdgeNaturalObjectCycleTheme
+class EdgeNaturalObjectCycleTheme <<(E,yellow)>>
 EdgeNaturalObjectCycleTheme : numberA : int - nr
 EdgeNaturalObjectCycleTheme : numberB : int - nri
 EdgeNaturalObjectCycleTheme : previewA : str - nr
 EdgeNaturalObjectCycleTheme : previewB : str - nr
 
 
-NaturalObject "0..n" -- "1" EdgeNaturalObjectNaturalObject : has part >
-EdgeNaturalObjectNaturalObject "1" -- "0..n or 1" NaturalObject: part of >
+EdgeNaturalObjectNaturalObject "0..n" -- "1" NaturalObject : part of >
+EdgeNaturalObjectNaturalObject "1" -- "0..n or 1" NaturalObject: has part >
 
 NaturalObject "0..n" -- "1" EdgeNaturalObjectIconography : view >
 EdgeNaturalObjectIconography "1" -- "0..n" Iconography : view of <
@@ -58,6 +59,6 @@ EdgeNaturalObjectOption "1" -- "0..n" Option : attribute <
 NaturalObject "0..n" -- "1" EdgeNaturalObjectCycleTheme : related image cycles >
 EdgeNaturalObjectCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
-NaturalObject "0..n" --- "0..n" HeraldicObject: < Object from nature \n in heraldry >
+HeraldicObject "0..n" --- "0..n" NaturalObject: > in heraldry \n object form nature <
 
 @enduml

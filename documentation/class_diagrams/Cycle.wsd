@@ -1,79 +1,91 @@
 @startuml Cycle
 
-class Cycle 
+class Cycle <<(G,blue)>>
 Cycle : medium : str - o - r
 Cycle : name_preferred: str -  nr 
 Cycle : name_variant: str - r
-
+Cycle : bibliographical_references : Citation - r
 class MakingProcess
 
-class Person
+class Person <<(O,lime)>>
 
-class Family
+class Family <<(O,lime)>>
 
-class Office
+class Office <<(O,lime)>>
 
-class Organisation
+class Personification <<(O,lime)>>
 
-class OrganisationTheme
+class Organisation <<(O,lime)>>
 
-class Place 
+class OrganisationTheme <<(O,lime)>>
 
-class PlaceTheme
+class Place <<(O,lime)>>
 
-class NaturalObject
+class PlaceTheme <<(O,lime)>>
 
-class Image
+class NaturalObject <<(O,lime)>>
 
-class EdgePersonCycleTheme
+class Thing <<(O,lime)>>
+
+class Action <<(O,lime)>>
+
+class MakingProcess <<(I,red)>>
+
+class Manuscript <<(O,green)>>
+
+class Book <<(O,green)>>
+
+class Image <<(I,red)>>
+
+class EdgePersonCycleTheme <<(E,yellow)>>
 EdgePersonCycleTheme : numberA : int - nr
 EdgePersonCycleTheme : numberB : int - nr
 EdgePersonCycleTheme : previewA : str - nr
 EdgePersonCycleTheme : previewB : str - nr
 
-class EdgeFamilyCycleTheme
+class EdgeFamilyCycleTheme <<(E,yellow)>>
 EdgeFamilyCycleTheme : numberA : int - nr
 EdgeFamilyCycleTheme : numberB : int - nr
 EdgeFamilyCycleTheme : previewA : str - nr
 EdgeFamilyCycleTheme : previewB : str - nr
 
-class EdgeOfficeCycleTheme
+class EdgeOfficeCycleTheme <<(E,yellow)>>
 EdgeOfficeCycleTheme : numberA : int - nr
 EdgeOfficeCycleTheme : numberB : int - nr
 EdgeOfficeCycleTheme : previewA : str - nr
 EdgeOfficeCycleTheme : previewB : str - nr
 
-class EdgePersonificationCycle
+class EdgePersonificationCycle  <<(E,yellow)>>
 EdgePersonificationCycle : numberA : int - nr
 EdgePersonificationCycle : numberB : int - nr
 EdgePersonificationCycle : previewA : str - nr
 EdgePersonificationCycle : previewB : str - nr
 
-class EdgeOrganisationCycleTheme
+class EdgeOrganisationCycleTheme  <<(E,yellow)>>
 EdgeOrganisationCycleTheme : numberA : int - nr
 EdgeOrganisationCycleTheme : numberB : int - nr
 EdgeOrganisationCycleTheme : previewA : str - nr
 EdgeOrganisationCycleTheme : previewB : str - nr
 
-class EdgePlaceCycleTheme
+class EdgePlaceCycleTheme  <<(E,yellow)>>
 EdgePlaceCycleTheme : numberA : int - nr
 EdgePlaceCycleTheme : numberB : int - nr
 EdgePlaceCycleTheme : previewA : str - nr
 EdgePlaceCycleTheme : previewB : str - nr
 
-class EdgeNaturalObjectCycleTheme
+class EdgeNaturalObjectCycleTheme  <<(E,yellow)>>
 EdgeNaturalObjectCycleTheme : numberA : int - nr
 EdgeNaturalObjectCycleTheme : numberB : int - nri
 EdgeNaturalObjectCycleTheme : previewA : str - nr
 EdgeNaturalObjectCycleTheme : previewB : str - nr
 
-class EdgeThingCycle
+class EdgeThingCycle  <<(E,yellow)>>
 EdgeThingCycle : numberA : int - nr
 EdgeThingCycle : numberB : int - nr
 EdgeThingCycle : previewA : str - nr
 EdgeThingCycle : previewB : str - nr
 
-class EdgeActionCycle
+class EdgeActionCycle  <<(E,yellow)>>
 EdgeActionCycle : numberA : int - nr
 EdgeActionCycle : numberB : int - nr
 EdgeActionCycle : previewA : str - nr
@@ -81,21 +93,21 @@ EdgeActionCycle : previewB : str - nr
 
 
 
-class EdgeCycleMakingProcess
+class EdgeCycleMakingProcess  <<(E,yellow)>>
 EdgeCycleMakingProcess : number - int - o - nr
 EdgeCycleMakingProcess : partial - bool - o - nr
 
-class EdgeManuscriptCycle
+class EdgeManuscriptCycle  <<(E,yellow)>>
 EdgeManuscriptCycle : current : boolean - o - nr
 EdgeManuscriptCycle : partial : boolean - o - nr
 EdgeManuscriptCycle : page number for display : str - nr
 EdgeManuscriptCycle : sequence number : perhaps tuple \n              of two integers - nr
 
-class EdgeBookCycle
+class EdgeBookCycle  <<(E,yellow)>>
 EdgeBookCycle : page number for display : str - nr
 EdgeBookCycle : sequence number : perhaps tuple \n                  of two integers - nr
 
-class EdgeCycleCollection
+class EdgeCycleCollection  <<(E,yellow)>>
 EdgeCycleCollection : current? : boolean - o - nr
 EdgeCycleCollection : partial : boolean - o - nr
 EdgeCycleCollection : catalogue : str - nr
@@ -103,12 +115,12 @@ EdgeCycleCollection : inventory_no_preferred : str - nr
 EdgeCycleCollection : inventory_no_other : str - r
 EdgeCycleCollection : date : Date - nr
 
-class EdgePlaceCycle
+class EdgePlaceCycle  <<(E,yellow)>>
 EdgePlaceCycle : current : bool -  o - nr
 EdgePlaceCycle : partial : bool - o - nr
 EdgePlaceCycle : date : Date - nr
 
-class EdgeImageCycle
+class EdgeImageCycle <<(E,yellow)>>
 EdgeImageCycle : sequence_number : int - o - nr
 EdgeImageCycle : number : str
 

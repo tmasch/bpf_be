@@ -1,6 +1,6 @@
 @startuml Place 
 
-class Place
+class Place <<(O,lime)>>
 Place : type : str - o - nr
 Place : references : ExternalReference - r
 Place : name_preferred : str - o - nr
@@ -10,71 +10,71 @@ Place : coordinates_s : format to be determined - nr
 Place : coordinates_e : format to be determined - nr
 Place : coordinates_w : format to be determined - nr
 Place : date : Date - nr
-Place : bibliography : Bibliography - r
+Place : bibliographical_references : Citation - r
 
 
-class Person 
+class Person <<(O,lime)>>
 
-class Family
+class Family <<(O,lime)>>
 
-class Office
+class Office <<(A,green)>>
 
-class Organisation
+class Organisation <<(O,lime)>>
 
-class Place 
+class Place <<(O,lime)>>
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class Option 
+class Option <<(A,green)>>
     
-class Criterion
+class Criterion <<(A,green)>>
 
-class Cycle
+class Cycle <<(G,blue)>>
 
-class Book
+class Book <<(A,green)>>
 
-class Heading
+class Heading <<(A,green)>>
 
-class MakingProcess
+class MakingProcess <<(I,red)>>
 
-class Artwork
+class Artwork <<(I,red)>>
 
-class EdgePersonPlace
+class EdgePersonPlace <<(E,yellow)>>
 EdgePersonPlace : date : Date - nr
 
-class EdgePlaceFamily
+class EdgePlaceFamily <<(E,yellow)>>
 EdgePlaceFamily : date : Date - nr
 
-class EdgeOrganisationPlace
+class EdgeOrganisationPlace <<(E,yellow)>>
 EdgeOrganisationPlace : date : Date - nr
 
-class EdgePlacePlace
+class EdgePlacePlace <<(E,yellow)>>
 EdgePlacePlace : date : Date - nr
 
-class EdgePlaceIconography
+class EdgePlaceIconography <<(E,yellow)>>
 EdgePlaceIconography : numberA : int - nr
 EdgePlaceIconography : numberB : int - nr
 EdgePlaceIconography : previewA : str - nr
 EdgePlaceIconography : previewB : str - nr
 EdgePlaceIconography : copy_variants : bool - o - nr
 
-class EdgePlaceCriterion
+class EdgePlaceCriterion <<(E,yellow)>>
 EdgePlaceCriterion : number : int - nr - o 
 
-class EdgePlaceOption
+class EdgePlaceOption <<(E,yellow)>>
 EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
 EdgePlaceOption : previewA : str - nr
 EdgePlaceOption : previewB : str - nr
 EdgePlaceOption : copy_variants : bool - o - nr
 
-class EdgePlaceCycle
+class EdgePlaceCycle <<(E,yellow)>>
 EdgePlaceCycle : numberA : int - nr
 EdgePlaceCycle : numberB : int - nr
 EdgePlaceCycle : previewA : str - nr
 EdgePlaceCycle : previewB : str - nr
 
-class EdgePlaceArtwork
+class EdgePlaceArtwork <<(E,yellow)>>
 EdgePlaceArtwork : current : bool : o - nr
 EdgePlaceArtwork : date : Date - nr
 
@@ -84,12 +84,12 @@ EdgePersonPlace "1" -- "0..n" Place : born here <
 Place "0..n" -- "1" EdgePlaceFamily: active here >
 EdgePlaceFamily "1" -- "0..n" Family : place of activity <
 
-Place "0..n" --- "0..n" Office : > offices here \n office in <
+Office "0..n" --- "0..n" Place : > office in \n offices here <
 
 Organisation "0..n" -- "1" EdgeOrganisationPlace : located in >
 EdgeOrganisationPlace "1" -- "0..n" Place : located here <
 
-Place "0..n" -- "1" EdgePlacePlace : has part >
+EdgePlacePlace "1" -- "0..n" Place : has part >
 EdgePlacePlace "1" -- "1 or 1..n" Place : part of <
 
 Place "0..n" -- "1" EdgePlaceIconography : view >
@@ -107,7 +107,7 @@ EdgePlaceCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Book "0..n" --- "0..n" Place : > published in  \n place of publication of <
 
-Place "0..n" --- "0..n" Heading : < is example for \n has example >
+Heading "0..n" --- "0..n" Place : < has example \n is example for >
 
 Place "0..n" --- "1" MakingProcess : < made in \n was place of making of >
 

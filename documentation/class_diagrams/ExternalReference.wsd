@@ -1,6 +1,6 @@
 @startuml ExternalReference
 
-class ExternalReference
+class ExternalReference <<(n,cyan)>>
 
 ExternalReference : number : int - nr
 ExternalReference : id : str - o - nr 

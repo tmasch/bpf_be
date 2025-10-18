@@ -1,6 +1,6 @@
 @startuml Photo
 
-class Photo
+class Photo <<(I,red)>>
 Photo : filename : str - o - nr
 Photo : uri: str - nr
 Photo : max_download_size : int - o - nr
@@ -8,14 +8,15 @@ Photo : creative_commons_statement : str - o - nr
 Photo : creditline : str - nr
 Photo : rights_internal : str - nr
 Photo : date : date - nr
+Photo : bibliographical_references : Citation - r
 
-class Copy 
+class Copy  <<(I,red)>>
 
-class Person 
+class Person <<(O,lime)>>
 
-class Campaign
+class Campaign <<(A,green)>>
 
-class EdgeCopyPhoto
+class EdgeCopyPhoto <<(E,yellow)>>
 EdgeCopyPhoto : preferred : bool - o - nr
 
 

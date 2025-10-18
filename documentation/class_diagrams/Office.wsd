@@ -1,24 +1,24 @@
 @startuml
-class Office
+class Office <<(A,green)>>
 
 Office : references : ExternalReference - r
 Office : name_preferred : str - o - nr
 Office : name_variant : str - r
 Office : date : Date - nr
-Office : bibliography : Bibliography - r
+Office : bibliographical_references : Citation - r
 
 
 
-class Person
+class Person <<(O,lime)>>
 
-class Organisation
+class Organisation <<(O,lime)>>
 
-class Place 
+class Place <<(O,lime)>>
 
-class EdgePersonOffice
+class EdgePersonOffice <<(E,yellow)>>
 EdgePersonOffice : date : Date - nr
 
-class EdgeOfficeCycle
+class EdgeOfficeCycle <<(E,yellow)>>
 EdgeOfficeCycle : numberA : int - nr
 EdgeOfficeCycle : numberB : int - nr
 EdgeOfficeCycle : previewA : str - nr

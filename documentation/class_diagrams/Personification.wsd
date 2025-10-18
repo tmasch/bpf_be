@@ -1,45 +1,45 @@
 @startuml Personification 
-class Personification
+class Personification <<(O,lime)>>
 Personification : type : str - o - nr
 Personification : references : ExternalReference - r
 Personification : name_preferred : str - o - nr
 Personification : name_variant : str - o - nr
-Personification : bibliography : Bibliography - r
+Personification : bibliographical_references : Citation - r
 
-class Heading
+class Heading <<(A,green)>>
 
-class Organisation
+class Organisation <<(O,lime)>>
 
-class Place
+class Place <<(O,lime)>>
 
-class Iconography
+class Iconography <<(A,green)>>
 
-class Criterion
+class Criterion <<(A,green)>>
 
-class Option 
+class Option  <<(A,green)>>
 
-class Cycle
+class Cycle <<(G,blue)>>
 
-class HeraldicObject
+class HeraldicObject <<(O,lime)>>
 
 
-class EdgePersonificationIconography
+class EdgePersonificationIconography <<(E,yellow)>>
 EdgePersonificationIconography : numberA : int - nr
 EdgePersonificationIconography : numberB : int - nri
 EdgePersonificationIconography : previewA : str - nr
 EdgePersonificationIconography : previewB : str - nr
 
-class EdgePersonificationCriterion
+class EdgePersonificationCriterion <<(E,yellow)>>
 EdgePersonificationCriterion : number : int - nr - o 
 
-class EdgePersonificationOption
+class EdgePersonificationOption <<(E,yellow)>>
 EdgePersonificationOption : numberA : int - nr
 EdgePersonificationOption : numberB : int - nri
 EdgePersonificationOption : previewA : str - nr
 EdgePersonificationOption : previewB : str - nr
 EdgePersonificationOption : copy_variants : bool - o - nr
 
-class EdgePersonificationCycle
+class EdgePersonificationCycle <<(E,yellow)>>
 EdgePersonificationCycle : numberA : int - nr
 EdgePersonificationCycle : numberB : int - nr
 EdgePersonificationCycle : previewA : str - nr

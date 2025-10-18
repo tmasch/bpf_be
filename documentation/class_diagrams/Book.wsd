@@ -1,5 +1,5 @@
 @startuml Book 
-class Book 
+class Book <<(A,Green)>>
 Book : references : ExternalReference - r
 Book : title : str - o - nr
 Book : parent title : str - nr
@@ -7,23 +7,23 @@ Book : volume number : str - nr
 Book : date : Date - nr
 Book : all_catalogued : boolean - o - nr
 Book : all_catalogued_comments : str - nr
-Book : bibliography : Bibliography - r
+Book : bibliographical_references : Citation - r
 
-class Person 
+class Person <<(O,lime)>>
 
-class Place
+class Place <<(O,Lime)>>
 
-class Manuscript
+class Manuscript <<(A,Green)>>
 
-class EdgeBookArtwork
+class EdgeBookArtwork <<(E,Yellow)>>
 EdgeBookArtwork : page number for display : str - nr
 EdgeBookArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
-class Artwork
+class Artwork <<(I,Red)>>
 
-Book "0..n" --- "0..n" Place : > published in  \n place of publication of <
+Place "0..n" --- "0..n" Book : < published in  \n place of publication of >
 
-Book "0..n" --- "0..n" Person : > author was  \n author of <
+Person "0..n" --- "0..n" Book : < author was  \n author of >
 
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 

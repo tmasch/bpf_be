@@ -1,14 +1,14 @@
 @startuml Inscription
 
-class Inscription
+class Inscription <<(I,red)>>
 Inscription : text : str - nr 
 Inscription : text_diplomatic : str - nr 
 Inscription : text_translated : str - nr 
 Inscription : lemma : bool - o - nr
 
-class Text 
+class Text  <<(A,green)>>
 
-class Image 
+class Image <<(I,red)>>
 
 
 

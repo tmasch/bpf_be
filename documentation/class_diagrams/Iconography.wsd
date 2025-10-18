@@ -1,106 +1,109 @@
 @startuml Iconography
-class Iconography
+class Iconography <<(A,green)>>
 Iconography : type : str - o - nr
 Iconography : references : ExternalReference - r
 Iconography : name_preferred : str - o - nr
 Iconography : name_variant : str - r
+Iconography : bibliographical_references : Citation - r
 
-class Person 
+class Person <<(O,lime)>>
 
-class Family
+class Family <<(O,lime)>>
 
-class Organisation
+class Personification <<(O,lime)>>
 
-class Place
+class Organisation <<(O,lime)>>
 
-class NaturalObject
+class Place <<(O,lime)>>
 
-class Thing
+class NaturalObject <<(O,lime)>>
 
-class Text
+class Thing <<(O,lime)>>
 
-class Action
+class Text <<(O,lime)>>
 
-class Artwork
+class Action <<(O,lime)>>
 
-class Criterion
+class Artwork <<(I,red)>>
 
-class Image
+class Criterion  <<(A,green)>>
 
-class EdgePersonIconography
+class Image <<(I,red)>>
+
+class EdgePersonIconography <<(E,yellow)>>
 EdgePersonIconography : numberA : int - nr
 EdgePersonIconography : numberB : int - nri
 EdgePersonIconography : previewA : str - nr
 EdgePersonIconography : previewB : str - nr
 EdgePersonIconography : copy_variants : bool - o - nr
 
-class EdgeFamilyIconography
+class EdgeFamilyIconography <<(E,yellow)>>
 EdgeFamilyIconography : numberA : int - nr
 EdgeFamilyIconography : numberB : int - nr
 EdgeFamilyIconography : previewA : str - nr
 EdgeFamilyIconography : previewB : str - nr
 EdgeFamilyIconography : copy_variants - bool - nr
 
-class EdgePersonificationIconography
+class EdgePersonificationIconography <<(E,yellow)>>
 EdgePersonificationIconography : numberA : int - nr
 EdgePersonificationIconography : numberB : int - nri
 EdgePersonificationIconography : previewA : str - nr
 EdgePersonificationIconography : previewB : str - nr
 EdgePersonificationIconography : copy_variants : bool - o - nr
 
-class EdgeOrganisationIconography
+class EdgeOrganisationIconography <<(E,yellow)>>
 EdgeOrganisationIconography : numberA : int - nr
 EdgeOrganisationIconography : numberB : int - nr
 EdgeOrganisationIconography : previewA : str - nr
 EdgeOrganisationIconography : previewB : str - nr
 EdgeOrganisationIconography : copy_variants : bool - o - nr
 
-class EdgePlaceIconography
+class EdgePlaceIconography <<(E,yellow)>>
 EdgePlaceIconography : numberA : int - nr
 EdgePlaceIconography : numberB : int - nr
 EdgePlaceIconography : previewA : str - nr
 EdgePlaceIconography : previewB : str - nr
 EdgePlaceIconography : copy_variants : bool - o - nr
 
-class EdgeNaturalObjectIconography
+class EdgeNaturalObjectIconography <<(E,yellow)>>
 EdgeNaturalObjectIconography : numberA : int - nr
 EdgeNaturalObjectIconography : numberB : int - nri
 EdgeNaturalObjectIconography : previewA : str - nr
 EdgeNaturalObjectIconography : previewB : str - nr
 EdgeNaturalObjectIconography : copy_variants : bool - o - nr
 
-class EdgeThingIconography
+class EdgeThingIconography <<(E,yellow)>>
 EdgeThingIconography : numberA : int - nr
 EdgeThingIconography : numberB : int - nri
 EdgeThingIconography : previewA : str - nr
 EdgeThingIconography : previewB : str - nr
 EdgeThingIconography : copy_variants : bool - o - nr
 
-class EdgeTextIconography
+class EdgeTextIconography <<(E,yellow)>>
 EdgeTextIconography : numberA : int - nr
 EdgeTextIconography : numberB : int - nr
 EdgeTextIconography : previewA : str - nr
 EdgeTextIconography : previewB : str - nr
 EdgeTextIconography : copy_variants : bool - o - nr
 
-class EdgeActionIconography
+class EdgeActionIconography <<(E,yellow)>>
 EdgeActionIconography : numberA : int - nr
 EdgeActionIconography : numberB : int - nri
 EdgeActionIconography : previewA : str - nr
 EdgeActionIconography : previewB : str - nr
 EdgeActionIconography : copy_variants : bool - o - nr
 
-class EdgeArtworkIconography
+class EdgeArtworkIconography <<(E,yellow)>>
 EdgeArtworkIconography : numberA : int - nr
 EdgeArtworkIconography : numberB : int - nr
 EdgeArtworkIconography : previewA : str - nr
 EdgeArtworkIconography : previewB : str - nr
 EdgeArtworkIconography : copy_variants : bool - o - nr
 
-class EdgeIconographyCriterion
+class EdgeIconographyCriterion <<(E,yellow)>>
 EdgeIconographyCriterion : number : int- o - nr
 
-class EdgeImageIconography
+class EdgeImageIconography <<(E,yellow)>>
 EdgeImageIconography : preferred : bool - o - nr
 EdgeImageIconography : number : int - o - nr
 EdgeImageIconography : qualifier : str - o - nr

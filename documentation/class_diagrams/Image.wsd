@@ -1,25 +1,31 @@
 @startuml Image
 
-class Image
+class Image <<(I,red)>>
 
 Image : position : str - nr 
 Image : detail : bool - o - nr
+Image : bibliographical_references : Citation - r
 
+class Artwork <<(I,red)>>
 
-class EdgeArtworkImage
+class Iconography <<(A,green)>>
 
-class Iconography
+class Inscription <<(I,red)>>
 
-class Inscription
+class Copy <<(I,red)>>
 
-class EdgeArtworkImage
+class Option <<(A,green)>>
+
+class Cycle <<(G,blue)>>
+
+class EdgeArtworkImage <<(E,yellow)>>
 EdgeArtworkImage : number : int - o - nr
 EdgeArtworkImage : preferred : bool - o - nr
 
-class EdgeImageCopy
+class EdgeImageCopy <<(E,yellow)>>
 EdgeImageCopy : preferred : bool - o - nr
 
-class EdgeImageIconography
+class EdgeImageIconography <<(E,yellow)>>
 EdgeImageIconography : preferred : bool - o - nr
 EdgeImageIconography : number : int - o - nr
 EdgeImageIconography : qualifier : str - o - nr
@@ -28,7 +34,7 @@ EdgeImageIconography : qualifier_comments : str - nr
 EdgeImageIconography : options : id  - r
 
 
-class EdgeImageCycle
+class EdgeImageCycle <<(E,yellow)>>
 EdgeImageCycle : sequence_number : int - o - nr
 EdgeImageCycle : number : str
 

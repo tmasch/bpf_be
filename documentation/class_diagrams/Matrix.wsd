@@ -1,20 +1,22 @@
 @startuml Matrix
 
-class Matrix 
+class Matrix <<(G,blue)>>
 Matrix : medium:: str - o - r
 Matrix : name_preferred: str -  nr 
 Matrix : name_variant: str - r
 
-class Artwork
+class Artwork <<(I,red)>>
 
-class MakingProcess
+class MakingProcess <<(I,red)>>
 
-class Text
+class Text <<(O,lime)>>
 
-class EdgeMatrixMakingProcess
+class Iconography <<(A,green)>>
+
+class EdgeMatrixMakingProcess <<(E,yellow)>>
 EdgeMatrixMakingProcess : number - int - o - nr
 
-class EdgeMatrixIconography
+class EdgeMatrixIconography <<(E,yellow)>>
 EdgeMatrixIconography : preferred : bool - o - nr
 EdgeMatrixIconography : number : int - o - nr
 EdgeMatrixIconography : qualifier : str - o - nr

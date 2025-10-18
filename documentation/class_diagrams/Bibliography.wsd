@@ -1,0 +1,23 @@
+@startuml Bibliography
+
+class Bibliography <<(A,green)>>
+Bibliography : short_reference : str - o - nr
+Bibliography : year : str - nr 
+Bibliography : year_sorting : int - nr
+Bibliography : bibliographical_record : str - o - nr 
+Bibliography : abbreviation : str - nr 
+Bibliography : multi_volume : bool - o - nr
+
+Class Citation <<(N,cyan)>>
+
+class EdgeBibliographyBibliography <<(E,yellow)>>
+EdgeBibliographyBibliography : volume_number : str - nr
+EdgeBibliographyBibliography : sequence_number : tuble of ints - nr
+
+Bibliography "0..n" -- "1" EdgeBibliographyBibliography: > has part
+EdgeBibliographyBibliography "1" -- "0..n" Bibliography: > belongs to
+
+
+Bibliography "0..n" --- "1" Citation: < source \n quoted in >
+
+@enduml
