@@ -40,6 +40,12 @@ class Campaign <<(A,green)>>
 class EdgePersonPerson <<(E,yellow)>>
 EdgePersonPerson : date : Date - nr
 
+class EdgeHeadingPerson  <<(E,yellow)>>
+EdgeHeadingPerson : numberA : int - nr
+EdgeHeadingPerson : numberB : int - nri
+EdgeHeadingPerson : previewA : str - nr
+EdgeHeadingPerson : previewB : str - nr
+
 class EdgePersonOffice <<(E,yellow)>>
 EdgePersonOffice : date : Date - nr
 
@@ -74,6 +80,9 @@ EdgePersonCycle : previewB : str - nr
 EdgePersonPerson "1" -- "0..n" Person : father of >
 EdgePersonPerson "1" -- "0..n" Person : son of <
 
+Heading "0..n" -- "1" EdgeHeadingPerson : > has example
+EdgeHeadingPerson "1" -- "0..n" Person :  is example for <
+
 Family "0..n" --- "0..n" Person : > has member \n member of <
 
 Office "0..n" -- "1" EdgePersonOffice : office held by >
@@ -100,8 +109,6 @@ EdgePersonCycle "1" -- "0..n" Cycle : theme of cycle <
 Text "0..n" --- "0..n" Person : > Author was \n Author of < 
 
 Person "0..n" --- "0..n" Book : > Author of \n Author was < 
-
-Person "0..n" --- "0..n" Heading : < is example for \n has example >
 
 Person "0..n" --- "1" MakingProcess : < made \n was artist of >
 

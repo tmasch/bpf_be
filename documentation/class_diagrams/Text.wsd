@@ -40,6 +40,12 @@ class Option <<(A,green)>>
 class EdgeTextText <<(E,yellow)>>
 EdgeTextText : number : int - nr
 
+class EdgeHeadingText  <<(E,yellow)>>
+EdgeHeadingText : numberA : int - nr
+EdgeHeadingText : numberB : int - nri
+EdgeHeadingText : previewA : str - nr
+EdgeHeadingText : previewB : str - nr
+
 class EdgeTextIconography <<(E,yellow)>>
 EdgeTextIconography : numberA : int - nr
 EdgeTextIconography : numberB : int - nr
@@ -63,7 +69,8 @@ EdgeTextCycle : numberB : int - nr
 EdgeTextCycle : previewA : str - nr
 EdgeTextCycle : previewB : str - nr
 
-
+Heading "0..n" -- "1" EdgeHeadingText : > has example
+EdgeHeadingText "1" -- "0..n" Text :  is example for <
 
 Person "0..n" --- "0..n" Text : > wrote \n written by <
 
@@ -71,7 +78,6 @@ Family "0..n" --- "0..n" Text :  > appears in by\n  describes <
 
 EdgeTextText "1" -- "0..n" Text : has part <
 EdgeTextText "1" -- "0 or 1" Text :  part of >
-
 
 Text "0..n" -- "1" EdgeTextIconography : source of >
 EdgeTextIconography "1" -- "0..n" Iconography : source <
@@ -85,7 +91,6 @@ EdgeTextOption "1" -- "0..n" Option : additional source <
 Text "0..n" -- "1" EdgeTextCycle : related image cycles >
 EdgeTextCycle "1" -- "0..n" Cycle : theme of cycle <
 
-Heading "0..n" --- "0..n" Text : < has example \n is example for >
 
 Text "0..n" --- "0..n" Manuscript: < illustrated in \n contains illustrations of
 

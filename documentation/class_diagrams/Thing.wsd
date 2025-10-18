@@ -61,8 +61,8 @@ EdgeThingCycle : numberB : int - nr
 EdgeThingCycle : previewA : str - nr
 EdgeThingCycle : previewB : str - nr
 
-Heading "0..n" -- "1" EdgeHeadingThing: example for >
-EdgeHeadingThing "1" -- "0..n" Thing: common term <
+Heading "0..n" -- "1" EdgeHeadingThing: has example >
+EdgeHeadingThing "1" -- "0..n" Thing: is example for <
 
 EdgeThingThing "1" -- "0..n" Thing : related to >
 EdgeThingThing "1" -- "0..n" Thing : related to <

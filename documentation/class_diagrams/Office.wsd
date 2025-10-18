@@ -1,19 +1,30 @@
-@startuml
+@startuml Office
 class Office <<(A,green)>>
-
 Office : references : ExternalReference - r
 Office : name_preferred : str - o - nr
 Office : name_variant : str - r
 Office : date : Date - nr
 Office : bibliographical_references : Citation - r
 
-
+class Heading <<(A,green)>>
 
 class Person <<(O,lime)>>
 
 class Organisation <<(O,lime)>>
 
 class Place <<(O,lime)>>
+
+class EdgeHeadingOffice  <<(E,yellow)>>
+EdgeHeadingOffice : numberA : int - nr
+EdgeHeadingOffice : numberB : int - nri
+EdgeHeadingOffice : previewA : str - nr
+EdgeHeadingOffice : previewB : str - nr
+
+class EdgeOfficePlace  <<(E,yellow)>>
+EdgeOfficePlace : numberA : int - nr
+EdgeOfficePlace : numberB : int - nri
+EdgeOfficePlace : previewA : str - nr
+EdgeOfficePlace : previewB : str - nr
 
 class EdgePersonOffice <<(E,yellow)>>
 EdgePersonOffice : date : Date - nr
@@ -24,10 +35,13 @@ EdgeOfficeCycle : numberB : int - nr
 EdgeOfficeCycle : previewA : str - nr
 EdgeOfficeCycle : previewB : str - nr
 
+Heading "0..n" -- "1" EdgeHeadingOffice : > has example
+EdgeHeadingOffice "1" -- "0..n" Office :  is example for <
 
 Organisation "0..n" --- "0..1" Office : > has Office \n Office in <
 
-Place "0..n" --- "0..1" Office : > has Office \n Office in <
+Office "0..n" -- "1" EdgeOfficePlace : > office in
+EdgeOfficePlace "1" -- "0..n" Place :  offices here <
 
 Office "0..n" -- "1" EdgePersonOffice : > Office held by
 EdgePersonOffice "1" -- "0..n" Person : > has office

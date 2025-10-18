@@ -22,6 +22,11 @@ class Cycle <<(G,blue)>>
 
 class HeraldicObject <<(O,lime)>>
 
+class EdgeHeadingPersonification  <<(E,yellow)>>
+EdgeHeadingPersonification : numberA : int - nr
+EdgeHeadingPersonification : numberB : int - nri
+EdgeHeadingPersonification : previewA : str - nr
+EdgeHeadingPersonification : previewB : str - nr
 
 class EdgePersonificationIconography <<(E,yellow)>>
 EdgePersonificationIconography : numberA : int - nr
@@ -46,7 +51,8 @@ EdgePersonificationCycle : previewA : str - nr
 EdgePersonificationCycle : previewB : str - nr
 
 
-Heading "0..n" --- "0..1" Personification: > personification \n personification of <
+Heading "0..n" -- "1" EdgeHeadingPersonification : > personification
+EdgeHeadingPersonification "1" -- "0..n" Personification :  personification of <
 
 Organisation "0..n" --- "0..1" Personification: > personification \n personification of <
 

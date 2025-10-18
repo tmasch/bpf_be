@@ -7,11 +7,10 @@ Iconobase - Classes
 - [Ancillary classes](#ancillary-classes)
   - [Date](#date)
   - [ExternalReference](#externalreference)
-  - [Bibliography](#bibliography)
-- [Authority records](#authority-records)
+  - [Citation](#citation)
+- [Authority records that (also) function as Object records for Iconographies](#authority-records-that-also-function-as-object-records-for-iconographies)
   - [Person](#person)
   - [Family](#family)
-  - [Office](#office)
   - [Personification](#personification)
   - [Organisation](#organisation)
   - [Place](#place)
@@ -19,12 +18,16 @@ Iconobase - Classes
   - [Thing](#thing)
   - [Text](#text)
   - [Action](#action)
+- [Authority Records that do not function as Object records](#authority-records-that-do-not-function-as-object-records)
   - [Book](#book)
   - [Manuscript](#manuscript)
   - [Iconography](#iconography)
   - [Criterion](#criterion)
   - [Option](#option)
+  - [Heading](#heading)
+  - [Office](#office)
   - [Campaign](#campaign)
+  - [Bibliography](#bibliography)
 - [Group records](#group-records)
   - [Matrix](#matrix)
   - [Cycle](#cycle)
@@ -39,6 +42,17 @@ Iconobase - Classes
 
 # Abbreviations
 
+In the names of classes, the following letters are used: 
+
+A (dark green): Authority record (not used as Object record)
+E (yellow): Edge
+G (blue): Group record
+I (red): Individual record
+N (cyan): aNcillary record
+O (light green): Authority record (used as Object record)
+
+In the descriptions, the following letters are used: 
+
 r: repeatable
 nr: non-repeatable
 o: obligatory
@@ -48,7 +62,7 @@ There will be more criteria for validating records that are ready to be made pub
 
 
 # Ancillary classes
-
+**
 In the following, these classes are merely listed like attributes of other classes. I am not sure if they would be connected directly or also with an Edge. With a potential exception in ExternalReference, the Edge would contain no information apart from the IDs of both elements, and the obligatory fields relationA and relationB. 
 
 ## Date
@@ -84,12 +98,38 @@ If one has an Edge between the ExternalReference and the object it is connected 
 
 
 
-## Bibliography
+## Citation
 
-This class will be used for bibliographical references in modern research literature, not for historical books. 
-ToDo!
+Bibliographical references consist of two records: 
+- the Bibliography record contains bibliographical data (if possible, imported automatically from a library catalogue)
+- the Citation record contains a link to a Bibliographical record and information on the quotation that is relevant in this context. It can be linked to most records in Iconobase. 
+- One could likewise treat the Citation record as Edge between other records and the Bibliography record. 
+![Create](./class_diagrams/Citation.png)
 
-# Authority records
+**Attributes:**
+- page_name: the way, pages are counted, by default "p. ", but possible alternatives "col. ",  etc. perhaps to be selected from a dropdown menu
+- page_number: the number, as string (no sorting needed)
+- image_name / image_number : works equivalent to  page_name + page_number. To be used primarily in information on the source of images in the Photo record. 
+- catalogue_number / catalogue_number_sequence: number of a catalogue entry. This would be preceded either by 'cat. ' or by the abbreviation given in the Bibliography record. 
+
+**Additional criteria for creating links:**
+
+- none
+
+**Additional criteria for validation for saving record:**
+
+- Must be connected to a Bibliography record. 
+  
+
+**Additional criteria for validation for publishing record:**
+
+- Only records connected to at least one other record (apart from the Bibliographical record)
+
+# Authority records that (also) function as Object records for Iconographies
+
+These authority records are used as Objects for Iconographical descriptions, and they all have similar structures. They also have similar links to other records so that they can be treated similarly at the FE. There are two distinctions to be made within this group: 
+- Some records have also other functions (e.g., for describing Making Processes) and hence additional links (e.g., Person, Organisation, Place, Text)
+- Some records can be recursively linked to other records of the same class, leading to a Matryoshka-like structure (Place, Text, NaturalObject). 
 
 ## Person
 
@@ -106,7 +146,7 @@ This record is for any person (Artists, Authors, etc., Depicted figures), hence 
   - One Person can have a number of types on every level, and every type determines which attributes and connections will be needed. 
 
 
-**Edge between Person and Heading:**
+**Edge between Person and Heading (EdgeHeadingPerson):**
 
 This could be used, for instance, for indicating professions. 
 
@@ -278,36 +318,6 @@ This Edge would be used for regularly, e.g. for ciycles of family portraits, or 
 - a Family needs to be connected to a Person or an Iconography/Option/Cycle. 
 
 
-## Office
-
-Like Family, this is primarily an addition to the class Person. It helps to search for images connected to persons who had the same office, e.g. all Bishops of Augsburg. An Office is defined as a 'job' within an 'organisation' (or in case of political authorities, with a place). Typically, there is only one holder of an Office at a time, although there would be exceptions (e.g., Roman consuls - I a not sure if canon of a Cathedral would count as office since there is a higher, but limited, number, but perhaps it should). 
-
-![Create](./class_diagrams/Office.png)
-
-**Attributes:**
-
-- date: This would denote the time when the office existed, but I am not sure how important this information really is (I mainly left the field here for the sake of consistency). If it is used, it should allow for timespans that have no end date. 
-
-**Edge between Office and Office:**
-
-This Edge could be used to indicate which Office was replaced by another (e.g. Duke of Bavaria by Elector of Bavaria). I am not sure how necessary it is, and it is certainly sometimes subjective. 
-
-**Edge between Office and Cycle (EdgeOfficeCycle):**
-
-This is meant e.g. for portrait series of all bishops of a certain see. Perhaps, one would need also here connections to Iconography and Option, but I currently have problems finding a use case. 
-
-**Additional criteria for validation for saving record:**
-
-- none
-  
-
-**Additional criteria for validation for publishing record:**
-
-- an Office must be connected to either an Organisation or a Place (Place meaning here Region - historical or Town). 
-- an Office needs to be connected to a Person or an Iconography/Option/Cycle. 
-- each EdgePersonOffice must contain a date - to allow sorting of office-holders. 
-
-
 ## Personification
 
 This record is only used as Object record for iconographical descriptions. The conceptual problem is that, whilst Persons are individuals so that references to Persons either mean the same Person or different Person, Personifications are mere figments and not clearly marked individuals. Frequently, Personifications will be named, but especially in Post-medieval images outside of books they are often without names and have to be identified by comparing their attributes to personifications in iconographic handbooks such as Cesare Ripa's *Iconographia* 
@@ -342,8 +352,8 @@ This record is for two different types of organisations, firstly Collections and
   - If there is a type "Collection", there must also be a type "Museum", "Library", "Archive" (pershaps), "Private Collection", "Dealer", or "Auction House". These are mutually exclusive, and they determine the way other attributes are displayed in the UI. 
   - The name_variant field would also include former names. Currently, there is no way to indicate the time of name changes, but this is not really the job of Iconobase. 
   
-**Edge between Organisation and Heading**
-This is not yet really developed, one might want to connect, e.g., all civic militias (which are important in Dutch art, e.g., Rembrandt's Nightwatch to heading such as 'military units')
+**Edge between Organisation and Heading (EdgeHeadingOrganisation)**
+This could be used to group together similar organisations, e.g. Benedictine Monasteries. 
 
 **Edge between Organisation and Person (EdgePersonOrganisation)**
 In addition to has member / member of, many other relations are possible, e.g.:
@@ -601,6 +611,9 @@ individuum / belongs to: for species > individuum, breed > individuum
 
 The cardinality 'upwards' is normally "1". "0" only appears for the very top levels (e.g., record "Animals"). Cardinalities of higher than "1" would only be needed in exceptional cases, e.g., if a "species old name" can be attributed to several modern species. If it is worth introducing this complication (since Text and Place records normally have here cardinality "1" I am not sure)
 
+**Edge between Natural Object and Heading (EdgeHeadingNaturalObject):**
+This Edge could be used to create groups that are not biological groups, should the need arise (e.g., 'trees with edible fruits')
+
 **Edge between Natural Object and Iconography (EdgeNaturalObjectIconography):**
 
 This Edge would probably be not used for records of the type 'group' (I reckon that one would rather have e.g. a 'species' record for 'not-further-defined snake'). 
@@ -657,7 +670,7 @@ Thing records are Object records used for anything that is neither a Person nor 
 
 - type: one probably will have to use different types - although one has to work out to what extent these records should be placed into context by types versus by headings. Hence, maybe the type section will remain rudimentary or can even go. 
 
-**Edge between Heading and Type (EdgeHeadingType):**
+**Edge between Heading and Thing (EdgeHeadingThing):**
 
 This Edge will be primarily used to put the Things into groups - it is possible to give several headings to a Thing. One has to think if there would be more specific relationships. 
 
@@ -800,6 +813,9 @@ none
 - The record must be connected to another Action record or to a Heading
 - The record must be connected to an Iconography or an Option, or a Cycle
 
+# Authority Records that do not function as Object records
+
+These Authority records are not connected to Iconographies, and they do not have a standard structure
 
 ## Book 
 
@@ -1016,7 +1032,7 @@ see above
 **Edge between Place and Option (EdgePlaceOption):**
 **Edge between Text and Option (EdgeTextOption):**
 
-These Edges function similar to the Edges between this Object records and the Iconographies. The exception is the attribute 'copy_variants'. If it is set on True, the screen for connect an Image to an Iconography will not only be shown the variants offered by this Iconography, but also the variants offered by this linked Object record (e.g., if the Person record for St Peter has the attribute 'with keys', one could decide whether this should be shown for any Iconographies connected with St Peter - it would probably make sense for 'No narrative context', but not for 'Crucifixion of St Peter'). 
+These Edges function similar to the Edges between this Object records and the Iconographies. The exception is the attribute 'copy_variants'. If it is set on True, the screen for connect an Imagne to an Iconography will not only be shown the variants offered by this Iconography, but also the variants offered by this linked Object record (e.g., if the Person record for St Peter has the attribute 'with keys', one could decide whether this should be shown for any Iconographies connected with St Peter - it would probably make sense for 'No narrative context', but not for 'Crucifixion of St Peter'). 
 
 I have not made an Edge between Artwork and Option records since I can hardly envisage when an Artwork appear in a variant of an Iconography (this would be like 'Death of Caesar with or without the Laoocoon Group behind'). 
 
@@ -1038,6 +1054,46 @@ see above.
 It would probably make most sense to publish Options together with the linked Criterion record. 
 Different from Iconography records, there is no need for Option records to be linked to an Object (Person etc.) record, there may well be Criteria and Options without such links (e.g., if there is an Option 'Angel at the right' for an Annunciation). 
 
+## Heading
+
+This is a very simple class that merely has the purpose of grouping together Object records. 
+
+
+## Office
+
+Like Family, this is primarily an addition to the class Person. It helps to search for images connected to persons who had the same office, e.g. all Bishops of Augsburg. An Office is defined as a 'job' within an 'organisation' (or in case of political authorities, with a place). Typically, there is only one holder of an Office at a time, although there would be exceptions (e.g., Roman consuls - I a not sure if canon of a Cathedral would count as office since there is a higher, but limited, number, but perhaps it should). 
+
+![Create](./class_diagrams/Office.png)
+
+**Attributes:**
+
+- date: This would denote the time when the office existed, but I am not sure how important this information really is (I mainly left the field here for the sake of consistency). If it is used, it should allow for timespans that have no end date. 
+
+**Edge between Office and Office:**
+
+This Edge could be used to indicate which Office was replaced by another (e.g. Duke of Bavaria by Elector of Bavaria). I am not sure how necessary it is, and it is certainly sometimes subjective. 
+
+**Edge between Office and Heading (EdgeHeadingOffice):**
+
+This is used for indication of the 'general profession', e.g., the Office "Elector of Bavaria" cold be linked to a heading 'Ruler'
+
+**Edge between Office and Cycle (EdgeOfficeCycle):**
+
+This is meant e.g. for portrait series of all bishops of a certain see. Perhaps, one would need also here connections to Iconography and Option, but I currently have problems finding a use case. 
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- an Office must be connected to either an Organisation or a Place (Place meaning here Region - historical or Town). 
+- an Office needs to be connected to a Person or an Iconography/Option/Cycle. 
+- each EdgePersonOffice must contain a date - to allow sorting of office-holders. 
+
+
+
 
 ## Campaign 
 
@@ -1056,6 +1112,43 @@ none (it may be that a campaign is linked to several persons or organisations. )
 **Additional criteria for validation for publishing record:**
 
 A campaign record can only be published if there are Photo records connected to it. 
+
+## Bibliography
+
+This class will be used for bibliographical references in modern research literature, not for historical books. 
+
+
+![Create](./class_diagrams/Bibliography.png)
+
+**Attributes:**
+- short_reference / year / year_sorting These are the elements that would normally be displayed with a citation. If one wanted to display always the full bibliographical references, one could foregoe short_reference and year. 
+  - the short reference would be the author or, if one is lacking, the title
+  - the year would be a string to allow also for "s.a." or date ranges
+  - by contrast, year_sorting would be an integer, for sorting entries chronologically.
+  - bibliographical_record would be the complete bibliographical record of the text according to some standard system (e.g. style of the Journal of the Warburg and Courtaiuld Institutes)
+  - abbreviation: this field is only needed for big catalogues that have specific names for their catalogue numbers, e.g. "B." for a print from Bartsch's catalogue. 
+  - multi_volume: by default False, set to True if the record is the parent record of a multi-volume work
+  
+
+**Edge between Bibliography and Bibliography:**
+This would be needed for multi-volume works, and its only purpose would be to allow browsing through volume of multi-volume catalogues such as Bartsch or Hollstein (the bibliographical_record has already all details one would need for quoting). 
+- The volume_number would be the volume number displayed,sometimes in Roman numberals, or with letters attached
+- The sequence_number would be the number for ordering the volumes in a list. 
+
+**Additional criteria for creating links:**
+
+- The link via the EdgeBibliographyBibliography can only be made between a Bibliography record that has multi-volume as True, and one that has it as False. 
+- Records with multi_volume True cannot be connect to Citation records. 
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- Only records connected to at least one Citation are published. 
+
 
 
 
@@ -1415,7 +1508,5 @@ none
 none
 
 **Additional criteria for validation for publishing record:**
-
-
-
+none
 

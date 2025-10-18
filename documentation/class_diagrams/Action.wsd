@@ -26,20 +26,20 @@ EdgeHeadingAction : previewB : str - nr
 
 class EdgeThingAction <<(E,yellow)>>
 EdgeThingAction : numberA : int - nr
-EdgeThingAction : numberB : int - nri
+EdgeThingAction : numberB : int - nr
 EdgeThingAction : previewA : str - nr
 EdgeThingAction : previewB : str - nr
 
 class EdgeActionAction <<(E,yellow)>>
 EdgeActionAction : numberA : int - nr
-EdgeActionAction : numberB : int - nri
+EdgeActionAction : numberB : int - nr
 EdgeActionAction : previewA : str - nr
 EdgeActionAction : previewB : str - nr
 EdgeActionAction : copy_variants : bool - o - nr
 
 class EdgeActionIconography <<(E,yellow)>>
 EdgeActionIconography : numberA : int - nr
-EdgeActionIconography : numberB : int - nri
+EdgeActionIconography : numberB : int - nr
 EdgeActionIconography : previewA : str - nr
 EdgeActionIconography : previewB : str - nr
 EdgeActionIconography : copy_variants : bool - o - nr

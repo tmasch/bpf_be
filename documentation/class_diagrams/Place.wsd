@@ -39,6 +39,18 @@ class MakingProcess <<(I,red)>>
 
 class Artwork <<(I,red)>>
 
+class EdgeHeadingPlace  <<(E,yellow)>>
+EdgeHeadingPlace : numberA : int - nr
+EdgeHeadingPlace : numberB : int - nri
+EdgeHeadingPlace : previewA : str - nr
+EdgeHeadingPlace : previewB : str - nr
+
+class EdgeOfficePlace  <<(E,yellow)>>
+EdgeOfficePlace : numberA : int - nr
+EdgeOfficePlace : numberB : int - nri
+EdgeOfficePlace : previewA : str - nr
+EdgeOfficePlace : previewB : str - nr
+
 class EdgePersonPlace <<(E,yellow)>>
 EdgePersonPlace : date : Date - nr
 
@@ -84,7 +96,8 @@ EdgePersonPlace "1" -- "0..n" Place : born here <
 Place "0..n" -- "1" EdgePlaceFamily: active here >
 EdgePlaceFamily "1" -- "0..n" Family : place of activity <
 
-Office "0..n" --- "0..n" Place : > office in \n offices here <
+Office "0..n" -- "1" EdgeOfficePlace : > office in
+EdgeOfficePlace "1" -- "0..n" Place :  offices here <
 
 Organisation "0..n" -- "1" EdgeOrganisationPlace : located in >
 EdgeOrganisationPlace "1" -- "0..n" Place : located here <
@@ -101,13 +114,13 @@ EdgePlaceCriterion "1" -- "1" Criterion : \n Criterion linked to <
 Place "0..n" -- "1" EdgePlaceOption : additionally depicted in >
 EdgePlaceOption "1" -- "0..n" Option : additional depicted place <
 
-
 Place "0..n" -- "1" EdgePlaceCycle : related image cycles >
 EdgePlaceCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Book "0..n" --- "0..n" Place : > published in  \n place of publication of <
 
-Heading "0..n" --- "0..n" Place : < has example \n is example for >
+Heading "0..n" -- "1" EdgeHeadingPlace : > has example
+EdgeHeadingPlace "1" -- "0..n" Place :  is example for <
 
 Place "0..n" --- "1" MakingProcess : < made in \n was place of making of >
 

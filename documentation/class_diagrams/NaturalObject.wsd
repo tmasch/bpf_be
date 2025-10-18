@@ -17,8 +17,18 @@ class Cycle <<(G,blue)>>
 
 class HeraldicObject <<(O,lime)>>
 
+class Heading <<(A,green)>>
+
 class EdgeNaturalObjectNaturalObject <<(E,yellow)>>
 EdgeNaturalObjectNaturalObject : number : int - o - nr 
+
+class EdgeHeadingNaturalObject  <<(E,yellow)>>
+EdgeHeadingNaturalObject : numberA : int - nr
+EdgeHeadingNaturalObject : numberB : int - nri
+EdgeHeadingNaturalObject : previewA : str - nr
+EdgeHeadingNaturalObject : previewB : str - nr
+
+
 
 class EdgeNaturalObjectIconography <<(E,yellow)>>
 EdgeNaturalObjectIconography : numberA : int - nr
@@ -46,6 +56,9 @@ EdgeNaturalObjectCycleTheme : previewB : str - nr
 
 EdgeNaturalObjectNaturalObject "0..n" -- "1" NaturalObject : part of >
 EdgeNaturalObjectNaturalObject "1" -- "0..n or 1" NaturalObject: has part >
+
+Heading "0..n" -- "1" EdgeHeadingNaturalObject : has example >
+EdgeHeadingNaturalObject "1" -- "0..n" NaturalObject : is example of <
 
 NaturalObject "0..n" -- "1" EdgeNaturalObjectIconography : view >
 EdgeNaturalObjectIconography "1" -- "0..n" Iconography : view of <

@@ -35,6 +35,11 @@ class Campaign <<(A,green)>>
 class EdgeOrganisationOrganisation <<(E,yellow)>>
 EdgeOrganisationOrganisation : date : Date - nr
 
+class EdgeHeadingOrganisation  <<(E,yellow)>>
+EdgeHeadingOrganisation : numberA : int - nr
+EdgeHeadingOrganisation : numberB : int - nri
+EdgeHeadingOrganisation : previewA : str - nr
+EdgeHeadingOrganisation : previewB : str - nr
 
 class EdgePersonOrganisation <<(E,yellow)>>
 EdgePersonOrganisation : date : Date - nr
@@ -93,6 +98,8 @@ EdgeCopyCollection : date : Date - nr
 EdgeOrganisationOrganisation "1" -- "0..n" Organisation : affiliated to >
 EdgeOrganisationOrganisation "1" -- "0..n" Organisation : has affiliate >
 
+Heading "0..n" -- "1" EdgeHeadingOrganisation : > has example
+EdgeHeadingOrganisation "1" -- "0..n" Organisation: example of <
 
 Person "0..n" -- "1" EdgePersonOrganisation : has member >
 EdgePersonOrganisation "1" -- "0..n" Organisation : member of <
@@ -125,7 +132,6 @@ EdgeManuscriptCollection "1" -- "0..n" Manuscript : in <
 Organisation "0..n" -- "1" EdgeCopyCollection : has >
 EdgeCopyCollection "1" -- "0..n" Copy : in <
 
-Organisation "0..n" --- "0..n" Heading : < is example for \n has example >
 
 Organisation "0..n" --- "0..n" Campaign : > has photos \n photos in <
 

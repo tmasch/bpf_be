@@ -1,0 +1,126 @@
+@startuml Heading 
+
+class Heading <<(A,green)>>
+Heading : references : ExternalReference - r
+Heading : name_preferred : str - o - nr
+Heading : name_variant : str - r 
+Heading : bibliographical_references : Citation - r
+
+class Person <<(O,lime)>>
+
+class Family <<(O,lime)>>
+
+class Office <<(A,green)>>
+
+class Personification <<(O,lime)>>
+
+class Organisation <<(O,lime)>>
+
+class NaturalObject <<(O,lime)>>
+
+class Thing <<(O,lime)>>
+
+class Text <<(O,lime)>>
+
+class Action <<(O,lime)>>
+
+class EdgeHeadingHeading <<(E,yellow)>>
+EdgeHeadingHeading : numberA : int - nr
+EdgeHeadingHeading : numberB : int - nri
+EdgeHeadingHeading : previewA : str - nr
+EdgeHeadingHeading : previewB : str - nr
+
+class EdgeHeadingPerson  <<(E,yellow)>>
+EdgeHeadingPerson : numberA : int - nr
+EdgeHeadingPerson : numberB : int - nri
+EdgeHeadingPerson : previewA : str - nr
+EdgeHeadingPerson : previewB : str - nr
+
+class EdgeHeadingFamily  <<(E,yellow)>>
+EdgeHeadingFamily : numberA : int - nr
+EdgeHeadingFamily : numberB : int - nri
+EdgeHeadingFamily : previewA : str - nr
+EdgeHeadingFamily : previewB : str - nr
+
+class EdgeHeadingOffice  <<(E,yellow)>>
+EdgeHeadingOffice : numberA : int - nr
+EdgeHeadingOffice : numberB : int - nri
+EdgeHeadingOffice : previewA : str - nr
+EdgeHeadingOffice : previewB : str - nr
+
+class EdgeHeadingPersonification  <<(E,yellow)>>
+EdgeHeadingPersonification : numberA : int - nr
+EdgeHeadingPersonification : numberB : int - nri
+EdgeHeadingPersonification : previewA : str - nr
+EdgeHeadingPersonification : previewB : str - nr
+
+class EdgeHeadingOrganisation  <<(E,yellow)>>
+EdgeHeadingOrganisation : numberA : int - nr
+EdgeHeadingOrganisation : numberB : int - nri
+EdgeHeadingOrganisation : previewA : str - nr
+EdgeHeadingOrganisation : previewB : str - nr
+
+class EdgeHeadingPlace  <<(E,yellow)>>
+EdgeHeadingPlace : numberA : int - nr
+EdgeHeadingPlace : numberB : int - nri
+EdgeHeadingPlace : previewA : str - nr
+EdgeHeadingPlace : previewB : str - nr
+
+class EdgeHeadingNaturalObject  <<(E,yellow)>>
+EdgeHeadingNaturalObject : numberA : int - nr
+EdgeHeadingNaturalObject : numberB : int - nri
+EdgeHeadingNaturalObject : previewA : str - nr
+EdgeHeadingNaturalObject : previewB : str - nr
+
+class EdgeHeadingThing <<(E,yellow)>>
+EdgeHeadingThing : numberA : int - nr
+EdgeHeadingThing : numberB : int - nri
+EdgeHeadingThing : previewA : str - nr
+EdgeHeadingThing : previewB : str - nr
+
+class EdgeHeadingText  <<(E,yellow)>>
+EdgeHeadingText : numberA : int - nr
+EdgeHeadingText : numberB : int - nri
+EdgeHeadingText : previewA : str - nr
+EdgeHeadingText : previewB : str - nr
+
+class EdgeHeadingAction  <<(E,yellow)>>
+EdgeHeadingAction : numberA : int - nr
+EdgeHeadingAction : numberB : int - nri
+EdgeHeadingAction : previewA : str - nr
+EdgeHeadingAction : previewB : str - nr
+
+EdgeHeadingHeading "1" -- "0..n" Heading : related concept >
+EdgeHeadingHeading "1" -- "0..n" Heading : related concept <
+
+Heading "0..n" -- "1" EdgeHeadingPerson : > has example
+EdgeHeadingPerson "1" -- "0..n" Person :  is example for <
+
+Heading "0..n" -- "1" EdgeHeadingFamily : > has example
+EdgeHeadingFamily "1" -- "0..n" Family :  is example for <
+
+Heading "0..n" -- "1" EdgeHeadingOffice : > has example
+EdgeHeadingOffice "1" -- "0..n" Office :  is example for <
+
+Heading "0..n" -- "1" EdgeHeadingPersonification : > personification
+EdgeHeadingPersonification "1" -- "0..n" Personification :  personification of <
+
+Heading "0..n" -- "1" EdgeHeadingOrganisation : > has example
+EdgeHeadingOrganisation "1" -- "0..n" Organisation: example of <
+
+Heading "0..n" -- "1" EdgeHeadingPlace : > has example
+EdgeHeadingPlace "1" -- "0..n" Place :  is example for <
+
+Heading "0..n" -- "1" EdgeHeadingNaturalObject : has example >
+EdgeHeadingNaturalObject "1" -- "0..n" NaturalObject : is example of <
+
+Heading "0..n" -- "1" EdgeHeadingThing: has example >
+EdgeHeadingThing "1" -- "0..n" Thing: is example for <
+
+Heading "0..n" -- "1" EdgeHeadingText : > has example
+EdgeHeadingText "1" -- "0..n" Text :  is example for <
+
+Heading "0..n" -- "1" EdgeHeadingAction: related action >
+EdgeHeadingAction "1" -- "0..n" Action: related concept <
+
+@enduml
