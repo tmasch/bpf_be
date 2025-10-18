@@ -1058,6 +1058,23 @@ Different from Iconography records, there is no need for Option records to be li
 
 This is a very simple class that merely has the purpose of grouping together Object records. 
 
+![Create](./class_diagrams/Heading.png)
+
+**Edge between Heading and Heading (EdgeHeadingHeading):**
+
+I wonder if one should also a connection for parent/child records with the proviso that every record may only have one connection to a Parent record. This could simply the display, since one could then show one Heading with a line of parent Heading records. 
+
+**Additional criteria for creating links:**
+
+none (in most cases, a Heading record will only be linked to one type of Object records, but sometimes there might be more, e.g. a Heading 'butcher' could be linked to the Natural Object 'animal', the Thing 'saussage' and the Action 'slaughtering')
+
+**Additional criteria for validation for saving record:**
+
+none
+
+**Additional criteria for validation for publishing record:**
+
+A Heading would only be published if linked to at least one record that is not a Heading either. 
 
 ## Office
 

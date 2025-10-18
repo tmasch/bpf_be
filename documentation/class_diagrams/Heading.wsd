@@ -16,6 +16,8 @@ class Personification <<(O,lime)>>
 
 class Organisation <<(O,lime)>>
 
+class Place <<(O,lime)>>
+
 class NaturalObject <<(O,lime)>>
 
 class Thing <<(O,lime)>>
