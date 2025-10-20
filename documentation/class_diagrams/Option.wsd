@@ -3,10 +3,12 @@
 class Option <<(A,green)>>
 Option : references : ExternalReference - r
 Option : name_preferred : str - o - nr
+Option : name_translated: str - nr
 Option : name_short : str - o - nr
 Option : search_term : str - nr
 Option : bibliographical_references : Citation - r
 
+class Criterion <<(A,green)>>
 
 class Person <<(O,lime)>>
 
@@ -26,7 +28,6 @@ class Text <<(O,lime)>>
 
 class Iconography <<(A,green)>>
 
-class Criterion <<(A,green)>>
 
 class Image <<(I,red)>>
 

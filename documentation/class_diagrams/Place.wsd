@@ -23,6 +23,8 @@ class Organisation <<(O,lime)>>
 
 class Place <<(O,lime)>>
 
+class HeraldicObject <<(0,lime)>>
+
 class Iconography <<(A,green)>>
 
 class Option <<(A,green)>>
@@ -101,6 +103,8 @@ EdgeOfficePlace "1" -- "0..n" Place :  offices here <
 
 Organisation "0..n" -- "1" EdgeOrganisationPlace : located in >
 EdgeOrganisationPlace "1" -- "0..n" Place : located here <
+
+HeraldicObject "0..n" --- "0..n" Place : > place \n in heraldry <
 
 EdgePlacePlace "1" -- "0..n" Place : has part >
 EdgePlacePlace "1" -- "1 or 1..n" Place : part of <

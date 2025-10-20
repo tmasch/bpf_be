@@ -118,15 +118,6 @@ EdgeImageIconography : qualifier : str - o - nr
 EdgeImageIconography : qualifier_comment : str - nr
 EdgeImageIconography : options : id  - r
 
-class EdgeIconographyIconography <<(E,yellow)>>
-EdgeIconographyIconography : numberA : int - nr
-EdgeIconographyIconography : numberB : int - nr
-EdgeIconographyIconography : previewA : str - nr
-EdgeIconographyIconography : previewB : str - nr
-EdgeIconographyIconography : location : str - nr
-EdgeIconographyIconography : copy_variants : bool - o - nr
-
-
 
 
 Person "0..n" -- "1" EdgePersonIconography : portrayed in >
@@ -168,9 +159,6 @@ EdgeIconographyCriterion "1" -- "1" Criterion : variant of <
 
 Iconography "0..n" -- "1" EdgeImageIconography : shown in >
 EdgeImageIconography "1" -- "0..n" Image : showns  <
-
-EdgeIconographyIconography "1" -- "0..n" Iconography : included in >
-Iconography "1" -- "0..n" EdgeIconographyIconography : includes >
 
 
 @enduml

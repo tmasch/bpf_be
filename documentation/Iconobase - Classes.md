@@ -16,6 +16,7 @@ Iconobase - Classes
   - [Place](#place)
   - [NaturalObject](#naturalobject)
   - [Thing](#thing)
+  - [Heraldic Object](#heraldic-object)
   - [Text](#text)
   - [Action](#action)
 - [Authority Records that do not function as Object records](#authority-records-that-do-not-function-as-object-records)
@@ -660,6 +661,8 @@ All records can be linked to Iconography and Object records - with exception of 
 - The record must be linked to a parent record (unless it is already e.g. 'Animals'). 
 - The record must be linkedto an Iconography, Option, Cycle or HeraldicObject record. 
 
+
+
 ## Thing
 
 Thing records are Object records used for anything that is neither a Person nor a Family, nor a Personification nor an Organisation nor a Place nor an Option for Nature. Hence, it may describe things ranging from zodiac signs to surgical tools. I am still relatively vague about how it could be used. 
@@ -687,6 +690,54 @@ attribute / object used as attribute
 additionally depicted / additionally depicted object. 
 
 The 'attribute' relationship is of special interest - there will be a search function for Images (thus Options) connected to a specific Thing (or NaturalObject) via the relationship 'attribute', e.g., all Personifications that have a lightning-bolt as attribute. 
+
+## Heraldic Object
+
+Coats-of-arms work differently from other images. 
+- Only relatively few Objects (especially Natural Objects and Things) are shown regularly in them, but they are shown in many variations (e.g., a lion could be standing, on all fours, sleeping, in different colours, and potentially with tongue, claws, or other body-parts in another colour). This necessitates the following changes: 
+  - No 'normal' Objects are connected to coats-of-arms. Instead, special 'Heraldic Object' records are made and linked to the standard Object record, e.g. Lion (Heraldic Object) vs. Lion (Natural Object)
+  - Thus, the system otherwise used for describing iconographical variants and placed between Iconography and Image records is here placed between Heraldic Object and Iconography records. 
+  - Conversely, the Iconography record of a coat-of-arms will probably not have any variants (this means, there are different ways of showing lions, but the royal arms of England always have three lions passant guardant or). Hence, there is no need for inheriting these variants (the only variants of coat-of-arm Iconography records I can think of is if the arms are shown complete, or only the shield, or only the crest, but this may not be worth it)
+- Many coats-of-arms, especially from the post-medieval period, are composites eof (often 4, 9, or even more) shields, most of which can also appear alone (they were inherited from different branches of a family). 
+  - For these purposes, the class IconographyComposite will be introduced (see there)
+
+![Create](./class_diagrams/HeraldicObject.png)
+
+**Attributes:**
+- type: Here, one could discern Ordinaries (simple geometrical patterns) and charges proper (animals etc.), and perhaps subdivide charges into e.g. animals, objects, persons etc.
+- name/name_translated: English heraldry uses a very specialist language, and for technical terms a plain English version should be given
+
+**Edge between Person and Iconography:**
+**Edge between Place and Iconography:**
+**Edge between NaturalObject and Iconography:**
+**Edge between Thing and Iconography:**
+
+These are links between the normal Object records and HeraldicObject records - necessary because the normal Object records do not the attached structure of Criteria and Options. Normally, a HeraldicObject would be linked to another Object (and, I cannot think why it should be linked to more than one, although I have to think about that more), the exception being simple Ordinaries (see above). Currently, I cannot think of other Object records being connected to coats-of-arms, but maybe one or two more will have to be added. 
+
+**Edge between HeraldicObect and Criterion (EdgeHeraldicObjectCriterion):**
+
+This Edge is used for describing how the elements appear in the coat-of-arms (e.g. how many?, which posture? which colour?). Most probably each HeraldicObject will have at least one Criterion, colour. 
+
+**Criterion and Option records:**
+
+These records have been described in detail above. Here, their functioin is different. They do not indicate a range of variants of an iconography of which an individual image might pick one or more, but rather they define which variant of an Object is part (immutable part) of a certain iconography. The English royal arms have, for instance, three golden lions, the arms of the Duchy of Normandy two golden lions, and the arms of the medieval Duchy of Swabia three black lions. Hence, there is no need to inherit any variants, and the attribute copy_variants is always false. 
+
+**Additional criteria for creating links:**
+
+- none
+
+
+**Additional criteria for validation for saving record:**
+
+- none
+  
+
+**Additional criteria for validation for publishing record:**
+
+- The record must have at least one Criterion record (for colour)
+- Unless the record has the type 'Ordinary', it must be linked to at least one other Object record. 
+- The record must be linked to an Iconography record. 
+
 
 
 
@@ -800,7 +851,7 @@ The Heading can signify general themes (e.g., liturgy, teaching, execution of ju
 
 **Edge between Action and Criterion:**
 
-This is useful for recording different variants of an action, it would need to be inherited through 'copy_variant'. To use the bloodthirsty example from above, one could perhaps ask here, if a sword, and axe, or a guillotine is used. If there are Actions that are children of Actions, there is naturally a risk of the inheritance becoming chaotic. 
+This is useful for recording different variants of an action, it would need to be inherited through 'copy_variants'. To use the bloodthirsty example from above, one could perhaps ask here, if a sword, and axe, or a guillotine is used. If there are Actions that are children of Actions, there is naturally a risk of the inheritance becoming chaotic. 
 
 
 **Additional criteria for creating links:**
@@ -938,6 +989,13 @@ This record is the central record on subject-matter of an Image, and as such it 
 
 These Edges connect the Iconography record to records for the Objects shown in the Iconography. All Edges are explained with the respective Objects. Several more such Edges will be added later. 
 
+**Edge between Iconography and Iconography (EdgeIconographyIconography):**
+
+This Edge would be used primarily for coats-of-arms: There would be one Iconography that has a complex coats-of-arms (e.g. Royal Arms of the United Kingdom) that has connections to Object records of the owner of the coat-of-arms (in this case a Place), and connections to the Iconography records of the individual arms of England, Scotland, and Ireland. (I am not sure if the composite coat-of-arms may also have connections to HeraldicObject records, e.g. for the Supporters - in any case, the structure as drawn up here allows this). 
+The attribute "location" cold tell where in the composite shield the individual shields are. 
+
+In theory, one could use this arrangement also for describing scenes that regularly include other scenes, e.g. a Nativity with Annunciation to the Shepherds in the background. However, this needs more thinking, and in any case, it would necessitate inheriting variants (coats-of-arms have none )
+
 **Edge between Iconography and Criterion (EdgeIconographyCriterion):**
 
 This Edge connects the Iconography record with a Criterion record that specifies an element where variants occur, e.g., a specific attribute that may be present or not. 
@@ -969,10 +1027,12 @@ none
 - the record must be linked to at least one Iconography record. 
 - according to some preliminary discussions with the editors of Iconclass: if the record has no Iconclass ID in external references, an automatic message will be sent to Iconclass. If Iconclass assigns a notation to this iconography, this ID will be sent to Iconobase (if possible, it should be added to the record automatically, otherwise manually). 
 
+
+
 ## Criterion
 
 Criterion records are one of the two elements of the innovative system to describe variants of works of art. The Criterion record names one aspect of the Image, and the Option records describe different ways this aspect is shown, e.g., a Criterion record could be "with attribute key?", and the Options would be "yes", "now", "unclear" and "not yet determined". 
-Criterion records can appear in three places: most commonly, they are connected to Iconography records and name an aspect of the icongraphy. However, it is also possible to affix them to records for some Objects linked to Iconography records, most commonly Person or Personification records. They would then describe aspects of depictions of this Person or Personification and would be inherited to linked Iconography records, with the Edge has copy_variants as True. Lastly, they can be connected to Heraldic Objects, since in coats-of-arms not the iconography of the Objects have variants (e.g., lion rampant or). 
+Criterion records can appear in three places: most commonly, they are connected to Iconography records and name an aspect of the icongraphy. However, it is also possible to affix them to records for some Objects linked to Iconography records, most commonly Person or Personification records. They would then describe aspects of depictions of this Person or Personification and would be inherited to linked Iconography records, with the Edge has copy_variants as True. Lastly, they can be connected to Heraldic Objects, since in coats-of-arms not the iconography of the Objects have variants (e.g., lion rampant or). For the sake of clarity, the connected needede for the latter are not shown hnere but in the diagram HeraldicObject. 
 
 ![Create](./class_diagrams/Criterion.png)
 
@@ -1012,11 +1072,13 @@ A Criterion record would be published together with the Iconography record (it w
 
 The Option record is the second part of describing iconographical variants, if the Criterion record poses a question, the Option record suggests a potential answer. This record is more complex than the Criterion record, since it is - like the Iconography record, linked to Option records. 
 
+
 ![Create](./class_diagrams/option.png)
 
 **Attributes:**
 - external references can exist, sometimes Iconclass calls has separate notations for what would here be variants. 
 - name_preferred and name_short are two different variants of the name. name_preferred is used as a stand-alone name, and name_short together with the name of the Criterion, e.g. there may be the Criterion "with Joseph", name_short of one option would be 'no', and name_preferred 'without Joseph'
+- name_translated will probably be only used in the context of heraldry, as translation of heraldic terms, e.g. "gold" for "or". I am not sure if one would also need translations for the shorter form (which are only seen by editors)
 - search_term: terms used for search, e.g., in the above example, the Option 'with Joseph' might have 'Joseph' as additional search tame, e.g. for a search "Adoration Magi Joseph", whereas "without Joseph" would not have this search term (and it should not be found in searches for 'Joseph'). 
 
 **Edge between Criterion and Option (EdgeCriterionOption):**

@@ -1,0 +1,54 @@
+@startuml HeraldicObject
+
+class HeraldicObject <<(O,lime)>>
+HeraldicObject : type : str - o - nr 
+HeraldicObject : name_preferred : str - o - nr 
+HeraldicObject : name_translated : str - nr 
+HeraldicObject : name_variant : str - r 
+HeraldicObject : references : ExternalReference - r 
+HeraldicObject : bibliographical_references : Citation - r
+
+class Person <<(O,lime)>>
+
+class Place <<(0,lime)>>
+
+class NaturalObject <<(O,lime)>>
+
+class Thing <<(0,lime)>>
+
+class Criterion <<(A,green)>>
+
+class Option <<(A,green)>>
+
+class Iconography <<(A,green)>>
+
+class EdgeHeraldicObjectIconography <<(E,yellow)>>
+EdgeHeraldicObjectIconography : number : int - o - nr
+EdgeHeraldicObjectIconography : options : id  - r
+
+class EdgeHeraldicObjectCriterion <<(E,yellow)>>
+EdgeHeraldicObjectCriterion : number : int- o - nr
+
+class EdgeCriterionOption <<(E,yellow)>>
+EdgeCriterionOption : number : int - o - nr
+
+HeraldicObject "0..n" -- "1" EdgeHeraldicObjectCriterion : has variants >
+EdgeHeraldicObjectCriterion "1" -- "1" Criterion : variant of <
+
+HeraldicObject "0..n" -- "1" EdgeHeraldicObjectIconography : appears in >
+EdgeHeraldicObjectIconography "1" -- "0..n" Iconography : contains <
+
+Criterion "1..n" -- "1" EdgeCriterionOption : option >
+EdgeCriterionOption "1" -- "1" Option : < option for
+
+Option "0..n" -- "1" EdgeHeraldicObjectIconography : > variant appears in \n contains variant <
+
+Person "0..n" --- "0..n" HeraldicObject: > in heraldry \n person <
+
+Place "0..n" --- "0..n" HeraldicObject: > in heraldry \n place <
+
+NaturalObject "0..n" --- "0..n" HeraldicObject: > in heraldy \n  object from nature <
+
+Thing "0..n" --- "0..n" HeraldicObject: > in heraldry \n thing <
+
+@enduml

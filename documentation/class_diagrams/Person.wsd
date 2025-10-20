@@ -27,6 +27,8 @@ class Cycle <<(G,blue)>>
 
 class Text <<(O,lime)>>
 
+class HeraldicObject <<(O,lime)>>
+
 class Book <<(A,green)>>
 
 class Heading <<(A,green)>>
@@ -93,6 +95,8 @@ EdgePersonOrganisation "1" -- "0..n" Person : member of <
 
 Place "0..n" -- "1" EdgePersonPlace : born here >
 EdgePersonPlace "1" -- "0..n" Person : born in  <
+
+HeraldicObject "0..n" --- "0..n" Person: > person \n in heraldry <
 
 Person "0..n" -- "1" EdgePersonIconography : portrayed in >
 EdgePersonIconography "1" -- "0..n" Iconography : portrayed person <

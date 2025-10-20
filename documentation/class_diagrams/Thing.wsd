@@ -19,6 +19,8 @@ class Option <<(A,green)>>
 
 class Cycle <<(G,blue)>>
 
+class HeraldicObject <<(O,lime)>>
+
 class EdgeHeadingThing <<(E,yellow)>>
 EdgeHeadingThing : numberA : int - nr
 EdgeHeadingThing : numberB : int - nri
@@ -82,6 +84,7 @@ EdgeThingOption "1" -- "0..n" Option : object used as attribute <
 Thing "0..n" -- "1" EdgeThingCycle : related image cycles >
 EdgeThingCycle "1" -- "0..n" Cycle : theme of cycle <
 
+HeraldicObject "0..n" --- "0..n" Thing: > Thing \n in heraldry <
 
 
 @enduml
