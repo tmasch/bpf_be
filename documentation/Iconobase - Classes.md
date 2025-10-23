@@ -25,6 +25,7 @@ Iconobase - Classes
   - [Iconography](#iconography)
   - [Criterion](#criterion)
   - [Option](#option)
+  - [Typology](#typology)
   - [Heading](#heading)
   - [Office](#office)
   - [Campaign](#campaign)
@@ -797,8 +798,10 @@ I am not sure if this is needed, and what for.
 These two Edges could be used to show for every text the illustrated manuscripts and books kept in Iconobase. However, strictly speaking, this information could be inferred via the connections between Manuscript and Artwork, and Artwork and Text (or Book and Artwork, and Artwork and Text), hence I am not sure if it has to be (a) created manually (b) created automatically and then stored so that it could be edited manually, or (c) created automatically for search processes only. 
 
 **Edge between Text and Artwork:**
+**Edge between Text and Matrix:**
 
 Here, the cardinality from Artwork to Text is normally 0..1 (an Artwork may can only illustrate one Text, the text written next to it). However, there can be additional connections to texts with duplicate as True, hence 0..n in this situation. 
+By contrast, the Edge between Text and Matrix goes between the Matrix and all Texts where the image produced by this Matrix appears, hence 0..n. 
 
 **Edge between Text and Iconography (EdgeTextIconography):**
 **Edge between Text and Option (EdgeTextOption):**
@@ -896,6 +899,10 @@ publisher was / publisher of
 In addition to published in / place of publication of, also the following Relation is possible:
 printed in / place of printing of
 
+**Edge between Book and Text:**
+
+See Text: I am not sure if this Edge is needed, or if there is a way to insert it automatically. 
+
 **Manuscript:**
 
 This connection is for the case that a copy of a printed book has painted decorations. In some cases one would simply catalogue it as a 'manuscript', but in other cases one might one to refer to the original book (e.g., if the paintings are actually overpaintings of the printed illustrations and copy their compositions, as not rare in French luxury books). This is not be used very often. 
@@ -930,11 +937,13 @@ This functions similar to the Edge between Book and Artwork (see above).
 New is the attribute "current?" - it indicates if the Artwork is still part of the Manuscript or has been cut out (alas, too common)
 The cardinality from Artwork to the Edge is now not 0..1 but 0..n - there are cases of images cut out from one manuscript and glued into another; but I assume that this cardinality would be probably 0..n by default, see above under Book. 
 
-**Edge between Book and Collection (EdgeManuscriptCollection):**
+**Edge between Manuscript and Collection (EdgeManuscriptCollection):**
 
 This Edge is the same as the Edge between Artworks and Collections. 
 
+**Edge between Manuscript and Text:**
 
+See Text: I am not sure if this Edge is needed, or if there is a way to insert it automatically. 
 
 **Additional criteria for creating links:**
 - An EdgeManuscriptArtwork can only be established if the Artwork has a Medium appropriate for a Manuscript (e.g. "Illumination", not "Mural Painting")
@@ -1031,7 +1040,8 @@ none
 
 ## Criterion
 
-Criterion records are one of the two elements of the innovative system to describe variants of works of art. The Criterion record names one aspect of the Image, and the Option records describe different ways this aspect is shown, e.g., a Criterion record could be "with attribute key?", and the Options would be "yes", "now", "unclear" and "not yet determined". 
+Criterion records are one of the two elements of the innovative system to describe variants of works of art. The Criterion record names one aspect of the Image, and the Option records describe different ways this aspect is shown, e.g., a Criterion record could be "with attribute key?", and the Options would be "yes", "now", "unclear" and "not yet determined". (There might be two special kinds of Criterion records - one containing a number of variants that are very rare and thus do not merit the full yes - no - unclear - to be determined system but are deemed to be not there unless marked; and the other containing typological relationships, which are also relatively rare outside illustrations of specific types of texts. These types would have a generic heading and then merely a list of potential Options that are all non-exclusive). 
+
 Criterion records can appear in three places: most commonly, they are connected to Iconography records and name an aspect of the icongraphy. However, it is also possible to affix them to records for some Objects linked to Iconography records, most commonly Person or Personification records. They would then describe aspects of depictions of this Person or Personification and would be inherited to linked Iconography records, with the Edge has copy_variants as True. Lastly, they can be connected to Heraldic Objects, since in coats-of-arms not the iconography of the Objects have variants (e.g., lion rampant or). For the sake of clarity, the connected needede for the latter are not shown hnere but in the diagram HeraldicObject. 
 
 ![Create](./class_diagrams/Criterion.png)
@@ -1115,6 +1125,49 @@ see above.
 
 It would probably make most sense to publish Options together with the linked Criterion record. 
 Different from Iconography records, there is no need for Option records to be linked to an Object (Person etc.) record, there may well be Criteria and Options without such links (e.g., if there is an Option 'Angel at the right' for an Annunciation). 
+
+## Typology
+
+This record is for a special case of connections between iconographies, typological relationships. In the strictest sense, this means that an Old-Testament scene (e.g., Jonah being disgorged by the sea-monster) is the model for a New-Testament scene (e.g., Resurrection of Christ), but there are also some freer applications (e.g., biblical models for lives of saints). 
+
+The Typology record always combines two images. It is hence connected to two Iconography records (that they have a list of all the Types respectively Antitypes of this Iconography) and to two Option records (to mark images that indeed are connected to this Type or Antitype). A Typology record "Jonas disgorged by the sea monster as Type for the Resurrection of Christ" is connected to the Iconography "Jonas disgorged by the sea monster", to its Option "with Antitype Resurrection of Christ" as well as to the Iconography "Resurreciton of Christ" and its Option "with Type Jonas disgorged from the Sea Monster". 
+
+(There might be some slightly different uses of Typology records that need more thinking, e.g., linking it not to an iconography but to a Heading or a Person, e.g. for Judith killing Holofernes as Example for the virtue of Fortitudo, and sometimes there would be on one side no link to an Option - e.g., if there are images of scenes involving Old-Testament women as Types for some aspects of the Virgin Mary, without giving specific Anti-Types.)
+
+For the sake of clarity, the diagram shows all connected objects twice, once for each connection. 
+
+![Create](./class_diagrams/typology.png)
+
+**Attributes:**
+
+- type: there would be only few types, suggesting the name of the relations:
+  - classical Type/Antitype
+  - biblical model/saints' lives
+  - abstract concept / example (in this case perhaps linked to a Headingrather than an Iconography, see above)
+
+**Edge between Heading and Typology:**
+
+This needs more work, it could be used to have e.g. a list of all Types and Antitypes organised by Biblical book. 
+
+**Edge between Typology and Iconography (EdgeTypologyIconography):**
+**Edge between Typology and Option (EdgeTypologyOption):**
+
+Normally, each Typology record has two Edges of each type. The relationships have to be complementary (e.g., if one is 'type of', the other one must be 'antitype for')
+
+
+**Additional criteria for creating links:**
+
+There may be not more than two links to Option records, and not more than two links to Iconography/Person/Heading records. 
+
+**Additional criteria for validation for saving record:**
+
+see above
+
+**Additional criteria for validation for publishing record:**
+
+There must be two links to Iconography/Person/Heading records, and at least one to an Option record. 
+
+
 
 ## Heading
 
@@ -1297,9 +1350,9 @@ This is the same as the EdgeArtworkMakingProcess (see below). I am not sure how 
 These Edges function in the same way as the corresponding Edges of the Artwork node. They would probably contain whereabouts information shared by all members of the cycle, details have to be sorted out. 
 The only addition is the boolean 'partial' that could be used to indicate if a Cycle is split over several locations (one could also forego it and only indicate the former locations where all used to be together, I ahve to think about it). 
 
-**Edge between Cycle and Themes (EdgePersonCYcleTheme, EdgeFamilyCycleTheme, EdgeOfficeCycleTheme, EdgeOrganisationCycleTheme, EdgePlaceCycleTheme):**
+**Edge between Cycle and Themes (EdgePersonCYcleTheme, EdgeFamilyCycleTheme, EdgeOfficeCycleTheme, EdgeOrganisationCycleTheme, EdgePlaceCycleTheme, EdgeArtworkiCycle):**
 
-These Edges connect the Cycle to the Object that is depicted, e.g. if the cycle is scenes from the Life of Christ it would be connected to Christ, if it is portraits of all Bohemian Kings, it would be connected to Office. Probably, there would be an element between the Themes and Cycle, e.g. to define if something is a cycle of the Infancy of Christ, a cycle on the Passion, etc. I wonder if one would put a 'theme' as an attribute into the Cycle record, or connect to the Persons, Organisations etc. Heading records with headings such as "Cycles - Infancy", and only these to the individual cycles, or find again another solution. 
+These Edges connect the Cycle to the Object that is depicted, e.g. if the cycle is scenes from the Life of Christ it would be connected to Christ, if it is portraits of all Bohemian Kings, it would be connected to the Office King of Bohema. Probably, there would be an element between the Themes and Cycle, e.g. to define if something is a cycle of the Infancy of Christ, a cycle on the Passion, etc. I wonder if one would put a 'theme' as an attribute into the Cycle record, or connect to the Persons, Organisations etc. Heading records with headings such as "Cycles - Infancy", and only these to the individual cycles, or find again another solution. Artworks also means here cycles having a certain artwork as a topic, e.g., a series of views of the Laocoon. 
 NB: OrganisationTheme and PlaceTheme nodes are simply Organisation and Place nodes - only, I have them elsewhere in the diagram, and I didn't want it to become too confusing. 
 
 **Edge between Cycle and Image (EdgeImageCycle):**

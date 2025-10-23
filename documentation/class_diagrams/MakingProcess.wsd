@@ -15,10 +15,18 @@ class Place <<(O,lime)>>
 
 class Artwork <<(I,red)>>
 
+class Cycle <<(G,blue)>>
+
 class Matrix <<(G,blue)>>
 
 class EdgeArtworkMakingProcess <<(E,yellow)>>
 EdgeArtworkMakingProcess : number - int - o - nr
+
+class EdgeCycleMakingProcess  <<(E,yellow)>>
+EdgeCycleMakingProcess : number - int - o - nr
+EdgeCycleMakingProcess : partial - bool - o - nr
+
+
 
 class EdgeMatrixMakingProcess <<(E,yellow)>>
 EdgeMatrixMakingProcess : number - int - o - nr
@@ -29,6 +37,10 @@ EdgeMatrixMakingProcess "1" -- "1" MakingProcess
 
 Artwork "1..n" -- "1" EdgeArtworkMakingProcess
 EdgeArtworkMakingProcess "1" -- "1" MakingProcess
+
+Cycle "0..n" -- "1" EdgeCycleMakingProcess 
+EdgeCycleMakingProcess "1" -- "0..n" MakingProcess
+
 
 MakingProcess "0..1" -- "0..n" Person : > made by \n  made <
 

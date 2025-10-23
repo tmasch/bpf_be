@@ -1,0 +1,80 @@
+@startuml Typology 
+
+class Typology <<(A,green)>>
+Typology : type : str - o - nr 
+Typology : references : ExternalReference - r
+Typology : name_preferred : str - o - nr
+Typology : name_variant : str - r 
+Typology : bibliographical_references : Citation - r
+
+class Heading <<(A,green)>>
+
+class Iconography1 <<(A,green)>>
+
+class Criterion1 <<(A,green)>>
+
+class Iconography2 <<(A,green)>>
+
+class Criterion2 <<(A,green)>>
+
+class Option1 <<(A,green)>>
+
+class Option2 <<(A,green)>>
+
+class EdgeTypologyIconography1 <<(E,yellow)>>
+EdgeTypologyIconography1 : numberA : int - nr
+EdgeTypologyIconography1 : numberB : int - nri
+EdgeTypologyIconography1 : previewA : str - nr
+EdgeTypologyIconography1 : previewB : str - nr
+
+class EdgeTypologyIconography2 <<(E,yellow)>>
+EdgeTypologyIconography2 : numberA : int - nr
+EdgeTypologyIconography2 : numberB : int - nri
+EdgeTypologyIconography2 : previewA : str - nr
+EdgeTypologyIconography2 : previewB : str - nr
+
+class EdgeTypologyOption1 <<(E,yellow)>>
+EdgeTypologyOption1 : numberA : int - nr
+EdgeTypologyOption1 : numberB : int - nr
+EdgeTypologyOption1 : previewA : str - nr
+EdgeTypologyOption1 : previewB : str - nr
+
+class EdgeTypologyOption2 <<(E,yellow)>>
+EdgeTypologyOption2 : numberA : int - nr
+EdgeTypologyOption2 : numberB : int - nr
+EdgeTypologyOption2 : previewA : str - nr
+EdgeTypologyOption2 : previewB : str - nr
+
+class EdgeHeadingTypology <<(E,yellow)>>
+EdgeHeadingTypology : numberA : int - nr
+EdgeHeadingTypology : numberB : int - nr
+EdgeHeadingTypology : previewA : str - nr
+EdgeHeadingTypology : previewB : str - nr
+
+
+Iconography1 "0..n" -- "1" Criterion1
+Criterion1 "0..n" -- "1" Option1
+
+Iconography1 "0..n" -- "1" EdgeTypologyIconography1: has type >
+
+Iconography2 "0..n" -- "1" Criterion2
+Criterion2 "0..n" -- "1" Option2
+
+
+Iconography2 "0..n" -- "1" EdgeTypologyIconography2: has antitype >
+
+
+
+EdgeTypologyIconography1 "1" -- "1" Typology: antitype of <
+EdgeTypologyIconography2 "1" -- "1" Typology: type for <
+
+Typology "1" -- "1" EdgeTypologyOption1: antitype of > 
+Typology "1" -- "1" EdgeTypologyOption2: type for >
+
+EdgeTypologyOption1 "1" -- Option1: with type <
+EdgeTypologyOption2 "1" -- Option2: with antitype <
+
+Heading "0..n" -- "1" EdgeHeadingTypology: example for >
+EdgeHeadingTypology "1" -- "0..n" Typology: belongs to < 
+
+@enduml

@@ -10,6 +10,8 @@ HeraldicObject : bibliographical_references : Citation - r
 
 class Person <<(O,lime)>>
 
+class Personification <<(0,lime)>>
+
 class Place <<(0,lime)>>
 
 class NaturalObject <<(O,lime)>>
@@ -44,6 +46,8 @@ EdgeCriterionOption "1" -- "1" Option : < option for
 Option "0..n" -- "1" EdgeHeraldicObjectIconography : > variant appears in \n contains variant <
 
 Person "0..n" --- "0..n" HeraldicObject: > in heraldry \n person <
+
+Personification "0..n" --- "0..1" HeraldicObject : > in heraldry \n personification <
 
 Place "0..n" --- "0..n" HeraldicObject: > in heraldry \n place <
 

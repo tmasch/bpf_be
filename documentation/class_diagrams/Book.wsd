@@ -13,13 +13,22 @@ class Person <<(O,lime)>>
 
 class Place <<(O,Lime)>>
 
+class Text <<(O,Lime)>>
+
 class Manuscript <<(A,Green)>>
 
 class EdgeBookArtwork <<(E,Yellow)>>
 EdgeBookArtwork : page number for display : str - nr
 EdgeBookArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
+class EdgeBookCycle  <<(E,yellow)>>
+EdgeBookCycle : page number for display : str - nr
+EdgeBookCycle : sequence number : perhaps tuple \n                  of two integers - nr
+
+
 class Artwork <<(I,Red)>>
+
+class Cycle <<(G,blue)>>
 
 Place "0..n" --- "0..n" Book : < published in  \n place of publication of >
 
@@ -27,7 +36,12 @@ Person "0..n" --- "0..n" Book : < author was  \n author of >
 
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 
-Book "0..n" --- "1" EdgeBookArtwork : contains > 
-EdgeBookArtwork "1" --- "0..1" Artwork : in <
+Book "0..n" -- "1" EdgeBookArtwork : contains > 
+EdgeBookArtwork "1" -- "0..1" Artwork : in <
+
+Book "0..1" -- "1" EdgeBookCycle : contains > 
+EdgeBookCycle "1" -- "0..n" Cycle : in <
+
+Text "0..n" --- "0..n" Book: > illustrated in \n contains illustrations of <
 
 @enduml 

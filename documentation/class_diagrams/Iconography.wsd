@@ -30,9 +30,13 @@ class Action <<(O,lime)>>
 
 class Artwork <<(I,red)>>
 
+class Matrix <<(G,blue)>>
+
 class Criterion  <<(A,green)>>
 
 class Image <<(I,red)>>
+
+class Typology <<(A,green)>>
 
 class EdgePersonIconography <<(E,yellow)>>
 EdgePersonIconography : numberA : int - nr
@@ -126,6 +130,19 @@ EdgeIconographyIconography : previewB : str - nr
 EdgeIconographyIconography : location : str - nr
 EdgeIconographyIconography : copy_variants : bool - o - nr
 
+class EdgeTypologyIconography <<(E,yellow)>>
+EdgeTypologyIconography : numberA : int - nr
+EdgeTypologyIconography : numberB : int - nri
+EdgeTypologyIconography : previewA : str - nr
+EdgeTypologyIconography : previewB : str - nr
+
+class EdgeMatrixIconography <<(E,yellow)>>
+EdgeMatrixIconography : preferred : bool - o - nr
+EdgeMatrixIconography : number : int - o - nr
+EdgeMatrixIconography : qualifier : str - o - nr
+EdgeMatrixIconography : qualifier_comment : str - nr
+EdgeMatrixIconography : qualifier_comments : str - nr
+EdgeMatrixIconography : options : id  - r
 
 
 
@@ -169,8 +186,13 @@ EdgeIconographyCriterion "1" -- "1" Criterion : variant of <
 Iconography "0..n" -- "1" EdgeImageIconography : shown in >
 EdgeImageIconography "1" -- "0..n" Image : showns  <
 
+Iconography "0..n" -- "1" EdgeMatrixIconography : can be shown in >
+EdgeMatrixIconography "1" -- "0..n" Matrix : can show <
+
 EdgeIconographyIconography "1" -- "0..n" Iconography : included in >
 Iconography "1" -- "0..n" EdgeIconographyIconography : includes >
 
+Iconography "0..n" -- "1" EdgeTypologyIconography : has type >
+EdgeTypologyIconography "1" -- "0..n" Typology : antitype of <
 
 @enduml

@@ -34,7 +34,7 @@ Artwork "0..n" --- "1..n" Matrix : < impression of \n matrix of >
 Matrix "0..n" --- "0..n" Text : > can illustrate \n can be illustration of <
 
 Matrix "0..n" -- "1" EdgeMatrixIconography : can show >
-EdgeMatrixIconography "1" -- Iconography : can be shown in <
+EdgeMatrixIconography "1" -- "0..n" Iconography : can be shown in <
 
 
 

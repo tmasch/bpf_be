@@ -11,7 +11,7 @@ class Person <<(O,lime)>>
 
 class Family <<(O,lime)>>
 
-class Office <<(O,lime)>>
+class Office <<(A,green)>>
 
 class Personification <<(O,lime)>>
 
@@ -26,6 +26,10 @@ class PlaceTheme <<(O,lime)>>
 class NaturalObject <<(O,lime)>>
 
 class Thing <<(O,lime)>>
+
+class Artwork <<(I,red)>>
+
+class Text <<(O,lime)>>
 
 class Action <<(O,lime)>>
 
@@ -85,13 +89,23 @@ EdgeThingCycle : numberB : int - nr
 EdgeThingCycle : previewA : str - nr
 EdgeThingCycle : previewB : str - nr
 
+class EdgeArtworkCycle << (E,yellow) >>
+EdgeArtworkCycle : numberA : int - nr
+EdgeArtworkCycle : numberB : int - nr
+EdgeArtworkCycle : previewA : str - nr
+EdgeArtworkCycle : previewB : str - nr
+
+class EdgeTextCycle <<(E,yellow)>>
+EdgeTextCycle : numberA : int - nr
+EdgeTextCycle : numberB : int - nr
+EdgeTextCycle : previewA : str - nr
+EdgeTextCycle : previewB : str - nr
+
 class EdgeActionCycle  <<(E,yellow)>>
 EdgeActionCycle : numberA : int - nr
 EdgeActionCycle : numberB : int - nr
 EdgeActionCycle : previewA : str - nr
 EdgeActionCycle : previewB : str - nr
-
-
 
 class EdgeCycleMakingProcess  <<(E,yellow)>>
 EdgeCycleMakingProcess : number - int - o - nr
@@ -150,6 +164,12 @@ EdgeNaturalObjectCycleTheme "1" -- "0..n" Cycle : theme of cycle <
 
 Thing "0..n" -- "1" EdgeThingCycle : related image cycles >
 EdgeThingCycle "1" -- "0..n" Cycle : theme of cycle <
+
+Artwork "0..n" -- "1" EdgeArtworkCycle : theme of cycle >
+EdgeArtworkCycle "1" -- "0..n" Cycle : related image cycle <
+
+Text "0..n" -- "1" EdgeTextCycle : related image cycles >
+EdgeTextCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Action "0..n" -- "1" EdgeActionCycle : related image cycles >
 EdgeActionCycle "1" -- "0..n" Cycle : theme of cycle <

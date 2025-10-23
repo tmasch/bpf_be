@@ -10,6 +10,8 @@ class Heading <<(A,green)>>
 
 class Person <<(O,lime)>>
 
+class Family <<(O,lime)>>
+
 class Organisation <<(O,lime)>>
 
 class Place <<(O,lime)>>
@@ -29,6 +31,9 @@ EdgeOfficePlace : previewB : str - nr
 class EdgePersonOffice <<(E,yellow)>>
 EdgePersonOffice : date : Date - nr
 
+class EdgeFamilyOffice <<(E,yellow)>>
+EdgeFamilyOffice : date : Date - nr
+
 class EdgeOfficeCycle <<(E,yellow)>>
 EdgeOfficeCycle : numberA : int - nr
 EdgeOfficeCycle : numberB : int - nr
@@ -45,6 +50,11 @@ EdgeOfficePlace "1" -- "0..n" Place :  offices here <
 
 Office "0..n" -- "1" EdgePersonOffice : > Office held by
 EdgePersonOffice "1" -- "0..n" Person : > has office
+
+Office "0..n" -- "1" EdgeFamilyOffice :  office was held frequently by >
+EdgeFamilyOffice "1" -- "0..n" Family :  had frequently office <
+
+
 
 Office "0..n" --- "0..n" Office : > succeeded by \n preceded by <
 

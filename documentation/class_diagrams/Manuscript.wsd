@@ -14,9 +14,13 @@ EdgeManuscriptArtwork : current : boolean - o - nr
 EdgeManuscriptArtwork : page number for display : str - nr
 EdgeManuscriptArtwork : sequence number : perhaps tuple \n                  of two integers - nr
 
+class Cycle <<(G,blue)>>
+
 class Artwork <<(I,red)>>
 
 class Book <<(A,green)>>
+
+class Text <<(O,lime)>>
 
 class EdgeManuscriptCollection <<(E,yellow)>>
 EdgeManuscriptCollection : current? : boolean - o - nr
@@ -25,16 +29,26 @@ EdgeManuscriptCollection : inventory_no_preferred : str - nr
 EdgeManuscriptCollection : inventory_no_other : str - r
 EdgeManuscriptCollection : date : Date - nr
 
+
+class EdgeManuscriptCycle  <<(E,yellow)>>
+EdgeManuscriptCycle : current : boolean - o - nr
+EdgeManuscriptCycle : partial : boolean - o - nr
+EdgeManuscriptCycle : page number for display : str - nr
+EdgeManuscriptCycle : sequence number : perhaps tuple \n              of two integers - nr
 class Organisation <<(O,lime)>>
 
 Book "0..n" --- "0..1" Manuscript : > used in  \n printed model was <
 
-Manuscript "0..n" --- "1" EdgeManuscriptArtwork : contains > 
+Manuscript "0..n" -- "1" EdgeManuscriptArtwork : contains > 
+EdgeManuscriptArtwork "1" -- "0..n" Artwork : in <
 
-EdgeManuscriptArtwork "1" --- "0..n" Artwork : in <
+Manuscript "0..n" -- "1" EdgeManuscriptCycle : contains > 
+EdgeManuscriptCycle "1" -- "0..n" Cycle : in <
 
-Manuscript "0..n" --- "1" EdgeManuscriptCollection : kept in >
 
-EdgeManuscriptCollection "1" --- "0..n" Organisation : has <
+Manuscript "0..n" -- "1" EdgeManuscriptCollection : kept in >
+EdgeManuscriptCollection "1" -- "0..n" Organisation : has <
+
+Text "0..n" --- "0..n" Manuscript: > illustrated in \n contains illustrations of <
 
 @enduml 

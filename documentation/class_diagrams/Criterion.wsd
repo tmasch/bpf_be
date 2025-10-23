@@ -18,7 +18,11 @@ class Organisation <<(O,lime)>>
 
 class Place <<(O,lime)>>
 
+class Thing <<(O,lime)>>
+
 class Text <<(O,lime)>>
+
+class Action <<(O,lime)>>
 
 class Option <<(A,green)>>
 
@@ -46,8 +50,14 @@ EdgeOrganisationCriterion : number : int - nr - o
 class EdgePlaceCriterion <<(E,yellow)>>
 EdgePlaceCriterion : number : int - nr - o 
 
+class EdgeThingCriterion <<(E,yellow)>>
+EdgeThingCriterion : number : int - nr - o 
+
 class EdgeTextCriterion <<(E,yellow)>>
 EdgeTextCriterion : number : int - nr - o 
+
+class EdgeActionCriterion <<(E,yellow)>>
+EdgeActionCriterion : number : int - nr - o 
 
 class EdgeCriterionOption <<(E,yellow)>>
 EdgeCriterionOption : number : int - o - nr
@@ -79,8 +89,14 @@ EdgeNaturalObjectCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
 Place "0..n" -- "1" EdgePlaceCriterion : > can be connected to \n these Criteria 
 EdgePlaceCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
 
+Thing "0..n" -- "1" EdgeThingCriterion : > can be connected to \n these Criteria 
+EdgeThingCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
 Text "0..n" -- "1" EdgeTextCriterion : > can be connected to \n these Criteria 
 EdgeTextCriterion "1" -- "0..1" Criterion : \n Criterion linked to <
+
+Action "0..n" -- "1" EdgeActionCriterion : > can be connected to \n these Criteria 
+EdgeActionCriterion "1" -- "1" Criterion : \n Criterion linked to <
 
 
 

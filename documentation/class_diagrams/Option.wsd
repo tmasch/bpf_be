@@ -20,11 +20,17 @@ class Organisation <<(O,lime)>>
 
 class NaturalObject <<(O,lime)>>
 
+class Artwork <<(I,red)>>
+
 class Thing <<(O,lime)>>
 
 class Place <<(O,lime)>>
 
 class Text <<(O,lime)>>
+
+class Action <<(O,lime)>>
+
+class Typology <<(A,green)>>
 
 class Iconography <<(A,green)>>
 
@@ -79,6 +85,12 @@ EdgeThingOption : previewA : str - nr
 EdgeThingOption : previewB : str - nr
 EdgeThingOption : copy_variants : bool - o - nr
 
+class EdgeArtworkOption << (E,yellow) >>
+EdgeArtworkOption : numberA : int - nr
+EdgeArtworkOption : numberB : int - nr
+EdgeArtworkOption : previewA : str - nr
+EdgeArtworkOption : previewB : str - nr
+
 class EdgePlaceOption <<(E,yellow)>>
 EdgePlaceOption : numberA : int - nr
 EdgePlaceOption : numberB : int - nr
@@ -92,6 +104,21 @@ EdgeTextOption : numberB : int - nr
 EdgeTextOption : previewA : str - nr
 EdgeTextOption : previewB : str - nr
 EdgeTextOption : copy_variants : bool - o - nr
+
+class EdgeActionOption <<(E,yellow)>>
+EdgeActionOption : numberA : int - nr
+EdgeActionOption : numberB : int - nr
+EdgeActionOption : previewA : str - nr
+EdgeActionOption : previewB : str - nr
+
+class EdgeTypologyOption <<(E,yellow)>>
+EdgeTypologyOption : numberA : int - nr
+EdgeTypologyOption : numberB : int - nr
+EdgeTypologyOption : previewA : str - nr
+EdgeTypologyOption : previewB : str - nr
+
+
+
 
 class EdgeImageIconography <<(E,yellow)>>
 EdgeImageIconography : preferred : bool - o - nr
@@ -127,11 +154,20 @@ EdgeNaturalObjectOption "1" -- "0..n" Option : attribute <
 Thing "0..n" -- "1" EdgeThingOption : attribute >
 EdgeThingOption "1" -- "0..n" Option : object used as attribute <
 
+Artwork "0..n" -- "1" EdgeArtworkOption : additionally shown in >
+EdgeArtworkOption "1" -- "0..n" Option : additional shown <
+
 Place "0..n" -- "1" EdgePlaceOption : additionally depicted in >
 EdgePlaceOption "1" -- "0..n" Option : additional depicted place <
 
 Text "0..n" -- "1" EdgeTextOption : addition source of >
 EdgeTextOption "1" -- "0..n" Option : additional source <
+
+Action "0..n" -- "1" EdgeActionOption : additional action in >
+EdgeActionOption "1" -- "0..n" Option : additionally shown Action <
+
+Typology "1" -- "1" EdgeTypologyOption: antitype of > 
+EdgeTypologyOption "1" -- Option: with type <
 
 Iconography "0..n" ---- "1" EdgeImageIconography: shown in >
 

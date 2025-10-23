@@ -12,6 +12,8 @@ class Person <<(O,lime)>>
 
 class Office <<(A,green)>>
 
+class Personification <<(O,lime)>>
+
 class Place <<(O,lime)>>
 
 class Iconography <<(A,green)>>
@@ -23,6 +25,8 @@ class Criterion <<(A,green)>>
 class Cycle <<(G,blue)>>
 
 class Artwork <<(I,red)>>
+
+class MakingProcess <<(I,red)>>
 
 class Manuscript <<(A,green)>>
 
@@ -110,6 +114,8 @@ EdgeOfficeOrganisation "1" -- "0..n" Organisation : connected \n to office <
 Place "0..n" -- "1" EdgeOrganisationPlace : located here >
 EdgeOrganisationPlace "1" -- "0..n" Organisation : located in <
 
+Organisation "0..n" --- "0..1" Personification: > personification \n personification of <
+
 Organisation "0..n" -- "1" EdgeOrganisationIconography : shows members of >
 EdgeOrganisationIconography "1" -- "0..n" Iconography : portrayed persons belong to <
 
@@ -125,6 +131,8 @@ EdgeOrganisationCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Organisation "0..n" -- "1" EdgeArtworkCollection : has >
 EdgeArtworkCollection "1" -- "0..n" Artwork : in <
+
+Organisation "0..n" -- "0..1" MakingProcess : > made \n  made by <
 
 Organisation "0..n" -- "1" EdgeManuscriptCollection : has >
 EdgeManuscriptCollection "1" -- "0..n" Manuscript : in <

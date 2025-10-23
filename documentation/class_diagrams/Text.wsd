@@ -29,6 +29,8 @@ class Heading <<(A,green)>>
 
 class Artwork <<(I,red)>>
 
+class Matrix <<(G,blue)>>
+
 class Inscription <<(I,red)>>
 
 class Iconography <<(A,green)>>
@@ -94,9 +96,11 @@ EdgeTextCycle "1" -- "0..n" Cycle : theme of cycle <
 
 Text "0..n" --- "0..n" Manuscript: < illustrated in \n contains illustrations of
 
-Text "0..n" --- "0..n" Book: < illustrated in \n contains illustrations of
+Text "0..n" --- "0..n" Book: > illustrated in \n contains illustrations of <
 
-Text "0..n" --- "0..1 or 0..n" Artwork : < illustrates \n illustration of >
+Text "0..n" --- "0..n" Artwork : < illustrates \n illustration of >
+
+Text "0..n" --- "0..n" Matrix : > can be illustration of \n can illustrate <
 
 Text "0..n" --- "0..1 or 0..n" Inscription : < quoted in \n quotes >
 

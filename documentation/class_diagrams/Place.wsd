@@ -95,8 +95,8 @@ EdgePlaceArtwork : date : Date - nr
 Person "0..n" -- "1" EdgePersonPlace : born in >
 EdgePersonPlace "1" -- "0..n" Place : born here <
 
-Place "0..n" -- "1" EdgePlaceFamily: active here >
-EdgePlaceFamily "1" -- "0..n" Family : place of activity <
+Family "0..n" -- "1" EdgePlaceFamily: place of activity >
+EdgePlaceFamily "1" -- "0..n" Place :  active here <
 
 Office "0..n" -- "1" EdgeOfficePlace : > office in
 EdgeOfficePlace "1" -- "0..n" Place :  offices here <

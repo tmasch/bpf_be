@@ -26,6 +26,8 @@ class Text <<(O,lime)>>
 
 class Action <<(O,lime)>>
 
+class Typology <<(A,green)>>
+
 class EdgeHeadingHeading <<(E,yellow)>>
 EdgeHeadingHeading : numberA : int - nr
 EdgeHeadingHeading : numberB : int - nri
@@ -92,6 +94,13 @@ EdgeHeadingAction : numberB : int - nri
 EdgeHeadingAction : previewA : str - nr
 EdgeHeadingAction : previewB : str - nr
 
+class EdgeHeadingTypology <<(E,yellow)>>
+EdgeHeadingTypology : numberA : int - nr
+EdgeHeadingTypology : numberB : int - nr
+EdgeHeadingTypology : previewA : str - nr
+EdgeHeadingTypology : previewB : str - nr
+
+
 EdgeHeadingHeading "1" -- "0..n" Heading : related concept >
 EdgeHeadingHeading "1" -- "0..n" Heading : related concept <
 
@@ -124,5 +133,8 @@ EdgeHeadingText "1" -- "0..n" Text :  is example for <
 
 Heading "0..n" -- "1" EdgeHeadingAction: related action >
 EdgeHeadingAction "1" -- "0..n" Action: related concept <
+
+Heading "0..n" -- "1" EdgeHeadingTypology: example for >
+EdgeHeadingTypology "1" -- "0..n" Typology: belongs to < 
 
 @enduml
