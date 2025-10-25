@@ -303,7 +303,7 @@ It could work as follows:
 [Contents](#table-of-contents)
 
 - First, the type of Iconography has to be selected (Portrait, Emblem, etc.)
-- Based on this type, one can enter one or more connected objects in search boxes and select the connection they have with the iconography (e..g, 'portrait of', 'acting person', etc.). The connection to or ingest or creation of these Authority records is described in \documentation\00 general\element_insert_object and element_insert_object_place_text respectively. TODO: import variants, if available. 
+- Based on this type, one can enter one or more connected objects in search boxes and select the connection they have with the iconography (e..g, 'portrait of', 'acting person', etc.). The connection to or ingest or creation of these Authority records is described in Connection simple and Connection Place / Text respectively (see above).  
 - A name (and name variants or comments) are given manually (for some types of iconography, e.g. portraits, a name will be created automatically out of type and connected objects, which, however, can still be changed manually). 
 - The Iconclass notation(s) for this iconography are entered, and hence a link to Iconclass built (all Iconography records without Iconclass notations will be sent to the Iconclass editorsto consider creating notations for these Iconographies). 
 - If the iconography has variants (e.g., if an image of a saint appears with different attributes), these can be catalogued. It makes sense to have two forms for entering this data - one largely filled in with simple options 'yes', 'no', 'unclear', 'not yet determined', and another that has only the last two options complete, whilst the rest can be filled in freely. If an option in one of the variants needs connections to other Object records, they can be entered as described above. (It should also be possible to combine some variants, especially attributes, also with Object records, e.g., records of saints). In this case, once a connection to an Object record is made, one could decide whether the variants connected with this person should be available in this iconography record. This needs more thinking (e.g., should the variant records be copied to the Iconography record and then adjusted or should simply links to them be available? The latter would be more elegant but may create some dispaly problems). 
@@ -444,11 +444,12 @@ The following actions would be necessary:
 
 Authority records as ingested automatically from the GND or another source often lack some information that is needed for Iconobase. This information could either be added immediately after ingesting the new record or later, before the record is made public. 
 
-It could mean two things: 
+It could mean three things: 
 - Determining the type of an authority record (e.g., is a depicted person a historical figure, a mythological figure, etc.I)
 - Creating links to other records - e.g., a 'historical figure' must be defined by a place, a date, and a profession, however vague (or, in many cases easier, by an office and dates), an artist must have a preferred place of activity, a town must belong to a region, and an animal species to larger groups. 
 - If a place of activity is assigned to an artist, all Making processes with this artist and no link to a place are to be supplied with this place or activity as place. 
 This would be done through manual editing. One would probably go through all unpublished Authority records in an Ingest process, open them and be prompted which information was still missing. 
+- If an Authority record can be linked to an Iconography record, it must be able to add one or more variants that could then be exported to all connected Iconography records (typical example: a saint with attributes that appear in different iconographies the saint is in. The addition of variants works as the addition of variants to an Iconography record. )
 
 ## Edit Authority records
 [Contents](#table-of-contents)

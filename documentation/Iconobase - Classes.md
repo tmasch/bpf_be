@@ -996,14 +996,16 @@ This record is the central record on subject-matter of an Image, and as such it 
 **Edge between Iconography and Action (EdgeActionIconography):**
 **Edge between Iconography and Artwork (EdgeArtworkIconography):**
 
-These Edges connect the Iconography record to records for the Objects shown in the Iconography. All Edges are explained with the respective Objects. Several more such Edges will be added later. 
+These Edges connect the Iconography record to records for the Objects shown in the Iconography. All Edges are explained with the respective Objects. 
+In some cases, especially with Persons, an Object can be connected with many Iconographies (e.g., how many Iconographies could be linked to 'Jesus Christ'?). There should be a way of presenting them e.g. as a list punctuated by subheadings (e.g., Infancy, Passion, etc.), but how could this be done from a data point of view? With Heading records between Object and Iconography? I am not sure. 
+
 
 **Edge between Iconography and Iconography (EdgeIconographyIconography):**
 
 This Edge would be used primarily for coats-of-arms: There would be one Iconography that has a complex coats-of-arms (e.g. Royal Arms of the United Kingdom) that has connections to Object records of the owner of the coat-of-arms (in this case a Place), and connections to the Iconography records of the individual arms of England, Scotland, and Ireland. (I am not sure if the composite coat-of-arms may also have connections to HeraldicObject records, e.g. for the Supporters - in any case, the structure as drawn up here allows this). 
 The attribute "location" cold tell where in the composite shield the individual shields are. 
 
-In theory, one could use this arrangement also for describing scenes that regularly include other scenes, e.g. a Nativity with Annunciation to the Shepherds in the background. However, this needs more thinking, and in any case, it would necessitate inheriting variants (coats-of-arms have none )
+In theory, one could use this arrangement also for describing scenes that regularly include other scenes, e.g. a Nativity with Annunciation to the Shepherds in the background. However, this needs more thinking, and it would probably better to have this as an Option. 
 
 **Edge between Iconography and Criterion (EdgeIconographyCriterion):**
 

@@ -35,9 +35,9 @@ end note
 :Enter Object name and
 select Connection for each
 Object
-(processes element_insert_object
-or element_insert_object_
-text_place);
+(processes Connect Simple
+or Connect Place/Text 
+as described above);
 note left
 screen3
 endnote
@@ -92,9 +92,9 @@ if (Record needs variants) then (yes)
     to additional objects) then (yes)
         :enter object records
         and connections, using
-        element_insert_object or
-        eLement_insert_object_
-        place_text;
+        processes Connect Simple or 
+        Connect Place/Text as 
+        described above;
         note right
         this would be e.g. 
         attributes or additional

@@ -5,7 +5,7 @@ title Select Connected Object Records (Iconography)
 start
 note right
 This action happens
-regularly in two contextsn:
+regularly in two contexts:
 - manual editing
 of Artwork records 
 - copying information 
@@ -66,6 +66,20 @@ if (Select item from list) then (result)
     |DB|
     :Search;
     |BFF|
+    if (Iconography
+    record is connected to
+    any Object records with
+    copy_variants = True in
+    the edge) then (yes)
+        :Retrieve all variants
+        connected to these
+        Object records;
+        |DB|
+        :Search;
+        |BFF|
+        else (no)
+    end if 
+
     :Process search result 
     for display;
     |UI|
