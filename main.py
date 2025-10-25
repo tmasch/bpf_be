@@ -22,12 +22,12 @@ from dotenv import load_dotenv
 #from fastapi import FastAPI
 from fastapi import FastAPI,APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import parse_iiif
-import db_actions
-import classes
-import image_actions
-import book_ingest_create_records
-import display_records
+from bpf.parsing import parse_iiif
+from bpf import db_actions
+from bpf import classes
+from bpf import image_actions
+from bpf import book_ingest_create_records
+from bpf import display_records
 
 load_dotenv()
 

@@ -1,3 +1,4 @@
+
 #pylint: disable=C0301,C0114,C0116
 import asyncio
 #from rich import print
@@ -5,8 +6,8 @@ from beanie import WriteRules
 #from beanie.odm.operators.find.element import BaseFindElementOperator
 from dotenv import load_dotenv
 
-import db_actions
-import classes
+import src.db_actions as db_actions
+import src.classes as classes
 
 load_dotenv()
 

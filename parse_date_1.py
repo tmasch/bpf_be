@@ -1,6 +1,6 @@
 #pylint: disable=C0114,C0304,C0116
 import re
-import classes
+import bpf.classes as classes
 
 
 @classes.func_logger

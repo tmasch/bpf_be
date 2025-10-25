@@ -5,8 +5,8 @@ from beanie import WriteRules, DeleteRules
 #from beanie.odm.operators.find.element import BaseFindElementOperator
 from dotenv import load_dotenv
 
-import db_actions
-import classes
+import src.db_actions as db_actions
+import src.classes as classes
 
 load_dotenv()
 

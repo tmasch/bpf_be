@@ -13,7 +13,7 @@ from beanie import init_beanie
 import motor.motor_asyncio
 
 import exp_classes
-import person_relations
+import bpf.person_relations as person_relations
 
 
 

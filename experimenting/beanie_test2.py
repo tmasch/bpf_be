@@ -4,8 +4,8 @@ from rich import print
 from beanie import WriteRules
 from dotenv import load_dotenv
 
-import db_actions
-import classes
+import bpf.db_actions as db_actions
+import bpf.classes as classes
 
 load_dotenv()
 
