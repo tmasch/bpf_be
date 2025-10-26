@@ -35,6 +35,20 @@ async def create_test_record_saint_scholastica():
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
+async def create_test_record_queen_anne():
+    gnd_id="118649450"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
+
+async def create_test_record_adolf_friedrich():
+    # One of the relatively few persons with a person-person relation that has a time attached
+    gnd_id="100014704"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
+
+
+
+
 
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
@@ -48,26 +62,128 @@ async def test_parse_gnd_name_preferred():
     name_preferred=parse_gnd.gnd_record_get_name_preferred(rubens)
     assert name_preferred[0] == 'Rubens, Peter Paul'
     assert name_preferred[1] == ''
-    """
-    Also subfield c filled - not a ruler - Saint
-    """
+
+    #Also subfield c filled - not a ruler - Saint
+
     thomas=await create_test_record_thomas_aquinas()
     name_preferred=parse_gnd.gnd_record_get_name_preferred(thomas)
     assert name_preferred[0] == 'Thomas (von Aquin)'
     assert name_preferred[1] == 'Saint'
-    """
-    Also subfield b filled - 
-    subfield c filled with a ruler's
-    designation that is to be ignored
-    """
-    max=await create_test_record_max_emanuel()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(max)
+
+    #Also subfield b filled -
+    #subfield c filled with a ruler's
+    #designation that is to be ignored
+
+    maximilian=await create_test_record_max_emanuel()
+    name_preferred=parse_gnd.gnd_record_get_name_preferred(maximilian)
     assert name_preferred[0] == 'Maximilian Emanuel II.'
     assert name_preferred[1] == 'Bayern, Kurfürst'
-    """
-    Subfield c only indicates a saint
-    """
+
+    #Subfield c only indicates a saint
+
     scholastica=await create_test_record_saint_scholastica()
     name_preferred=parse_gnd.gnd_record_get_name_preferred(scholastica)
     assert name_preferred[0] == 'Scholastika'
     assert name_preferred[1] == 'Saint'
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_sex():
+    await db_actions.initialise_beanie()
+    #men
+    thomas=await create_test_record_thomas_aquinas()
+    sex = parse_gnd.gnd_record_get_sex(thomas)
+    assert sex == "male"
+    #women
+    anne=await create_test_record_queen_anne()
+    sex = parse_gnd.gnd_record_get_sex(anne)
+    print(sex)
+    assert sex == "female"
+    #not indicated
+    scholastica=await create_test_record_saint_scholastica()
+    sex = parse_gnd.gnd_record_get_sex(scholastica)
+    assert sex == ""
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_name_variant():
+    await db_actions.initialise_beanie()
+    # Max Emanuel (first additional name has subfields a and b, and c with a comma; 12th additional name has subfields a and b, and c without comma)
+    maximilian=await create_test_record_max_emanuel()
+    name_variants, comments = parse_gnd.gnd_record_get_name_variant(maximilian, "")
+    print(name_variants[0])
+    print(comments)
+    assert name_variants[0] == "Massimiliano Emanuele II."
+    assert "Baviera, Duca" in comments
+    assert name_variants[11] == "Maximilianus Emmanuel (Palatinae Dux)"
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_connected_persons():
+    await db_actions.initialise_beanie()
+    # Max Emanuel (first connected person has subfields a and c, 4, and 9 with 'v:')
+    maximilian=await create_test_record_max_emanuel()
+    connected_persons = parse_gnd.gnd_record_get_connected_persons(maximilian)
+    connection0 = connected_persons[0]
+    person0 = connection0.entityB
+    assert person0.name == "Ferdinand Maria (Bayern, Kurfürst)"
+    assert person0.external_id[0].name == "GND"
+    assert person0.external_id[0].external_id == "119105691"
+    assert person0.external_id[0].uri == "https://d-nb.info/gnd/119105691"
+    # The following two assertions are true by error (see below)
+    assert person0.external_id[1].uri == "https://d-nb.info/gnd/119105691"
+    assert person0.external_id[2].external_id == "https://d-nb.info/gnd/119105691"
+    assert connection0.relationB == "bezf"
+    assert connection0.connection_comment == "Vater"
+    # 7th connected person has subfields a, b and c, 4, and 9 with 'v:'
+    connection6 = connected_persons[6]
+    person6 = connection6.entityB
+    assert person6.name == "Karl VII. (Heiliges Römisches Reich, Kaiser)"
+    assert connection6.relationB == "bezf"
+    assert connection6.connection_comment == "Sohn"
+    # Adolf Friedrich von Mecklenburg - has relationship with time attached:
+    adolf=await create_test_record_adolf_friedrich()
+    connected_persons = parse_gnd.gnd_record_get_connected_persons(adolf)
+    connection1 = connected_persons[1]
+    assert connection1.relationB == "bezf"
+    assert connection1.connection_comment == "Ehefrau, 1. Ehe"
+    assert connection1.connection_time == "1622-1634"
+
+    # Some comments:
+    # There are several subfields "0" that can contain
+        # the GND ID, prefaced by "(DE-588)"
+        # the internal ID of the Deutsche Nationalbibliothek, prefaced by "(DE-101)" 
+            #  (for persons normally identical to the GND ID, for orgs and places not)
+        # the URI containing the GND ID
+    # I need:
+        # The GND ID with the name "GND"
+        # Only if it is different, the internal ID with a different name (for searches in VIAF, where the GND ID is not viable because of a bug in VIAF)
+        
+    # It may furthermore make sense to provide for the possibility that there is no such subfield, but onl one with a URI
+    # it may make sense to read also 500 subfield d (date) to improve the dummy nodes
+    # connection_comment is actually a comment on relationB (and later on, it will become relationB, since the information displayed in relationB is very vague)
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_connected_orgs():
+    await db_actions.initialise_beanie()
+    # Adolf Friedrich von Mecklenburg, connected to one organisationthat has 510 a, as well as 510 9, with "v:" and "Z:"
+    adolf=await create_test_record_adolf_friedrich()
+    connected_orgs = parse_gnd.gnd_record_get_connected_orgs(adolf)
+    connection0 = connected_orgs[0]
+    org0 = connection0.entityB
+    assert org0.name == "Fruchtbringende Gesellschaft"
+    assert org0.external_id[0].external_id=="004706463"
+    assert org0.external_id[1].external_id=="2011193-9"
+    assert connection0.relationB == "affi"
+    assert connection0.connection_comment == "175"
+    assert connection0.connection_time == "1629-"
+
+    # Some comments:
+    
+    # Also here problem with multiple subfields 0, see above
+

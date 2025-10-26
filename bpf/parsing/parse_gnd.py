@@ -1057,7 +1057,7 @@ def gnd_record_get_connected_orgs(record):
     
     """
     connections = []
-    datafields = find_datafields(record,"500")
+    datafields = find_datafields(record,"510")
     for datafield in datafields:
         org=classes.Node()
         org.type="Organisation"
@@ -1135,7 +1135,7 @@ def gnd_record_get_connected_places(record):
 #                     pe.connected_locations.append(conn_pl)
 """
     connections = []
-    datafields = find_datafields(record,"500")
+    datafields = find_datafields(record,"551")
     for datafield in datafields:
         pl=classes.Node()
         pl.type="Place"

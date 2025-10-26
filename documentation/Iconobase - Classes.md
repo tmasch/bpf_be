@@ -67,6 +67,7 @@ There will be more criteria for validating records that are ready to be made pub
 **
 In the following, these classes are merely listed like attributes of other classes. I am not sure if they would be connected directly or also with an Edge. With a potential exception in ExternalReference, the Edge would contain no information apart from the IDs of both elements, and the obligatory fields relationA and relationB. 
 
+
 ## Date
 
 This class is used for all indications of dates - all references to "date" as a format refer to it and not to an out-of-the-box date function. 
@@ -99,7 +100,6 @@ The attribute 'number' is used for displaying all ExternalReference instances co
 If one has an Edge between the ExternalReference and the object it is connected to, the relations would be something like 'external reference' and "external reference for". In this case, one could put make the number an attribute of the Edge, as is the case with other such numbers. 
 
 
-
 ## Citation
 
 Bibliographical references consist of two records: 
@@ -108,15 +108,18 @@ Bibliographical references consist of two records:
 - One could likewise treat the Citation record as Edge between other records and the Bibliography record. 
 ![Create](./class_diagrams/Citation.png)
 
+
 **Attributes:**
 - page_name: the way, pages are counted, by default "p. ", but possible alternatives "col. ",  etc. perhaps to be selected from a dropdown menu
 - page_number: the number, as string (no sorting needed)
 - image_name / image_number : works equivalent to  page_name + page_number. To be used primarily in information on the source of images in the Photo record. 
 - catalogue_number / catalogue_number_sequence: number of a catalogue entry. This would be preceded either by 'cat. ' or by the abbreviation given in the Bibliography record. 
 
+
 **Additional criteria for creating links:**
 
 - none
+
 
 **Additional criteria for validation for saving record:**
 
@@ -127,11 +130,13 @@ Bibliographical references consist of two records:
 
 - Only records connected to at least one other record (apart from the Bibliographical record)
 
+
 # Authority records that (also) function as Object records for Iconographies
 
 These authority records are used as Objects for Iconographical descriptions, and they all have similar structures. They also have similar links to other records so that they can be treated similarly at the FE. There are two distinctions to be made within this group: 
 - Some records have also other functions (e.g., for describing Making Processes) and hence additional links (e.g., Person, Organisation, Place, Text)
 - Some records can be recursively linked to other records of the same class, leading to a Matryoshka-like structure (Place, Text, NaturalObject). 
+
 
 ## Person
 
@@ -172,8 +177,11 @@ publisher of / publisher was
 
 Note the cardinality, every MakingProcess contains only one Person.
 
+
 **Edge between Person and Family :**
+
 I am not sure how to use this (it would be helpful for coats-of-arms, but it is a rather vague concept, e.g., do people also belong to the family of the in-laws? what is a family, and what is a branch of a family?). 
+
 
 **Edge between Person and Office (EdgePersonOffice):**
 
@@ -183,19 +191,19 @@ Offices held by the person. In case of several Offices one would probably sort t
 **Edge between Person and Organisation (EdgePersonOrganisation):**
 
 In addition to has member / member of, many other relations are possible, e.g.:
-founded by / founder of
-has director / director of (unless 'Office is used for that')
-has benefactor / benefactor of
-etc. 
+- founded by / founder of
+- has director / director of (unless 'Office is used for that')
+- has benefactor / benefactor of
+- etc. 
 
 
 **Edge between Person and Place (EdgePersonPlace):**
 
 In addition to born in / place of birth, several other relationships are possible, e.g.:
-died in / place of death
-active in / place of activity
-buried in / place of burial
-The date field would be needed for "active in" or similar relationships. 
+- died in / place of death
+- active in / place of activity
+- buried in / place of burial
+- The date field would be needed for "active in" or similar relationships. 
 
 
 **Edge between Person and Person (EdgePersonPerson):**
@@ -287,7 +295,7 @@ This could be used either simply to allocate families to countries, or to give a
 This would be used to connect families of rulers with the office, e.g. the Wittelsbach family to Dukes/Electors/Kings of Bavaria. It could also be used for families that regularly held non-hereditary offices (e.g. the Wittelsbach also as Archbishops of Cologne in the Baroque Age), but this may get a bit too much. 
 
 
-**Edge between Family and Iconography (EdgeFamilyIconography):**
+**Edge between Family and Iconography (EdgeFamilyIconography):**<br>
 **Edge between Family and Option (EdgeFamilyOption):**
 
 The Edge to Iconography would be used with different relationships for different types of iconography, heraldry would be the typical use, however, some other relationships might also be possible:
@@ -331,8 +339,8 @@ Hence, there will be needs for either linking together Personification records w
 - "type": This field would be needed if one had something akin the "species old name" system, then those and the 'Primary' personifications should be distinguishes. Otherwise, it is not needed. 
 - "name_preferred" / "name_variant": If the 'species old name' concept is used, these records would have as 'name_preferred' the name as written in the source, otherwise it would have the name of the Personification in a standard language (if possible, I would say, for some many the standard would be Latin, but for others Italian or French??). It would perhaps make sense to have the possibility of giving names together with sources (i.e., the names used in certain iconographical dictionaries) - only how? Tuples of name and ID of a Text record would make most sense buit iupset the overall structure, hence perhaps clumsily the name and the title of the text in brackets?, or something in the coments section?
   
-**Edge between Heading and Personification:**
-**Edge between Organisation and Personification:**
+**Edge between Heading and Personification:**<br>
+**Edge between Organisation and Personification:**<br>
 **Edge between Place and Personification:**
 
 These Edges link the Personifications to the concepts they show, Heading would be used e.g. for Personifications of virtues and vices, Organisations for Personifications of Organisations, and Place for geographical Personifications. It is possible that several additional entities, e.g., Family and Office, also need to be included here 
@@ -408,8 +416,8 @@ This Edge is primarily incuded to have a parallel with an Edge for Persons.
 This Edge works similar to the Edge between Organisation and Iconography, but in this case the Organisation would be the common 'Theme' of a cycle (e.g., "Events from the History of Aldersbach Abbey"). I have to think more about how to do that (especially, if there should be a node between the Cycle and the Organisation)
 
 
-**Edge between Artwork and Collection (EdgeArtworkCollection)**
-**Edge between Manuscript and Collection (EdgeManuscriptCollection)**
+**Edge between Artwork and Collection (EdgeArtworkCollection)**<br>
+**Edge between Manuscript and Collection (EdgeManuscriptCollection)**<br>
 **Edge between Copy and Collection (EdgeCopyCollection)**
 
 These three Edges have the same structure. 
@@ -499,32 +507,21 @@ This Edge is used to connect Artworks to the Place where they are (or were). The
 
 There are several relationships possible, depending on the Type of Iconography and the Type of Place, e.g.
 
-for Iconography "Topographical View" and Place "Historical Region": 
+- for Iconography "Topographical View" and Place "Historical Region": 
+  - view / view of
+  - map / map of
+- for Iconography "Topographical View" and Place "Town": 
+  - view / view of
+  - plan / plan of
+- for Iconography "Topographical View" and Place "Building", "Building" or "Building part": 
+  - exterior / exterior of
+  - interior / interior of
+  - reconstruction / reconstruction of
+  - elevation / elevation of
+  - plan / plan of
 
-view / view of
-
-map / map of
-
-for Iconography "Topographical View" and Place "Town": 
-
-view / view of
-
-plan / plan of
-
-for Iconography "Topographical View" and Place "Building", "Building" or "Building part": 
-
-exterior / exterior of
-
-interior / interior of
-
-reconstruction / reconstruction of
-
-elevation / elevation of
-
-plan / plan of
-
-for Iconography "Narrative Scene" 
-action happening here / place of action (Here is a problem: this would only indicate where an action took place, not if the place is really shown there, the latter would be rather under EdgePlaceOption)
+- for Iconography "Narrative Scene" 
+  - action happening here / place of action (Here is a problem: this would only indicate where an action took place, not if the place is really shown there, the latter would be rather under EdgePlaceOption)
 
 The attribute copy_variants determines if any variants (i.e., Criteria and Options) linked to the Place record should be made available in this Iconography record. 
 
@@ -708,10 +705,10 @@ Coats-of-arms work differently from other images.
 - type: Here, one could discern Ordinaries (simple geometrical patterns) and charges proper (animals etc.), and perhaps subdivide charges into e.g. animals, objects, persons etc.
 - name/name_translated: English heraldry uses a very specialist language, and for technical terms a plain English version should be given
 
-**Edge between Person and Iconography:**
-**Edge between Place and Iconography:**
-**Edge between NaturalObject and Iconography:**
-**Edge between Thing and Iconography:**
+**Edge between Person and Iconography:**<br>
+**Edge between Place and Iconography:**<br>
+**Edge between NaturalObject and Iconography:**<br>
+**Edge between Thing and Iconography:**<br>
 
 These are links between the normal Object records and HeraldicObject records - necessary because the normal Object records do not the attached structure of Criteria and Options. Normally, a HeraldicObject would be linked to another Object (and, I cannot think why it should be linked to more than one, although I have to think about that more), the exception being simple Ordinaries (see above). Currently, I cannot think of other Object records being connected to coats-of-arms, but maybe one or two more will have to be added. 
 
@@ -792,18 +789,18 @@ person from / comes from
 
 I am not sure if this is needed, and what for. 
 
-**Edge between Text and Manuscript:**
+**Edge between Text and Manuscript:**<br>
 **Edge between Text and Book:**
 
 These two Edges could be used to show for every text the illustrated manuscripts and books kept in Iconobase. However, strictly speaking, this information could be inferred via the connections between Manuscript and Artwork, and Artwork and Text (or Book and Artwork, and Artwork and Text), hence I am not sure if it has to be (a) created manually (b) created automatically and then stored so that it could be edited manually, or (c) created automatically for search processes only. 
 
-**Edge between Text and Artwork:**
+**Edge between Text and Artwork:**<br>
 **Edge between Text and Matrix:**
 
 Here, the cardinality from Artwork to Text is normally 0..1 (an Artwork may can only illustrate one Text, the text written next to it). However, there can be additional connections to texts with duplicate as True, hence 0..n in this situation. 
 By contrast, the Edge between Text and Matrix goes between the Matrix and all Texts where the image produced by this Matrix appears, hence 0..n. 
 
-**Edge between Text and Iconography (EdgeTextIconography):**
+**Edge between Text and Iconography (EdgeTextIconography):**<br>
 **Edge between Text and Option (EdgeTextOption):**
 
 This Edge is used for two different scenarios
@@ -946,6 +943,7 @@ This Edge is the same as the Edge between Artworks and Collections.
 See Text: I am not sure if this Edge is needed, or if there is a way to insert it automatically. 
 
 **Additional criteria for creating links:**
+
 - An EdgeManuscriptArtwork can only be established if the Artwork has a Medium appropriate for a Manuscript (e.g. "Illumination", not "Mural Painting")
 
 **Additional criteria for validation for saving record:**
@@ -987,13 +985,13 @@ This record is the central record on subject-matter of an Image, and as such it 
 
 - references: This refers primarily to Iconclass notations. One could also refer here to Warburg or Princeton Index URIs.
 
-**Edge between Iconography and Person (EdgePersonIconography):**
-**Edge between Iconography and Family (EdgeFamilyIconography):**
-**Edge between Iconography and Organisation (EdgeOrganisationIconography):**
-**Edge between Iconography and Place (EdgePlaceIconography):**
-**Edge between Iconography and Natural Object (EdgeNaturalObjectIconography):**
-**Edge between Iconography and Text (EdgeTextIconography):**
-**Edge between Iconography and Action (EdgeActionIconography):**
+**Edge between Iconography and Person (EdgePersonIconography):**<br>
+**Edge between Iconography and Family (EdgeFamilyIconography):**<br>
+**Edge between Iconography and Organisation (EdgeOrganisationIconography):**<br>
+**Edge between Iconography and Place (EdgePlaceIconography):**<br>
+**Edge between Iconography and Natural Object (EdgeNaturalObjectIconography):**<br>
+**Edge between Iconography and Text (EdgeTextIconography):**<br>
+**Edge between Iconography and Action (EdgeActionIconography):**<br>
 **Edge between Iconography and Artwork (EdgeArtworkIconography):**
 
 These Edges connect the Iconography record to records for the Objects shown in the Iconography. All Edges are explained with the respective Objects. 
@@ -1051,15 +1049,15 @@ Criterion records can appear in three places: most commonly, they are connected 
 **Attributes:**
 The class is very simple, the only attribute being a name. 
 
-**Edge between Iconography and Criterion (EdgeIconographyCriterion):**
-**Edge between Heraldic Object and Criterion (EdgeHeraldicObjectCriterion):**
-**Edge between Person and Criterion (EdgePersonCriterion):**
-**Edge between Family and Criterion (EdgeFamilyCriterion):**
-**Edge between Personification and Criterion (EdgePersonificationCriterion):**
-**Edge between Natural Object and Criterion (EdgeNaturalObjectCriterion):**
-**Edge between Organisation and Criterion (EdgeOrganisationCriterion):**
-**Edge between Place and Criterion (EdgePlaceCriterion):**
-**Edge between Text and Criterion (EdgeTextCriterion):**
+**Edge between Iconography and Criterion (EdgeIconographyCriterion):**<br>
+**Edge between Heraldic Object and Criterion (EdgeHeraldicObjectCriterion):**<br>
+**Edge between Person and Criterion (EdgePersonCriterion):**<br>
+**Edge between Family and Criterion (EdgeFamilyCriterion):**<br>
+**Edge between Personification and Criterion (EdgePersonificationCriterion):**<br>
+**Edge between Natural Object and Criterion (EdgeNaturalObjectCriterion):**<br>
+**Edge between Organisation and Criterion (EdgeOrganisationCriterion):**<br>
+**Edge between Place and Criterion (EdgePlaceCriterion):**<br>
+**Edge between Text and Criterion (EdgeTextCriterion):**<br>
 
 These Edges only contain a number so that Criteria (if there are several) can be arranged in the most user-friendly way. Since every Criterion is only linked to one record of this kind, one could likewise place this number as attribute of the Criterion record, it is here in the Edge for the sake of consistency with other Edges. 
 
@@ -1088,6 +1086,7 @@ The Option record is the second part of describing iconographical variants, if t
 ![Create](./class_diagrams/option.png)
 
 **Attributes:**
+
 - external references can exist, sometimes Iconclass calls has separate notations for what would here be variants. 
 - name_preferred and name_short are two different variants of the name. name_preferred is used as a stand-alone name, and name_short together with the name of the Criterion, e.g. there may be the Criterion "with Joseph", name_short of one option would be 'no', and name_preferred 'without Joseph'
 - name_translated will probably be only used in the context of heraldry, as translation of heraldic terms, e.g. "gold" for "or". I am not sure if one would also need translations for the shorter form (which are only seen by editors)
@@ -1097,14 +1096,14 @@ The Option record is the second part of describing iconographical variants, if t
 
 see above
 
-**Edge between Person and Option (EdgePersonOption):**
-**Edge between Family and Option (EdgeFamilyOption):**
-**Edge between Personification and Option (EdgePersonificationOption):**
-**Edge between Organisation and Option (EdgeOrganisationOption):**
-**Edge between Natural Object and Option (EdgeNaturalObjectOption):**
-**Edge between Thing and Option (EdgeThingOption):**
-**Edge between Place and Option (EdgePlaceOption):**
-**Edge between Text and Option (EdgeTextOption):**
+**Edge between Person and Option (EdgePersonOption):**<br>
+**Edge between Family and Option (EdgeFamilyOption):**<br>
+**Edge between Personification and Option (EdgePersonificationOption):**<br>
+**Edge between Organisation and Option (EdgeOrganisationOption):**<br>
+**Edge between Natural Object and Option (EdgeNaturalObjectOption):**<br>
+**Edge between Thing and Option (EdgeThingOption):**<br>
+**Edge between Place and Option (EdgePlaceOption):**<br>
+**Edge between Text and Option (EdgeTextOption):**<br>
 
 These Edges function similar to the Edges between this Object records and the Iconographies. The exception is the attribute 'copy_variants'. If it is set on True, the screen for connect an Imagne to an Iconography will not only be shown the variants offered by this Iconography, but also the variants offered by this linked Object record (e.g., if the Person record for St Peter has the attribute 'with keys', one could decide whether this should be shown for any Iconographies connected with St Peter - it would probably make sense for 'No narrative context', but not for 'Crucifixion of St Peter'). 
 
@@ -1151,7 +1150,7 @@ For the sake of clarity, the diagram shows all connected objects twice, once for
 
 This needs more work, it could be used to have e.g. a list of all Types and Antitypes organised by Biblical book. 
 
-**Edge between Typology and Iconography (EdgeTypologyIconography):**
+**Edge between Typology and Iconography (EdgeTypologyIconography):**<br>
 **Edge between Typology and Option (EdgeTypologyOption):**
 
 Normally, each Typology record has two Edges of each type. The relationships have to be complementary (e.g., if one is 'type of', the other one must be 'antitype for')
@@ -1416,9 +1415,9 @@ oil sketch / oil sketch for
 modello  / modello for
 ricordo / ricordo for
 
-**Edge between Place and Artwork (EdgePlaceArtwork):**
-**Edge between Collection and Artwork (EdgeArtworkCollection):**
-**Edge between Manuscript and Artwork (EdgeManuscriptArtwork):**
+**Edge between Place and Artwork (EdgePlaceArtwork):**<br>
+**Edge between Collection and Artwork (EdgeArtworkCollection):**<br>
+**Edge between Manuscript and Artwork (EdgeManuscriptArtwork):**<br>
 **Edge between Book and Artwork (EdgeBookArtwork):**
 
 These four Edges are used to indicate where the Artwork is located - in a Place (e.g., in a church building), in a Collection (e.g., Museum or Dealer), or within a manuscript or within a book. 
@@ -1428,8 +1427,8 @@ Depending of the type of location, they have different properties, e.g. the loca
 
 This Edge is used to indicate, which passage of a text is illustrated by the Artwork (this has nothing ot do with the iconography, but it means basically the passage of text the Artwork is in, e.g., a Crucifixion may be in a book of the Life of Christ, or in the Canon of a Missal, etc.). For details, especially the cardinality, see above. 
 
-**Edge between Artwork and Iconography (EdgeArtworkIconography):**
-**Edge between Artwork and Option (EdgeArtworkOption):**
+**Edge between Artwork and Iconography (EdgeArtworkIconography):**<br>
+**Edge between Artwork and Option (EdgeArtworkOption):**<br>
 **Edge between Artwork and Cycle (EdgeARtworkCycle):**
 
 These three Edges are ony used if the Artwork is in turn the iconography for other Artworks (e.g., an engraving showing the Hercules Farnese). Of them, EdgeArtworkCycle will be needed very rarely, and for EdgeArtworkOption I cannot think of a use case, so I primarily added them for consistency (I didn't add a connection to Criterion because I think that this could really be ruled out)
@@ -1481,6 +1480,7 @@ When an Artwork record is created, one or more MakingProcess records are created
 - partial_detail: this field is only relevant when partial is True - one could indicate here which part is connected to this MakingProcess, e.g. "flowers"
 
 **Edge between Artwork and MakingProcess (EdgeArtworkMakingProcess):**
+
 see under Artwork
 
 **Edge between Matrix and MakingProcess (EdgeMatrixMakingProcess):**
@@ -1489,6 +1489,7 @@ This works like the EdgeArtworkMakingProcess, see under Artwork
 
 
 **Additional criteria for creating links:**
+
 - A MakingProcess can only be linked to one Person or to one Organisation. 
 - A MakingProcess can only be linked to a Person of the type 'Artist' (or, for some MakingProcesses, only 'Printer'). 
 - A MakingProcess can ony linked to an Organisation of the type 'Group of Members' (One might also think of having a new Organisation type 'Workshop' and restrict the links to it, but I am not sure ife this is necessary)
@@ -1505,10 +1506,12 @@ The Image record describe what can be seen on a photo of the Artwork record, hen
 ![Create](./class_diagrams/Image.png)
 
 **Attributes:**
+
 detail: indicates if the Image is a detail of the complete artwork or shows it in its entirety. 
 position: indicates the part of the artwork shown, e.g. "top left" or "NW corner, upper row". A controlled vocabulary probably does not make sense. Normally, this would be empty if detail is 'false', but perhaps not always, I am not totally sure. 
 
 **Edge between Artwork and Image (EdgeArtworkImage):**
+
 see above
 
 
@@ -1522,12 +1525,14 @@ This Edge is probably used for two different scenarios.
   This works like the EdgeArtworkImage, but numbering is not necessary since there is no sensible way in which the copies should be ordered. 
 
   **Edge between Image and Iconography (EdgeImageIconography):**
+
 - preferred: This means that this is the Image that should appear in a search for the connected iconography. For every combination of Artwork and Iconography, only one connection can be preferred. 
 - number: The number in which the iconographie are listed in the Image record (makes only sense in that direction)
 - qualifier and qualifier_comments: Indicates how certain the connection is. This would be selected from a list, with the default 'no comments', and other options e.g. 'according to source texts', 'tentative'. If needed, this may be explained in qualifier_comments.
 - options: A list of the IDs of all the Options of the selected Iconography that are pertinent for the Image
 
 **Edge between Image and Cycle (EdgeImageCycle):**
+
 This Edge connects the Image to a Cycle, i.e., a series of Images that are made to function as a unity and that have a common topic (simple example, Stations of the Cross in a certain church). I have not fully worked out what to do with the Cycles, but I assume that the only information needed on the Edge is a sequence number (so that the Images within a CYcle could be ordered correctly and, where it is indicated, a number for display (would be used if the Images bear these numbers))
 
 **Edge between Image and Inscription:**
@@ -1577,6 +1582,7 @@ A link to a Text is only possible if the Text has the type "Quotation". This wou
 
 There must be either a link to a Text record, or the text field must be filled (or as condition for publishing?)
 
+
 **Additional criteria for validation for publishing record:**
 
 The record must be connected to an Image record (or, if I use that, to an Iconography record)
@@ -1594,25 +1600,33 @@ Originally, I left out this node in all other cases and connected the Image node
 
 see above
 
+
 **Edge between Copy and Photo (EdgeImagecopy):**
+
 works like EdgeImagecopy
 
+
 **Edge between Copy and Collection (EdgeCopyCollection):**
+
 works like EdgeArtworkCollection
+
 
 
 **Additional criteria for creating links:**
 
 Links to Organisations (= Collections) are only possible if the medium of the Artwork connected to this Copy record fits with a multiple (e.g., 'woodcut' but not 'fresco'). In this case, the Image record cannot have links to Place or Organisation records. 
 
+
 **Additional criteria for validation for saving record:**
 
 There must not be more than one Edge to a Collection with current as True. 
+
 
 **Additional criteria for validation for publishing record:**
 
 The record must be connected to a Photo record. 
 As stated under Artwork Record - an Artwork Record can only be published if either it or a connected Copy record is connected to a Collection, a Place, or a Manuscript. 
+
 
 ## Photo
 
@@ -1631,16 +1645,23 @@ There is a principal question if all photos should be stored locally, or if for 
 - rights_internal: information about image rights for internal use only (e.g., contact details of photographer)
 - date: date of the photo campaign (if one wants to indicate it). If there is a date for a linked Campaign it may not be necessary to give a date here (unless the campaign went on for many years, and one wants to be more specific)
 
+
 **Edge to Person/Edge to Campaign:**
+
 If a Person is linked to a Campaign, it would be probably not needed to indicate the Person also here (or this could be done automatically)
 
 
 **Additional criteria for creating links:**
+
 none
+
 
 **Additional criteria for validation for saving record:**
+
 none
 
+
 **Additional criteria for validation for publishing record:**
+
 none
 
