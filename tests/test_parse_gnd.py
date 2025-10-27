@@ -46,9 +46,15 @@ async def create_test_record_adolf_friedrich():
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
+async def create_test_record_caspar_adolay():
+    gnd_id = "100004636"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
 
-
-
+async def create_test_record_arenswald():
+    gnd_id = "100014747"
+    r=await parse_gnd.get_records(gnd_id)
+    return r[0]
 
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
@@ -182,8 +188,53 @@ async def test_parse_gnd_get_connected_orgs():
     assert connection0.relationB == "affi"
     assert connection0.connection_comment == "175"
     assert connection0.connection_time == "1629-"
-
+    # Caspar Adolay, connected to one organisation that has 510 a and 510 b
+    caspar = await create_test_record_caspar_adolay()
+    connected_orgs = parse_gnd.gnd_record_get_connected_orgs(caspar)
+    connection0 = connected_orgs[0]
+    org0 = connection0.entityB
+    assert org0.name == "Bayern (Bayerischer Landtag)"
+    assert connection0.relationB == "affi"
     # Some comments:
     
     # Also here problem with multiple subfields 0, see above
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_connected_places():
+    await db_actions.initialise_beanie()
+    # Rubens: first connected places has subfields a and 4, second a, 4 and 9, the latter with "v:"
+    rubens = await create_test_record_rubens()
+    connected_places = parse_gnd.gnd_record_get_connected_places(rubens)
+    connection0 = connected_places[0]
+    place0 = connection0.entityB
+    assert place0.name == "Siegen"
+    assert place0.external_id[0].external_id=="04054883X"
+    assert place0.external_id[1].external_id=="4054883-1"
+    assert connection0.relationB=="ortg"
+    connection1 = connected_places[1]
+    assert connection1.relationB=="ortw"
+    assert connection1.connection_comment=="dort aufgewachsen"
+    # Arenswald: connected to places with subfields a, g, 4 and 9, the latter with "Z:"
+    arenswald = await create_test_record_arenswald()
+    connected_places = parse_gnd.gnd_record_get_connected_places(arenswald)
+    connection0 = connected_places[0]
+    place0 = connection0.entityB
+    assert place0.name=="Neuenkirchen (Amt Anklam-Land)"
+    assert connection0.relationB=="ortw"
+    assert connection0.connection_time=="1765-1770"
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_comments():
+    await db_actions.initialise_beanie()
+    # Max Emanuel - has a field 678 but also many other elements beforehands that would be written into the comment field"
+    maximilian=await create_test_record_max_emanuel()
+    comment = parse_gnd.get_gnd_comments(maximilian, "")
+    assert comment == "seit 1679 Kurfürst von Bayern; 1692-1706 Generalstatthalter der Spanischen Niederlande"
+
+
 
