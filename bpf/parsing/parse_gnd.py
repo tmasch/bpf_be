@@ -1289,9 +1289,9 @@ def get_gnd_dates(record):
 
 """
     datafields = find_datafields(record,"548")
-    dates_from_source = []
-    date = classes.DateImport()
+    dates_from_source = []    
     for datafield in datafields:
+        date = classes.DateImport()
         subfields = find_subfields(datafield,"a")
         if subfields:
             date.datestring_raw = subfields[0]
@@ -1310,7 +1310,7 @@ def get_gnd_dates(record):
         # Since this function is not only used for persons but also for organisations, a potential
         # preview must not only cater for "datl" (no comments needed) and "datw" ("active "), 
         # but also for "datb" ("extant ")
-        return (dates_from_source)
+    return (dates_from_source)
         
 
 @classes.func_logger

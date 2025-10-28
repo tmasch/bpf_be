@@ -237,4 +237,17 @@ async def test_parse_gnd_get_comments():
     assert comment == "seit 1679 Kurfürst von Bayern; 1692-1706 Generalstatthalter der Spanischen Niederlande"
 
 
-
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_get_dates():
+    await db_actions.initialise_beanie()
+    # elector Maximilian: two dates, the first years only, type "datl", the second days, datetype "datx"
+    maximilian=await create_test_record_max_emanuel()
+    date=parse_gnd.get_gnd_dates(maximilian)
+    date0 = date[0]
+    assert date0.datestring_raw=="1662-1726"
+    assert date0.datetype=="datl"
+    date1 = date[1]
+    assert date1.datestring_raw=="11.07.1662-26.02.1726"
+    assert date1.datetype=="datx"
