@@ -251,3 +251,16 @@ async def test_parse_gnd_get_dates():
     date1 = date[1]
     assert date1.datestring_raw=="11.07.1662-26.02.1726"
     assert date1.datetype=="datx"
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_professions():
+    await db_actions.initialise_beanie()
+    # elector Maximilian: has profession
+    maximilian = await create_test_record_max_emanuel()
+    profession=parse_gnd.parse_gnd_profession(maximilian, "")
+    assert profession=="Kurfürst"
+    
+    # some entries also seem to have subfield 9, starting with "v:", I should add that.
