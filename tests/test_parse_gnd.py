@@ -14,6 +14,8 @@ async def test_parse_gnd_get_records():
     records=await parse_gnd.get_records(gnd_id)
     assert type(records).__name__ == "_Element"
 
+## Test records for persons
+
 async def create_test_record_rubens():
     gnd_id="11860354X"
     r=await parse_gnd.get_records(gnd_id)
@@ -55,6 +57,7 @@ async def create_test_record_arenswald():
     gnd_id = "100014747"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
+
 
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
@@ -264,3 +267,180 @@ async def test_parse_gnd_professions():
     assert profession=="Kurfürst"
     
     # some entries also seem to have subfield 9, starting with "v:", I should add that.
+
+
+# Test records for organisations
+
+async def create_test_record_electrochemical_society():
+    gnd_id="343-8"
+    r=await parse_gnd.get_org_records(gnd_id)
+    return r[0]
+
+async def create_test_record_academy_religion():
+    gnd_id="364-5"
+    r=await parse_gnd.get_org_records(gnd_id)
+    return r[0]
+
+async def create_test_record_nato():
+    gnd_id="378-5"
+    r=await parse_gnd.get_org_records(gnd_id)
+    return r[0]
+
+
+async def create_test_record_gesellschaft_kernforschung():
+    gnd_id="2036894-X"
+    r=await parse_gnd.get_org_records(gnd_id)
+    return r[0]
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_org_record_get_name_preferred():
+    await db_actions.initialise_beanie()
+    # Electrochemical Society has a subfield b
+    electrochemical_society=await create_test_record_electrochemical_society()
+    name_preferred= parse_gnd.gnd_org_record_get_name_preferred(electrochemical_society)
+    assert name_preferred=="Electrochemical Society (Electrothermics and Metallurgy Division)"
+    # Academy of Relgion and Mental Health has a subfield g
+    academy_of_religion = await create_test_record_academy_religion()
+    name_preferred= parse_gnd.gnd_org_record_get_name_preferred(academy_of_religion)
+    assert name_preferred=="Academy of Religion and Mental Health (New York, NY)"
+    # Gesellschaft für Kernforschung has subfields b and g
+    gesellschaft_kernforschung=await create_test_record_gesellschaft_kernforschung()
+    name_preferred=parse_gnd.gnd_org_record_get_name_preferred(gesellschaft_kernforschung)
+    assert name_preferred=="Gesellschaft für Kernforschung (Abteilung Datenverarbeitung und Instrumentierung) (Karlsruhe)"
+    # (this is not pretty, but it will be rare)
+    # I have no text for the x since I didn't find an example
+
+    # Currently, the parsing does not support repetible subfields b and g - I have no clue if they exist. 
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_org_record_get_name_variant():
+    await db_actions.initialise_beanie()
+    academy_of_religion = await create_test_record_academy_religion()
+    # Academy of Religion and Mental Health has subfield g
+    name_variant= parse_gnd.gnd_org_record_get_name_variant(academy_of_religion)
+    assert name_variant[0]=="Académie de Religion et de Santé Mentale (New York, NY)"
+    # Nato subcommittee has subfield g
+    nato= await create_test_record_nato()
+    name_variant= parse_gnd.gnd_org_record_get_name_variant(nato)
+    assert name_variant[1]=="NATO (Groupe Consultatif pour la Recherche et le Développement Aérospatial)"
+
+    # there may be a repetition of the subfield b, and we should cater for this. 
+
+
+
+
+async def create_test_record_kathedrale_antwerpen():
+    gnd_id="4068763-6"
+    r=await parse_gnd.get_place_records(gnd_id)
+    return r[0]
+
+async def create_test_record_ardabil():
+    gnd_id="4068833-1"
+    r=await parse_gnd.get_place_records(gnd_id)
+    return r[0]
+
+async def create_test_record_regierungsbezirk_merseburg():
+    gnd_id="15720-X"
+    r=await parse_gnd.get_place_records(gnd_id)
+    return r[0]
+
+async def create_text_record_britisch_ostafrika():
+    gnd_id="14267-0"
+    r=await parse_gnd.get_place_records(gnd_id)
+    return r[0]
+
+
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_place_record_get_entity_type():
+    await db_actions.initialise_beanie()
+    kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
+    entity_type = parse_gnd.gnd_place_record_get_entity_type(kathedrale_antwerpen)
+    assert entity_type[0]=="g"
+    assert entity_type[1]=="gib"
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_place_record_get_geonames():
+    await db_actions.initialise_beanie()
+    ardabil = await create_test_record_ardabil()
+    geonames = parse_gnd.gnd_place_record_get_geonames(ardabil)
+    assert geonames[0].external_id=="143083"
+    assert geonames[0].uri=="https://sws.geonames.org/143083"
+    
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_place_record_get_coordinates():
+    await db_actions.initialise_beanie()
+    ardabil = await create_test_record_ardabil()
+    coordinates = parse_gnd.gnd_place_record_get_coordinates(ardabil)
+    assert coordinates[0].west=="E 048 17 35"
+    assert coordinates[0].east=="E 048 17 35"
+    assert coordinates[0].north=="N 038 14 59"
+    assert coordinates[0].south=="N 038 14 59"
+    assert coordinates[1].west=="E048.293300"
+    assert coordinates[1].east=="E048.293300"
+    assert coordinates[1].north=="N038.249800"
+    assert coordinates[1].south=="N038.249800"
+
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_place_record_get_name_preferred():
+    await db_actions.initialise_beanie()
+    # Ardabil, has only subfield a
+    ardabil = await create_test_record_ardabil()
+    name_preferred = parse_gnd.gnd_place_record_get_name_preferred(ardabil)
+    assert name_preferred=="Ardabil"
+    # Kathedrale Antwerpen has subfields a and g
+    kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
+    name_preferred = parse_gnd.gnd_place_record_get_name_preferred(kathedrale_antwerpen)
+    assert name_preferred=="Kathedrale Antwerpen (Antwerpen)"
+
+    # I dop not test the subfields x and z because I haven't found 
+    # any examples for their use
+
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_gnd_place_record_get_name_variant():
+    await db_actions.initialise_beanie()
+    # Ardabil, has only subfield a
+    ardabil = await create_test_record_ardabil()
+    name_variant = parse_gnd.gnd_place_record_get_name_variant(ardabil)
+    assert name_variant[0]=="Ardebil"
+    # Kathedrale Antwerpen has subfields a and g
+    kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
+    name_variant = parse_gnd.gnd_place_record_get_name_variant(kathedrale_antwerpen)
+    assert name_variant[0]=="Liebfrauenkathedrale Antwerpen (Antwerpen)"
+    # Regierungsbezirk Merseburg has two synonyms that, however, 
+    # have the relation "spio", they should be supressed
+    regierungsbezirk_merseburg = await create_test_record_regierungsbezirk_merseburg()
+    name_variant = parse_gnd.gnd_place_record_get_name_variant(regierungsbezirk_merseburg)    
+    assert not name_variant
+    # Britisch Ostafrika has in one synym a field "x" without having in "4" the spio
+    # > this should not be excluded
+    britisch_ostafrika=await create_text_record_britisch_ostafrika()
+    name_variant = parse_gnd.gnd_place_record_get_name_variant(britisch_ostafrika)
+    assert name_variant[5]=="Großbritannien (Kolonie)"
+
+
+
+    # Subfield x can be repeated, this should be included here. 
+    # I did not check subfield z because I didn't find an example

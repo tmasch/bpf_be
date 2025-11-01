@@ -612,6 +612,33 @@ async def get_records(gnd_id):
     records=root.find("records", namespaces=root.nsmap)
     return records
 
+
+@classes.async_func_logger
+# I created this function since get_records only works for persons
+async def get_org_records(gnd_id):
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
+                    + gnd_id\
+                    + r'%20and%20BBG%3DTb*&recordSchema=MARC21-xml&maximumRecords=100'
+    content=await get_external_data.get_web_data(authority_url)
+    root = etree.XML(content)
+    records=root.find("records", namespaces=root.nsmap)
+    return records
+
+
+@classes.async_func_logger
+# I created this function since get_records only works for persons
+async def get_place_records(gnd_id):
+    authority_url = r'https://services.dnb.de/sru/authorities?version=1.1&operation=searchRetrieve&query=NID%3D'\
+                    + gnd_id\
+                    + r'%20and%20BBG%3DTg*&recordSchema=MARC21-xml&maximumRecords=100'
+    content=await get_external_data.get_web_data(authority_url)
+    root = etree.XML(content)
+    records=root.find("records", namespaces=root.nsmap)
+    return records
+
+
+
+
 @classes.async_func_logger
 async def find_related_persons(gnd_id):
     records = await get_records(gnd_id)
@@ -1410,7 +1437,7 @@ def gnd_org_record_exclusion(record):
     return exclude
     
 
-@classes.async_func_logger
+@classes.func_logger
 def gnd_org_record_get_name_preferred(record):
     """
     Takes the preferred name of an organisation
@@ -1474,9 +1501,14 @@ def gnd_org_record_get_name_variant(record):
         subfields = find_subfields(datafield,"b")
         if subfields: 
             name_variant = name_variant + " (" + subfields[0] + ")"
+        # I add subfield g because it does appear. 
+        subfields = find_subfields(datafield,"g")
+        if subfields: 
+            name_variant = name_variant + " (" + subfields[0] + ")"
         if name_variant not in variants:
             variants.append(name_variant)
     return (variants)
+
 
 
 
@@ -1543,7 +1575,7 @@ def gnd_place_record_get_entity_type(record):
     for datafield in datafields:
         subfields = find_subfields(datafield,"b")
         if subfields: 
-            entities.append.subfields[0]
+            entities.append(subfields[0])
     return entities
     
 def gnd_place_record_get_geonames(record):
@@ -1572,7 +1604,7 @@ def gnd_place_record_get_geonames(record):
         if subfields:
             external_reference.name = subfields[0]
             if external_reference.name == "geonames":
-                external_reference.uri = "https://sws.geonames.org/" + external_references.external_id
+                external_reference.uri = "https://sws.geonames.org/" + external_reference.external_id
                 external_references.append(external_reference)      
     return(external_references)
 
@@ -1630,6 +1662,10 @@ def gnd_place_record_get_name_preferred(record):
         subfields = find_subfields(datafield,"a")
         if subfields:
             name_preferred = subfields[0]
+        # I added subfield g that wasn't here beforehand. 
+        subfields = find_subfields(datafield,"g")
+        if subfields:
+            name_preferred = name_preferred + " (" + subfields[0] + ")"
         # "x" and "z" in subfields are for subdivisions of some kind
         # I have no clue if they ever occur in images relevant to me. 
         subfields = find_subfields(datafield,"x")
@@ -1663,23 +1699,38 @@ def gnd_place_record_get_name_variant(record):
     datafields = find_datafields(record,"451")
     for datafield in datafields:
         name_variant = ""
+        relation = ""
         subfields = find_subfields(datafield,"a")
         if subfields: 
             name_variant = subfields[0]
+        
+        # I added subfield g because it was not there, and is actually in use
+
+        subfields = find_subfields(datafield,"g")
+        if subfields: 
+            name_variant = name_variant + " (" + subfields[0] + ")"
+
         # I don't know if the subfields i, x and z ever contain any relevant information,
         # so I add them just in case. 
-        subfields = find_subfields(datafield,"i")
-        if subfields: 
-            name_variant = name_variant + " )" + subfields[0] + ")"
+
+        # No, I have now deleted i because it merely explains a "4" field
+
         subfields = find_subfields(datafield,"x")
         if subfields: 
             name_variant = name_variant + " (" + subfields[0] + ")"
         subfields = find_subfields(datafield,"z")
         if subfields: 
             name_variant = name_variant + " (" + subfields[0] + ")"
-        if name_variant not in variants:
+        subfields = find_subfields(datafield,"4")
+        if subfields: 
+            relation = subfields[0]
+
+        if name_variant not in variants and relation != "spio":
+            # Some 'variant names' are no true variants but names of 
+            # governmental instituitions of the territory, this 
+            # should exclude them. 
             variants.append(name_variant)
-    return (variants)
+    return variants
 
 
 
