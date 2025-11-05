@@ -59,6 +59,52 @@ async def create_test_record_arenswald():
     return r[0]
 
 
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_record_get_gnd_internal_id():
+    await db_actions.initialise_beanie()
+    rubens=await create_test_record_rubens()
+    gnd_internal=parse_gnd.gnd_record_get_gnd_internal_id(rubens)[0]
+    assert gnd_internal.name=="GND intern"
+    assert gnd_internal.external_id=="11860354X"
+
+# I am not sure if this function is needed: it appears to be identical to the ID that is in 035 with prefix "(DE-101)"
+
+#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+@pytest.mark.asyncio
+#@classes.func_logger
+async def test_parse_gnd_record_get_external_references():
+    await db_actions.initialise_beanie()
+    # Rubens: Person. old record has Prefix (DE-588a)
+    rubens=await create_test_record_rubens()
+    external_references=parse_gnd.gnd_record_get_external_references(rubens)
+    assert external_references[0].name=="GND internal"
+    assert external_references[0].external_id == "11860354X"
+    assert external_references[0].uri == ""
+    assert external_references[1].name=="GND"
+    assert external_references[1].external_id == "11860354X"
+    assert external_references[1].uri == "https://d-nb.info/gnd/11860354X"
+    assert external_references[2].name== "GND old"
+    assert external_references[2].external_id == "187114714"
+    assert external_references[2].uri == ""
+    assert external_references[3].name== "GND old"
+    assert external_references[3].external_id == "11860354X"
+    assert external_references[3].uri == ""
+    # Gesellschaft für Kernforschung - old record has DE-588b
+    gesellschaft_für_kernforschung = await create_test_record_gesellschaft_kernforschung()
+    external_references = parse_gnd.gnd_record_get_external_references(gesellschaft_für_kernforschung)
+    assert external_references[2].name == "GND old"
+    assert external_references[2].external_id == "2036894-X"
+    # Kathedrale Antwerpen - old record has DE-588c
+    kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
+    external_references = parse_gnd.gnd_record_get_external_references(kathedrale_antwerpen)
+    assert external_references[2].name == "GND old"
+    assert external_references[2].external_id == 4068763-6
+
+
+
 #@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger

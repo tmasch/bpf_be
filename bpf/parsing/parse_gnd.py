@@ -757,6 +757,12 @@ def gnd_record_get_gnd_internal_id(record):
     #     for subfield in subfields:
     #         key= subfield.get("code")
     #         value=subfield.text
+
+
+    # It appears that this is identifical to 035, Prefix "(DE-101)", 
+    # hence, this function is not needed in the normal parsing process
+    # (it may be needed for linked records that do not have a DE-101 in the link,
+    # if that happens (I am not sure))
     
 
 @classes.func_logger
@@ -799,22 +805,41 @@ def gnd_record_get_external_references(record):
     external_references=[]
     datafields = find_datafields(record,"035")
     for datafield in datafields:
+        # There is either a subfield a or a subfield z. 
+        # Subfield a has current ID, subfield Z old IDs from mergers. 
+        # I only used to read subfield a - now I read both, just in 
+        # case z may be needed for some searches. 
         subfields = find_subfields(datafield,"a")
         if subfields: 
             external_reference = classes.ExternalReference()
-            external_reference.name="GND"
-            if subfields[0][0:8] == "(DE-588)" or subfields[0][0:8] == "(DE-101)": 
-                # sometimes, there is this prefix, which is unnecessary and should be cut out. 
+            if subfields[0][0:8] == "(DE-588)":
                 external_reference.external_id=subfields[0][8:]
-            else:
-                external_reference.external_id=subfields[0][0:]
-            external_reference.uri = r'https://d-nb.info/gnd/' + external_reference.external_id
-            for extant_external_reference in external_references:
-                if extant_external_reference.name == external_reference.name and \
-                    extant_external_reference.external_id == external_reference.external_id:
-                    break
-            else: 
-                external_references.append(external_reference)
+                external_reference.name = "GND"
+                external_reference.uri = r'https://d-nb.info/gnd/' + external_reference.external_id
+            elif subfields[0][0:8] == "(DE-101)":
+                external_reference.external_id=subfields[0][8:]
+                external_reference.name = "GND internal"
+                # There is apparently no URI connected to it. 
+
+        subfields = find_subfields(datafield,"z")
+        if subfields: 
+            print("subfields z")
+            print(subfields)
+            external_reference = classes.ExternalReference()
+            if subfields[0][0:9] == "(DE-588a)" or subfields[0][0:9] == "(DE-588b)" or subfields[0][0:9] == "(DE-588c)":
+                external_reference.external_id=subfields[0][9:]
+            if subfields[0][0:8] == "(DE-588)":
+                external_reference.external_id=subfields[0][8:]
+            external_reference.name = "GND old"
+
+
+            
+        for extant_external_reference in external_references:
+            if extant_external_reference.name == external_reference.name and \
+                extant_external_reference.external_id == external_reference.external_id:
+                break
+        else: 
+            external_references.append(external_reference)
             
 #   Annoyingly, the search also finds IDs from the old database PND. If it is possible that a PND ID is the same as the GND ID of a 
 #   different record, I have to include a function to delete this record from the results (I am enquiring if this is the case)
