@@ -1,4 +1,4 @@
-#pylint: disable=C0116
+
 """
 Test of GND parsing
 """
@@ -76,6 +76,9 @@ async def test_parse_gnd_record_get_gnd_internal_id():
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_record_get_external_references():
+    """
+    Test for parsing external references (field 035)
+    """
     await db_actions.initialise_beanie()
     # Rubens: Person. old record has Prefix (DE-588a)
     rubens=await create_test_record_rubens()
@@ -90,18 +93,17 @@ async def test_parse_gnd_record_get_external_references():
     assert external_references[2].external_id == "187114714"
     assert external_references[2].uri == ""
     assert external_references[3].name== "GND old"
-    assert external_references[3].external_id == "11860354X"
+    assert external_references[3].external_id == "127110801"
     assert external_references[3].uri == ""
-    # Gesellschaft für Kernforschung - old record has DE-588b
-    gesellschaft_für_kernforschung = await create_test_record_gesellschaft_kernforschung()
-    external_references = parse_gnd.gnd_record_get_external_references(gesellschaft_für_kernforschung)
-    assert external_references[2].name == "GND old"
-    assert external_references[2].external_id == "2036894-X"
-    # Kathedrale Antwerpen - old record has DE-588c
+    # I don't do a separate test for DE-588b and DE-588c
+    # since none of the usual guinea-pigs has here
+    # anything that is not a repetition of a 035 subfield a.
+    # Kathedrale Antwerpen - old record has DE-588c, but it is a repeatition
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
     external_references = parse_gnd.gnd_record_get_external_references(kathedrale_antwerpen)
-    assert external_references[2].name == "GND old"
-    assert external_references[2].external_id == 4068763-6
+    assert len(external_references) == 2 #without the old IDs. 
+    #assert external_references[2].name == "GND old"
+    #assert external_references[2].external_id == "4068763-6"
 
 
 
@@ -110,8 +112,10 @@ async def test_parse_gnd_record_get_external_references():
 #@classes.func_logger
 async def test_parse_gnd_name_preferred():
     """
-    Only subfield a filled
+    Gets the preferred name from a person (field 100)
     """
+    #Only subfield a filled
+    
     await db_actions.initialise_beanie()
     rubens=await create_test_record_rubens()
     name_preferred=parse_gnd.gnd_record_get_name_preferred(rubens)
@@ -145,6 +149,9 @@ async def test_parse_gnd_name_preferred():
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_sex():
+    """
+    tests for the sex of a person (field 375)
+    """
     await db_actions.initialise_beanie()
     #men
     thomas=await create_test_record_thomas_aquinas()
@@ -395,7 +402,7 @@ async def create_test_record_regierungsbezirk_merseburg():
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
 
-async def create_text_record_britisch_ostafrika():
+async def create_test_record_britisch_ostafrika():
     gnd_id="14267-0"
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
@@ -482,7 +489,7 @@ async def test_gnd_place_record_get_name_variant():
     assert not name_variant
     # Britisch Ostafrika has in one synym a field "x" without having in "4" the spio
     # > this should not be excluded
-    britisch_ostafrika=await create_text_record_britisch_ostafrika()
+    britisch_ostafrika=await create_test_record_britisch_ostafrika()
     name_variant = parse_gnd.gnd_place_record_get_name_variant(britisch_ostafrika)
     assert name_variant[5]=="Großbritannien (Kolonie)"
 
