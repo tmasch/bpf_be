@@ -728,7 +728,7 @@ async def find_and_parse_person_gndid(gnd_id):
 #                person_found.external_id.append(external_reference)
 
 @classes.async_func_logger
-async def get_records(gnd_id):
+async def get_person_records(gnd_id):
     """
     Downloads person records from the GND
     """
@@ -743,7 +743,6 @@ async def get_records(gnd_id):
 
 
 @classes.async_func_logger
-# I created this function since get_records only works for persons
 async def get_org_records(gnd_id):
     """
     Downloads organisationrecords from the GND
@@ -759,7 +758,6 @@ async def get_org_records(gnd_id):
 
 
 @classes.async_func_logger
-# I created this function since get_records only works for persons
 async def get_place_records(gnd_id):
     """
     Downloads place records from the GND
@@ -783,7 +781,7 @@ async def find_related_persons(gnd_id):
     this function is. 
     Why is this not done in the context of parsing of every record?
     """
-    records = await get_records(gnd_id)
+    records = await get_person_records(gnd_id)
     for record in records:
         r = gnd_record_get_connected_persons(record)
     return r
@@ -829,9 +827,9 @@ async def find_and_parse_person_gnd(authority_url):
         person_found=classes.Node()
         person_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
         person_found.external_id.extend(gnd_record_get_external_references(record))
-        name_preferred, comments = gnd_record_get_name_preferred(record)
+        name_preferred, comments = gnd_record_get_person_name_preferred(record)
         person_found.add_attribute("name_preferred",name_preferred)
-        name_variant, comments = gnd_record_get_name_variant(record, person_found.comments)
+        name_variant, comments = gnd_record_get_person_name_variant(record, person_found.comments)
 #        person_found.add_attribute("name_variant",name_variant)
         person_found.add_attribute("gnd_id",gnd_record_get_gnd_id(record))
         person_found.type="Person"
@@ -839,9 +837,9 @@ async def find_and_parse_person_gnd(authority_url):
 #        person_found.connected_organisations = gnd_record_get_connected_orgs(record)
 #        person_found.connected_places = gnd_record_get_connected_places(record)
         person_found.add_attribute("sex",gnd_record_get_sex(record))
-#        person_found.dates_from_source = get_gnd_dates(record)
-#        person_found.comments = parse_gnd_profession(record, person_found.comments)
-#        person_found.comments = get_gnd_comments(record, person_found.comments)
+#        person_found.dates_from_source = gnd_record_get_dates(record)
+#        person_found.comments = gnd_record_get_profession(record, person_found.comments)
+#        person_found.comments = gnd_record_get_comments(record, person_found.comments)
 #        print(person_found)
  #       connected_person = classes.EntityConnection()
  #       connected_person.connection_type = "Candidate"
@@ -943,7 +941,7 @@ def gnd_record_get_external_references(record):
 
 
 @classes.func_logger
-def gnd_record_get_name_preferred(record):
+def gnd_record_get_person_name_preferred(record):
     """
     Takes the preferred name from field 100
     Possible additions: some more standard identifyers in 100c
@@ -1004,7 +1002,7 @@ def gnd_record_get_sex(record):
 
 
 @classes.func_logger
-def gnd_record_get_name_variant(record, comments):
+def gnd_record_get_person_name_variant(record, comments):
     """
     Parses name variants of a person (field 400)
     """
@@ -1201,7 +1199,7 @@ def gnd_record_get_connected_places(record):
 
 
 @classes.func_logger
-def get_gnd_comments(record, comments):
+def gnd_record_get_comments(record, comments):
     """
     Parses comments from a GND record (field 678)
     """
@@ -1216,7 +1214,7 @@ def get_gnd_comments(record, comments):
 
 
 @classes.func_logger
-def get_gnd_dates(record):
+def gnd_record_get_dates(record):
     """
     Parses references to dates in a GND record (field 548)
     """
@@ -1245,7 +1243,7 @@ def get_gnd_dates(record):
     return dates_from_source
 
 @classes.func_logger
-def parse_gnd_profession(record, comments):
+def gnd_record_get_profession(record, comments):
     """
     Parses the keyword field in the GND (field 550), 
     that is primarily relevant for professions of persons.
@@ -1278,24 +1276,23 @@ were reused from parsing person records.
     root = etree.XML(content)
     records=root.find("records", namespaces=root.nsmap)
     for record in records:
-        exclude = gnd_org_record_exclusion(record)
+        exclude = gnd_record_org_exclusion(record)
         if not exclude:
             print("found record")
-
             org_found=classes.Node()
             org_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
             org_found.external_id.extend(gnd_record_get_external_references(record))
-            org_found.name_preferred = gnd_org_record_get_name_preferred(record)
-            org_found.name_variant = gnd_org_record_get_name_variant(record)
+            org_found.name_preferred = gnd_record_get_org_name_preferred(record)
+            org_found.name_variant = gnd_record_get_org_name_variant(record)
     #        org_found.gnd_id=gnd_record_get_gnd_id(record)
             org_found.type="Organisation"
     #        org_found.connected_persons =  gnd_record_get_connected_persons(record)
     #        org_found.connected_organisations = gnd_record_get_connected_orgs(record)
 #           org_found.connected_places = gnd_record_get_connected_places(record)
 
-            org_found.dates_from_source = get_gnd_dates(record)
-            org_found.comments = parse_gnd_profession(record, org_found.comments)
-            org_found.comments = get_gnd_comments(record, org_found.comments)
+            org_found.dates_from_source = gnd_record_get_dates(record)
+            org_found.comments = gnd_record_get_profession(record, org_found.comments)
+            org_found.comments = gnd_record_get_comments(record, org_found.comments)
     #        print(org_found)
 
             connected_org = classes.Edge()
@@ -1305,7 +1302,7 @@ were reused from parsing person records.
     return result
 
 @classes.func_logger
-def gnd_org_record_exclusion(record):
+def gnd_record_org_exclusion(record):
     """
     This module checks two fields in the GND record - if one of them has a relevant entry, the
     entire record is excluded from the list of candidates. 
@@ -1324,7 +1321,7 @@ def gnd_org_record_exclusion(record):
 
 
 @classes.func_logger
-def gnd_org_record_get_name_preferred(record):
+def gnd_record_get_org_name_preferred(record):
     """
     Parses the preferred name of an organisation from the GND (field 110)
     """
@@ -1347,7 +1344,7 @@ def gnd_org_record_get_name_preferred(record):
 
 
 @classes.func_logger
-def gnd_org_record_get_name_variant(record):
+def gnd_record_get_org_name_variant(record):
     """
     Parses variant names of an organisation from the GND (field 410)
     """
@@ -1391,7 +1388,7 @@ is moved to this function gnd_parsing_place_part_of_list.
     result = []
     for record in records:
         pl_found = classes.Node()
-        entity_types = gnd_place_record_get_entity_type(record)
+        entity_types = gnd_record_get_entity_type(record)
         if(("gik" in entity_types or "giz" in entity_types or "gxz" in entity_types) \
            and "gil" not in entity_types):
             # This is for searching for towns.
@@ -1399,20 +1396,20 @@ is moved to this function gnd_parsing_place_part_of_list.
             # I have to create here different filters
             pl_found.external_id.extend(gnd_record_get_gnd_internal_id(record))
             pl_found.external_id.extend(gnd_record_get_external_references(record))
-            pl_found.external_id.extend(gnd_place_record_get_geonames(record))
-            #pl_found.coordinates = gnd_place_record_get_coordinates(record)
+            pl_found.external_id.extend(gnd_record_get_geonames(record))
+            #pl_found.coordinates = gnd_record_get_coordinates(record)
             # up to now, entity does not allow for coordinates, this has to change
-            pl_found.name_preferred = gnd_place_record_get_name_preferred(record)
-            pl_found.name_variant = gnd_place_record_get_name_variant(record)
+            pl_found.name_preferred = gnd_record_get_place_name_preferred(record)
+            pl_found.name_variant = gnd_record_get_place_name_variant(record)
     #        org_found.gnd_id=gnd_record_get_gnd_id(record)
             pl_found.type="Place"
     #        pl_found.connected_persons =  gnd_record_get_connected_persons(record)
     #        pl_found.connected_organisations = gnd_record_get_connected_orgs(record)
 #           pl_found.connected_places = gnd_record_get_connected_places(record)
 
-            pl_found.dates_from_source = get_gnd_dates(record) # just in case
-            pl_found.comments = parse_gnd_profession(record, pl_found.comments)
-            pl_found.comments = get_gnd_comments(record, pl_found.comments)
+            pl_found.dates_from_source = gnd_record_get_dates(record) # just in case
+            pl_found.comments = gnd_record_get_profession(record, pl_found.comments)
+            pl_found.comments = gnd_record_get_comments(record, pl_found.comments)
     #        print(org_found)
 
             connected_place = classes.Edge()
@@ -1423,7 +1420,7 @@ is moved to this function gnd_parsing_place_part_of_list.
 #            print(potential_places_list)
     return result
 
-def gnd_place_record_get_entity_type(record):
+def gnd_record_get_entity_type(record):
     """
     The entity indicates if the place is a town or a building or a country etc.
     It thus determines, if a place should be parsed and entered into the list
@@ -1437,7 +1434,7 @@ def gnd_place_record_get_entity_type(record):
             entities.append(subfields[0])
     return entities
 
-def gnd_place_record_get_geonames(record):
+def gnd_record_get_geonames(record):
     """ 
     The geonames id is stored in a separate field.                    
 """
@@ -1457,7 +1454,7 @@ def gnd_place_record_get_geonames(record):
                 external_references.append(external_reference)
     return external_references
 
-def gnd_place_record_get_coordinates(record):
+def gnd_record_get_coordinates(record):
     """
     Parses the coordinates in a GND place record (field 34)
     """
@@ -1480,7 +1477,7 @@ def gnd_place_record_get_coordinates(record):
         coordinates_list.append(coordinates)
     return coordinates_list
 
-def gnd_place_record_get_name_preferred(record):
+def gnd_record_get_place_name_preferred(record):
     """
     Parses the preferred name of a Place in the GND (field 151)
     """
@@ -1504,7 +1501,7 @@ def gnd_place_record_get_name_preferred(record):
             name_preferred = name_preferred + " (" + subfields[0] + ")"
     return name_preferred
 
-def gnd_place_record_get_name_variant(record):
+def gnd_record_get_place_name_variant(record):
     """
     Parses variant names of a place in the GND (field 451)
     """

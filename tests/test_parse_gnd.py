@@ -14,7 +14,7 @@ async def test_parse_gnd_get_records():
     """
     await db_actions.initialise_beanie()
     gnd_id="11860354X"
-    records=await parse_gnd.get_records(gnd_id)
+    records=await parse_gnd.get_person_records(gnd_id)
     assert type(records).__name__ == "_Element"
 
 ## Test records for persons
@@ -24,7 +24,7 @@ async def create_test_record_rubens():
     Create a test Person record for Pieter Paul Rubens
     """
     gnd_id="11860354X"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 
@@ -33,7 +33,7 @@ async def create_test_record_thomas_aquinas():
     Create a test Person record for Thomas Aquinas
     """
     gnd_id="118622110"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_max_emanuel():
@@ -41,7 +41,7 @@ async def create_test_record_max_emanuel():
     Create a test Person record for Elector Max Emanuel
     """
     gnd_id="11857941X"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_saint_scholastica():
@@ -49,7 +49,7 @@ async def create_test_record_saint_scholastica():
     Create a test Person record for St Scholastica
     """
     gnd_id="122475127"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_queen_anne():
@@ -57,7 +57,7 @@ async def create_test_record_queen_anne():
     Create a test Person record for Queen Anne
     """
     gnd_id="118649450"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_adolf_friedrich():
@@ -66,7 +66,7 @@ async def create_test_record_adolf_friedrich():
     """
     # One of the relatively few persons with a person-person relation that has a time attached
     gnd_id="100014704"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_caspar_adolay():
@@ -74,7 +74,7 @@ async def create_test_record_caspar_adolay():
     Create a test Person record for Caspar Adolay
     """
     gnd_id = "100004636"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 async def create_test_record_arenswald():
@@ -82,7 +82,7 @@ async def create_test_record_arenswald():
     Create a test Person record for Arenswald
     """
     gnd_id = "100014747"
-    r=await parse_gnd.get_records(gnd_id)
+    r=await parse_gnd.get_person_records(gnd_id)
     return r[0]
 
 
@@ -152,14 +152,14 @@ async def test_parse_gnd_name_preferred():
 
     await db_actions.initialise_beanie()
     rubens=await create_test_record_rubens()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(rubens)
+    name_preferred=parse_gnd.gnd_record_get_person_name_preferred(rubens)
     assert name_preferred[0] == 'Rubens, Peter Paul'
     assert name_preferred[1] == ''
 
     #Also subfield c filled - not a ruler - Saint
 
     thomas=await create_test_record_thomas_aquinas()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(thomas)
+    name_preferred=parse_gnd.gnd_record_get_person_name_preferred(thomas)
     assert name_preferred[0] == 'Thomas (von Aquin)'
     assert name_preferred[1] == 'Saint'
 
@@ -168,14 +168,14 @@ async def test_parse_gnd_name_preferred():
     #designation that is to be ignored
 
     maximilian=await create_test_record_max_emanuel()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(maximilian)
+    name_preferred=parse_gnd.gnd_record_get_person_name_preferred(maximilian)
     assert name_preferred[0] == 'Maximilian Emanuel II.'
     assert name_preferred[1] == 'Bayern, Kurfürst'
 
     #Subfield c only indicates a saint
 
     scholastica=await create_test_record_saint_scholastica()
-    name_preferred=parse_gnd.gnd_record_get_name_preferred(scholastica)
+    name_preferred=parse_gnd.gnd_record_get_person_name_preferred(scholastica)
     assert name_preferred[0] == 'Scholastika'
     assert name_preferred[1] == 'Saint'
 
@@ -206,15 +206,15 @@ async def test_parse_gnd_get_sex():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_gnd_get_name_variant():
+async def test_parse_gnd_get_person_name_variant():
     """
-    Tests gnd_record_get_name_variant
+    Tests gnd_record_get_person_name_variant
     """
     await db_actions.initialise_beanie()
     # Max Emanuel (first additional name has subfields a and b, and c with a comma;
     # 12th additional name has subfields a and b, and c without comma)
     maximilian=await create_test_record_max_emanuel()
-    name_variants, comments = parse_gnd.gnd_record_get_name_variant(maximilian, "")
+    name_variants, comments = parse_gnd.gnd_record_get_person_name_variant(maximilian, "")
     print(name_variants[0])
     print(comments)
     assert name_variants[0] == "Massimiliano Emanuele II."
@@ -341,15 +341,15 @@ async def test_parse_gnd_get_connected_places():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_gnd_get_comments():
+async def test_parse_gnd_record_get_comments():
     """
-    Tests get_gnd_comments
+    Tests gnd_record_get_comments
     """
     await db_actions.initialise_beanie()
     # Max Emanuel - has a field 678 but also many other elements beforehand
     # that would be written into the comment field"
     maximilian=await create_test_record_max_emanuel()
-    comment = parse_gnd.get_gnd_comments(maximilian, "")
+    comment = parse_gnd.gnd_record_get_comments(maximilian, "")
     assert comment == "seit 1679 Kurfürst von Bayern; " \
         + "1692-1706 Generalstatthalter der Spanischen Niederlande"
 
@@ -358,15 +358,15 @@ async def test_parse_gnd_get_comments():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_gnd_get_dates():
+async def test_parse_gnd_record_get_dates():
     """
-    Tests get_gnd_dates
+    Tests gnd_record_get_dates
     """
     await db_actions.initialise_beanie()
     # elector Maximilian: two dates, the first years only, type "datl",
     # the second days, datetype "datx"
     maximilian=await create_test_record_max_emanuel()
-    date=parse_gnd.get_gnd_dates(maximilian)
+    date=parse_gnd.gnd_record_get_dates(maximilian)
     date0 = date[0]
     assert date0.datestring_raw=="1662-1726"
     assert date0.datetype=="datl"
@@ -379,14 +379,14 @@ async def test_parse_gnd_get_dates():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_parse_gnd_professions():
+async def test_gnd_record_get_profession():
     """
-    Tests parse_gnd_profession
+    Tests gnd_record_get_professions
     """
     await db_actions.initialise_beanie()
     # elector Maximilian: has profession
     maximilian = await create_test_record_max_emanuel()
-    profession=parse_gnd.parse_gnd_profession(maximilian, "")
+    profession=parse_gnd.gnd_record_get_profession(maximilian, "")
     assert profession=="Kurfürst"
 
     # some entries also seem to have subfield 9, starting with "v:", I should add that.
@@ -432,22 +432,22 @@ async def create_test_record_gesellschaft_kernforschung():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_org_record_get_name_preferred():
+async def test_gnd_record_get_org_name_preferred():
     """
-    Tests gnd_org_record_get_name_preferred
+    Tests gnd_record_get_org_name_preferred
     """
     await db_actions.initialise_beanie()
     # Electrochemical Society has a subfield b
     electrochemical_society=await create_test_record_electrochemical_society()
-    name_preferred= parse_gnd.gnd_org_record_get_name_preferred(electrochemical_society)
+    name_preferred= parse_gnd.gnd_record_get_org_name_preferred(electrochemical_society)
     assert name_preferred=="Electrochemical Society (Electrothermics and Metallurgy Division)"
     # Academy of Relgion and Mental Health has a subfield g
     academy_of_religion = await create_test_record_academy_religion()
-    name_preferred= parse_gnd.gnd_org_record_get_name_preferred(academy_of_religion)
+    name_preferred= parse_gnd.gnd_record_get_org_name_preferred(academy_of_religion)
     assert name_preferred=="Academy of Religion and Mental Health (New York, NY)"
     # Gesellschaft für Kernforschung has subfields b and g
     gesellschaft_kernforschung=await create_test_record_gesellschaft_kernforschung()
-    name_preferred=parse_gnd.gnd_org_record_get_name_preferred(gesellschaft_kernforschung)
+    name_preferred=parse_gnd.gnd_record_get_org_name_preferred(gesellschaft_kernforschung)
     assert name_preferred == \
         "Gesellschaft für Kernforschung (Abteilung Datenverarbeitung und Instrumentierung) " \
             + "(Karlsruhe)"
@@ -461,24 +461,22 @@ async def test_gnd_org_record_get_name_preferred():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_org_record_get_name_variant():
+async def test_gnd_record_get_org_name_variant():
     """
-    Tests gnd_org_record_get_name_variant
+    Tests gnd_record_get_org_name_variant
     """
     await db_actions.initialise_beanie()
     academy_of_religion = await create_test_record_academy_religion()
     # Academy of Religion and Mental Health has subfield g
-    name_variant= parse_gnd.gnd_org_record_get_name_variant(academy_of_religion)
+    name_variant= parse_gnd.gnd_record_get_org_name_variant(academy_of_religion)
     assert name_variant[0]=="Académie de Religion et de Santé Mentale (New York, NY)"
     # Nato subcommittee has subfield g
     nato= await create_test_record_nato()
-    name_variant= parse_gnd.gnd_org_record_get_name_variant(nato)
+    name_variant= parse_gnd.gnd_record_get_org_name_variant(nato)
     assert name_variant[1] == \
         "NATO (Groupe Consultatif pour la Recherche et le Développement Aérospatial)"
 
     # there may be a repetition of the subfield b, and we should cater for this.
-
-
 
 
 async def create_test_record_kathedrale_antwerpen():
@@ -517,13 +515,13 @@ async def create_test_record_britisch_ostafrika():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_place_record_get_entity_type():
+async def test_gnd_record_get_entity_type():
     """
-    tests gnd_place_record_get_entity_type
+    tests gnd_record_get_entity_type
     """
     await db_actions.initialise_beanie()
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
-    entity_type = parse_gnd.gnd_place_record_get_entity_type(kathedrale_antwerpen)
+    entity_type = parse_gnd.gnd_record_get_entity_type(kathedrale_antwerpen)
     assert entity_type[0]=="g"
     assert entity_type[1]=="gib"
 
@@ -532,13 +530,13 @@ async def test_gnd_place_record_get_entity_type():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_place_record_get_geonames():
+async def test_gnd_record_get_geonames():
     """
-    tests gnd_place_record_get_geonames
+    tests gnd_record_get_geonames
     """
     await db_actions.initialise_beanie()
     ardabil = await create_test_record_ardabil()
-    geonames = parse_gnd.gnd_place_record_get_geonames(ardabil)
+    geonames = parse_gnd.gnd_record_get_geonames(ardabil)
     assert geonames[0].external_id=="143083"
     assert geonames[0].uri=="https://sws.geonames.org/143083"
 
@@ -547,13 +545,13 @@ async def test_gnd_place_record_get_geonames():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_place_record_get_coordinates():
+async def test_gnd_record_get_coordinates():
     """
-    tests gnd_place_record_get_coordinates
+    tests gnd_record_get_coordinates
     """
     await db_actions.initialise_beanie()
     ardabil = await create_test_record_ardabil()
-    coordinates = parse_gnd.gnd_place_record_get_coordinates(ardabil)
+    coordinates = parse_gnd.gnd_record_get_coordinates(ardabil)
     assert coordinates[0].west=="E 048 17 35"
     assert coordinates[0].east=="E 048 17 35"
     assert coordinates[0].north=="N 038 14 59"
@@ -569,18 +567,18 @@ async def test_gnd_place_record_get_coordinates():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_place_record_get_name_preferred():
+async def test_gnd_record_get_place_name_preferred():
     """
-    Tests gnd_place_record_get_name_preferred
+    Tests gnd_record_get_place_name_preferred
     """
     await db_actions.initialise_beanie()
     # Ardabil, has only subfield a
     ardabil = await create_test_record_ardabil()
-    name_preferred = parse_gnd.gnd_place_record_get_name_preferred(ardabil)
+    name_preferred = parse_gnd.gnd_record_get_place_name_preferred(ardabil)
     assert name_preferred=="Ardabil"
     # Kathedrale Antwerpen has subfields a and g
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
-    name_preferred = parse_gnd.gnd_place_record_get_name_preferred(kathedrale_antwerpen)
+    name_preferred = parse_gnd.gnd_record_get_place_name_preferred(kathedrale_antwerpen)
     assert name_preferred=="Kathedrale Antwerpen (Antwerpen)"
 
     # I dop not test the subfields x and z because I haven't found
@@ -591,28 +589,28 @@ async def test_gnd_place_record_get_name_preferred():
 # side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
-async def test_gnd_place_record_get_name_variant():
+async def test_gnd_record_get_place_name_variant():
     """
-    Tests gnd_place_record_get_name_variant
+    Tests gnd_record_get_place_name_variant
     """
     await db_actions.initialise_beanie()
     # Ardabil, has only subfield a
     ardabil = await create_test_record_ardabil()
-    name_variant = parse_gnd.gnd_place_record_get_name_variant(ardabil)
+    name_variant = parse_gnd.gnd_record_get_place_name_variant(ardabil)
     assert name_variant[0]=="Ardebil"
     # Kathedrale Antwerpen has subfields a and g
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
-    name_variant = parse_gnd.gnd_place_record_get_name_variant(kathedrale_antwerpen)
+    name_variant = parse_gnd.gnd_record_get_place_name_variant(kathedrale_antwerpen)
     assert name_variant[0]=="Liebfrauenkathedrale Antwerpen (Antwerpen)"
     # Regierungsbezirk Merseburg has two synonyms that, however,
     # have the relation "spio", they should be supressed
     regierungsbezirk_merseburg = await create_test_record_regierungsbezirk_merseburg()
-    name_variant = parse_gnd.gnd_place_record_get_name_variant(regierungsbezirk_merseburg)
+    name_variant = parse_gnd.gnd_record_get_place_name_variant(regierungsbezirk_merseburg)
     assert not name_variant
     # Britisch Ostafrika has in one synym a field "x" without having in "4" the spio
     # > this should not be excluded
     britisch_ostafrika=await create_test_record_britisch_ostafrika()
-    name_variant = parse_gnd.gnd_place_record_get_name_variant(britisch_ostafrika)
+    name_variant = parse_gnd.gnd_record_get_place_name_variant(britisch_ostafrika)
     assert name_variant[5]=="Großbritannien (Kolonie)"
 
     # Subfield x can be repeated, this should be included here.
