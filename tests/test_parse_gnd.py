@@ -9,6 +9,9 @@ from bpf.parsing import parse_gnd
 
 @pytest.mark.asyncio
 async def test_parse_gnd_get_records():
+    """
+    This test is beyond my pay-greade, I don't know what it does. 
+    """
     await db_actions.initialise_beanie()
     gnd_id="11860354X"
     records=await parse_gnd.get_records(gnd_id)
@@ -17,62 +20,92 @@ async def test_parse_gnd_get_records():
 ## Test records for persons
 
 async def create_test_record_rubens():
+    """
+    Create a test Person record for Pieter Paul Rubens
+    """
     gnd_id="11860354X"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 
 async def create_test_record_thomas_aquinas():
+    """
+    Create a test Person record for Thomas Aquinas
+    """
     gnd_id="118622110"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_max_emanuel():
+    """
+    Create a test Person record for Elector Max Emanuel
+    """
     gnd_id="11857941X"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_saint_scholastica():
+    """
+    Create a test Person record for St Scholastica
+    """
     gnd_id="122475127"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_queen_anne():
+    """
+    Create a test Person record for Queen Anne
+    """
     gnd_id="118649450"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_adolf_friedrich():
+    """
+    Create a test Person record for Adolf Friedrich 
+    """
     # One of the relatively few persons with a person-person relation that has a time attached
     gnd_id="100014704"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_caspar_adolay():
+    """
+    Create a test Person record for Caspar Adolay
+    """
     gnd_id = "100004636"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 async def create_test_record_arenswald():
+    """
+    Create a test Person record for Arenswald
+    """
     gnd_id = "100014747"
     r=await parse_gnd.get_records(gnd_id)
     return r[0]
 
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_record_get_gnd_internal_id():
+    """
+    Tests gnd_record_get_gnd_internal_id
+    """
     await db_actions.initialise_beanie()
     rubens=await create_test_record_rubens()
     gnd_internal=parse_gnd.gnd_record_get_gnd_internal_id(rubens)[0]
     assert gnd_internal.name=="GND intern"
     assert gnd_internal.external_id=="11860354X"
 
-# I am not sure if this function is needed: it appears to be identical to the ID that is in 035 with prefix "(DE-101)"
+# I am not sure if this function is needed: it appears to be identical
+# to the ID that is in 035 with prefix "(DE-101)"
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_record_get_external_references():
@@ -101,13 +134,14 @@ async def test_parse_gnd_record_get_external_references():
     # Kathedrale Antwerpen - old record has DE-588c, but it is a repeatition
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
     external_references = parse_gnd.gnd_record_get_external_references(kathedrale_antwerpen)
-    assert len(external_references) == 2 #without the old IDs. 
+    assert len(external_references) == 2 #without the old IDs.
     #assert external_references[2].name == "GND old"
     #assert external_references[2].external_id == "4068763-6"
 
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_name_preferred():
@@ -115,7 +149,7 @@ async def test_parse_gnd_name_preferred():
     Gets the preferred name from a person (field 100)
     """
     #Only subfield a filled
-    
+
     await db_actions.initialise_beanie()
     rubens=await create_test_record_rubens()
     name_preferred=parse_gnd.gnd_record_get_name_preferred(rubens)
@@ -145,7 +179,8 @@ async def test_parse_gnd_name_preferred():
     assert name_preferred[0] == 'Scholastika'
     assert name_preferred[1] == 'Saint'
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_sex():
@@ -167,12 +202,17 @@ async def test_parse_gnd_get_sex():
     sex = parse_gnd.gnd_record_get_sex(scholastica)
     assert sex == ""
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_name_variant():
+    """
+    Tests gnd_record_get_name_variant
+    """
     await db_actions.initialise_beanie()
-    # Max Emanuel (first additional name has subfields a and b, and c with a comma; 12th additional name has subfields a and b, and c without comma)
+    # Max Emanuel (first additional name has subfields a and b, and c with a comma;
+    # 12th additional name has subfields a and b, and c without comma)
     maximilian=await create_test_record_max_emanuel()
     name_variants, comments = parse_gnd.gnd_record_get_name_variant(maximilian, "")
     print(name_variants[0])
@@ -181,10 +221,14 @@ async def test_parse_gnd_get_name_variant():
     assert "Baviera, Duca" in comments
     assert name_variants[11] == "Maximilianus Emmanuel (Palatinae Dux)"
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_connected_persons():
+    """
+    Tests gnd_record_get_connected_persons
+    """
     await db_actions.initialise_beanie()
     # Max Emanuel (first connected person has subfields a and c, 4, and 9 with 'v:')
     maximilian=await create_test_record_max_emanuel()
@@ -217,23 +261,31 @@ async def test_parse_gnd_get_connected_persons():
     # Some comments:
     # There are several subfields "0" that can contain
         # the GND ID, prefaced by "(DE-588)"
-        # the internal ID of the Deutsche Nationalbibliothek, prefaced by "(DE-101)" 
+        # the internal ID of the Deutsche Nationalbibliothek, prefaced by "(DE-101)"
             #  (for persons normally identical to the GND ID, for orgs and places not)
         # the URI containing the GND ID
     # I need:
         # The GND ID with the name "GND"
-        # Only if it is different, the internal ID with a different name (for searches in VIAF, where the GND ID is not viable because of a bug in VIAF)
-        
-    # It may furthermore make sense to provide for the possibility that there is no such subfield, but onl one with a URI
-    # it may make sense to read also 500 subfield d (date) to improve the dummy nodes
-    # connection_comment is actually a comment on relationB (and later on, it will become relationB, since the information displayed in relationB is very vague)
+        # Only if it is different, the internal ID with a different name
+        # (for searches in VIAF, where the GND ID is not viable because of a bug in VIAF)
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+    # It may furthermore make sense to provide for the possibilit
+    #  that there is no such subfield, but only one with a URI
+    # it may make sense to read also 500 subfield d (date) to improve the dummy nodes
+    # connection_comment is actually a comment on relationB (and later on, it will become relationB,
+    # since the information displayed in relationB is very vague)
+
+#@mock.patch('get_external_data.get_web_data_as_json', }
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_connected_orgs():
+    """
+    Tests gnd_record_get_connected_orgs
+    """
     await db_actions.initialise_beanie()
-    # Adolf Friedrich von Mecklenburg, connected to one organisationthat has 510 a, as well as 510 9, with "v:" and "Z:"
+    # Adolf Friedrich von Mecklenburg, connected to one organisationthat has 510 a,
+    # as well as 510 9, with "v:" and "Z:"
     adolf=await create_test_record_adolf_friedrich()
     connected_orgs = parse_gnd.gnd_record_get_connected_orgs(adolf)
     connection0 = connected_orgs[0]
@@ -252,13 +304,16 @@ async def test_parse_gnd_get_connected_orgs():
     assert org0.name == "Bayern (Bayerischer Landtag)"
     assert connection0.relationB == "affi"
     # Some comments:
-    
     # Also here problem with multiple subfields 0, see above
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_connected_places():
+    """
+    Tests gnd_record_get_connected_places
+    """
     await db_actions.initialise_beanie()
     # Rubens: first connected places has subfields a and 4, second a, 4 and 9, the latter with "v:"
     rubens = await create_test_record_rubens()
@@ -282,23 +337,34 @@ async def test_parse_gnd_get_connected_places():
     assert connection0.connection_time=="1765-1770"
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_comments():
+    """
+    Tests get_gnd_comments
+    """
     await db_actions.initialise_beanie()
-    # Max Emanuel - has a field 678 but also many other elements beforehands that would be written into the comment field"
+    # Max Emanuel - has a field 678 but also many other elements beforehand
+    # that would be written into the comment field"
     maximilian=await create_test_record_max_emanuel()
     comment = parse_gnd.get_gnd_comments(maximilian, "")
-    assert comment == "seit 1679 Kurfürst von Bayern; 1692-1706 Generalstatthalter der Spanischen Niederlande"
+    assert comment == "seit 1679 Kurfürst von Bayern; " \
+        + "1692-1706 Generalstatthalter der Spanischen Niederlande"
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_get_dates():
+    """
+    Tests get_gnd_dates
+    """
     await db_actions.initialise_beanie()
-    # elector Maximilian: two dates, the first years only, type "datl", the second days, datetype "datx"
+    # elector Maximilian: two dates, the first years only, type "datl",
+    # the second days, datetype "datx"
     maximilian=await create_test_record_max_emanuel()
     date=parse_gnd.get_gnd_dates(maximilian)
     date0 = date[0]
@@ -309,47 +375,67 @@ async def test_parse_gnd_get_dates():
     assert date1.datetype=="datx"
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json',\
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_parse_gnd_professions():
+    """
+    Tests parse_gnd_profession
+    """
     await db_actions.initialise_beanie()
     # elector Maximilian: has profession
     maximilian = await create_test_record_max_emanuel()
     profession=parse_gnd.parse_gnd_profession(maximilian, "")
     assert profession=="Kurfürst"
-    
+
     # some entries also seem to have subfield 9, starting with "v:", I should add that.
 
 
 # Test records for organisations
 
 async def create_test_record_electrochemical_society():
+    """
+    Creates a test organisation record for a subgroup of the electrochemical society
+    """
     gnd_id="343-8"
     r=await parse_gnd.get_org_records(gnd_id)
     return r[0]
 
 async def create_test_record_academy_religion():
+    """
+    Creates a test organisation record for the american academy of religion
+    """
     gnd_id="364-5"
     r=await parse_gnd.get_org_records(gnd_id)
     return r[0]
 
 async def create_test_record_nato():
+    """
+    Creates a test organisation record for an institution of the NATO
+    """
     gnd_id="378-5"
     r=await parse_gnd.get_org_records(gnd_id)
     return r[0]
 
 
 async def create_test_record_gesellschaft_kernforschung():
+    """
+    Creates a test organisation record for a subgroup fo the Gesellschaft für Kernforschung
+    """
     gnd_id="2036894-X"
     r=await parse_gnd.get_org_records(gnd_id)
     return r[0]
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_org_record_get_name_preferred():
+    """
+    Tests gnd_org_record_get_name_preferred
+    """
     await db_actions.initialise_beanie()
     # Electrochemical Society has a subfield b
     electrochemical_society=await create_test_record_electrochemical_society()
@@ -362,16 +448,23 @@ async def test_gnd_org_record_get_name_preferred():
     # Gesellschaft für Kernforschung has subfields b and g
     gesellschaft_kernforschung=await create_test_record_gesellschaft_kernforschung()
     name_preferred=parse_gnd.gnd_org_record_get_name_preferred(gesellschaft_kernforschung)
-    assert name_preferred=="Gesellschaft für Kernforschung (Abteilung Datenverarbeitung und Instrumentierung) (Karlsruhe)"
+    assert name_preferred == \
+        "Gesellschaft für Kernforschung (Abteilung Datenverarbeitung und Instrumentierung) " \
+            + "(Karlsruhe)"
     # (this is not pretty, but it will be rare)
     # I have no text for the x since I didn't find an example
 
-    # Currently, the parsing does not support repetible subfields b and g - I have no clue if they exist. 
+    # Currently, the parsing does not support repetible subfields b and g -
+    # I have no clue if they exist.
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_org_record_get_name_variant():
+    """
+    Tests gnd_org_record_get_name_variant
+    """
     await db_actions.initialise_beanie()
     academy_of_religion = await create_test_record_academy_religion()
     # Academy of Religion and Mental Health has subfield g
@@ -380,40 +473,54 @@ async def test_gnd_org_record_get_name_variant():
     # Nato subcommittee has subfield g
     nato= await create_test_record_nato()
     name_variant= parse_gnd.gnd_org_record_get_name_variant(nato)
-    assert name_variant[1]=="NATO (Groupe Consultatif pour la Recherche et le Développement Aérospatial)"
+    assert name_variant[1] == \
+        "NATO (Groupe Consultatif pour la Recherche et le Développement Aérospatial)"
 
-    # there may be a repetition of the subfield b, and we should cater for this. 
+    # there may be a repetition of the subfield b, and we should cater for this.
 
 
 
 
 async def create_test_record_kathedrale_antwerpen():
+    """
+    Creates a test Place record for Antwerp Cathedral
+    """
     gnd_id="4068763-6"
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
 
 async def create_test_record_ardabil():
+    """
+    Creates a test Place record for the town of Ardabil
+    """
     gnd_id="4068833-1"
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
 
 async def create_test_record_regierungsbezirk_merseburg():
+    """
+    Creates a test Place record for the Regierungsbezhierk Merseburg
+    """
     gnd_id="15720-X"
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
 
 async def create_test_record_britisch_ostafrika():
+    """
+    Creates a test Place record for British East Africa
+    """
     gnd_id="14267-0"
     r=await parse_gnd.get_place_records(gnd_id)
     return r[0]
 
-
-
-
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_place_record_get_entity_type():
+    """
+    tests gnd_place_record_get_entity_type
+    """
     await db_actions.initialise_beanie()
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
     entity_type = parse_gnd.gnd_place_record_get_entity_type(kathedrale_antwerpen)
@@ -421,22 +528,29 @@ async def test_gnd_place_record_get_entity_type():
     assert entity_type[1]=="gib"
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json',\
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_place_record_get_geonames():
+    """
+    tests gnd_place_record_get_geonames
+    """
     await db_actions.initialise_beanie()
     ardabil = await create_test_record_ardabil()
     geonames = parse_gnd.gnd_place_record_get_geonames(ardabil)
     assert geonames[0].external_id=="143083"
     assert geonames[0].uri=="https://sws.geonames.org/143083"
-    
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json', \
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_place_record_get_coordinates():
+    """
+    tests gnd_place_record_get_coordinates
+    """
     await db_actions.initialise_beanie()
     ardabil = await create_test_record_ardabil()
     coordinates = parse_gnd.gnd_place_record_get_coordinates(ardabil)
@@ -451,10 +565,14 @@ async def test_gnd_place_record_get_coordinates():
 
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json',\
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_place_record_get_name_preferred():
+    """
+    Tests gnd_place_record_get_name_preferred
+    """
     await db_actions.initialise_beanie()
     # Ardabil, has only subfield a
     ardabil = await create_test_record_ardabil()
@@ -465,14 +583,18 @@ async def test_gnd_place_record_get_name_preferred():
     name_preferred = parse_gnd.gnd_place_record_get_name_preferred(kathedrale_antwerpen)
     assert name_preferred=="Kathedrale Antwerpen (Antwerpen)"
 
-    # I dop not test the subfields x and z because I haven't found 
+    # I dop not test the subfields x and z because I haven't found
     # any examples for their use
 
 
-#@mock.patch('get_external_data.get_web_data_as_json', side_effect=test_get_external_data.mock_get_web_data_as_json)
+#@mock.patch('get_external_data.get_web_data_as_json',\
+# side_effect=test_get_external_data.mock_get_web_data_as_json)
 @pytest.mark.asyncio
 #@classes.func_logger
 async def test_gnd_place_record_get_name_variant():
+    """
+    Tests gnd_place_record_get_name_variant
+    """
     await db_actions.initialise_beanie()
     # Ardabil, has only subfield a
     ardabil = await create_test_record_ardabil()
@@ -482,10 +604,10 @@ async def test_gnd_place_record_get_name_variant():
     kathedrale_antwerpen = await create_test_record_kathedrale_antwerpen()
     name_variant = parse_gnd.gnd_place_record_get_name_variant(kathedrale_antwerpen)
     assert name_variant[0]=="Liebfrauenkathedrale Antwerpen (Antwerpen)"
-    # Regierungsbezirk Merseburg has two synonyms that, however, 
+    # Regierungsbezirk Merseburg has two synonyms that, however,
     # have the relation "spio", they should be supressed
     regierungsbezirk_merseburg = await create_test_record_regierungsbezirk_merseburg()
-    name_variant = parse_gnd.gnd_place_record_get_name_variant(regierungsbezirk_merseburg)    
+    name_variant = parse_gnd.gnd_place_record_get_name_variant(regierungsbezirk_merseburg)
     assert not name_variant
     # Britisch Ostafrika has in one synym a field "x" without having in "4" the spio
     # > this should not be excluded
@@ -493,7 +615,5 @@ async def test_gnd_place_record_get_name_variant():
     name_variant = parse_gnd.gnd_place_record_get_name_variant(britisch_ostafrika)
     assert name_variant[5]=="Großbritannien (Kolonie)"
 
-
-
-    # Subfield x can be repeated, this should be included here. 
+    # Subfield x can be repeated, this should be included here.
     # I did not check subfield z because I didn't find an example
