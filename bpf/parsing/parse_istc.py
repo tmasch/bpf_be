@@ -3,9 +3,30 @@
 \todo
 """
 import re
+import requests
+import json
 from bpf import classes
 from bpf import get_external_data
 
+
+
+
+@classes.async_func_logger
+async def get_istc_record_for_testing(istc_number):
+    """
+    This module is used for returning whole ISTC records in order to test parsing function. 
+    """
+    url = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + \
+        istc_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format'\
+            + r'facet=Holding%20country&facet=Publication%20country&'\
+                + r'nofacets=true&mode=default&aggregations=true&style=full'
+    response = requests.get(url)
+    content = response.content
+    result = json.loads(content)
+    istc_record_short = result["rows"]
+#    print("record that is coming back to get_istc_record_for_testing")
+#    print(istc_record_short)
+    return istc_record_short
 
 
 
@@ -30,7 +51,7 @@ async def parse_istc(url) -> classes.Graph:
     bi.type="BibliographicInformation"
 
 ####### FINDING BIBILIOGRAPHIC ID
-    bib_ids = parse_istc_bibliographic_id(istc_record_short)
+    bib_ids = istc_get_bibliographic_id(istc_record_short)
     bi.external_id.extend(bib_ids)
 
 ####### FINDING AUTHOR
@@ -67,7 +88,7 @@ def parse_istc_imprint(record):
 #                print(step1["imprint_date"])
                 #bi.printing_date = step1["imprint_date"].strip("[]")
                 printing_date_raw = imprint["imprint_date"].strip("[]")
-                bi.date_string, bi.date_start, bi.date_end = istc_date_working(printing_date_raw)
+                #bi.date_string, bi.date_start, bi.date_end = istc_analyse_date(printing_date_raw)
 
 #
 #            bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
@@ -208,7 +229,7 @@ def parse_istc_imprint(record):
 
 
 @classes.func_logger
-def parse_istc_bibliographic_id(istc_record_short):
+def istc_get_bibliographic_id(istc_record_short):
     """
     Parses ID numbers from ISTC and GND
     """
@@ -256,19 +277,13 @@ def parse_istc_bibliographic_id(istc_record_short):
 
 
 @classes.func_logger
-def istc_date_working(printing_date_raw):
+def istc_analyse_date(printing_date_raw):
     """
     \todo
     """
-#    date_pattern = r'(About |about |Before |before |Not before |not before |Shortly before \
-#    |shortly before |Between |between |After |after |Not after \
-#    |not after |Shortly after |shortly after )?(\d{1,2} )?\
-#    ([A-Za-z\.]{3,5} )?(\d{4})?(/\d{2,4}|-\d{2,4})?( and |and )?\
-#    (\d{1,2} )?([\w\.]{3,5} )?(\d{4})?'
-    # I have no clue what is going on here - when breaking the last line of this pattern
-    # at a less awkward place it was rendered invalid.
-    date_pattern = r'(About |about |Before |before |Not before |not before \
-        |Shortly before |shortly before |Between |between |After |after |Not after \
+    # The last options before the backslash did not work, hence I repeated them. 
+    date_pattern = r'(About |about |Before |before |Not before |not before |not before \
+        |Shortly before |shortly before |Between |between |After |after |Not after |Not after \
         |not after |Shortly after |shortly after )?(\d{1,2} )?([A-Za-z\.]{3,5} )?(\d{4})?(/\d{2,4}|-\d{2,4})?( and |and )?(\d{1,2} )?([\w\.]{3,5} )?(\d{4})?'
 
     date_prefix = ""
@@ -296,19 +311,9 @@ def istc_date_working(printing_date_raw):
     date_start = ()
     date_end = ()
 
-#    print(step1["imprint_date"])
-    #bi.printing_date = step1["imprint_date"].strip("[]")
-#                printing_date_raw = step1["imprint_date"].strip("[]")
-#    print("printing_date_raw: " + printing_date_raw)
-#    print("printing_date_raw: "+"x"+printing_date_raw + "x")
-#    print( re.match(date_pattern, printing_date_raw))
-    #printing_date_divided = printing_date_raw
     if  re.match(date_pattern, printing_date_raw):
         print("date matching with pattern")
         printing_date_divided = re.match(date_pattern, printing_date_raw).groups()
-#        date_prefix = ""
-#        date_prefix, date_day, date_month, date_year, date_year_to, date_between_indicator, \
-#        date_between_day, date_between_month, date_between_year = printing_date_divided
         if printing_date_divided[0]:
             date_prefix = printing_date_divided[0]
         if printing_date_divided[1]:
@@ -329,106 +334,58 @@ def istc_date_working(printing_date_raw):
         if printing_date_divided[8]:
             date_between_year = printing_date_divided[8]
 
-#    print("Raw date: ")
-#    print(printing_date_raw)
-#    print("Prefix: ")
-#    if date_prefix != "":
-#        print(date_prefix) #+ "x"
-#    print("Day: ")
-#    if date_day:
-#        print(date_day) #+ "x"
-#    print("Month: ")
-#    if date_month:
-#        print(date_month) #+ "x"
-#    print("Year: ")
-#    if date_year:
-#        print(date_year) #+ "x"
-#    print("Year - to: ")
-#    if date_year_to:
-#        print(date_year_to) #+ "x"
-#    if date_between_day:
-#        print("date_between_day: ")
-#        print(date_between_day)
-#    if date_between_month:
-#        print("date_between_month: ")
-#        print(date_between_month)
-#    if date_between_year:
-#        print("date_between_year: ")
-#        print(date_between_year) #+ "x"
+
     string_prefix, string_year, string_year_between, start_year, end_year = \
         analyse_year(date_prefix, date_year, date_year_to, date_between_year)
-    string_month, start_month, end_month = \
+    string_month, string_month_between, start_month, end_month = \
         analyse_month(date_between_year, date_between_month, date_month)
-    string_day, start_day, end_day = analyse_day(date_between_day, \
-        date_between_year, string_day_between, date_day, end_month, end_year)
-#            print("Date: ")
-#            if string_prefix :
-#                print(string_prefix)
-#            if string_day:
-#                print(string_day)
-#            if string_month:
-#                print(string_month)
-#            if string_year:
-#                print(string_year)
-#    print("start_day: ")
-#    print(start_day)
-#    print("start_month: ")
-#    print(start_month)
-#    print("start_year: ")
-#    print(start_year)
+    string_day, string_day_between, start_day, end_day = analyse_day(date_between_day, \
+        date_between_year, date_day, end_month, end_year)
+
 
     date_string = string_prefix + string_day + string_month + string_year + \
          date_between_indicator + string_day_between + \
          string_month_between + string_year_between
+    date_string = date_string.strip()
     date_start = (start_year, start_month, start_day)
     date_end = (end_year, end_month, end_day)
 
     return (date_string, date_start, date_end)
 
 @classes.func_logger
-def analyse_prefix(date_prefix, date_year, string_prefix, start_year, end_year):
+def analyse_prefix(date_prefix, start_year, end_year):
     """
     This function reads the prefix of the date from ISTC and returns both a standardised prefix and
     adopted settings for start_year and end_year. 
     """
+    string_prefix = "" # an insurance in case there is an unusual date_prefix
     match date_prefix:
         case "About "|"about ":
             string_prefix = "about "
-            string_year = date_year + " "
-            start_year = int(date_year) - 1
-            end_year = int(date_year) + 1
+            start_year = start_year - 1
+            end_year = end_year + 1
         case "Before " | "before ":
             string_prefix = "before "
-            string_year = date_year + " "
-            start_year = int(date_year) - 2
-            end_year = int(date_year)
+            start_year = start_year - 2
         case "Shortly before " | "shortly before ":
             string_prefix = "shortly before "
             # I am not sure if I will suppress this eventually??
-            string_year = date_year + " "
-            start_year = int(date_year) - 1
-            end_year = int(date_year)
+            start_year = start_year - 1
         case "Not before " | "not before ":
             string_prefix = "not before "
-            string_year = date_year + " "
-            start_year = int(date_year)
-            end_year = int(date_year) + 2
+            end_year = end_year + 2
         case "After " | "after ":
             string_prefix = "after "
-            string_year = date_year + " "
-            start_year = int(date_year)
-            end_year = int(date_year) + 2
+            end_year = end_year + 2
         case "Shortly after " | "shortly after ":
             string_prefix = "shortly after "
-            string_year = date_year + " "
-            start_year = int(date_year)
-            end_year = int(date_year) + 1
+            end_year = end_year + 1
         case "Not after " | "not after ":
             string_prefix = "not after "
-            string_year = date_year + " "
-            start_year = int(date_year) - 2
-            end_year = int(date_year)
-    return(string_prefix, string_year, start_year, end_year)
+            start_year = start_year - 2
+        case _:
+            string_prefix = "(unknown prefix - please check) "
+    return(string_prefix, start_year, end_year)
 
 @classes.func_logger
 def analyse_year(date_prefix, date_year, date_year_to, date_between_year):
@@ -441,20 +398,20 @@ def analyse_year(date_prefix, date_year, date_year_to, date_between_year):
     start_year = 0
     end_year = 0
 
-    if date_prefix == "" and date_year_to == "" and date_between_year == "":
+    if date_year_to == "" and date_between_year == "":
         #If there is only one date
         print("Only one year: ")
         print(date_year)
         if date_year != "":
         #This is not the case if there is a date such as "Between Jan. and Oct. 1488"
-            string_year = date_year + " "
+            string_year = date_year
             start_year = int(date_year)
             end_year = int(date_year)
-    elif date_prefix != "" and date_year_to == "" and date_between_year == "":
+        if date_prefix != "":
         #If there is only one date, that is not exact
 #                    print("only one year, but prefixes")
-        string_prefix, string_year, start_year, end_year = \
-            analyse_prefix(date_prefix, date_year, string_prefix, start_year, end_year)
+            string_prefix, start_year, end_year = \
+                analyse_prefix(date_prefix, start_year, end_year)
         # This standardises the prefix and changes start year and end year accordingly
     elif date_prefix in ("Between ", "between ") \
         and date_between_year != "":
@@ -515,6 +472,7 @@ def analyse_month(date_between_year, date_between_month, date_month):
     month_numbers = {"Jan. " : 1, "Feb. " : 2, "Mar. " : 3, "Apr. ": 4, "May " : 5, "June " : 6, \
                      "July " : 7, "Aug. " : 8, \
                     "Sep. " : 9, "Sept. " : 9, "Oct. " : 10, "Nov. " : 11, "Dec. " : 12}
+    string_month_between = ""
     start_month = 0
     end_month = 0
 
@@ -523,7 +481,7 @@ def analyse_month(date_between_year, date_between_month, date_month):
         number_month_between = month_numbers[date_between_month]
         end_month = int(number_month_between)
     elif date_between_year != "":
-        # Thus, there is no end month but an end year in this case,
+        # Thus, there is no end month but an end year. In this case,
         # the end month has to be December.
         end_month = 12
 
@@ -541,14 +499,15 @@ def analyse_month(date_between_year, date_between_month, date_month):
         start_month = 1
         if end_month == 0: # If it has not been defined elsewhere
             end_month = 12
-    return (string_month, start_month, end_month)
+    return (string_month, string_month_between, start_month, end_month)
 
 @classes.func_logger
-def analyse_day(date_between_day, date_between_year, string_day_between, \
+def analyse_day(date_between_day, date_between_year, \
                 date_day, end_month, end_year):
     """
     This function parses indications of days. 
     """
+    string_day_between = ""
     end_day = 0
     if date_between_day != "":
         string_day_between = date_between_day
@@ -558,12 +517,12 @@ def analyse_day(date_between_day, date_between_year, string_day_between, \
         # the end month has to be December.
         if end_month in [1, 3, 5, 7, 8, 10, 12]:
             end_day = 31
-        if end_month in [4, 6, 9, 11]:
+        elif end_month in [4, 6, 9, 11]:
             end_day = 30
-        if end_month == 2 and end_year%4 == 0:
+        elif end_month == 2 and end_year%4 == 0:
             # In the Julian calendar, 1500 is a leap year
             end_day = 29
-        if end_month == 2 and end_year%4 != 0:
+        elif end_month == 2 and end_year%4 != 0:
             end_day = 28
 
 
@@ -578,11 +537,11 @@ def analyse_day(date_between_day, date_between_year, string_day_between, \
         if end_day == 0:
             if end_month in [1, 3, 5, 7, 8, 10, 12]:
                 end_day = 31
-            if end_month in [4, 6, 9, 11]:
+            elif end_month in [4, 6, 9, 11]:
                 end_day = 30
-            if end_month == 2 and end_year%4 == 0:
+            elif end_month == 2 and end_year%4 == 0:
                 # In the Julian calendar, 1500 is a leap year
                 end_day = 29
-            if end_month == 2 and end_year%4 != 0:
+            elif end_month == 2 and end_year%4 != 0:
                 end_day = 28
-    return (string_day, start_day, end_day)
+    return (string_day, string_day_between, start_day, end_day)
