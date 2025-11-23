@@ -705,10 +705,10 @@ Coats-of-arms work differently from other images.
 - type: Here, one could discern Ordinaries (simple geometrical patterns) and charges proper (animals etc.), and perhaps subdivide charges into e.g. animals, objects, persons etc.
 - name/name_translated: English heraldry uses a very specialist language, and for technical terms a plain English version should be given
 
-**Edge between Person and Iconography:**<br>
-**Edge between Place and Iconography:**<br>
-**Edge between NaturalObject and Iconography:**<br>
-**Edge between Thing and Iconography:**<br>
+**Edge between Person and HeraldicObject:**<br>
+**Edge between Place and HeraldicObject:**<br>
+**Edge between NaturalObject and HeraldicObject:**<br>
+**Edge between Thing and HeraldicObject:**<br>
 
 These are links between the normal Object records and HeraldicObject records - necessary because the normal Object records do not the attached structure of Criteria and Options. Normally, a HeraldicObject would be linked to another Object (and, I cannot think why it should be linked to more than one, although I have to think about that more), the exception being simple Ordinaries (see above). Currently, I cannot think of other Object records being connected to coats-of-arms, but maybe one or two more will have to be added. 
 

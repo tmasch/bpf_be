@@ -3,8 +3,8 @@
 \todo
 """
 import re
-import requests
 import json
+import requests
 from bpf import classes
 from bpf import get_external_data
 
@@ -62,13 +62,20 @@ async def parse_istc(url) -> classes.Graph:
         author.name=istc_record_short["author"]
         results.nodes.append(author)
 
+###### FINDING TITLE
+    if "title" in istc_record_short:
+        bi.title = istc_record_short["title"]
+
+###### FINDING IMPRINT
+    if "imprint" in istc_record_short:
+        results = parse_istc_imprint(results, istc_record_short)
     return results
 
 
-def parse_istc_imprint(record):
-
-    result=classes.Graph()
-
+def parse_istc_imprint(result, record):
+    """
+    Parse the imprints (Places, Printers, Publishers, Dates)
+    """
     if "imprint" in record:
         for imprint in record["imprint"]:
             # this is iterated in case there are several imprints, I reckon
@@ -79,10 +86,12 @@ def parse_istc_imprint(record):
 
             if "imprint_place" in imprint:
                 place = classes.Node()
+                place.type = "place"
                 place.name = imprint["imprint_place"].strip("[]")
                 place.set_attribute("chosen_candidate_id",-1)
                 place.set_attribute("role","mfp")
                 result.nodes.append(place)
+
 
             if "imprint_date" in imprint:
 #                print(step1["imprint_date"])
@@ -91,18 +100,6 @@ def parse_istc_imprint(record):
                 #bi.date_string, bi.date_start, bi.date_end = istc_analyse_date(printing_date_raw)
 
 #
-#            bi.date_start = datetime(start_year, start_month, start_day, 0, 0, 0, 0)
-#            bi.date_end = datetime(end_year, end_month, end_day, 23, 59, 59, 0)
-#            bi.date_start = (start_year, start_month, start_day)
-#            bi.date_end = (end_year, end_month, end_day)
-#            bi.date_start = (1500, 1, 1)
-#            bi.date_end = (1550, 12, 31)
-#            print("date ended")
-
-
-
-
-
             # Until I have changed it everyhwhere and also in the FE,
             # I still use the old bi.printing_date function.
 
@@ -125,9 +122,11 @@ def parse_istc_imprint(record):
                     publisher_name_long = imprint_name_long_divided[1]
                     printer_name_long = printer_name_long.strip(",")
                     pl_duplicate = classes.Node()
-                    pl_duplicate.name = bi.places[0].name
-                    pl_duplicate.role = "pup"
-                    bi.places.append(pl_duplicate)
+                    pl_duplicate.type = "place"
+                    pl_duplicate.name = place.name
+                    pl_duplicate.set_attribute("chosen_candidate_id",-1)
+                    pl_duplicate.set_attribute("role","pup")
+                    result.nodes.append(pl_duplicate)
                     # I append the place again, this time as place of publication
                     # I could instead replace the string for the role with a list,
                     # but this is a lot more work, so I have to think
@@ -135,97 +134,139 @@ def parse_istc_imprint(record):
                 else:
                     printer_name_long = imprint_name_long
 
-
                 if printer_name_long:
-#                    print("printer_name_long: " + printer_name_long)
-                    printer_name_long = printer_name_long.replace("[", "")
-                    printer_name_long = printer_name_long.replace("]", "")
-
-                    if " and " in printer_name_long: #in this case, there are two printers
-                        printer_name_long_divided = printer_name_long.split(" and ")
-                        printer_counter = 0
-                        while printer_counter < len(printer_name_long_divided):
-                            person_name=""
-                            printer_name = printer_name_long_divided[printer_counter]
-                            printer_name = printer_name.strip(" [],")
-                            if " " in printer_name:
-                                #if there is a blank inside the name -
-                                # hence it is more than just a Christian name
-                                person_name = printer_name
-                            else: # If there is only a Christian name
-
-                                if printer_name_long_divided[printer_counter+1]:
-                                    next_printer = printer_name_long_divided\
-                                        [printer_counter+1].strip()
-                                    # if there is a next printer in the list
-                                    # whose name has at least two words
-                                    if " " in next_printer:
-                                        next_printer_divided = next_printer.split(" ")
-                                        next_printer_surname = next_printer_divided[-1]
-                                        person_name = printer_name + " " + next_printer_surname
-                                else: # if there is no next printer,
-                                    #or the next printer does not have a surname, either
-                                    person_name = printer_name
-                            pe=classes.make_new_role(role="prt",person_name=person_name)
-                            print("pe in parse_istc")
-                            print(pe)
-                            bi.persons.append(pe)
-                            printer_counter = printer_counter + 1
-                    else: #If there is only one printer
-                        pe=classes.make_new_role(role="prt",person_name=printer_name_long)
-                        print(pe)
-                        bi.persons.append(pe)
-
+                    result = istc_get_printer_name(result, printer_name_long)
                 if publisher_name_long:
-                    print("publisher_name_long: " + publisher_name_long)
-                    if " and " in publisher_name_long: #in this case, there are two publishers
-                        publisher_name_long_divided = publisher_name_long.split(" and ")
-                        print("Two publishers")
-                        publisher_counter = 0
-                        while publisher_counter < len(publisher_name_long_divided):
-                            publisher_name = publisher_name_long_divided[publisher_counter]
-                            publisher_name = publisher_name.strip(" []")
-                            if " " in publisher_name:
-                                #if there is a blank inside the name -
-                                # hence it is more than just a Christian name
-                                pepersonname = publisher_name
-                            elif "himself" in publisher_name:
-                                pepersonname = printer_name_long
-                                # in this case there can only be one printer
-                            else: # If there is only a Christian name
-                                if publisher_name_long_divided[publisher_counter+1]:
-                                    next_publisher = publisher_name_long_divided\
-                                        [publisher_counter+1].strip()
-                                    # if there is a next publisher in the list
-                                    # whose name has at least two words
-                                    if " " in next_publisher:
-                                        next_publisher_divided = next_publisher.split(" ")
-                                        next_publisher_surname = next_publisher_divided[-1]
-                                        pepersonname = publisher_name + " " + next_publisher_surname
-                                    else: # if the next printer doesn't have a surname, either
-                                        pepersonname = publisher_name
-                                else: # if there is no next printer
-                                    pepersonname = publisher_name
-                            print("Publisher name: "+ pe.name)
+                    result = istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+
+
+    return result
+
+@classes.func_logger
+def istc_get_printer_name(result, printer_name_long):
+    """
+    Parses printer_name and gets from there one or two names ofprinters
+    """
+#   print("printer_name_long: " + printer_name_long)
+    printer_name_long = printer_name_long.replace("[", "")
+    printer_name_long = printer_name_long.replace("]", "")
+
+    if " and " in printer_name_long: #in this case, there are two printers
+        printer_name_long_divided = printer_name_long.split(" and ")
+        printer_counter = 0
+        while printer_counter < len(printer_name_long_divided):
+            person_name=""
+            printer_name = printer_name_long_divided[printer_counter]
+            printer_name = printer_name.strip(" [],")
+            if " " in printer_name:
+                #if there is a blank inside the name -
+                # hence it is more than just a Christian name
+                person_name = printer_name
+            else: # If there is only a Christian name
+
+                if printer_name_long_divided[printer_counter+1]:
+                    next_printer = printer_name_long_divided\
+                        [printer_counter+1].strip()
+                    # if there is a next printer in the list
+                    # whose name has at least two words
+                    if " " in next_printer:
+                        next_printer_divided = next_printer.split(" ")
+                        next_printer_surname = next_printer_divided[-1]
+                        person_name = printer_name + " " + next_printer_surname
+                else: # if there is no next printer,
+                    #or the next printer does not have a surname, either
+                    person_name = printer_name
+            #pe=classes.make_new_role(role="prt",person_name=person_name)
+            pe = classes.Node()
+            pe.type = "person"
+            pe.name_preferred = person_name
+            pe.set_attribute("chosen_candidate_id",-1)
+            pe.set_attribute("role","prt")
+            print("pe in parse_istc")
+            print(pe)
+            result.nodes.append(pe)
+            #bi.persons.append(pe)
+            printer_counter = printer_counter + 1
+    else: #If there is only one printer
+        pe = classes.Node()
+        pe.type = "person"
+        pe.name_preferred = printer_name_long
+        pe.set_attribute("chosen_candidate_id",-1)
+        pe.set_attribute("role","prt")
+        print("pe in parse_istc")
+        print(pe)
+        result.nodes.append(pe)
+
+        #pe=classes.make_new_role(role="prt",person_name=printer_name_long)
+        #print(pe)
+        #bi.persons.append(pe)
+    return result
+
+@classes.func_logger
+def istc_get_publisher_name(result, publisher_name_long, printer_name_long):
+    """
+    Identifies one or more publishers (if they are indicated separately from the printers)
+    """
+    print("publisher_name_long: " + publisher_name_long)
+    if " and " in publisher_name_long: #in this case, there are two publishers
+        publisher_name_long_divided = publisher_name_long.split(" and ")
+        print("Two publishers")
+        publisher_counter = 0
+        while publisher_counter < len(publisher_name_long_divided):
+            publisher_name = publisher_name_long_divided[publisher_counter]
+            publisher_name = publisher_name.strip(" []")
+            if " " in publisher_name:
+                #if there is a blank inside the name -
+                # hence it is more than just a Christian name
+                pepersonname = publisher_name
+            elif "himself" in publisher_name:
+                pepersonname = printer_name_long
+                # in this case there can only be one printer
+            else: # If there is only a Christian name
+                if publisher_name_long_divided[publisher_counter+1]:
+                    next_publisher = publisher_name_long_divided\
+                        [publisher_counter+1].strip()
+                    # if there is a next publisher in the list
+                    # whose name has at least two words
+                    if " " in next_publisher:
+                        next_publisher_divided = next_publisher.split(" ")
+                        next_publisher_surname = next_publisher_divided[-1]
+                        pepersonname = publisher_name + " " + next_publisher_surname
+                    else: # if the next printer doesn't have a surname, either
+                        pepersonname = publisher_name
+                else: # if there is no next printer
+                    pepersonname = publisher_name
+            print("Publisher name: "+ pepersonname)
+            pe = classes.Node()
+            pe.type = "person"
+            pe.name_preferred = pepersonname
+            pe.set_attribute("chosen_candidate_id",-1)
+            pe.set_attribute("role","pbl")
+            print("pe in parse_istc")
+            print(pe)
+            result.nodes.append(pe)
+
 #                            pe = classes.SelectionCandidate()
 #                            pe.person = classes.Person()
 #                            pe.person.role = "pbl"
-                            publisher=classes.make_new_role(role="pbl",person_name=pepersonname)
-                            bi.persons.append(publisher)
-                            publisher_counter = publisher_counter + 1
-                    else: #If there is only one publisher
+            #publisher=classes.make_new_role(role="pbl",person_name=pepersonname)
+            #bi.persons.append(publisher)
+            publisher_counter = publisher_counter + 1
+    else: #If there is only one publisher
 #                        pe = classes.SelectionCandidate()
 #  #                       pe.person = classes.Person()
 #                         pe.person.name = publisher_name_long
 #                         pe.person.role = "pbl"
-                        publisher=classes.make_new_role(role="pbl",person_name=publisher_name_long)
-                        bi.persons.append(publisher)
-        if "title" in istc_record_short:
-            bi.title = istc_record_short["title"]
-
-
-    return bi
-
+#                        publisher=classes.make_new_role(role="pbl",person_name=publisher_name_long)
+#                        result.nodes.append(publisher)
+        pe.type = "person"
+        pe.name_preferred = pepersonname
+        pe.set_attribute("chosen_candidate_id",-1)
+        pe.set_attribute("role","pbl")
+        print("pe in parse_istc")
+        print(pe)
+        result.nodes.append(pe)
+    return result
 
 
 @classes.func_logger
@@ -281,7 +322,7 @@ def istc_analyse_date(printing_date_raw):
     """
     \todo
     """
-    # The last options before the backslash did not work, hence I repeated them. 
+    # The last options before the backslash did not work, hence I repeated them.
     date_pattern = r'(About |about |Before |before |Not before |not before |not before \
         |Shortly before |shortly before |Between |between |After |after |Not after |Not after \
         |not after |Shortly after |shortly after )?(\d{1,2} )?([A-Za-z\.]{3,5} )?(\d{4})?(/\d{2,4}|-\d{2,4})?( and |and )?(\d{1,2} )?([\w\.]{3,5} )?(\d{4})?'

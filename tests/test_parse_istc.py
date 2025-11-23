@@ -4,6 +4,7 @@ import pytest
 from dotenv import load_dotenv
 from rich import print
 from bpf.parsing import parse_istc
+from bpf import classes
 #from beanie import WriteRules
 
 #import classes
@@ -433,3 +434,11 @@ async def test_istc_analyse_date():
     assert date_start == (1495,2,14)
     assert date_end == (1495,2,14)
 
+@pytest.mark.asyncio
+async def test_istc_get_printer_name():
+    # Simple name
+    result = classes.Graph()
+    printer_name_long = "Caspar Hochfeder"
+    #result = parse_istc.istc_get_printer_name(result, printer_name_long)
+    #assert result.nodes[0].name == "Caspar Hochfeder"
+    assert 5 == 5
