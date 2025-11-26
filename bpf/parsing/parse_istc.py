@@ -48,102 +48,112 @@ async def parse_istc(url) -> classes.Graph:
         return
 
     bi = classes.Node()
-    bi.type="BibliographicInformation"
+    results.nodes.append(bi)
+    results.nodes[0].type="BibliographicInformation"
 
 ####### FINDING BIBILIOGRAPHIC ID
     bib_ids = istc_get_bibliographic_id(istc_record_short)
-    bi.external_id.extend(bib_ids)
+    results.nodes[0].external_id.extend(bib_ids)
 
 ####### FINDING AUTHOR
     if "author" in istc_record_short:
         author=classes.Node()
         author.type="person"
         author.set_attribute("role","aut")
-        author.name=istc_record_short["author"]
+        author.set_attribute("chosen_candidate_id","-1")
+        author.name_preferred = istc_record_short["author"]
         results.nodes.append(author)
 
 ###### FINDING TITLE
     if "title" in istc_record_short:
-        bi.title = istc_record_short["title"]
+        title = istc_record_short["title"].strip()
+        results.nodes[0].set_attribute("title", title)
 
 ###### FINDING IMPRINT
     if "imprint" in istc_record_short:
         results = parse_istc_imprint(results, istc_record_short)
+    print("results overall")
+    print(results)
     return results
 
 
-def parse_istc_imprint(result, record):
+def parse_istc_imprint(results, record):
     """
     Parse the imprints (Places, Printers, Publishers, Dates)
     """
-    if "imprint" in record:
-        for imprint in record["imprint"]:
-            # this is iterated in case there are several imprints, I reckon
-            printer_name_long = ""
-            publisher_name_long = ""
+
+    for imprint in record["imprint"]:
+        # this is iterated in case there are several imprints, I reckon
+        printer_name_long = ""
+        publisher_name_long = ""
 #            print("step1 in imprint: ")
 #            print(step1)
 
-            if "imprint_place" in imprint:
-                place = classes.Node()
-                place.type = "place"
-                place.name = imprint["imprint_place"].strip("[]")
-                place.set_attribute("chosen_candidate_id",-1)
-                place.set_attribute("role","mfp")
-                result.nodes.append(place)
+        if "imprint_place" in imprint:
+            place = classes.Node()
+            place.type = "place"
+            place.name_preferred = imprint["imprint_place"].strip("[]")
+            place.set_attribute("chosen_candidate_id","-1")
+            place.set_attribute("role","mfp")
+            results.nodes.append(place)
 
 
-            if "imprint_date" in imprint:
+        if "imprint_date" in imprint:
 #                print(step1["imprint_date"])
-                #bi.printing_date = step1["imprint_date"].strip("[]")
-                printing_date_raw = imprint["imprint_date"].strip("[]")
-                #bi.date_string, bi.date_start, bi.date_end = istc_analyse_date(printing_date_raw)
+            #bi.printing_date = step1["imprint_date"].strip("[]")
+            printing_date_raw = imprint["imprint_date"].strip("[]")
+            date = istc_analyse_date(printing_date_raw)
+            results.nodes[0].dates.append(date)
+            #bi.date_string, bi.date_start, bi.date_end = istc_analyse_date(printing_date_raw)
 
 #
-            # Until I have changed it everyhwhere and also in the FE,
-            # I still use the old bi.printing_date function.
+        # Until I have changed it everyhwhere and also in the FE,
+        # I still use the old bi.printing_date function.
 
 #            bi.printing_date = bi.date_string + " (" + bi.date_start.isoformat()[0:10] +
 #              " - " + bi.date_end.isoformat()[0:10] + ")"
 
-            if "imprint_name" in imprint:
-                imprint_name_long = imprint["imprint_name"].strip("[]")
+        if "imprint_name" in imprint:
+            imprint_name_long = imprint["imprint_name"]
 
 
-            if imprint_name_long:
+        if imprint_name_long:
 #                print("imprint_name_long before replacement: " + imprint_name_long)
-                imprint_name_long = imprint_name_long.replace("and for", "and")
-                # sometimes, the "for" is repeated for a second publisher, what is confusing
+            imprint_name_long = imprint_name_long.replace("[", "")
+            imprint_name_long = imprint_name_long.replace("]", "")
+            imprint_name_long = imprint_name_long.replace("and for", "and")
+            # sometimes, the "for" is repeated for a second publisher, what is confusing
 #                print("imprint_name_long after replacement: " + imprint_name_long)
-                if " for " in imprint_name_long:
-                    # in this case there are both a printer and a publisher
-                    imprint_name_long_divided = imprint_name_long.split(" for ")
-                    printer_name_long = imprint_name_long_divided[0]
-                    publisher_name_long = imprint_name_long_divided[1]
-                    printer_name_long = printer_name_long.strip(",")
-                    pl_duplicate = classes.Node()
-                    pl_duplicate.type = "place"
-                    pl_duplicate.name = place.name
-                    pl_duplicate.set_attribute("chosen_candidate_id",-1)
-                    pl_duplicate.set_attribute("role","pup")
-                    result.nodes.append(pl_duplicate)
-                    # I append the place again, this time as place of publication
-                    # I could instead replace the string for the role with a list,
-                    # but this is a lot more work, so I have to think
-                    # if this is appropriate (I fear it is)
-                else:
-                    printer_name_long = imprint_name_long
+            if " for " in imprint_name_long:
+                # in this case there are both a printer and a publisher
+                imprint_name_long_divided = imprint_name_long.split(" for ")
+                printer_name_long = imprint_name_long_divided[0]
+                publisher_name_long = imprint_name_long_divided[1]
+                printer_name_long = printer_name_long.strip(",")
+                pl_duplicate = classes.Node()
+                pl_duplicate.type = "place"
+                pl_duplicate.name_preferred = place.name_preferred
+                pl_duplicate.set_attribute("chosen_candidate_id","-1")
+                pl_duplicate.set_attribute("role","pup")
+                results.nodes.append(pl_duplicate)
+                # I append the place again, this time as place of publication
+                # I could instead replace the string for the role with a list,
+                # but this is a lot more work, so I have to think
+                # if this is appropriate (I fear it is)
+            else:
+                printer_name_long = imprint_name_long
 
-                if printer_name_long:
-                    result = istc_get_printer_name(result, printer_name_long)
-                if publisher_name_long:
-                    result = istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+            if printer_name_long:
+                results = istc_get_printer_name(results, printer_name_long)
+            if publisher_name_long:
+                results = istc_get_publisher_name(results, publisher_name_long, printer_name_long)
 
-
-    return result
+    print("final results in parse_imprint")
+    print(results)
+    return results
 
 @classes.func_logger
-def istc_get_printer_name(result, printer_name_long):
+def istc_get_printer_name(results, printer_name_long):
     """
     Parses printer_name and gets from there one or two names ofprinters
     """
@@ -172,6 +182,8 @@ def istc_get_printer_name(result, printer_name_long):
                     if " " in next_printer:
                         next_printer_divided = next_printer.split(" ")
                         next_printer_surname = next_printer_divided[-1]
+                        # It should be -2 + -1 if -2 is something like "de",
+                        # but this may be too much fuss.
                         person_name = printer_name + " " + next_printer_surname
                 else: # if there is no next printer,
                     #or the next printer does not have a surname, either
@@ -180,33 +192,34 @@ def istc_get_printer_name(result, printer_name_long):
             pe = classes.Node()
             pe.type = "person"
             pe.name_preferred = person_name
-            pe.set_attribute("chosen_candidate_id",-1)
+            pe.set_attribute("chosen_candidate_id","-1")
             pe.set_attribute("role","prt")
             print("pe in parse_istc")
             print(pe)
-            result.nodes.append(pe)
+            results.nodes.append(pe)
             #bi.persons.append(pe)
             printer_counter = printer_counter + 1
     else: #If there is only one printer
         pe = classes.Node()
         pe.type = "person"
         pe.name_preferred = printer_name_long
-        pe.set_attribute("chosen_candidate_id",-1)
+        pe.set_attribute("chosen_candidate_id","-1")
         pe.set_attribute("role","prt")
         print("pe in parse_istc")
         print(pe)
-        result.nodes.append(pe)
+        results.nodes.append(pe)
 
         #pe=classes.make_new_role(role="prt",person_name=printer_name_long)
         #print(pe)
         #bi.persons.append(pe)
-    return result
+    return results
 
 @classes.func_logger
-def istc_get_publisher_name(result, publisher_name_long, printer_name_long):
+def istc_get_publisher_name(results, publisher_name_long, printer_name_long):
     """
     Identifies one or more publishers (if they are indicated separately from the printers)
     """
+    pepersonname = ""
     print("publisher_name_long: " + publisher_name_long)
     if " and " in publisher_name_long: #in this case, there are two publishers
         publisher_name_long_divided = publisher_name_long.split(" and ")
@@ -220,7 +233,7 @@ def istc_get_publisher_name(result, publisher_name_long, printer_name_long):
                 # hence it is more than just a Christian name
                 pepersonname = publisher_name
             elif "himself" in publisher_name:
-                pepersonname = printer_name_long
+                pepersonname = printer_name_long.strip()
                 # in this case there can only be one printer
             else: # If there is only a Christian name
                 if publisher_name_long_divided[publisher_counter+1]:
@@ -240,11 +253,11 @@ def istc_get_publisher_name(result, publisher_name_long, printer_name_long):
             pe = classes.Node()
             pe.type = "person"
             pe.name_preferred = pepersonname
-            pe.set_attribute("chosen_candidate_id",-1)
+            pe.set_attribute("chosen_candidate_id","-1")
             pe.set_attribute("role","pbl")
-            print("pe in parse_istc")
+            print("pe in parse_istc - publisher")
             print(pe)
-            result.nodes.append(pe)
+            results.nodes.append(pe)
 
 #                            pe = classes.SelectionCandidate()
 #                            pe.person = classes.Person()
@@ -259,14 +272,15 @@ def istc_get_publisher_name(result, publisher_name_long, printer_name_long):
 #                         pe.person.role = "pbl"
 #                        publisher=classes.make_new_role(role="pbl",person_name=publisher_name_long)
 #                        result.nodes.append(publisher)
+        pe = classes.Node()
         pe.type = "person"
-        pe.name_preferred = pepersonname
-        pe.set_attribute("chosen_candidate_id",-1)
+        pe.name_preferred = publisher_name_long
+        pe.set_attribute("chosen_candidate_id","-1")
         pe.set_attribute("role","pbl")
-        print("pe in parse_istc")
+        print("pe in parse_istc - publisher")
         print(pe)
-        result.nodes.append(pe)
-    return result
+        results.nodes.append(pe)
+    return results
 
 
 @classes.func_logger
@@ -351,7 +365,8 @@ def istc_analyse_date(printing_date_raw):
     date_string = ""
     date_start = ()
     date_end = ()
-
+    printing_date_raw = printing_date_raw.replace(".1", ". 1")
+    # in case the blank after the abbreviation of the month has been forgotten.
     if  re.match(date_pattern, printing_date_raw):
         print("date matching with pattern")
         printing_date_divided = re.match(date_pattern, printing_date_raw).groups()
@@ -387,11 +402,12 @@ def istc_analyse_date(printing_date_raw):
     date_string = string_prefix + string_day + string_month + string_year + \
          date_between_indicator + string_day_between + \
          string_month_between + string_year_between
-    date_string = date_string.strip()
-    date_start = (start_year, start_month, start_day)
-    date_end = (end_year, end_month, end_day)
+    date = classes.Date()
+    date.date_string = date_string.strip()
+    date.date_start = (start_year, start_month, start_day)
+    date.date_end = (end_year, end_month, end_day)
+    return date
 
-    return (date_string, date_start, date_end)
 
 @classes.func_logger
 def analyse_prefix(date_prefix, start_year, end_year):
@@ -507,7 +523,7 @@ def analyse_month(date_between_year, date_between_month, date_month):
     This function parses indications of months
     """
     month_names = {"Jan. " : "January ", "Feb. " : "February ", "Mar. " : "March ", \
-                   "Apr. ": "April", "May " : "May ", "June " : "June ", "July " : "July ", \
+                   "Apr. ": "April ", "May " : "May ", "June " : "June ", "July " : "July ", \
                     "Aug. " : "August ", "Sep. " : "September ", "Sept. " : "September ", \
                     "Oct. " : "October ", "Nov. " : "November ", "Dec. " : "December "}
     month_numbers = {"Jan. " : 1, "Feb. " : 2, "Mar. " : 3, "Apr. ": 4, "May " : 5, "June " : 6, \

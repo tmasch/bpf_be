@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from rich import print
 from bpf.parsing import parse_istc
 from bpf import classes
+from bpf import db_actions
 #from beanie import WriteRules
 
 #import classes
@@ -39,6 +40,18 @@ async def create_test_albrecht():
     return r[0]
 
 
+async def create_test_abbreviamentum():
+    """
+    Create a test record for a abbreviamentum statutorum
+    no Author
+    One Place, two printers, date-range
+    """
+    id = "ia00003000"
+    r=await parse_istc.get_istc_record_for_testing(id)
+    return r[0]
+
+
+
 async def create_test_wine():
     """
     Create a test record for a post-1500 book on wine
@@ -63,10 +76,57 @@ async def create_test_gulden():
     r=await parse_istc.get_istc_record_for_testing(id)
     return r[0]
 
+async def create_test_accoltis():
+    """
+    Creates a test record
+    One author
+    Imprint with one place, one printer, one publisher, date by day
+    """
+    id = "ia00018500"
+    r=await parse_istc.get_istc_record_for_testing(id)
+    return r[0]
+
+async def create_test_alanus_doctrinale():
+    """
+    Creates a test record
+    One author
+    Imprint with one place, two  printers, one publisher, date by day
+    """
+    id = "ia00178000"
+    r=await parse_istc.get_istc_record_for_testing(id)
+    return r[0]
+
+
+async def create_test_alanus():
+    """
+    Creates a test record
+    One author
+    Imprint with one place, one printer, for himself and two other publishers, date simple day
+    """
+    id = "ia00224000"
+    r=await parse_istc.get_istc_record_for_testing(id)
+    return r[0]
+
+
+async def create_test_causidicus():
+    """
+    Creates a test record
+    One author
+    Imprint with one place, one printer, a date range from a day to a month
+    """
+    id = "ia00209230"
+    r=await parse_istc.get_istc_record_for_testing(id)
+    return r[0]
+
+
 
 
 @pytest.mark.asyncio
 async def test_istc_get_bibliographic_id():
+    """
+    tests different types of GW IDs
+    """
+    # simple ID
     aesopus = await create_test_aesopus()
     print("record")
     print(aesopus)
@@ -78,6 +138,7 @@ async def test_istc_get_bibliographic_id():
     assert bid[1].external_id == "359"
     assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW00359.htm"
 
+    # ID of an inserted record
     albrecht = await create_test_albrecht()
     bid = parse_istc.istc_get_bibliographic_id(albrecht)
     assert bid[0].name == "ISTC"
@@ -87,6 +148,7 @@ async def test_istc_get_bibliographic_id():
     assert bid[1].external_id == "0081020N"
     assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW0081020N.htm"
 
+    # ID of an edition not regarded as incunable in the GW
     wine = await create_test_wine()
     bid = parse_istc.istc_get_bibliographic_id(wine)
     assert bid[0].name == "ISTC"
@@ -96,6 +158,7 @@ async def test_istc_get_bibliographic_id():
     assert bid[1].external_id == "II Sp.699a"
     assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GWII699A.htm"
 
+    # ID of an edition not yet definitively catalogued in the GW
     gulden = await create_test_gulden()
     bid = parse_istc.istc_get_bibliographic_id(gulden)
     assert bid[0].name == "ISTC"
@@ -104,10 +167,15 @@ async def test_istc_get_bibliographic_id():
     assert bid[1].name == "GW"
     assert bid[1].external_id == "M52066"
     assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/M52066.htm"
-    
+
 
 @pytest.mark.asyncio
 async def test_istc_analyse_prefix():
+    """
+    Tests the parsing of different prefixes of dates
+    (which means both standardising expression and 
+    adjusting start and end dates)
+    """
     # option about
     date_prefix = "about "
     start_year = 1480
@@ -183,6 +251,9 @@ async def test_istc_analyse_prefix():
 
 @pytest.mark.asyncio
 async def test_istc_analyse_year():
+    """"
+    Analyses the year in a date
+    """
     # simple year
     date_prefix = ""
     date_year = "1480"
@@ -289,7 +360,10 @@ async def test_istc_analyse_year():
 
 
 @pytest.mark.asyncio
-async def test_istc_analyse_moth():
+async def test_istc_analyse_month():
+    """
+    Analyses the month in a date
+    """
     # no months given
     date_between_year = ""
     date_between_month = ""
@@ -339,6 +413,9 @@ async def test_istc_analyse_moth():
 
 @pytest.mark.asyncio
 async def test_istc_anaylyse_day():
+    """
+    Analyses the day in a date
+    """
     # Just one day
     date_between_day = ""
     date_between_year = ""
@@ -376,7 +453,7 @@ async def test_istc_anaylyse_day():
     assert string_day_between == ""
     assert start_day == 1
     assert end_day == 29
-    
+
 
 @pytest.mark.asyncio
 async def test_istc_analyse_date():
@@ -386,59 +463,394 @@ async def test_istc_analyse_date():
     """
     # simple year
     printing_date_raw = "1480"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "1480"
-    assert date_start == (1480,1,1)
-    assert date_end == (1480,12,31)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "1480"
+    assert date.date_start == (1480,1,1)
+    assert date.date_end == (1480,12,31)
     # simple day
     printing_date_raw = "11 Aug. 1494"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "11 August 1494"
-    assert date_start == (1494,8,11)
-    assert date_end == (1494,8,11)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "11 August 1494"
+    assert date.date_start == (1494,8,11)
+    assert date.date_end == (1494,8,11)
     # only year, with hyphen
     printing_date_raw = "1479-80"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "1479-1480"
-    assert date_start == (1479,1,1)
-    assert date_end == (1480,12,31)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "1479-1480"
+    assert date.date_start == (1479,1,1)
+    assert date.date_end == (1480,12,31)
     # only year, with prefix
     printing_date_raw = "about 1470"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "about 1470"
-    assert date_start == (1469,1,1)
-    assert date_end == (1471,12,31)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "about 1470"
+    assert date.date_start == (1469,1,1)
+    assert date.date_end == (1471,12,31)
     # exact date, with prefix
     printing_date_raw = "not before 27 Aug. 1492"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "not before 27 August 1492"
-    assert date_start == (1492,8,27)
-    assert date_end == (1494,8,27)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "not before 27 August 1492"
+    assert date.date_start == (1492,8,27)
+    assert date.date_end == (1494,8,27)
 
     printing_date_raw = "Not after 27 Aug. 1492"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "not after 27 August 1492"
-    assert date_start == (1490,8,27)
-    assert date_end == (1492,8,27)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "not after 27 August 1492"
+    assert date.date_start == (1490,8,27)
+    assert date.date_end == (1492,8,27)
 
     # two dates, in this case the first day, the second only year
     printing_date_raw = "between 8 Feb. 1471 and 1472"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "between 8 February 1471 and 1472"
-    assert date_start == (1471,2,8)
-    assert date_end == (1472,12,31)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "between 8 February 1471 and 1472"
+    assert date.date_start == (1471,2,8)
+    assert date.date_end == (1472,12,31)
     # date with different year in modern calendar
     printing_date_raw = "14 Feb. 1494/95"
-    date_string, date_start, date_end = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date_string == "14 February 1494 (in modern calendar 1495)"
-    assert date_start == (1495,2,14)
-    assert date_end == (1495,2,14)
+    date = parse_istc.istc_analyse_date(printing_date_raw)
+    assert date.date_string == "14 February 1494 (in modern calendar 1495)"
+    assert date.date_start == (1495,2,14)
+    assert date.date_end == (1495,2,14)
 
 @pytest.mark.asyncio
 async def test_istc_get_printer_name():
-    # Simple name
+    """
+    Tests extracting the printer's name(s)
+    """
+    # One printer
+    await db_actions.initialise_beanie()
     result = classes.Graph()
     printer_name_long = "Caspar Hochfeder"
-    #result = parse_istc.istc_get_printer_name(result, printer_name_long)
-    #assert result.nodes[0].name == "Caspar Hochfeder"
-    assert 5 == 5
+    result = parse_istc.istc_get_printer_name(result, printer_name_long)
+    assert result.nodes[0].name_preferred == "Caspar Hochfeder"
+    assert result.nodes[0].attributes[0].key == "chosen_candidate_id"
+    assert result.nodes[0].attributes[0].value == "-1"
+    assert result.nodes[0].attributes[1].key == "role"
+    assert result.nodes[0].attributes[1].value == "prt"
+    # two printers with different names
+    result = classes.Graph()
+    printer_name_long = "John Lettou and William de Machlinia"
+    result = parse_istc.istc_get_printer_name(result, printer_name_long)
+    assert result.nodes[0].name_preferred == "John Lettou"
+    assert result.nodes[1].name_preferred == "William de Machlinia"
+    # two printers with the same surname
+    result = classes.Graph()
+    printer_name_long = "Bernardinus and Ambrosius de Rovellis"
+    result = parse_istc.istc_get_printer_name(result, printer_name_long)
+    assert result.nodes[0].name_preferred == "Bernardinus Rovellis"
+    assert result.nodes[1].name_preferred == "Ambrosius de Rovellis"
+    # Here, the expected result is not beautiful, the 'de' should appear
+    # in both cases. However, (a) such situations are rare and (b), the
+    # names inserted into the database will normally be names from the GND, anyway.
+    # Hence, there is probably no need to create a rule that 'de', 'von' etc.
+    # should stay with the surname.
+
+@pytest.mark.asyncio
+async def test_istc_get_publisher_name():
+    """
+    Tests extracting the publisher's name(s), if distinct from the printers'
+    """
+    await db_actions.initialise_beanie()
+    # one publisher
+    result = classes.Graph()
+    publisher_name_long = "Andreas Torresanus"
+    printer_name_long = " Simon de Luere"
+    result = parse_istc.istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+    assert result.nodes[0].name_preferred == "Andreas Torresanus"
+    assert result.nodes[0].attributes[0].key == "chosen_candidate_id"
+    assert result.nodes[0].attributes[0].value == "-1"
+    assert result.nodes[0].attributes[1].key == "role"
+    assert result.nodes[0].attributes[1].value == "pbl"
+    # publishers with different names
+    result = classes.Graph()
+    publisher_name_long = "Antonius de Cistis and Henricus de Colonia"
+    printer_name_long = "Ugo Rugerius"
+    result = parse_istc.istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+    assert result.nodes[0].name_preferred == "Antonius de Cistis"
+    assert result.nodes[1].name_preferred == "Henricus de Colonia"
+    # publishers sharing surname
+    result = classes.Graph()
+    publisher_name_long = "Bastianus and Raphael de Orlandis"
+    printer_name_long = "dfsadfdsfs fsfsdfd"
+    result = parse_istc.istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+    assert result.nodes[0].name_preferred == "Bastianus Orlandis"
+    assert result.nodes[1].name_preferred == "Raphael de Orlandis"
+    # printer for himself and other publishers
+    result = classes. Graph()
+    publisher_name_long = "himself and Marcus Mazola and Antonius de Vignono"
+    # in the original it has 'himself and for',
+    # but the 'for' would be removed earlier on in the parsing.
+    printer_name_long = "Paulus de Butzbach "
+    result = parse_istc.istc_get_publisher_name(result, publisher_name_long, printer_name_long)
+    assert result.nodes[0].name_preferred == "Paulus de Butzbach"
+    assert result.nodes[1].name_preferred == "Marcus Mazola"
+    assert result.nodes[2].name_preferred == "Antonius de Vignono"
+
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_0():
+    """
+    tests the function for parsing the whole imprint
+    One place, one printer, one date
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    aesopus = await create_test_aesopus()
+    results = parse_istc.parse_istc_imprint(results, aesopus)
+    assert results.nodes[0].dates[0].date_string == "23 May 1487"
+    assert results.nodes[0].dates[0].date_start == (1487, 5, 23)
+    assert results.nodes[0].dates[0].date_end == (1487, 5, 23)
+    assert results.nodes[1].name_preferred == "Augsburg"
+    assert results.nodes[2].name_preferred == "Johann Schobsser"
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_1():
+    """
+    tests the function for parsing the whole imprint
+    One place, one printer, one date (with a range)
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    albrecht = await create_test_albrecht()
+    results = parse_istc.parse_istc_imprint(results, albrecht)
+    assert results.nodes[0].dates[0].date_string == "not before 8 April 1485"
+    assert results.nodes[0].dates[0].date_start == (1485, 4, 8)
+    assert results.nodes[0].dates[0].date_end == (1487, 4, 8)
+    assert results.nodes[1].name_preferred == "Augsburg"
+    assert results.nodes[2].name_preferred == "Johann Bämler"
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_2():
+    """
+    tests the function for parsing the whole imprint
+    One place, two printers, date-range
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    abbreviamentum = await create_test_abbreviamentum()
+    results = parse_istc.parse_istc_imprint(results, abbreviamentum)
+    assert results.nodes[0].dates[0].date_string == "about 1481-1482"
+    assert results.nodes[0].dates[0].date_start == (1481, 1, 1)
+    assert results.nodes[0].dates[0].date_end == (1482, 12, 31)
+    assert results.nodes[1].type == "place"
+    assert results.nodes[1].name_preferred == "London"
+    assert results.nodes[1].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[1].attributes[0].value == "-1"
+    assert results.nodes[1].attributes[1].key == "role"
+    assert results.nodes[1].attributes[1].value == "mfp"
+    assert results.nodes[2].name_preferred == "John Lettou"
+    assert results.nodes[2].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[2].attributes[0].value == "-1"
+    assert results.nodes[2].attributes[1].key == "role"
+    assert results.nodes[2].attributes[1].value == "prt"
+    assert results.nodes[3].name_preferred == "William de Machlinia"
+    assert results.nodes[3].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[3].attributes[0].value == "-1"
+    assert results.nodes[3].attributes[1].key == "role"
+    assert results.nodes[3].attributes[1].value == "prt"
+
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_3():
+    """
+    tests the function for parsing the whole imprint
+    One place, one printer, one publisher, date-range
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    accoltis = await create_test_accoltis()
+    results = parse_istc.parse_istc_imprint(results, accoltis)
+    assert results.nodes[0].dates[0].date_string == "11 August 1494"
+    assert results.nodes[0].dates[0].date_start == (1494, 8, 11)
+    assert results.nodes[0].dates[0].date_end == (1494, 8, 11)
+    assert results.nodes[1].type == "place"
+    assert results.nodes[1].name_preferred == "Pavia"
+    assert results.nodes[1].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[1].attributes[0].value == "-1"
+    assert results.nodes[1].attributes[1].key == "role"
+    assert results.nodes[1].attributes[1].value == "mfp"
+    assert results.nodes[2].name_preferred == "Pavia"
+    assert results.nodes[2].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[2].attributes[0].value == "-1"
+    assert results.nodes[2].attributes[1].key == "role"
+    assert results.nodes[2].attributes[1].value == "pup"
+    assert results.nodes[3].name_preferred == "Antonius de Carcano"
+    assert results.nodes[3].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[3].attributes[0].value == "-1"
+    assert results.nodes[3].attributes[1].key == "role"
+    assert results.nodes[3].attributes[1].value == "prt"
+    assert results.nodes[4].name_preferred == "Gabriel de Grassis"
+    assert results.nodes[4].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[4].attributes[0].value == "-1"
+    assert results.nodes[4].attributes[1].key == "role"
+    assert results.nodes[4].attributes[1].value == "pbl"
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_4():
+    """
+    tests the function for parsing the whole imprint
+    One place, two printers, one publisher date by day"""
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    alanus = await create_test_alanus_doctrinale()
+    results = parse_istc.parse_istc_imprint(results, alanus)
+    assert results.nodes[0].dates[0].date_string == "10 September 1500"
+    assert results.nodes[0].dates[0].date_start == (1500, 9, 10)
+    assert results.nodes[0].dates[0].date_end == (1500, 9, 10)
+    assert results.nodes[1].type == "place"
+    assert results.nodes[1].name_preferred == "Cologne"
+    assert results.nodes[1].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[1].attributes[0].value == "-1"
+    assert results.nodes[1].attributes[1].key == "role"
+    assert results.nodes[1].attributes[1].value == "mfp"
+    assert results.nodes[2].name_preferred == "Cologne"
+    assert results.nodes[2].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[2].attributes[0].value == "-1"
+    assert results.nodes[2].attributes[1].key == "role"
+    assert results.nodes[2].attributes[1].value == "pup"
+    assert results.nodes[3].name_preferred == "Heinrich Quentell"
+    assert results.nodes[3].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[3].attributes[0].value == "-1"
+    assert results.nodes[3].attributes[1].key == "role"
+    assert results.nodes[3].attributes[1].value == "prt"
+    assert results.nodes[4].name_preferred == "'Retro Minores'"
+    assert results.nodes[4].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[4].attributes[0].value == "-1"
+    assert results.nodes[4].attributes[1].key == "role"
+    assert results.nodes[4].attributes[1].value == "prt"
+    assert results.nodes[5].name_preferred == "Heinrich Quentell"
+    assert results.nodes[5].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[5].attributes[0].value == "-1"
+    assert results.nodes[5].attributes[1].key == "role"
+    assert results.nodes[5].attributes[1].value == "pbl"
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_5():
+    """
+    tests the function for parsing the whole imprint
+    One place, one printer, for himself and two other publishers
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    alanus = await create_test_alanus()
+    results = parse_istc.parse_istc_imprint(results, alanus)
+    assert results.nodes[0].dates[0].date_string == "12 January 1479"
+    assert results.nodes[0].dates[0].date_start == (1479, 1, 12)
+    assert results.nodes[0].dates[0].date_end == (1479, 1, 12)
+    assert results.nodes[1].type == "place"
+    assert results.nodes[1].name_preferred == "Mantua"
+    assert results.nodes[1].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[1].attributes[0].value == "-1"
+    assert results.nodes[1].attributes[1].key == "role"
+    assert results.nodes[1].attributes[1].value == "mfp"
+    assert results.nodes[2].name_preferred == "Mantua"
+    assert results.nodes[2].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[2].attributes[0].value == "-1"
+    assert results.nodes[2].attributes[1].key == "role"
+    assert results.nodes[2].attributes[1].value == "pup"
+    assert results.nodes[3].name_preferred == "Paulus de Butzbach"
+    assert results.nodes[3].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[3].attributes[0].value == "-1"
+    assert results.nodes[3].attributes[1].key == "role"
+    assert results.nodes[3].attributes[1].value == "prt"
+    assert results.nodes[4].name_preferred == "Paulus de Butzbach"
+    assert results.nodes[4].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[4].attributes[0].value == "-1"
+    assert results.nodes[4].attributes[1].key == "role"
+    assert results.nodes[4].attributes[1].value == "pbl"
+    assert results.nodes[5].name_preferred == "Marcus Mazola"
+    assert results.nodes[5].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[5].attributes[0].value == "-1"
+    assert results.nodes[5].attributes[1].key == "role"
+    assert results.nodes[5].attributes[1].value == "pbl"
+    assert results.nodes[6].name_preferred == "Antonius de Vignono"
+    assert results.nodes[6].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[6].attributes[0].value == "-1"
+    assert results.nodes[6].attributes[1].key == "role"
+    assert results.nodes[6].attributes[1].value == "pbl"
+
+@pytest.mark.asyncio
+async def test_istc_parse_imprint_6():
+    """
+    tests the function for parsing the whole imprint
+    One place, one printer, for himself and two other publishers
+    """
+    await db_actions.initialise_beanie()
+    results = classes.Graph()
+    bi = classes.Node()
+    results.nodes.append(bi)
+    causidicus = await create_test_causidicus()
+    results = parse_istc.parse_istc_imprint(results, causidicus)
+    assert results.nodes[0].dates[0].date_string == "between October 1485 and 24 December 1485"
+    assert results.nodes[0].dates[0].date_start == (1485, 10, 1)
+    assert results.nodes[0].dates[0].date_end == (1485, 12, 24)
+    assert results.nodes[1].type == "place"
+    assert results.nodes[1].name_preferred == "Haarlem"
+    assert results.nodes[1].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[1].attributes[0].value == "-1"
+    assert results.nodes[1].attributes[1].key == "role"
+    assert results.nodes[1].attributes[1].value == "mfp"
+    assert results.nodes[2].name_preferred == "Jacob Bellaert"
+    assert results.nodes[2].attributes[0].key == "chosen_candidate_id"
+    assert results.nodes[2].attributes[0].value == "-1"
+    assert results.nodes[2].attributes[1].key == "role"
+    assert results.nodes[2].attributes[1].value == "prt"
+    # It would be prettier if '1485 were not repeated in the string.
+    # However, I regard the way the date has been written here as
+    # incorrect, so it is probably not worth changing it.
+
+
+@pytest.mark.asyncio
+async def test_parse_istc_0():
+    """
+    Test or putting everything together. 
+    More tests are probably not needed, since the different constellations in 
+    imprint and ID have been tested before, and this is only about the title
+    and the assembly of the parts. 
+    
+    """
+    await db_actions.initialise_beanie()
+    istc_number = "ia00121400"
+    url = r'https://data.cerl.org/istc/_search?_format=json&pretty=false&query=_id%3A' + \
+    istc_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format'\
+        + r'facet=Holding%20country&facet=Publication%20country&'\
+            + r'nofacets=true&mode=default&aggregations=true&style=full'
+    results = await parse_istc.parse_istc(url)
+    assert results.nodes[0].type == "BibliographicInformation"
+    assert results.nodes[0].get_attribute("title") == \
+        "Vita, after Rinucius, et Fabulae, Lib. I-IV, " \
+        + "prose version of Romulus [German]. Add: Fabulae extravagantes. Fabulae novae " \
+            +"(Tr: Rinucius). Fabulae Aviani. Fabulae collectae [German] (Tr: Heinrich Steinhöwel)"
+    assert results.nodes[0].external_id[0].name == "ISTC"
+    assert results.nodes[0].external_id[0].external_id == "ia00121400"
+    assert results.nodes[0].external_id[0].uri == r'https://data.cerl.org/istc/ia00121400'
+    assert results.nodes[0].external_id[1].name == "GW"
+    assert results.nodes[0].external_id[1].external_id == "359"
+    assert results.nodes[0].external_id[1].uri == \
+        r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW00359.htm"
+    assert results.nodes[0].dates[0].date_string == "23 May 1487"
+    assert results.nodes[0].dates[0].date_start == (1487, 5, 23)
+    assert results.nodes[0].dates[0].date_end == (1487, 5, 23)
+    assert results.nodes[1].type == "person"
+    assert results.nodes[1].name_preferred == "Aesopus"
+    assert results.nodes[1].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[1].get_attribute("role") == "aut"
+    assert results.nodes[2].type == "place"
+    assert results.nodes[2].name_preferred == "Augsburg"
+    assert results.nodes[2].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[2].get_attribute("role") == "mfp"
+    assert results.nodes[3].type == "person"
+    assert results.nodes[3].name_preferred == "Johann Schobsser"
+    assert results.nodes[3].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[3].get_attribute("role") == "prt"
