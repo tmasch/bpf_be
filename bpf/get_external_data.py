@@ -52,6 +52,25 @@ async def get_web_data(url_in):
 
 
 @classes.async_func_logger
+async def get_web_data_without_checking_webcall(url_in):
+    """
+    Do a web call and return byte object.
+    this is a variant of get_web_data, it was introduced because the WebCall thing did not work
+
+    """
+    print("searching for")
+    print(url_in)
+    print("making web call")
+    response = requests.get(url_in)
+    content = response.content
+    print(type(content))
+    #wc = classes.WebCall(url=url_in,content=content)
+    #await wc.save()
+    return content
+
+
+
+@classes.async_func_logger
 async def get_viaf_header(session, url):
     # This is a short programme I received from Gregor Dick. Together with a gather funciton i
 #    async with session.head(url, allow_redirects=False) as response:

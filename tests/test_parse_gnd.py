@@ -25,6 +25,8 @@ async def create_test_record_rubens():
     """
     gnd_id="11860354X"
     r=await parse_gnd.get_person_records(gnd_id)
+    print("downloaded record")
+    print(r)
     return r[0]
 
 

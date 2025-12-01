@@ -280,7 +280,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
 
 
-@classes.async_func_logger
+@classes.async_func_loggeri
 async def identify_additional_person(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications
@@ -745,7 +745,7 @@ async def get_person_records(gnd_id):
 @classes.async_func_logger
 async def get_org_records(gnd_id):
     """
-    Downloads organisationrecords from the GND
+    Downloads organisation records from the GND
     """
     authority_url = r'https://services.dnb.de/sru/authorities?'\
         +r'version=1.1&operation=searchRetrieve&query=NID%3D'\
