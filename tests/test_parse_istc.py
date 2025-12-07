@@ -859,5 +859,5 @@ async def test_parse_istc_1():
     assert results.nodes[4].get_attribute("chosen_candidate_id") == "-1"
     assert results.nodes[4].get_attribute("role") == "mfp"
     # There is no printer connected to Paris, since
-    # only "n.pr." (no printer) is given, hence 
+    # only "n.pr." (no printer) is given, hence
     # the parser ignores it.

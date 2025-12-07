@@ -43,7 +43,7 @@ async def get_web_data(url_in):
         content=r[0].content
     else:
         print("making web call")
-        response = requests.get(url_in)
+        response = requests.get(url_in, timeout = 10)
         content = response.content
         print(type(content))
         wc = classes.WebCall(url=url_in,content=content)
@@ -61,7 +61,7 @@ async def get_web_data_without_checking_webcall(url_in):
     print("searching for")
     print(url_in)
     print("making web call")
-    response = requests.get(url_in)
+    response = requests.get(url_in, timeout = 10)
     content = response.content
     print(type(content))
     #wc = classes.WebCall(url=url_in,content=content)

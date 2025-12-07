@@ -8,15 +8,29 @@ from bpf import classes
 from bpf import get_external_data
 from bpf.parsing import parsing_helpers
 
+@classes.async_func_logger
+async def get_vd17_record_for_testing(url_bibliography):
+    """
+    Downloads a record for testing purposes.
+    """
+    content=await get_external_data.get_web_data_without_checking_webcall(url_bibliography)
+    root = etree.XML(content)
+    print("root of XML document")
+    print(root)
+    records=root.find("zs:records", namespaces=root.nsmap)
+    return records
 
-@classes.func_logger
-async def parse_vd17(url_bibliography):
+
+
+@classes.async_func_logger
+async def parse_vd17(url_bibliography) -> classes.Graph:
     """
     This function can be used for parsing both the VD17 and the VD18
     """
     print("PARSE VD17")
     print(url_bibliography)
-    bi = classes.BibliographicInformation()
+    results = classes.Graph()
+    #bi = classes.BibliographicInformation()
     # url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0\
     # &operation=searchRetrieve&query=pica.vds=" + \
     # bibliographic_id_number + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
@@ -29,28 +43,86 @@ async def parse_vd17(url_bibliography):
     for record in records:
         record_type = vd17_get_record_type(record)
         if record_type != "a":
-            bi = classes.BibliographicInformation()
-            bi.bibliographic_id = vd17_get_id(record)
+            results = classes.Graph()
+            bi = classes.Node()
+            results.nodes.append(bi)
+            #bi = classes.BibliographicInformation()
+            results.nodes[0].external_id = vd17_get_id(record)
             author_list = vd17_get_author(record)
             if author_list:
-                bi.persons.extend(author_list)
+                results.nodes.extend(author_list)
             #bi.title, bi.volume_number, bi.part_title = vd17_get_title(record) ## commented out
-            bi.title = vd17_get_title(record)[0] ## added
+            title, volume_number, part_title = vd17_get_title(record)
+            series_title, series_number = vd17_get_series(record)
+            # I presume that there is either a series_title (so that the field for titlea, 245a, \
+            # contains the part title, or a part_title, so that 245a contains the series title)
+            edition = vd17_get_edition(record)
+            if edition:
+                if part_title:
+                    part_title = part_title + ". " + edition
+                else:
+                    title = title + ". " + edition
+            if series_title:
+                results.nodes[0].set_attribute("title", series_title)
+                results.nodes[0].set_attribute("volume_number", series_number)
+                results.nodes[0].set_attribute("part_title", title)
+
+            else:
+                results.nodes[0].set_attribute("title", title)
+                # question: should I set the following attributes always, or only if they not ""
+                results.nodes[0].set_attribute("volume_number", volume_number)
+                results.nodes[0].set_attribute("part_title", part_title)
+
             printing_date_raw = vd17_get_date_raw(record)
             if printing_date_raw:
-                bi.date_string, bi.date_start, bi.date_end = map_printing_date(
+                date = classes.Date()
+                date.date_string, date.date_start, date.date_end = vd17_map_printing_date(
                 printing_date_raw
                   )
+                results.nodes[0].dates.append(date)
             #bi.printing_information = vd17_get_printing_information(record) ## commented out
-            printer_list = vd17_get_printer(record)
-            if printer_list:
-                bi.persons.extend(printer_list)
-            orgs_list = vd17_get_org(record)
-            if orgs_list:
-                bi.organisations = orgs_list
-            bi.places = vd17_get_place(record)
-    return bi
-       
+            imprint = vd17_get_imprint(record)
+            results.nodes[0].set_attribute("imprint", imprint)
+            person_list = vd17_get_person(record)
+            if person_list:
+                for entry in person_list:
+                    person = classes.Node()
+                    person.name_preferred = entry[0]
+                    person.set_attribute("role", entry[1])
+                    person.external_id.append(entry[2])
+                    results.nodes.append(person)
+
+            org_list = vd17_get_org(record)
+            if org_list:
+                for entry in org_list:
+                    org = classes.Node()
+                    org.name_preferred = entry[0]
+                    org.set_attribute("role", entry[1])
+                    org.external_id.append(entry[2])
+                    results.nodes.append(org)
+            if not person_list and not org_list:
+                # Sometimes, there is no proper entry for the printer,
+                #but his name is mentioned in another place.
+                person_list = vd17_get_printer_name(record)
+                if person_list:
+                    for entry in person_list:
+                        person = classes.Node()
+                        person.name_preferred = entry[0]
+                        person.set_attribute("role", entry[1])
+                        results.nodes.append(person)
+
+            place_list = vd17_get_place(record)
+            if place_list:
+                for entry in place_list:
+                    place = classes.Node()
+                    place.name_preferred = entry[0]
+                    place.set_attribute("role", entry[1])
+                    if len(entry) == 3: # 3rd part is often missing
+                        place.external_id.append(entry[2])
+                    results.nodes.append(place)
+        break
+    return results
+
 
 @classes.func_logger
 def vd17_get_record_type(record):
@@ -58,16 +130,6 @@ def vd17_get_record_type(record):
         Checks the 'Leader' of the record if it is the record for a monograph or a series - 
         in the latter case (pos. 19 = "a"), the record will be discarded. 
 
-    if (
-        "a4" in record[0].text
-    ):  # The first part of the record is the so-called 'leader'.
-        # It is here not constructed according to the usual rules.
-        # However, it appears that it contains the signs "a4" only if it describes a series,
-        # not an individual book. In this case, the record
-        # is not to be used.
-        # This needs to be changed!!
-        return ""
-        
         """
     leader=record.findall("{*}recordData/{*}record/{*}leader")
     leader_text = leader[0].text
@@ -77,167 +139,147 @@ def vd17_get_record_type(record):
 @classes.func_logger
 def vd17_get_id(record):
     """
-        for step1 in record:
-            field = step1
-            match field.get("tag"):
-                case "024":  # for the VD17 number
-                    bid = classes.BibliographicId()
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                bid.id = step2.text
-                                if bid.id[0:4] == "VD18":
-                                    bid.id = bid.id[5:]
-                            case "2":
-                                bid.name = step2.text
-                    if bid.name == "vd17":
-                        bid.uri = (
-                            r"https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%27"
-                            + bid.id
-                            + "%27"
-                        )
-                        bi.bibliographic_id.append(
-                            bid
-                        )  # in the VD17, there is only one ID,
-                        # this list is only introduced for the sake of consistence with incunables
-                    #                        single_place = (place_name, place_id, place_role)
-
-                    if bid.name == "vd18":
-                        bid.uri = (
-                            r"https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=\
-                            SRCHA&IKT=8080&SRT=YOP&TRM=VD18"
-                            + bid.id
-                            + "&ADI_MAT=B"
-                        )
-
-                        bi.bibliographic_id.append(
-                            bid
-                        )  # in the VD18, there is only one ID,
-                        # this list is only introduced for the sake of consistence with incunables
-                    #                        single_place = (place_name, place_id, place_role)
-                    print("vorher: ")
-                    print(bid.id)
-                    print("gesamt: ")
-                    print(bid)
-    
+    Gets the ID from VD17/VD18
     """
+    bib_ids = []
     datafields = find_datafields(record, "024")
     for datafield in datafields:
-        bibliographic_id = []
-        bid = classes.BibliographicId()
+        bib_id = classes.ExternalReference()
         subfields = find_subfields(datafield,"a")
         if subfields[0][0:4] == "VD18":
-            bid.bib_id = subfields[0][5:]
+            bib_id.external_id = subfields[0][5:]
         else:
-            bid.bib_id = subfields[0]
+            bib_id.external_id = subfields[0]
         subfields = find_subfields(datafield, "2")
-        bid.name = subfields[0]
-        if bid.name == "vd17":
-            bid.uri = (
+        bib_id.name = subfields[0]
+        if bib_id.name == "vd17":
+            bib_id.uri = (
                             r"https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%27"
-                            + bid.bib_id
+                            + bib_id.external_id
                             + "%27"
                         )
-        elif bid.name == "vd18":
-            bid.uri = (
-                            r"https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=8080&SRT=YOP&TRM=VD18"
-                            + bid.bib_id
-                            + "&ADI_MAT=B"
+        elif bib_id.name == "vd18":
+            bib_id.uri = (
+                    r"https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=8080&SRT=YOP&TRM=VD18"
+                    + bib_id.external_id
+                    + "&ADI_MAT=B"
             )
-        bibliographic_id.append(bid)
-    return bibliographic_id
+        print("bib_id that was found")
+        print(bib_id)
+        bib_ids.append(bib_id)
+    return bib_ids
 
 @classes.func_logger
 def vd17_get_author(record):
     """
-
-
-                case "100":  # for the author
-                    pe = classes.Entity()
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                pe.name = step2.text
-                            case "0":
-                                if "(DE-588)" in step2.text:
-                                    pe.id = (step2.text)[8:]
-                                    # here and elsewhere: to suppress the "(DE-588)"
-                                    pe.id_name = "GND"
-                    pe.role = "aut"
-                    print(pe)
-                    bi.persons.append(pe)
-                #                    print("vorher:" + pe.name)
-                #                    print("nachher: " + bi.persons)
-
-                
+    Gets the primary author (from field MARC 100)                
     """
     author_list = [] # according to rules, there should only be one author in a 100 field
     # but I am not sure if this is always the case.
     datafields = find_datafields(record, "100")
     for datafield in datafields:
-        name = ""
+        person = classes.Node()
+        person.type = "person"
+        person.name_preferred = ""
 
-        # I use this class here for any external ID; perhaps one should rename it to ExternalID to make clear
-        # that it is used for any indication of an ID in an external authority record. 
+        # I use this class here for any external ID; perhaps one should rename
+        # it to ExternalID to make clear
+        # that it is used for any indication of an ID in an external authority record.
 
         subfields = find_subfields(datafield, "a")
         if subfields:
-            name = subfields[0]
+            person.name_preferred = subfields[0]
+            person.set_attribute("role", "author")
         subfields = find_subfields(datafield, "0")
         if subfields:
 
             if subfields[0][0:8] == "(DE-588)":
-                id = classes.BibliographicId()
-                id.bib_id = subfields[0][8:]
-                id.name = "GND"
+                pe_id = classes.ExternalReference()
+                pe_id.external_id = subfields[0][8:]
+                pe_id.name = "GND"
             # I could also fill id.url field, but I am not sure if it is needed since
-            # the full record, including the URL, will be produced through parse_gnd anyway         
-            role = "aut"
-            author = classes.make_new_role(role=role,person_name=name)
-            # This has to be changed to include the ID, but I won't do it
-            # since make_new_role will be radiclaly changed because of the
-            # change in the data structure
-            author_list.append(author)
+            # the full record, including the URL, will be produced through parse_gnd anyway.
+                person.external_id.append(pe_id)
+            author_list.append(person)
         return author_list
 
 @classes.func_logger
 def vd17_get_title(record):
 
     """
-                case "245":  # for title and volume number
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                bi.title = step2.text
-                            case "n":
-                                bi.volume_number = step2.text
-                            case "p":
-                                bi.part_title = step2.text
-
-                
+     Gets title, volume number and part title
+     (so for VD17 - I am not yet sure how this
+     works for the VD18)
     """
-    title, volume_number, part_title = "", "", ""
+    title = ""
+    volume_number = ""
+    part_title = ""
     datafields = find_datafields(record, "245")
     if datafields:
         subfields = find_subfields(datafields[0], "a")
         if subfields:
             title = subfields[0]
+        subfields = find_subfields(datafields[0], "b") # = subtitle
+        if subfields:
+            title = title + " : " + subfields[0]
         subfields = find_subfields(datafields[0], "n")
         if subfields:
-            volume_number = subfields[0]
+            volume_number =  subfields[0]
         subfields = find_subfields(datafields[0], "p")
         if subfields:
-            part_title = subfields[0]
+            part_title =  subfields[0]
     return title, volume_number, part_title
+
+@classes.func_logger
+def vd17_get_edition(record):
+    """
+    Takes references to new editions from field 250
+    """
+    edition = ""
+    datafields = find_datafields(record, "250")
+    if datafields:
+        subfields = find_subfields(datafields[0], "a")
+        if subfields:
+            edition = subfields[0]
+    return edition
+
+
+@classes.func_logger
+def vd17_get_series(record):
+    """
+    At least in the VD18, sometimes for multi-volume works
+    field 245 contains not the main title but the part_title, 
+    and the main title and the volume number are in subfields of
+    field 490.
+    I wonder if I should not 
+    """
+    series_title = ""
+    series_number = ""
+    datafields = find_datafields(record, "490")
+    if datafields:
+        subfields = find_subfields(datafields[0], "a")
+        if subfields:
+            series_title = subfields[0]
+        subfields = find_subfields(datafields[0], "v")
+        if subfields:
+            series_number = subfields[0]
+    return series_title, series_number
+
+
+
 
 @classes.func_logger
 def vd17_get_date_raw(record):
     """            
-                case "264":  # for the date
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "c":
-                                printing_date_raw = step2.text.strip()
+    gets the raw format for the printing date
+    According to cursory tests, the following formats exist:
+    there are: 1620, [1620], [ca. 1620], [ca. 1620-1621], 1619 [erschienen] 1620
+    VD18 in Addition: Anno 1720, Anno MDCCXX, Im Jahr 1701
+
+    However, the change of cataloguing standards from RAK to RDA may mean that there
+    are in future transliterations rather than standardised forms, creating more
+    challenges. It may also be possible to take the date from four digits in field 008,
+    but I am not sure which pitfalls this would give. 
     """
     printing_date_raw = ""
     datafields = find_datafields(record, "264")
@@ -249,20 +291,15 @@ def vd17_get_date_raw(record):
 
 
 @classes.func_logger
-def vd17_get_printing_information(record):
+def vd17_get_imprint(record):
     """
-              case "500":  # for the original statement of publication
-                    # (in order to manually indicate who is printer and who is publisher)
-                    for step2 in field:
-                        if "Vorlageform" in step2.text:
-                            printing_information_divided = re.match(
-                                printing_information_pattern, step2.text
-                            )
-                            bi.printing_information = printing_information_divided[3]
+    Copies one of the fields with number 500 for additional printing information
+    (to be shown during the ingest process so that the editor can correct some 
+    data)
 
     """
-    printing_information_pattern = r"(.*)(: )(.*)"
-    printing_information = ""
+    printing_information_pattern = r"([^:]*)(: )(.*)"
+    imprint = ""
     datafields = find_datafields(record, "500")
     for datafield in datafields:
         subfields = find_subfields(datafield, "a")
@@ -271,47 +308,24 @@ def vd17_get_printing_information(record):
                 printing_information_divided = re.match(
                                 printing_information_pattern, subfields[0]
                             )
-                printing_information = printing_information + printing_information_divided[3]
+                imprint = printing_information_divided[3]
                             # I can do it in this simple way since, whilst there may be several
                             # '500' fields, only one will contain "Vorlageform"
 
-    return printing_information
+    return imprint
 
 @classes.func_logger
-def vd17_get_printer(record):
+def vd17_get_person(record):
     """
 
     This function gets all names in the 700 fields, which means all names
     connected to the book apart from the principal author (who is in 100)
-                case "700":  # for printers and publishers
-                    pe = classes.Entity()
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                pe.name = step2.text
-                            case "0":
-                                if "(DE-588)" in step2.text:
-                                    pe.id = (step2.text)[8:]
-                                    pe.id_name = "GND"
-                                    # person_id_divided = re.match(gnd_pattern, field[step2].text)
-                                    # person_id = person_id_divided[2]
-                            case "4":
-                                if step2.text == "prt":
-                                    pe.role = "prt"
-                                if step2.text == "pbl":
-                                    pe.role = "pbl"
-                                if step2.text == "rsp":
-                                    pe.role = "rsp"
-                                if step2.text == "aut":
-                                    pe.role = "aut"
-                    if pe.role != "":
-                        #                        single_person
-                        # = (person_name, person_id, person_role)
-                        bi.persons.append(pe)
 """
+    roles_list = {"aut" : "author", "rsp" : "respondent", "trl" : "translator", \
+                  "edt" : "editor", "pbl" : "publisher", "prt" : "printer"}
     datafields = find_datafields(record, "700")
+    person_list = []
     for datafield in datafields:
-        printer_list = []
         name = ""
         role = ""
         subfields = find_subfields(datafield, "a")
@@ -320,48 +334,50 @@ def vd17_get_printer(record):
         subfields = find_subfields(datafield, "0")
         if subfields:
             if subfields[0][0:8] == "(DE-588)":
-                id = classes.BibliographicId()
-                id.bib_id = subfields[0][8:]                        
-                id.name = "GND"
+                pe_id = classes.ExternalReference()
+                pe_id.external_id = subfields[0][8:]
+                pe_id.name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
-            if subfields[0] in ["aut", "rsp", "trl", "edt", "pbl", "prt"]:
-                role = subfields[0]
-                person = classes.make_new_role(role=role,person_name=name)
-                # This has to be changed to include the ID, but I won't do it
-                # since make_new_role will be radically changed because of the
-                # change in the data structure
-                printer_list.append(person)
-    return printer_list
+            if subfields[0] in roles_list:
+                role = roles_list[subfields[0]]
+                person = (name, role, pe_id)
+                person_list.append(person)
+    return person_list
+
+def vd17_get_printer_name(record):
+    """
+    This function is only used if there are no 700 fields, i.e.
+    if there is no proper record for the printer. 
+    IN this case, the name of the printer from field 264 b can be used, but it has
+    no GND ID and is hence far less pactical
+    
+    """
+    datafields = find_datafields(record, "264")
+    person_list = []
+    for datafield in datafields:
+        name = ""
+        role = ""
+        subfields = find_subfields(datafield, "b")
+        if subfields:
+            name = subfields[0]
+            role = "printer"
+            person = (name, role)
+            person_list.append(person)
+    return person_list
+
 
 @classes.func_logger
 def vd17_get_org(record):
     """
-                case "710":
-                    org = classes.Entity()
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                org.name = step2.text
-                            case "0":
-                                if "(DE-588)" in step2.text:
-                                    org.id = (step2.text)[8:]
-                                    org.id_name = "GND"
-                                    # person_id_divided = re.match(gnd_pattern, field[step2].text)
-                                    # person_id = person_id_divided[2]
-                            case "4":
-                                if step2.text == "prt":
-                                    org.role = "prt"
-                                if step2.text == "pbl":
-                                    org.role = "pbl"
-                    if org.role != "":
-                        #                        single_person =
-                        # (person_name, person_id, person_role)
-                        bi.organisations.append(org)
+    This function gets all names and IDs from 710 fields,
+    thus organisations functioning as authors, printers, etc.
     """
     orgs_list = []
     name = ""
     role = ""
+    roles_list = {"aut" : "author", "rsp" : "respondent", "trl" : "translator", \
+                  "edt" : "editor", "pbl" : "publisher", "prt" : "printer"}
     datafields = find_datafields(record, "710")
     for datafield in datafields:
         subfields = find_subfields(datafield, "a")
@@ -369,52 +385,30 @@ def vd17_get_org(record):
             name = subfields[0]
         subfields = find_subfields(datafield, "0")
         if subfields:
-            id = classes.BibliographicId()
+            org_id = classes.ExternalReference()
             if subfields[0][0:8] == "(DE-588)":
-                id.bib_id = subfields[0][8:]
-                id.name = "GND"
+                org_id.external_id = subfields[0][8:]
+                org_id.name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
-            if subfields[0] in ["aut", "rsp", "trl", "edt", "pbl", "prt"]:
-                role = subfields[0]
-                org = classes.make_new_role(role=role,person_name=name)
-                # This has to be changed to include the ID, but I won't do it
-                # since make_new_role will be radically changed because of the
-                # change in the data structure.
-                # Question: can this be used for organisations as well as for persons?
-                # Or will this be possible with the planned successor for 'role'?
-                # If not, one needs a different function here
+            if subfields[0] in roles_list:
+                role = roles_list[subfields[0]]
+                org = (name, role, org_id)
                 orgs_list.append(org)
     return orgs_list
 
 @classes.func_logger
 def vd17_get_place(record):
     """                        
-                        
-                case "751":  # for the places of printing and publishing
-                    #                        place_id = ""
-                    #                        place_role = ""
-                    pl = classes.Entity()
-                    for step2 in field:
-                        match step2.get("code"):
-                            case "a":
-                                pl.name = step2.text
-                            case "0":
-                                if "(DE-588)" in step2.text:
-                                    pl.id = (step2.text)[8:]
-                                    pl.id_name = "GND"
-                            case "4":
-                                if step2.text == "pup":
-                                    pl.role = "pup"
-                                elif step2.text == "mfp":
-                                    pl.role = "mfp"
-                                elif step2.text == "uvp":
-                                    pl.role = "uvp"
-                                    # I am not sure if I should not suppress 'uvp'????
-"""
+    Gets places (place or printing, place of publication, place of university
+    from field 751, here often without external IDs)
+    """
     places_list = []
+    roles_list = {"pup" : "place of publication", "mfp" : "place of printing", \
+                  "uvp" : "place of university"}
     name = ""
     role = ""
+    place_id = ""
     datafields = find_datafields(record, "751")
     for datafield in datafields:
         subfields = find_subfields(datafield, "a")
@@ -423,26 +417,23 @@ def vd17_get_place(record):
         subfields = find_subfields(datafield, "0")
         if subfields:
             if subfields[0][0:8] == "(DE-588)":
-                id = classes.BibliographicId()
-                id.bib_id = subfields[0][8:]
-                id.name = "GND"
+                place_id = classes.ExternalReference()
+                place_id.external_id = subfields[0][8:]
+                place_id.name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
-            if subfields[0] in ["pup", "mfp", "uvp"]:
-                role = subfields[0]
-                place = classes.make_new_role(role=role,person_name=name)
-                # This has to be changed to include the ID, but I won't do it
-                # since make_new_role will be radically changed because of the
-                # change in the data structure.
-                # Question: can this be used for places as well as for persons?
-                # Or will this be possible with the planned successor for 'role'?
-                # If not, one needs a different function here
+            if subfields[0] in roles_list:
+                role = roles_list[subfields[0]]
+                if place_id: # is often not indicated.
+                    place = (name, role, place_id)
+                else:
+                    place = (name, role)
                 places_list.append(place)
     return places_list
-        
+
 
 @classes.func_logger
-def vd17_map_printing_year_prefix (prefix, year_string, start_year, end_year):
+def vd17_map_printing_year_prefix (prefix, date_string, start_year, end_year):
     """
     This function examines the prefix of the printing date and 
     adjusts the date_string and the start_year and end_year 
@@ -451,34 +442,27 @@ def vd17_map_printing_year_prefix (prefix, year_string, start_year, end_year):
     print("Year in square brackets with Prefix")
     match prefix:
         case "erschienen ":
-            date_string = year_string
-            start_year = int(year_string)
-            end_year = int(year_string)
+            pass
+            # no changes needed
         case "ca. " | "ca." | "ca " | "circa " | "um " | "erschienen ca. ":
-            date_string = "about " + year_string
-            start_year = int(year_string) - 2
-            end_year = int(year_string) + 2
+            date_string = "about " + date_string
+            start_year = start_year - 2
+            end_year = end_year + 2
         case "vor ":  # I include the year for 'before' in the string
             # since I am not sure if it always means 'before Jan 1st'
-            date_string = "before " + year_string
-            start_year = int(year_string) - 5
-            end_year = int(year_string)
+            date_string = "before " + date_string
+            start_year = start_year - 5
         case "nach " | "erschienen nach ":  # cf. comment on "vor "
-            date_string = "after " + year_string
-            start_year = int(year_string)
-            end_year = int(year_string) + 5
+            date_string = "after " + date_string
+            end_year = end_year + 5
         case "nicht vor ":
-            date_string = "not before " + year_string
-            start_year = int(year_string)
-            end_year = int(year_string) + 5
+            date_string = "not before " + date_string
+            end_year = end_year + 5
         case "nicht nach ":
-            date_string = "not after " + year_string
-            start_year = int(year_string) - 5
-            end_year = int(year_string)
+            date_string = "not after " + date_string
+            start_year = start_year - 5
         case "i.e. ":
-            date_string = year_string + " (corrected date)"
-            start_year = int(year_string)
-            end_year = int(year_string)
+            date_string = date_string + " (corrected date)"
     return (date_string, start_year, end_year)
 
 
@@ -491,8 +475,8 @@ def vd17_map_printing_year_original_spelling(printing_date_raw):
     numerals
     """
     year_string = ""
-    start_year = ""
-    end_year = ""
+    start_year = 0
+    end_year = 0
     year_pattern_arabic_in_text = r"(1\d{3})[\D$]?"
     # should mean 1XXX, then a non-number or end of string
     year_pattern_roman_in_text = r"(M[DCLXVI\. ]*)"
@@ -526,30 +510,38 @@ def vd17_map_printing_year_original_spelling(printing_date_raw):
         date_string = "18th century"
         start_year = 1701
         end_year = 1800
-
     else:
         print("year not digested")
     return(date_string, start_year, end_year)
 
 
-    
 
 @classes.func_logger
-def map_printing_date(printing_date_raw):
+def vd17_map_printing_date(printing_date_raw):
     """
-    \todo
+    it does not work on the following construction (I do not know hnow common it is
+    1630 [erschienen] 1632)
     """
     year_pattern_isolated = r"\d{4}"
     year_pattern_brackets = r"\[(ca. |ca.|ca |circa |um |vor |nicht vor \
         |nach |nicht nach |erschienen |erschienen ca. |erschienen|\
         |erschienen nach |i.e. )?(\d{4})?([MDCLXVI\.]*)?(\?|\? )?(/\d{2}|/\d{4})?\]"
+    year_pattern_timespan_without_brackets = r"(\d{4})(-| - )(\d{4})"
 
-    start_year = 1000
-    end_year = 1000
-    date_string = "1000"
+    start_year = 0
+    end_year = 0
+    date_string = ""
 
-    print("Rohdatum: ")
-    print(printing_date_raw)
+    printing_date_raw = printing_date_raw.replace("[?]", "")
+    printing_date_raw = printing_date_raw.replace('[MDC]', "MDC")
+    printing_date_raw = printing_date_raw.replace('[MDCC]', "MDCC")
+
+    if "[erschienen]" in printing_date_raw:
+        # sometimes, there is e.g. "1602 [erschienen] 1612"
+        # instead of "1602 [i.e. 1612]"
+        printing_date_raw = "i.e. " + printing_date_raw.split("[erschienen]")[1]
+
+    # otherwise, this create havoc with year_pattern_brackets
     if (
         re.match(year_pattern_isolated, printing_date_raw)
         and len(printing_date_raw) == 4
@@ -566,7 +558,6 @@ def map_printing_date(printing_date_raw):
         ).groups()
         print("Year in square brackets matched")
         if printing_date_divided[1]:
-            print("year string: " + printing_date_divided[1])
             year_string = printing_date_divided[1]
             date_string = year_string
             start_year = int(year_string)
@@ -582,22 +573,30 @@ def map_printing_date(printing_date_raw):
             4
         ]:  # if there is a second year given as end of a period
             year_end_string = printing_date_divided[4][1:]
-            print("Year_end_string found: ")
-            print(year_end_string)
             if len(year_end_string) == 2:  # if there are only two digits
                 year_end_string = "17" + year_end_string
             year_string = year_string + " / " + year_end_string
             date_string = year_string
             end_year = int(year_end_string)
-        if printing_date_divided[0]:
+        if printing_date_divided[0]: # if there is a prefix
             date_string, start_year, end_year = \
                 vd17_map_printing_year_prefix(printing_date_divided[0], \
                     date_string, start_year, end_year)
         if printing_date_divided[3] == "?" or printing_date_divided[3] == "? ":
             date_string = date_string + "?"
+    elif re.search(year_pattern_timespan_without_brackets, printing_date_raw):
+        printing_date_divided = re.search(
+            year_pattern_timespan_without_brackets, printing_date_raw
+        ).groups()
+        date_string = printing_date_divided[0]+"-"+printing_date_divided[2]
+        start_year = int(printing_date_divided[0])
+        end_year = int(printing_date_divided[2])
+
+
     else:  # This means that there the original datestring
         # from the book that will hopefully contain a legible date
-        date_string, start_year, end_year = vd17_map_printing_year_original_spelling(printing_date_raw)
+        date_string, start_year, end_year = \
+            vd17_map_printing_year_original_spelling(printing_date_raw)
     date_start = (start_year, 1, 1)
     date_end = (end_year, 12, 31)
     return date_string, date_start, date_end
