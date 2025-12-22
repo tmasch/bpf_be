@@ -280,7 +280,7 @@ ID-number, otherwise for the name as string, and if this fails, for the name as 
 
 
 
-@classes.async_func_loggeri
+@classes.async_func_logger
 async def identify_additional_person(new_authority_id, role):
     """
 This function is used for any additional authority records that are suggested as identifications

@@ -47,6 +47,7 @@ async def parse_vd17(url_bibliography) -> classes.Graph:
             bi = classes.Node()
             results.nodes.append(bi)
             #bi = classes.BibliographicInformation()
+            results.nodes[0].type = "BibliographicInformation"
             results.nodes[0].external_id = vd17_get_id(record)
             author_list = vd17_get_author(record)
             if author_list:

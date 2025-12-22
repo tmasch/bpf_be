@@ -20,7 +20,7 @@ async def get_istc_record_for_testing(istc_number):
         istc_number + r'&size=10&sort=default&from=0&file=false&orig=true&facet=Format'\
             + r'facet=Holding%20country&facet=Publication%20country&'\
                 + r'nofacets=true&mode=default&aggregations=true&style=full'
-    response = requests.get(url)
+    response = requests.get(url, timeout = 10)
     content = response.content
     result = json.loads(content)
     istc_record_short = result["rows"]
@@ -110,7 +110,7 @@ def parse_istc_imprint(imprint):
     if "imprint_date" in imprint:
         printing_date_raw = imprint["imprint_date"].strip("[]")
         date = istc_analyse_date(printing_date_raw)
-        
+
 
     if "imprint_name" in imprint:
         imprint_name_long = imprint["imprint_name"]
