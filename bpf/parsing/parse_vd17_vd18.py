@@ -7,13 +7,16 @@ from lxml import etree
 from bpf import classes
 from bpf import get_external_data
 from bpf.parsing import parsing_helpers
+from bpf import db_actions
 
 @classes.async_func_logger
 async def get_vd17_record_for_testing(url_bibliography):
     """
     Downloads a record for testing purposes.
     """
-    content=await get_external_data.get_web_data_without_checking_webcall(url_bibliography)
+    await db_actions.initialise_beanie()
+    content = await get_external_data.get_web_data(url_bibliography)
+    #content=await get_external_data.get_web_data_without_checking_webcall(url_bibliography)
     root = etree.XML(content)
     print("root of XML document")
     print(root)
