@@ -54,45 +54,55 @@ async def parse_vd16(url) -> classes.Graph:
 
     bib_id = vd16_get_id(table)
     if bib_id:
-        results.nodes[0].external_id.append(bib_id)
+        external_id = classes.ExternalReference()
+        external_id.external_id = bib_id[0]
+        external_id.name = bib_id[1]
+        external_id.uri = bib_id[2]
+        results.nodes[0].external_id.append(external_id)
 
     person_list = vd16_get_person(table)
     #print("going through person_list")
     for person_raw in person_list:
-        person_name, person_role, person_id = person_raw
         person = classes.Node()
-        person.type = "person"
-        person.name_preferred = person_name
-        if person_role in ["printer", "publisher"]:
+        person.type = person_raw[0]
+        person.name_preferred = person_raw[1]
+        if person_raw[2] in ["printer", "publisher"]:
             printer_in_700 = True
-        person.set_attribute("role", person_role)
-        person.external_id.append(person_id)
+        person.set_attribute("role", person_raw[2])
+        external_id = classes.ExternalReference()
+        external_id.external_id = person_raw[3]
+        external_id.name = person_raw[4]
+        person.external_id.append(external_id)
     #    print(person)
         results.nodes.append(person)
 
     org_list = vd16_get_org(table)
     for org_raw in org_list:
-        org_name, org_role, org_id = org_raw
         org = classes.Node()
-        org.type = "organisation"
-        org.name_preferred = org_name
-        if org_role in ["printer", "publisher"]:
+        org.type = org_raw[0]
+        org.name_preferred = org_raw[1]
+        if org_raw[2] in ["printer", "publisher"]:
             printer_in_700 = True
-        org.set_attribute("role", org_role)
-        org.external_id.append(org_id)
+        org.set_attribute("role", org_raw[2])
+        external_id = classes.ExternalReference()
+        external_id.external_id = org_raw[3]
+        external_id.name = org_raw[4]
+        org.external_id.append(external_id)
         results.nodes.append(org)
 
     place_list = vd16_get_place(table)
     #print("going through places_list")
     for place_raw in place_list:
-        place_name, place_role, place_id = place_raw
         place = classes.Node()
-        place.type = "place"
-        place.name_preferred = place_name
-        if place_role in ["place of printing", "place of publication"]:
+        place.type = place_raw[0]
+        place.name_preferred = place_raw[1]
+        if place_raw[2] in ["place of printing", "place of publication"]:
             printing_place_in_751 = True
-        place.set_attribute("role", place_role)
-        place.external_id.append(place_id)
+        place.set_attribute("role", place_raw[2])
+        external_id = classes.ExternalReference()
+        external_id.external_id = place_raw[3]
+        external_id.name = place_raw[4]
+        place.external_id.append(external_id)
     #    print(place)
         results.nodes.append(place)
 
@@ -121,19 +131,24 @@ async def parse_vd16(url) -> classes.Graph:
                 person.set_attribute("role", "printer")
                 results.nodes.append(person)
         if len(results.nodes[0].dates) == 0:
-            results.nodes[0].dates.append(imprint_standardised[2])
+            date = classes.Date()
+            date.date_string = imprint_standardised[2]
+            date.date_start = imprint_standardised[3]
+            date.date_end = imprint_standardised[4]
+            results.nodes[0].dates.append(date)
     print(results)
     return results
 
-
-
+@classes.func_logger
 def vd16_get_id(table):
     """ 
     takes the first ID in field MARC 024
     """
-    bib_id = classes.ExternalReference()
+    external_id = ""
+    id_name = ""
+    uri = ""
     id_pattern = r'(VD16 [A-Z]{1,2} \d{1,5})(\. Weitere .*)?'
-    bib_id.name = "vd16"
+    id_name = "vd16"
     id_list = vd16_turn_marc_field_into_dict(table, "024")
     id_dict = id_list[0] # id field not repetible
     if id_dict["|a"]:
@@ -141,13 +156,14 @@ def vd16_get_id(table):
         id_divided = re.match(id_pattern, id_long)
         if id_divided:
             id_with_prefix = id_divided.groups()[0]
-            bib_id.external_id = id_with_prefix[5:]
+            external_id = id_with_prefix[5:]
             id_for_permalink = id_with_prefix.replace(" ", "+")
-            bib_id.uri = "https://gateway-bayern.de/" + id_for_permalink
+            uri = "https://gateway-bayern.de/" + id_for_permalink
+    bib_id = (external_id, id_name, uri)
     return bib_id
 
 
-
+@classes.func_logger
 def vd16_get_person(table):
     """
     Takes information from field MARC 100 (primary author)
@@ -156,9 +172,11 @@ def vd16_get_person(table):
     or contributors (the latter are being ignored here)
     """
 
+    node_type = ""
     name = ""
     role_abbreviation = ""
-    author_id = None
+    external_id = ""
+    id_name = ""
     person_list = []
     person_record_list = []
     roles_list = {"aut" : "author", "rsp" : "respondent", "trl" : "translator", \
@@ -170,25 +188,25 @@ def vd16_get_person(table):
 
         if "|a" in person:
             name = person["|a"]
+            node_type = "person"
         if "|4" in person:
             role_abbreviation = person["|4"]
         if "|0" in person:
             author_id = person["|0"]
             if author_id[0:8] == "(DE-588)":
                 author_id = author_id[8:]
-                pe_id = classes.ExternalReference()
-                pe_id.name = "GND"
-                pe_id.external_id = author_id
+                id_name = "GND"
+                external_id = author_id
                 # omitting code for GND
         if role_abbreviation in roles_list:
             role = roles_list[role_abbreviation]
-            person_record = (name, role, pe_id)
+            person_record = (node_type, name, role, external_id, id_name)
             person_record_list.append(person_record)
     print("list of person records: ")
     print(person_record_list)
     return person_record_list
 
-
+@classes.func_logger
 def vd16_get_org(table):
     """
     Takes information from field MARC 110
@@ -198,11 +216,13 @@ def vd16_get_org(table):
     It also parses further organisations from field 710
     """
 
+    node_type = ""
     name = ""
     role_abbreviation = ""
+    external_id = ""
+    id_name = ""
     org_list = []
     org_record_list = []
-    org_id = None
     roles_list = {"aut" : "author", "rsp" : "respondent", "trl" : "translator", \
                   "edt" : "editor", "pbl" : "publisher", "prt" : "printer"}
     org_list = vd16_turn_marc_field_into_dict(table, "110")
@@ -211,24 +231,24 @@ def vd16_get_org(table):
     for org in org_list:
         if "|a" in org:
             name = org["|a"]
+            node_type = "organisation"
         if "|4" in org:
             role_abbreviation = org["|4"]
         if "|0" in org:
             author_id = org["|0"]
             if author_id[0:8] == "(DE-588)":
                 author_id = author_id[8:]
-                org_id = classes.ExternalReference()
-                org_id.name = "GND"
-                org_id.external_id = author_id
+                id_name = "GND"
+                external_id = author_id
                 # omitting code for GND
         if role_abbreviation in roles_list:
             role = roles_list[role_abbreviation]
-            org_record = (name, role, org_id)
+            org_record = (node_type, name, role, external_id, id_name)
             org_record_list.append(org_record)
     return org_record_list
 
 
-
+@classes.func_logger
 def vd16_get_place(table):
     """
     Takes information from field MARC 751
@@ -236,36 +256,38 @@ def vd16_get_place(table):
     of manufacturing or of publication (normally, this
     is merely a string in field 264)
     """
+    node_type = ""
     name = ""
     role_abbreviation = ""
+    external_id = ""
+    id_name = ""
     place_list = []
     place_record_list = []
-    place_id = None
     roles_list = {"mfp" : "place of printing", "pup" : "place of publication"}
     place_list = vd16_turn_marc_field_into_dict(table, "751")
     for place in place_list:
         if "|a" in place:
             name = place["|a"]
+            node_type = "place"
         if "|4" in place:
             role_abbreviation = place["|4"]
         if "|0" in place:
             place_id_raw = place["|0"]
             if place_id_raw[0:8] == "(DE-588)":
                 place_id_raw = place_id_raw[8:]
-                place_id = classes.ExternalReference()
-                place_id.name = "GND"
-                place_id.external_id = place_id_raw
+                id_name = "GND"
+                external_id = place_id_raw
                 # omitting code for GND
         if role_abbreviation in roles_list:
             role = roles_list[role_abbreviation]
-            place_record = (name, role, place_id)
+            place_record = (node_type, name, role, external_id, id_name)
             place_record_list.append(place_record)
     print("list of place records: ")
     print(place_record_list)
     return place_record_list
 
 
-
+@classes.func_logger
 def vd16_get_title(table):
     """
     Takes information from field MARC 245 (title)
@@ -277,7 +299,7 @@ def vd16_get_title(table):
         title = title_dict["|a"]
     return title
 
-
+@classes.func_logger
 def vd16_get_imprint(table):
     """
     Takes information from MARC field 250 
@@ -298,7 +320,7 @@ def vd16_get_imprint(table):
             imprint_list.append(imprint)
     return imprint_list
 
-
+@classes.func_logger
 def vd16_get_imprint_standardised(table):
     """
     Takes information from MARC field 264
@@ -311,7 +333,9 @@ def vd16_get_imprint_standardised(table):
     printer = ""
     printer_additional = ""
     date_raw = ""
-    date = ""
+    date_string = ""
+    date_start = None
+    date_end = None
     imprint_list_raw = vd16_turn_marc_field_into_dict(table, "264")
     for imprint in imprint_list_raw:
         # I assume it is never repeated, but I am not sure
@@ -326,8 +350,8 @@ def vd16_get_imprint_standardised(table):
                 printer_additional = printer_divided[1]
         if "|c" in imprint_dict:
             date_raw = imprint_dict["|c"]
-            date = vd16_parse_printing_date(date_raw)
-        imprint_standardised = (place, printer, date)
+            date_string, date_start, date_end = vd16_parse_printing_date(date_raw)
+        imprint_standardised = (place, printer, date_string, date_start, date_end)
         imprint_list.append(imprint_standardised)
         if printer_additional:
             imprint_additional = ("", printer_additional, "")
@@ -335,7 +359,7 @@ def vd16_get_imprint_standardised(table):
     return imprint_list
 
 
-
+@classes.func_logger
 def vd16_parse_printing_date(date_raw):
     """
     Fills in a date form with the date string 
@@ -346,7 +370,6 @@ def vd16_parse_printing_date(date_raw):
     but just in case this also caters for
     "1505/06"
     """
-    date = classes.Date()
     date_raw = date_raw.replace("/", "-")
     if "-" in date_raw:
         date_divided = date_raw.split("-")
@@ -356,18 +379,18 @@ def vd16_parse_printing_date(date_raw):
             # this would be something like "1510/12"
             # I am not sure if this occurs anywhere.
             year_end = "15" + year_end
-        date.date_string = year_start + "-" + year_end
-        date.date_start = (int(year_start), 1, 1)
-        date.date_end = (int(year_end), 12, 31)
+        date_string = year_start + "-" + year_end
+        date_start = (int(year_start), 1, 1)
+        date_end = (int(year_end), 12, 31)
     else:
-        date.date_string = date_raw
-        date.date_start = (int(date_raw), 1, 1)
-        date.date_end = (int(date_raw), 12, 31)
-    return date
+        date_string = date_raw
+        date_start = (int(date_raw), 1, 1)
+        date_end = (int(date_raw), 12, 31)
+    return date_string, date_start, date_end
 
 
 
-
+@classes.func_logger
 def vd16_turn_marc_field_into_dict(table, field_number):
     """
     Text the lines with the given field number out of the 

@@ -105,19 +105,20 @@ async def test_vd16_get_id():
 # first case: multiple IDs given
     table = await create_test_luther()
     bib_id = parse_vd16.vd16_get_id(table)
-    assert bib_id.name == "vd16"
-    assert bib_id.external_id == "L 7550"
-    assert bib_id.uri == "https://gateway-bayern.de/VD16+L+7550"
+    assert bib_id[1] == "vd16"
+    assert bib_id[0] == "L 7550"
+    assert bib_id[2] == "https://gateway-bayern.de/VD16+L+7550"
 
 @pytest.mark.asyncio
 async def test_vd16_get_person():
     # one author
     table = await create_test_luther()
-    name, role, id = parse_vd16.vd16_get_person(table)[0]
-    assert name == "Luther, Martin"
-    assert role == "author"
-    assert id.name == "GND"
-    assert id.external_id == "118575449"
+    author_list = parse_vd16.vd16_get_person(table)
+    assert author_list[0][0] == "person"
+    assert author_list[0][1] == "Luther, Martin"
+    assert author_list[0][2] == "author"
+    assert author_list[0][4] == "GND"
+    assert author_list[0][3] == "118575449"
     # no author
     table = await create_test_zeitung()
     author_list = parse_vd16.vd16_get_person(table)
@@ -125,25 +126,29 @@ async def test_vd16_get_person():
     # two authors
     table = await create_test_eidyllia()
     author_list = parse_vd16.vd16_get_person(table)
-    assert author_list[0][0] == "Iteander, Samuel"
-    assert author_list[0][1] == "author"
-    assert author_list[0][2].name == "GND"
-    assert author_list[0][2].external_id == "119719797"
-    assert author_list[1][0] == "Olympius, Thomas"
-    assert author_list[1][1] == "author"
-    assert author_list[1][2].name == "GND"
-    assert author_list[1][2].external_id == "119777800"
+    assert author_list[0][0] == "person"
+    assert author_list[0][1] == "Iteander, Samuel"
+    assert author_list[0][2] == "author"
+    assert author_list[0][4] == "GND"
+    assert author_list[0][3] == "119719797"
+    assert author_list[1][0] == "person"
+    assert author_list[1][1] == "Olympius, Thomas"
+    assert author_list[1][2] == "author"
+    assert author_list[1][4] == "GND"
+    assert author_list[1][3] == "119777800"
     # one author, one printer
     table = await create_test_poemata()
     person_list = parse_vd16.vd16_get_person(table)
-    assert person_list[0][0] == "Finckelthusius, Laurentius"
-    assert person_list[0][1] == "author"
-    assert person_list[0][2].name == "GND"
-    assert person_list[0][2].external_id == "119671751"
-    assert person_list[1][0] == "Möllemann, Stephan"
-    assert person_list[1][1] == "printer"
-    assert person_list[1][2].name == "GND"
-    assert person_list[1][2].external_id == "11976329X"
+    assert person_list[0][0] == "person"
+    assert person_list[0][1] == "Finckelthusius, Laurentius"
+    assert person_list[0][2] == "author"
+    assert person_list[0][4] == "GND"
+    assert person_list[0][3] == "119671751"
+    assert person_list[1][0] == "person"
+    assert person_list[1][1] == "Möllemann, Stephan"
+    assert person_list[1][2] == "printer"
+    assert person_list[1][4] == "GND"
+    assert person_list[1][3] == "11976329X"
 
 
 @pytest.mark.asyncio
@@ -156,19 +161,21 @@ async def test_vd16_get_org_as_author():
     """
     table = await create_test_reichstag()
     org_list = parse_vd16.vd16_get_org(table)
-    assert org_list[0][0] == "Reichstag, Augsburg 1548"
-    assert org_list[0][1] == "author"
-    assert org_list[0][2] is None
+    assert org_list[0][0] == "organisation"
+    assert org_list[0][1] == "Reichstag, Augsburg 1548"
+    assert org_list[0][2] == "author"
+    assert org_list[0][3] == ""
 
 
 @pytest.mark.asyncio
 async def test_vde16_get_place():
     table = await create_test_carmen()
     place_list = parse_vd16.vd16_get_place(table)
-    assert place_list[0][0] == "Wittenberg"
-    assert place_list[0][1] == "place of printing"
-    assert place_list[0][2].name == "GND"
-    assert place_list[0][2].external_id == "4066640-2"
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Wittenberg"
+    assert place_list[0][2] == "place of printing"
+    assert place_list[0][4] == "GND"
+    assert place_list[0][3] == "4066640-2"
 
 
 @pytest.mark.asyncio
@@ -191,21 +198,21 @@ async def test_vd16_get_imprint():
 @pytest.mark.asyncio
 async def test_vd16_parse_printing_date():
     date = parse_vd16.vd16_parse_printing_date("1510")
-    assert date.date_string == "1510"
-    assert date.date_start == (1510,1,1)
-    assert date.date_end == (1510,12,31)
+    assert date[0] == "1510"
+    assert date[1] == (1510,1,1)
+    assert date[2] == (1510,12,31)
     date = parse_vd16.vd16_parse_printing_date("1510-1515")
-    assert date.date_string == "1510-1515"
-    assert date.date_start == (1510,1,1)
-    assert date.date_end == (1515,12,31)
+    assert date[0] == "1510-1515"
+    assert date[1] == (1510,1,1)
+    assert date[2] == (1515,12,31)
     date = parse_vd16.vd16_parse_printing_date("1510/1515")
-    assert date.date_string == "1510-1515"
-    assert date.date_start == (1510,1,1)
-    assert date.date_end == (1515,12,31)
+    assert date[0] == "1510-1515"
+    assert date[1] == (1510,1,1)
+    assert date[2] == (1515,12,31)
     date = parse_vd16.vd16_parse_printing_date("1510/11")
-    assert date.date_string == "1510-1511"
-    assert date.date_start == (1510,1,1)
-    assert date.date_end == (1511,12,31)
+    assert date[0] == "1510-1511"
+    assert date[1] == (1510,1,1)
+    assert date[2] == (1511,12,31)
 
 @pytest.mark.asyncio
 async def test_vd16_get_standardised_imprint():
@@ -219,17 +226,17 @@ async def test_vd16_get_standardised_imprint():
     imprint = parse_vd16.vd16_get_imprint_standardised(table)
     assert imprint[0][0] == "Wittenberg"
     assert imprint[0][1] == "Weiß, Hans"
-    assert imprint[0][2].date_string == "1532"
-    assert imprint[0][2].date_start == (1532,1,1)
-    assert imprint[0][2].date_end == (1532,12,31)
+    assert imprint[0][2] == "1532"
+    assert imprint[0][3] == (1532,1,1)
+    assert imprint[0][4] == (1532,12,31)
     # field with one place, two printers, one year
     table = await create_test_erasmus()
     imprint = parse_vd16.vd16_get_imprint_standardised(table)
     assert imprint[0][0] == "Basel"
     assert imprint[0][1] == "Froben, Hieronymus d.Ä."
-    assert imprint[0][2].date_string == "1548"
-    assert imprint[0][2].date_start == (1548,1,1)
-    assert imprint[0][2].date_end == (1548,12,31)
+    assert imprint[0][2] == "1548"
+    assert imprint[0][3] == (1548,1,1)
+    assert imprint[0][4] == (1548,12,31)
     assert imprint[1][0] == ""
     assert imprint[1][1] == "Episcopius, Nik. d.Ä."
     assert imprint[1][2] == ""
@@ -238,14 +245,14 @@ async def test_vd16_get_standardised_imprint():
     imprint = parse_vd16.vd16_get_imprint_standardised(table)
     assert imprint[0][0] == "Lyon"
     assert imprint[0][1] == "Sacon, Jacques"
-    assert imprint[0][2].date_string == "1509"
-    assert imprint[0][2].date_start == (1509,1,1)
-    assert imprint[0][2].date_end == (1509,12,31)
+    assert imprint[0][2] == "1509"
+    assert imprint[0][3] == (1509,1,1)
+    assert imprint[0][4] == (1509,12,31)
     assert imprint[1][0] == "Nürnberg"
     assert imprint[1][1] == "Koberger, Anton d.Ä."
-    assert imprint[1][2].date_string == "1509"
-    assert imprint[1][2].date_start == (1509,1,1)
-    assert imprint[1][2].date_end == (1509,12,31)
+    assert imprint[1][2] == "1509"
+    assert imprint[1][3] == (1509,1,1)
+    assert imprint[1][4] == (1509,12,31)
 
 @pytest.mark.asyncio
 async def test_parse_vd16_0():

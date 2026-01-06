@@ -33,10 +33,6 @@ async def parse_vd17(url_bibliography) -> classes.Graph:
     print("PARSE VD17")
     print(url_bibliography)
     results = classes.Graph()
-    #bi = classes.BibliographicInformation()
-    # url_bibliography = r"http://sru.k10plus.de/vd17?version=2.0\
-    # &operation=searchRetrieve&query=pica.vds=" + \
-    # bibliographic_id_number + r'&maximumRecords=10&startRecord=1&recordSchema=marcxml'
     content=await get_external_data.get_web_data(url_bibliography)
     root = etree.XML(content)
     print("root of XML document")
@@ -51,10 +47,14 @@ async def parse_vd17(url_bibliography) -> classes.Graph:
             results.nodes.append(bi)
             #bi = classes.BibliographicInformation()
             results.nodes[0].type = "BibliographicInformation"
-            results.nodes[0].external_id = vd17_get_id(record)
-            author_list = vd17_get_author(record)
-            if author_list:
-                results.nodes.extend(author_list)
+            bib_id_raw_list =  vd17_get_id(record)
+            for bib_id_raw in bib_id_raw_list:
+                external_id = classes.ExternalReference()
+                external_id.external_id = bib_id_raw[0]
+                external_id.name = bib_id_raw[1]
+                external_id.uri = bib_id_raw
+                results.nodes[0].external_id.append(external_id)
+            person_list = vd17_get_author(record)
             #bi.title, bi.volume_number, bi.part_title = vd17_get_title(record) ## commented out
             title, volume_number, part_title = vd17_get_title(record)
             series_title, series_number = vd17_get_series(record)
@@ -87,22 +87,31 @@ async def parse_vd17(url_bibliography) -> classes.Graph:
             #bi.printing_information = vd17_get_printing_information(record) ## commented out
             imprint = vd17_get_imprint(record)
             results.nodes[0].set_attribute("imprint", imprint)
-            person_list = vd17_get_person(record)
+            additional_person_list = vd17_get_person(record)
+            person_list.extend(additional_person_list)
             if person_list:
                 for entry in person_list:
                     person = classes.Node()
-                    person.name_preferred = entry[0]
-                    person.set_attribute("role", entry[1])
-                    person.external_id.append(entry[2])
+                    person.type = entry[0]
+                    person.name_preferred = entry[1]
+                    person.set_attribute("role", entry[2])
+                    external_id = classes.ExternalReference()
+                    external_id.external_id = entry[3]
+                    external_id.name = entry[4]
+                    person.external_id.append(external_id)
                     results.nodes.append(person)
 
             org_list = vd17_get_org(record)
             if org_list:
                 for entry in org_list:
                     org = classes.Node()
-                    org.name_preferred = entry[0]
-                    org.set_attribute("role", entry[1])
-                    org.external_id.append(entry[2])
+                    org.type = entry[0]
+                    org.name_preferred = entry[1]
+                    org.set_attribute("role", entry[2])
+                    external_id = classes.ExternalReference()
+                    external_id.external_id = entry[3]
+                    external_id.name = entry[4]
+                    org.external_id.append(external_id)
                     results.nodes.append(org)
             if not person_list and not org_list:
                 # Sometimes, there is no proper entry for the printer,
@@ -119,10 +128,14 @@ async def parse_vd17(url_bibliography) -> classes.Graph:
             if place_list:
                 for entry in place_list:
                     place = classes.Node()
-                    place.name_preferred = entry[0]
-                    place.set_attribute("role", entry[1])
-                    if len(entry) == 3: # 3rd part is often missing
-                        place.external_id.append(entry[2])
+                    place.type = entry[0]
+                    place.name_preferred = entry[1]
+                    place.set_attribute("role", entry[2])
+                    if entry[3]:
+                        external_id = classes.ExternalReference()
+                        external_id.external_id = entry[3]
+                        external_id.name = entry[4]
+                        place.external_id.append(external_id)
                     results.nodes.append(place)
         break
     return results
@@ -148,26 +161,29 @@ def vd17_get_id(record):
     bib_ids = []
     datafields = find_datafields(record, "024")
     for datafield in datafields:
-        bib_id = classes.ExternalReference()
+        name = ""
+        external_id = ""
+        uri = ""
         subfields = find_subfields(datafield,"a")
         if subfields[0][0:4] == "VD18":
-            bib_id.external_id = subfields[0][5:]
+            external_id = subfields[0][5:]
         else:
-            bib_id.external_id = subfields[0]
+            external_id = subfields[0]
         subfields = find_subfields(datafield, "2")
-        bib_id.name = subfields[0]
-        if bib_id.name == "vd17":
-            bib_id.uri = (
+        name = subfields[0]
+        if name == "vd17":
+            uri = (
                             r"https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%27"
-                            + bib_id.external_id
+                            + external_id
                             + "%27"
                         )
-        elif bib_id.name == "vd18":
-            bib_id.uri = (
+        elif name == "vd18":
+            uri = (
                     r"https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=8080&SRT=YOP&TRM=VD18"
-                    + bib_id.external_id
+                    + external_id
                     + "&ADI_MAT=B"
             )
+        bib_id = (external_id, name, uri)
         print("bib_id that was found")
         print(bib_id)
         bib_ids.append(bib_id)
@@ -182,28 +198,25 @@ def vd17_get_author(record):
     # but I am not sure if this is always the case.
     datafields = find_datafields(record, "100")
     for datafield in datafields:
-        person = classes.Node()
-        person.type = "person"
-        person.name_preferred = ""
-
-        # I use this class here for any external ID; perhaps one should rename
-        # it to ExternalID to make clear
-        # that it is used for any indication of an ID in an external authority record.
-
+        node_type = "person"
+        name_preferred = ""
+        role = ""
+        external_id = ""
+        id_name = ""
         subfields = find_subfields(datafield, "a")
         if subfields:
-            person.name_preferred = subfields[0]
-            person.set_attribute("role", "author")
+            name_preferred = subfields[0]
+            role = "author"
         subfields = find_subfields(datafield, "0")
         if subfields:
 
             if subfields[0][0:8] == "(DE-588)":
-                pe_id = classes.ExternalReference()
-                pe_id.external_id = subfields[0][8:]
-                pe_id.name = "GND"
-            # I could also fill id.url field, but I am not sure if it is needed since
+                external_id = subfields[0][8:]
+                id_name = "GND"
+            # I could also create an url but I am not sure if it is needed since
             # the full record, including the URL, will be produced through parse_gnd anyway.
-                person.external_id.append(pe_id)
+                #person.external_id.append(pe_id)
+            person = (node_type, name_preferred, role, external_id, id_name)
             author_list.append(person)
         return author_list
 
@@ -330,22 +343,25 @@ def vd17_get_person(record):
     datafields = find_datafields(record, "700")
     person_list = []
     for datafield in datafields:
+        node_type = ""
         name = ""
         role = ""
+        external_id = ""
+        id_name = ""
         subfields = find_subfields(datafield, "a")
         if subfields:
+            node_type = "person"
             name = subfields[0]
         subfields = find_subfields(datafield, "0")
         if subfields:
             if subfields[0][0:8] == "(DE-588)":
-                pe_id = classes.ExternalReference()
-                pe_id.external_id = subfields[0][8:]
-                pe_id.name = "GND"
+                external_id = subfields[0][8:]
+                id_name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
             if subfields[0] in roles_list:
                 role = roles_list[subfields[0]]
-                person = (name, role, pe_id)
+                person = (node_type, name, role, external_id, id_name)
                 person_list.append(person)
     return person_list
 
@@ -378,26 +394,29 @@ def vd17_get_org(record):
     thus organisations functioning as authors, printers, etc.
     """
     orgs_list = []
-    name = ""
-    role = ""
     roles_list = {"aut" : "author", "rsp" : "respondent", "trl" : "translator", \
                   "edt" : "editor", "pbl" : "publisher", "prt" : "printer"}
     datafields = find_datafields(record, "710")
     for datafield in datafields:
+        node_type = ""
+        name = ""
+        role = ""
+        external_id = ""
+        id_name = ""
         subfields = find_subfields(datafield, "a")
         if subfields:
             name = subfields[0]
+            node_type = "organisation"
         subfields = find_subfields(datafield, "0")
         if subfields:
-            org_id = classes.ExternalReference()
             if subfields[0][0:8] == "(DE-588)":
-                org_id.external_id = subfields[0][8:]
-                org_id.name = "GND"
+                external_id = subfields[0][8:]
+                id_name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
             if subfields[0] in roles_list:
                 role = roles_list[subfields[0]]
-                org = (name, role, org_id)
+                org = (node_type, name, role, external_id, id_name)
                 orgs_list.append(org)
     return orgs_list
 
@@ -410,28 +429,27 @@ def vd17_get_place(record):
     places_list = []
     roles_list = {"pup" : "place of publication", "mfp" : "place of printing", \
                   "uvp" : "place of university"}
+    node_type = ""
     name = ""
     role = ""
-    place_id = ""
+    external_id = ""
+    id_name = ""
     datafields = find_datafields(record, "751")
     for datafield in datafields:
         subfields = find_subfields(datafield, "a")
         if subfields:
             name = subfields[0]
+            node_type = "place"
         subfields = find_subfields(datafield, "0")
         if subfields:
             if subfields[0][0:8] == "(DE-588)":
-                place_id = classes.ExternalReference()
-                place_id.external_id = subfields[0][8:]
-                place_id.name = "GND"
+                external_id = subfields[0][8:]
+                id_name = "GND"
         subfields = find_subfields(datafield, "4")
         if subfields:
             if subfields[0] in roles_list:
                 role = roles_list[subfields[0]]
-                if place_id: # is often not indicated.
-                    place = (name, role, place_id)
-                else:
-                    place = (name, role)
+                place = (node_type, name, role, external_id, id_name)
                 places_list.append(place)
     return places_list
 

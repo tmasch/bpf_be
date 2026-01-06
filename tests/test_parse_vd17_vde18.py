@@ -147,9 +147,9 @@ async def test_vd17_get_bib_id():
         bib_id = parse_vd17_vd18.vd17_get_id(record)
         print("bib_ids")
         print(bib_id)
-        assert bib_id[0].external_id == "23:230233Z"
-        assert bib_id[0].name == "vd17"
-        assert bib_id[0].uri == \
+        assert bib_id[0][0] == "23:230233Z"
+        assert bib_id[0][1] == "vd17"
+        assert bib_id[0][2] == \
             r'https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%2723:230233Z%27'
     # VD18
     rance = await create_test_rance()
@@ -158,9 +158,9 @@ async def test_vd17_get_bib_id():
         print("bib_ids")
         print(bib_id)
         break # I only need the first record, but subscription with [0] does not seem to work.
-    assert bib_id[0].external_id == "14620189"
-    assert bib_id[0].name == "vd18"
-    assert bib_id[0].uri == \
+    assert bib_id[0][0] == "14620189"
+    assert bib_id[0][1] == "vd18"
+    assert bib_id[0][2] == \
         r'https://vd18.k10plus.de/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=8080&SRT=YOP&TRM=VD18' \
             + r'14620189&ADI_MAT=B'
 
@@ -184,21 +184,21 @@ async def test_vd17_get_author():
     occo = await create_test_occo()
     for record in occo:
         author_list = parse_vd17_vd18.vd17_get_author(record)
-        assert author_list[0].name_preferred == "Occo, Adolf"
-        assert author_list[0].type == "person"
-        assert author_list[0].get_attribute("role") == "author"
-        assert author_list[0].external_id[0].name == "GND"
-        assert author_list[0].external_id[0].external_id == "117079510"
+        assert author_list[0][1] == "Occo, Adolf"
+        assert author_list[0][0] == "person"
+        assert author_list[0][2] == "author"
+        assert author_list[0][4] == "GND"
+        assert author_list[0][3] == "117079510"
     #VD18
     rance = await create_test_rance()
     for record in rance:
         author_list = parse_vd17_vd18.vd17_get_author(record)
         break
-    assert author_list[0].name_preferred == "Rancé, Armand Jean Le Bouthillier de"
-    assert author_list[0].type == "person"
-    assert author_list[0].get_attribute("role") == "author"
-    assert author_list[0].external_id[0].name == "GND"
-    assert author_list[0].external_id[0].external_id == "118598244"
+    assert author_list[0][1] == "Rancé, Armand Jean Le Bouthillier de"
+    assert author_list[0][0] == "person"
+    assert author_list[0][2] == "author"
+    assert author_list[0][4] == "GND"
+    assert author_list[0][3] == "118598244"
 
 @pytest.mark.asyncio
 async def test_vd17_get_title():
@@ -329,14 +329,16 @@ async def test_vd17_get_person():
     confessio = await create_test_confessio()
     for record in confessio:
         person_list = parse_vd17_vd18.vd17_get_person(record)
-        assert person_list[0][0] == "Mamphras, Jeremias"
-        assert person_list[0][1] == "printer"
-        assert person_list[0][2].name == "GND"
-        assert person_list[0][2].external_id == "1037531809"
-        assert person_list[1][0] == "Starck, Daniel"
-        assert person_list[1][1] == "printer"
-        assert person_list[1][2].name == "GND"
-        assert person_list[1][2].external_id == "1037512634"
+        assert person_list[0][0] == "person"
+        assert person_list[0][1] == "Mamphras, Jeremias"
+        assert person_list[0][2] == "printer"
+        assert person_list[0][4] == "GND"
+        assert person_list[0][3] == "1037531809"
+        assert person_list[1][0] == "person"
+        assert person_list[1][1] == "Starck, Daniel"
+        assert person_list[1][2] == "printer"
+        assert person_list[1][4] == "GND"
+        assert person_list[1][3] == "1037512634"
 
 @pytest.mark.asyncio
 async def test_vd17_get_printer():
@@ -358,19 +360,21 @@ async def test_vd17_get_org():
     occo = await create_test_occo()
     for record in occo:
         org_list = parse_vd17_vd18.vd17_get_org(record)
-        assert org_list[0][0] == "Druckerei Ad insigne Pinus"
-        assert org_list[0][1] == "printer"
-        assert org_list[0][2].external_id == "6146135-0"
-        assert org_list[0][2].name == "GND"
+        assert org_list[0][0] == "organisation"
+        assert org_list[0][1] == "Druckerei Ad insigne Pinus"
+        assert org_list[0][2] == "printer"
+        assert org_list[0][3] == "6146135-0"
+        assert org_list[0][4] == "GND"
     # vd18, org as publisher
     biblia =await create_test_biblia()
     for record in biblia:
         org_list = parse_vd17_vd18.vd17_get_org(record)
         break
-    assert org_list[0][0] == "Johann Andreas Endter Erben"
-    assert org_list[0][1] == "publisher"
-    assert org_list[0][2].external_id == "6146131-3"
-    assert org_list[0][2].name == "GND"
+    assert org_list[0][0] == "organisation"
+    assert org_list[0][1] == "Johann Andreas Endter Erben"
+    assert org_list[0][2] == "publisher"
+    assert org_list[0][3] == "6146131-3"
+    assert org_list[0][4] == "GND"
 
 @pytest.mark.asyncio
 async def test_vd17_get_place():
@@ -379,28 +383,32 @@ async def test_vd17_get_place():
     occo = await create_test_occo()
     for record in occo:
         place_list = parse_vd17_vd18.vd17_get_place(record)
-        assert place_list[0][0] == "Augsburg"
-        assert place_list[0][1] == "place of publication"
-        assert len(place_list[0]) == 2 #no ID given
+        assert place_list[0][0] == "place"
+        assert place_list[0][1] == "Augsburg"
+        assert place_list[0][2] == "place of publication"
+        assert place_list[0][3] == "" # no id given
     # vd17, two places
     khraysser = await create_test_khraysser()
     for record in khraysser:
         place_list = parse_vd17_vd18.vd17_get_place(record)
-        assert place_list[0][0] == "Augsburg"
-        assert place_list[0][1] == "place of publication"
-        assert len(place_list[0]) == 2 #no ID given
-        assert place_list[1][0] == "Ingolstadt"
-        assert place_list[1][1] == "place of publication"
-        assert len(place_list[1]) == 2 #no ID given
+        assert place_list[0][0] == "place"
+        assert place_list[0][1] == "Augsburg"
+        assert place_list[0][2] == "place of publication"
+        assert place_list[0][3] == "" # no id given
+        assert place_list[1][0] == "place"
+        assert place_list[1][1] == "Ingolstadt"
+        assert place_list[1][2] == "place of publication"
+        assert place_list[1][3] == "" # no ID gven
     # vd18, one place, has ID
     biblia = await create_test_biblia()
     for record in biblia:
         place_list = parse_vd17_vd18.vd17_get_place(record)
         break
-    assert place_list[0][0] == "Nürnberg"
-    assert place_list[0][1] == "place of publication"
-    assert place_list[0][2].name == "GND"
-    assert place_list[0][2].external_id == "4042742-0"
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Nürnberg"
+    assert place_list[0][2] == "place of publication"
+    assert place_list[0][4] == "GND"
+    assert place_list[0][3] == "4042742-0"
 
 
 @pytest.mark.asyncio

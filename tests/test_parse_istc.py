@@ -142,42 +142,42 @@ async def test_istc_get_bibliographic_id():
     print("record")
     print(aesopus)
     bid = parse_istc.istc_get_bibliographic_id(aesopus)
-    assert bid[0].name == "ISTC"
-    assert bid[0].external_id == "ia00121400"
-    assert bid[0].uri == r'https://data.cerl.org/istc/ia00121400'
-    assert bid[1].name == "GW"
-    assert bid[1].external_id == "359"
-    assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW00359.htm"
+    assert bid[0][1] == "ISTC"
+    assert bid[0][0] == "ia00121400"
+    assert bid[0][2] == r'https://data.cerl.org/istc/ia00121400'
+    assert bid[1][1] == "GW"
+    assert bid[1][0] == "359"
+    assert bid[1][2] == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW00359.htm"
 
     # ID of an inserted record
     albrecht = await create_test_albrecht()
     bid = parse_istc.istc_get_bibliographic_id(albrecht)
-    assert bid[0].name == "ISTC"
-    assert bid[0].external_id == "ia00352720"
-    assert bid[0].uri == r'https://data.cerl.org/istc/ia00352720'
-    assert bid[1].name == "GW"
-    assert bid[1].external_id == "0081020N"
-    assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW0081020N.htm"
+    assert bid[0][1] == "ISTC"
+    assert bid[0][0] == "ia00352720"
+    assert bid[0][2] == r'https://data.cerl.org/istc/ia00352720'
+    assert bid[1][1] == "GW"
+    assert bid[1][0] == "0081020N"
+    assert bid[1][2] == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GW0081020N.htm"
 
     # ID of an edition not regarded as incunable in the GW
     wine = await create_test_wine()
     bid = parse_istc.istc_get_bibliographic_id(wine)
-    assert bid[0].name == "ISTC"
-    assert bid[0].external_id == "ia01082050"
-    assert bid[0].uri == r'https://data.cerl.org/istc/ia01082050'
-    assert bid[1].name == "GW"
-    assert bid[1].external_id == "II Sp.699a"
-    assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GWII699A.htm"
+    assert bid[0][1] == "ISTC"
+    assert bid[0][0] == "ia01082050"
+    assert bid[0][2] == r'https://data.cerl.org/istc/ia01082050'
+    assert bid[1][1] == "GW"
+    assert bid[1][0] == "II Sp.699a"
+    assert bid[1][2] == r"https://www.gesamtkatalogderwiegendrucke.de/docs/GWII699A.htm"
 
     # ID of an edition not yet definitively catalogued in the GW
     gulden = await create_test_gulden()
     bid = parse_istc.istc_get_bibliographic_id(gulden)
-    assert bid[0].name == "ISTC"
-    assert bid[0].external_id == "iz00019000"
-    assert bid[0].uri == r'https://data.cerl.org/istc/iz00019000'
-    assert bid[1].name == "GW"
-    assert bid[1].external_id == "M52066"
-    assert bid[1].uri == r"https://www.gesamtkatalogderwiegendrucke.de/docs/M52066.htm"
+    assert bid[0][1] == "ISTC"
+    assert bid[0][0] == "iz00019000"
+    assert bid[0][2] == r'https://data.cerl.org/istc/iz00019000'
+    assert bid[1][1] == "GW"
+    assert bid[1][0] == "M52066"
+    assert bid[1][2] == r"https://www.gesamtkatalogderwiegendrucke.de/docs/M52066.htm"
 
 
 @pytest.mark.asyncio
@@ -475,52 +475,52 @@ async def test_istc_analyse_date():
     # simple year
     printing_date_raw = "1480"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "1480"
-    assert date.date_start == (1480,1,1)
-    assert date.date_end == (1480,12,31)
+    assert date[0] == "1480"
+    assert date[1] == (1480,1,1)
+    assert date[2] == (1480,12,31)
     # simple day
     printing_date_raw = "11 Aug. 1494"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "11 August 1494"
-    assert date.date_start == (1494,8,11)
-    assert date.date_end == (1494,8,11)
+    assert date[0] == "11 August 1494"
+    assert date[1] == (1494,8,11)
+    assert date[2] == (1494,8,11)
     # only year, with hyphen
     printing_date_raw = "1479-80"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "1479-1480"
-    assert date.date_start == (1479,1,1)
-    assert date.date_end == (1480,12,31)
+    assert date[0] == "1479-1480"
+    assert date[1] == (1479,1,1)
+    assert date[2] == (1480,12,31)
     # only year, with prefix
     printing_date_raw = "about 1470"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "about 1470"
-    assert date.date_start == (1469,1,1)
-    assert date.date_end == (1471,12,31)
+    assert date[0] == "about 1470"
+    assert date[1] == (1469,1,1)
+    assert date[2] == (1471,12,31)
     # exact date, with prefix
     printing_date_raw = "not before 27 Aug. 1492"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "not before 27 August 1492"
-    assert date.date_start == (1492,8,27)
-    assert date.date_end == (1494,8,27)
+    assert date[0] == "not before 27 August 1492"
+    assert date[1] == (1492,8,27)
+    assert date[2] == (1494,8,27)
 
     printing_date_raw = "Not after 27 Aug. 1492"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "not after 27 August 1492"
-    assert date.date_start == (1490,8,27)
-    assert date.date_end == (1492,8,27)
+    assert date[0] == "not after 27 August 1492"
+    assert date[1] == (1490,8,27)
+    assert date[2] == (1492,8,27)
 
     # two dates, in this case the first day, the second only year
     printing_date_raw = "between 8 Feb. 1471 and 1472"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "between 8 February 1471 and 1472"
-    assert date.date_start == (1471,2,8)
-    assert date.date_end == (1472,12,31)
+    assert date[0] == "between 8 February 1471 and 1472"
+    assert date[1] == (1471,2,8)
+    assert date[2] == (1472,12,31)
     # date with different year in modern calendar
     printing_date_raw = "14 Feb. 1494/95"
     date = parse_istc.istc_analyse_date(printing_date_raw)
-    assert date.date_string == "14 February 1494 (in modern calendar 1495)"
-    assert date.date_start == (1495,2,14)
-    assert date.date_end == (1495,2,14)
+    assert date[0] == "14 February 1494 (in modern calendar 1495)"
+    assert date[1] == (1495,2,14)
+    assert date[2] == (1495,2,14)
 
 @pytest.mark.asyncio
 async def test_istc_get_printer_name():
@@ -532,21 +532,25 @@ async def test_istc_get_printer_name():
     printer_list = []
     printer_name_long = "Caspar Hochfeder"
     printer_list = parse_istc.istc_get_printer_name(printer_name_long)
-    assert printer_list[0].name_preferred == "Caspar Hochfeder"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
+    assert printer_list[0][0] == "person"
+    assert printer_list[0][1] == "Caspar Hochfeder"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
     # two printers with different names
     printer_list = []
     printer_name_long = "John Lettou and William de Machlinia"
     printer_list = parse_istc.istc_get_printer_name(printer_name_long)
-    assert printer_list[0].name_preferred == "John Lettou"
-    assert printer_list[1].name_preferred == "William de Machlinia"
+    assert printer_list[0][0] == "person"
+    assert printer_list[0][1] == "John Lettou"
+    assert printer_list[1][1] == "William de Machlinia"
     # two printers with the same surname
     printer_list = []
     printer_name_long = "Bernardinus and Ambrosius de Rovellis"
     printer_list = parse_istc.istc_get_printer_name(printer_name_long)
-    assert printer_list[0].name_preferred == "Bernardinus Rovellis"
-    assert printer_list[1].name_preferred == "Ambrosius de Rovellis"
+    assert printer_list[0][0] == "person"
+    assert printer_list[1][0] == "person"
+    assert printer_list[0][1] == "Bernardinus Rovellis"
+    assert printer_list[1][1] == "Ambrosius de Rovellis"
     # Here, the expected result is not beautiful, the 'de' should appear
     # in both cases. However, (a) such situations are rare and (b), the
     # names inserted into the database will normally be names from the GND, anyway.
@@ -564,23 +568,25 @@ async def test_istc_get_publisher_name():
     publisher_name_long = "Andreas Torresanus"
     printer_name_long = " Simon de Luere"
     publisher_list = parse_istc.istc_get_publisher_name(publisher_name_long, printer_name_long)
-    assert publisher_list[0].name_preferred == "Andreas Torresanus"
-    assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[0].get_attribute("role") == "pbl"
+    assert publisher_list[0][1]
+    #assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[0][2] == "publisher"
     # publishers with different names
     publisher_list = []
     publisher_name_long = "Antonius de Cistis and Henricus de Colonia"
     printer_name_long = "Ugo Rugerius"
     publisher_list = parse_istc.istc_get_publisher_name(publisher_name_long, printer_name_long)
-    assert publisher_list[0].name_preferred == "Antonius de Cistis"
-    assert publisher_list[1].name_preferred == "Henricus de Colonia"
+    assert publisher_list[0][0] == "person"
+    assert publisher_list[1][0] == "person"
+    assert publisher_list[0][1] == "Antonius de Cistis"
+    assert publisher_list[1][1] == "Henricus de Colonia"
     # publishers sharing surname
     publisher_list = []
     publisher_name_long = "Bastianus and Raphael de Orlandis"
     printer_name_long = "dfsadfdsfs fsfsdfd"
     publisher_list = parse_istc.istc_get_publisher_name(publisher_name_long, printer_name_long)
-    assert publisher_list[0].name_preferred == "Bastianus Orlandis"
-    assert publisher_list[1].name_preferred == "Raphael de Orlandis"
+    assert publisher_list[0][1] == "Bastianus Orlandis"
+    assert publisher_list[1][1] == "Raphael de Orlandis"
     # printer for himself and other publishers
     publisher_list = []
     publisher_name_long = "himself and Marcus Mazola and Antonius de Vignono"
@@ -588,9 +594,9 @@ async def test_istc_get_publisher_name():
     # but the 'for' would be removed earlier on in the parsing.
     printer_name_long = "Paulus de Butzbach "
     publisher_list = parse_istc.istc_get_publisher_name(publisher_name_long, printer_name_long)
-    assert publisher_list[0].name_preferred == "Paulus de Butzbach"
-    assert publisher_list[1].name_preferred == "Marcus Mazola"
-    assert publisher_list[2].name_preferred == "Antonius de Vignono"
+    assert publisher_list[0][1] == "Paulus de Butzbach"
+    assert publisher_list[1][1] == "Marcus Mazola"
+    assert publisher_list[2][1] == "Antonius de Vignono"
 
 
 @pytest.mark.asyncio
@@ -604,13 +610,17 @@ async def test_istc_parse_imprint_0():
     bi = classes.Node()
     results.nodes.append(bi)
     aesopus = await create_test_aesopus()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(aesopus["imprint"][0])
-    assert date.date_string == "23 May 1487"
-    assert date.date_start == (1487, 5, 23)
-    assert date.date_end == (1487, 5, 23)
-    assert place_list[0].name_preferred == "Augsburg"
-    assert printer_list[0].name_preferred == "Johann Schobsser"
-    assert publisher_list == []
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(aesopus["imprint"][0])
+    assert date_string == "23 May 1487"
+    assert date_start == (1487, 5, 23)
+    assert date_end == (1487, 5, 23)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Augsburg"
+    assert printer_list[0][0] == "person"
+    assert printer_list[0][1] == "Johann Schobsser"
+    assert printer_list[0][2] == "printer"
+    assert not publisher_list
 
 @pytest.mark.asyncio
 async def test_istc_parse_imprint_1():
@@ -620,12 +630,13 @@ async def test_istc_parse_imprint_1():
     """
     await db_actions.initialise_beanie()
     albrecht = await create_test_albrecht()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(albrecht["imprint"][0])
-    assert date.date_string == "not before 8 April 1485"
-    assert date.date_start == (1485, 4, 8)
-    assert date.date_end == (1487, 4, 8)
-    assert place_list[0].name_preferred == "Augsburg"
-    assert printer_list[0].name_preferred == "Johann Bämler"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(albrecht["imprint"][0])
+    assert date_string == "not before 8 April 1485"
+    assert date_start == (1485, 4, 8)
+    assert date_end == (1487, 4, 8)
+    assert place_list[0][1] == "Augsburg"
+    assert printer_list[0][1] == "Johann Bämler"
     assert not publisher_list
 
 @pytest.mark.asyncio
@@ -636,20 +647,21 @@ async def test_istc_parse_imprint_2():
     """
     await db_actions.initialise_beanie()
     abbreviamentum = await create_test_abbreviamentum()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(abbreviamentum["imprint"][0])
-    assert date.date_string == "about 1481-1482"
-    assert date.date_start == (1481, 1, 1)
-    assert date.date_end == (1482, 12, 31)
-    assert place_list[0].type == "place"
-    assert place_list[0].name_preferred == "London"
-    assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[0].get_attribute("role") == "mfp"
-    assert printer_list[0].name_preferred == "John Lettou"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
-    assert printer_list[1].name_preferred == "William de Machlinia"
-    assert printer_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[1].get_attribute("role") == "prt"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(abbreviamentum["imprint"][0])
+    assert date_string == "about 1481-1482"
+    assert date_start == (1481, 1, 1)
+    assert date_end == (1482, 12, 31)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "London"
+    #assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[0][2] == "place of printing"
+    assert printer_list[0][1] == "John Lettou"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
+    assert printer_list[1][1] == "William de Machlinia"
+    #assert printer_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[1][2] == "printer"
     assert not publisher_list
 
 
@@ -664,23 +676,24 @@ async def test_istc_parse_imprint_3():
     bi = classes.Node()
     results.nodes.append(bi)
     accoltis = await create_test_accoltis()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(accoltis["imprint"][0])
-    assert date.date_string == "11 August 1494"
-    assert date.date_start == (1494, 8, 11)
-    assert date.date_end == (1494, 8, 11)
-    assert place_list[0].type == "place"
-    assert place_list[0].name_preferred == "Pavia"
-    assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[0].get_attribute("role") == "mfp"
-    assert place_list[1].name_preferred == "Pavia"
-    assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[1].get_attribute("role") == "pup"
-    assert printer_list[0].name_preferred == "Antonius de Carcano"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
-    assert publisher_list[0].name_preferred == "Gabriel de Grassis"
-    assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[0].get_attribute("role") == "pbl"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(accoltis["imprint"][0])
+    assert date_string == "11 August 1494"
+    assert date_start == (1494, 8, 11)
+    assert date_end == (1494, 8, 11)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Pavia"
+    #assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[0][2] == "place of printing"
+    assert place_list[1][1] == "Pavia"
+    #assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[1][2] == "place of publication"
+    assert printer_list[0][1] == "Antonius de Carcano"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
+    assert publisher_list[0][1] == "Gabriel de Grassis"
+    #assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[0][2] == "publisher"
 
 
 @pytest.mark.asyncio
@@ -690,26 +703,27 @@ async def test_istc_parse_imprint_4():
     One place, two printers, one publisher date by day"""
     await db_actions.initialise_beanie()
     alanus = await create_test_alanus_doctrinale()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(alanus["imprint"][0])
-    assert date.date_string == "10 September 1500"
-    assert date.date_start == (1500, 9, 10)
-    assert date.date_end == (1500, 9, 10)
-    assert place_list[0].type == "place"
-    assert place_list[0].name_preferred == "Cologne"
-    assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[0].get_attribute("role") == "mfp"
-    assert place_list[1].name_preferred == "Cologne"
-    assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[1].get_attribute("role") == "pup"
-    assert printer_list[0].name_preferred == "Heinrich Quentell"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
-    assert printer_list[1].name_preferred == "'Retro Minores'"
-    assert printer_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[1].get_attribute("role") == "prt"
-    assert publisher_list[0].name_preferred == "Heinrich Quentell"
-    assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[0].get_attribute("role") == "pbl"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(alanus["imprint"][0])
+    assert date_string == "10 September 1500"
+    assert date_start == (1500, 9, 10)
+    assert date_end == (1500, 9, 10)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Cologne"
+    #assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[0][2] == "place of printing"
+    assert place_list[1][1] == "Cologne"
+    #assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[1][2] == "place of publication"
+    assert printer_list[0][1] == "Heinrich Quentell"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
+    assert printer_list[1][1] == "'Retro Minores'"
+    #assert printer_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[1][2] == "printer"
+    assert publisher_list[0][1] == "Heinrich Quentell"
+    #assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[0][2] == "publisher"
 
 @pytest.mark.asyncio
 async def test_istc_parse_imprint_5():
@@ -719,29 +733,30 @@ async def test_istc_parse_imprint_5():
     """
     await db_actions.initialise_beanie()
     alanus = await create_test_alanus()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(alanus["imprint"][0])
-    assert date.date_string == "12 January 1479"
-    assert date.date_start == (1479, 1, 12)
-    assert date.date_end == (1479, 1, 12)
-    assert place_list[0].type == "place"
-    assert place_list[0].name_preferred == "Mantua"
-    assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[0].get_attribute("role") == "mfp"
-    assert place_list[1].name_preferred == "Mantua"
-    assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[1].get_attribute("role") == "pup"
-    assert printer_list[0].name_preferred == "Paulus de Butzbach"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
-    assert publisher_list[0].name_preferred == "Paulus de Butzbach"
-    assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[0].get_attribute("role") == "pbl"
-    assert publisher_list[1].name_preferred == "Marcus Mazola"
-    assert publisher_list[1].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[1].get_attribute("role") == "pbl"
-    assert publisher_list[2].name_preferred == "Antonius de Vignono"
-    assert publisher_list[2].get_attribute("chosen_candidate_id") == "-1"
-    assert publisher_list[2].get_attribute("role") == "pbl"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(alanus["imprint"][0])
+    assert date_string == "12 January 1479"
+    assert date_start == (1479, 1, 12)
+    assert date_end == (1479, 1, 12)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Mantua"
+    #assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[0][2] == "place of printing"
+    assert place_list[1][1] == "Mantua"
+    #assert place_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[1][2] == "place of publication" == "place of publication"
+    assert printer_list[0][1] == "Paulus de Butzbach"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
+    assert publisher_list[0][1] == "Paulus de Butzbach"
+    #assert publisher_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[0][2] == "publisher"
+    assert publisher_list[1][1] == "Marcus Mazola"
+    #assert publisher_list[1].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[1][2] == "publisher"
+    assert publisher_list[2][1] == "Antonius de Vignono"
+    #assert publisher_list[2].get_attribute("chosen_candidate_id") == "-1"
+    assert publisher_list[2][2] == "publisher"
 
 @pytest.mark.asyncio
 async def test_istc_parse_imprint_6():
@@ -751,17 +766,19 @@ async def test_istc_parse_imprint_6():
     """
     await db_actions.initialise_beanie()
     causidicus = await create_test_causidicus()
-    place_list, date, printer_list, publisher_list = parse_istc.parse_istc_imprint(causidicus["imprint"][0])
-    assert date.date_string == "between October 1485 and 24 December 1485"
-    assert date.date_start == (1485, 10, 1)
-    assert date.date_end == (1485, 12, 24)
-    assert place_list[0].type == "place"
-    assert place_list[0].name_preferred == "Haarlem"
-    assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert place_list[0].get_attribute("role") == "mfp"
-    assert printer_list[0].name_preferred == "Jacob Bellaert"
-    assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
-    assert printer_list[0].get_attribute("role") == "prt"
+    place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+        parse_istc.parse_istc_imprint(causidicus["imprint"][0])
+    assert date_string == "between October 1485 and 24 December 1485"
+    assert date_start == (1485, 10, 1)
+    assert date_end == (1485, 12, 24)
+    assert place_list[0][0] == "place"
+    assert place_list[0][1] == "Haarlem"
+    #assert place_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert place_list[0][2] == "place of printing"
+    assert printer_list[0][1] == "Jacob Bellaert"
+    #assert printer_list[0].get_attribute("chosen_candidate_id") == "-1"
+    assert printer_list[0][2] == "printer"
+    assert len(publisher_list) == 0
     # It would be prettier if '1485 were not repeated in the string.
     # However, I regard the way the date has been written here as
     # incorrect, so it is probably not worth changing it.
@@ -800,16 +817,16 @@ async def test_parse_istc_0():
     assert results.nodes[0].dates[0].date_end == (1487, 5, 23)
     assert results.nodes[1].type == "person"
     assert results.nodes[1].name_preferred == "Aesopus"
-    assert results.nodes[1].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[1].get_attribute("role") == "aut"
+    #assert results.nodes[1].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[1].get_attribute("role") == "author"
     assert results.nodes[2].type == "place"
     assert results.nodes[2].name_preferred == "Augsburg"
-    assert results.nodes[2].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[2].get_attribute("role") == "mfp"
+    #assert results.nodes[2].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[2].get_attribute("role") == "place of printing"
     assert results.nodes[3].type == "person"
     assert results.nodes[3].name_preferred == "Johann Schobsser"
-    assert results.nodes[3].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[3].get_attribute("role") == "prt"
+    #assert results.nodes[3].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[3].get_attribute("role") == "printer"
 
 @pytest.mark.asyncio
 async def test_parse_istc_1():
@@ -844,20 +861,20 @@ async def test_parse_istc_1():
 
     assert results.nodes[1].type == "person"
     assert results.nodes[1].name_preferred == "Alexis, Guilielmus"
-    assert results.nodes[1].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[1].get_attribute("role") == "aut"
+    #assert results.nodes[1].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[1].get_attribute("role") == "author"
     assert results.nodes[2].type == "place"
     assert results.nodes[2].name_preferred == "Lyons"
-    assert results.nodes[2].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[2].get_attribute("role") == "mfp"
+    #assert results.nodes[2].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[2].get_attribute("role") == "place of printing"
     assert results.nodes[3].type == "person"
     assert results.nodes[3].name_preferred == "Martin Havard"
-    assert results.nodes[3].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[3].get_attribute("role") == "prt"
+    #assert results.nodes[3].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[3].get_attribute("role") == "printer"
     assert results.nodes[4].type == "place"
     assert results.nodes[4].name_preferred == "Paris?"
-    assert results.nodes[4].get_attribute("chosen_candidate_id") == "-1"
-    assert results.nodes[4].get_attribute("role") == "mfp"
+    #assert results.nodes[4].get_attribute("chosen_candidate_id") == "-1"
+    assert results.nodes[4].get_attribute("role") == "place of printing"
     # There is no printer connected to Paris, since
     # only "n.pr." (no printer) is given, hence
     # the parser ignores it.

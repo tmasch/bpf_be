@@ -53,13 +53,18 @@ async def parse_istc(url) -> classes.Graph:
 
 ####### FINDING BIBILIOGRAPHIC ID
     bib_ids = istc_get_bibliographic_id(istc_record_short)
-    results.nodes[0].external_id.extend(bib_ids)
+    for bib_id in bib_ids:
+        external_id = classes.ExternalReference()
+        external_id.external_id = bib_id[0]
+        external_id.name = bib_id[1]
+        external_id.uri = bib_id[2]
+        results.nodes[0].external_id.append(external_id)
 
 ####### FINDING AUTHOR
     if "author" in istc_record_short:
         author=classes.Node()
         author.type="person"
-        author.set_attribute("role","aut")
+        author.set_attribute("role","author")
         author.set_attribute("chosen_candidate_id","-1")
         author.name_preferred = istc_record_short["author"]
         results.nodes.append(author)
@@ -72,16 +77,36 @@ async def parse_istc(url) -> classes.Graph:
 ###### FINDING IMPRINT
     if "imprint" in istc_record_short:
         for imprint in istc_record_short["imprint"]:
-            place_list, date, printer_list, publisher_list = parse_istc_imprint(imprint)
-            results.nodes.extend(place_list)
-            results.nodes.extend(printer_list)
-            results.nodes.extend(publisher_list)
+            place_list, date_string, date_start, date_end, printer_list, publisher_list = \
+                parse_istc_imprint(imprint)
+            for place in place_list:
+                pl = classes.Node()
+                pl.type = place[0]
+                pl.name_preferred = place[1]
+                pl.set_attribute("role", place[2])
+                results.nodes.append(pl)
+            for printer in printer_list:
+                pe = classes.Node()
+                pe.type = printer[0]
+                pe.name_preferred = printer[1]
+                pe.set_attribute("role", printer[2])
+                results.nodes.append(pe)
+            for publisher in publisher_list:
+                pe = classes.Node()
+                pe.type = publisher[0]
+                pe.name_preferred = publisher[1]
+                pe.set_attribute("role", publisher[2])
+                results.nodes.append(pe)
+            date = classes.Date()
+            date.date_string = date_string
+            date.date_start = date_start
+            date.date_end = date_end
             results.nodes[0].dates.append(date)
     print("results overall")
     print(results)
     return results
 
-
+@classes.func_logger
 def parse_istc_imprint(imprint):
     """
     Parse the imprints (Places, Printers, Publishers, Dates)
@@ -95,21 +120,24 @@ def parse_istc_imprint(imprint):
     date = classes.Date()
     printer_name_long = ""
     publisher_name_long = ""
+    date_string = ""
+    date_start = None
+    date_end = None
 #            print("step1 in imprint: ")
 #            print(step1)
 
     if "imprint_place" in imprint:
-        place = classes.Node()
-        place.type = "place"
-        place.name_preferred = imprint["imprint_place"].strip("[]")
-        place.set_attribute("chosen_candidate_id","-1")
-        place.set_attribute("role","mfp")
+        node_type = "place"
+        name_preferred = imprint["imprint_place"].strip("[]")
+        #place.set_attribute("chosen_candidate_id","-1")
+        role = "place of printing"
+        place = (node_type, name_preferred, role)
         place_list.append(place)
 
 
     if "imprint_date" in imprint:
         printing_date_raw = imprint["imprint_date"].strip("[]")
-        date = istc_analyse_date(printing_date_raw)
+        date_string, date_start, date_end = istc_analyse_date(printing_date_raw)
 
 
     if "imprint_name" in imprint:
@@ -126,11 +154,12 @@ def parse_istc_imprint(imprint):
             printer_name_long = imprint_name_long_divided[0]
             publisher_name_long = imprint_name_long_divided[1]
             printer_name_long = printer_name_long.strip(",")
-            pl_duplicate = classes.Node()
-            pl_duplicate.type = "place"
-            pl_duplicate.name_preferred = place.name_preferred
-            pl_duplicate.set_attribute("chosen_candidate_id","-1")
-            pl_duplicate.set_attribute("role","pup")
+            #pl_duplicate = classes.Node()
+            duplicate_node_type = "place"
+            duplicate_name_preferred = name_preferred
+            #pl_duplicate.set_attribute("chosen_candidate_id","-1")
+            duplicate_role = "place of publication"
+            pl_duplicate = (duplicate_node_type, duplicate_name_preferred, duplicate_role)
             place_list.append(pl_duplicate)
             # I append the place again, this time as place of publication
             # I could instead replace the string for the role with a list,
@@ -148,7 +177,7 @@ def parse_istc_imprint(imprint):
 
     #print("final results in parse_imprint")
     #print(results)
-    return place_list, date, printer_list, publisher_list
+    return place_list, date_string, date_start, date_end, printer_list, publisher_list
 
 @classes.func_logger
 def istc_get_printer_name(printer_name_long):
@@ -188,27 +217,28 @@ def istc_get_printer_name(printer_name_long):
                     #or the next printer does not have a surname, either
                     person_name = printer_name
             #pe=classes.make_new_role(role="prt",person_name=person_name)
-            pe = classes.Node()
-            pe.type = "person"
-            pe.name_preferred = person_name
-            pe.set_attribute("chosen_candidate_id","-1")
-            pe.set_attribute("role","prt")
-            print("pe in parse_istc")
-            print(pe)
-            printer_list.append(pe)
+            #pe = classes.Node()
+            name_preferred = person_name
+            #pe.set_attribute("chosen_candidate_id","-1")
+            node_type = "person"
+            role = "printer"
+            #print("pe in parse_istc")
+            #print(pe)
+            printer = (node_type, name_preferred, role)
+            printer_list.append(printer)
             #bi.persons.append(pe)
             printer_counter = printer_counter + 1
     else: #If there is only one printer
-        pe = classes.Node()
-        pe.type = "person"
+        #pe = classes.Node()
         if printer_name_long != "n.pr.":
             # n.pr. means 'no printer identified
-            pe.name_preferred = printer_name_long
-            pe.set_attribute("chosen_candidate_id","-1")
-            pe.set_attribute("role","prt")
-            print("pe in parse_istc")
-            print(pe)
-            printer_list.append(pe)
+            name_preferred = printer_name_long
+            node_type = "person"
+            #pe.set_attribute("chosen_candidate_id","-1")
+            role = "printer"
+            #print("pe in parse_istc")
+            printer = (node_type, name_preferred, role)
+            printer_list.append(printer)
 
         #pe=classes.make_new_role(role="prt",person_name=printer_name_long)
         #print(pe)
@@ -252,13 +282,10 @@ def istc_get_publisher_name(publisher_name_long, printer_name_long):
                 else: # if there is no next printer
                     pepersonname = publisher_name
             print("Publisher name: "+ pepersonname)
-            pe = classes.Node()
-            pe.type = "person"
-            pe.name_preferred = pepersonname
-            pe.set_attribute("chosen_candidate_id","-1")
-            pe.set_attribute("role","pbl")
-            print("pe in parse_istc - publisher")
-            print(pe)
+            node_type = "person"
+            name_preferred = pepersonname
+            role = "publisher"
+            pe = (node_type, name_preferred, role)
             publisher_list.append(pe)
 
 #                            pe = classes.SelectionCandidate()
@@ -274,12 +301,10 @@ def istc_get_publisher_name(publisher_name_long, printer_name_long):
 #                         pe.person.role = "pbl"
 #                        publisher=classes.make_new_role(role="pbl",person_name=publisher_name_long)
 #                        result.nodes.append(publisher)
-        pe = classes.Node()
-        pe.type = "person"
-        pe.name_preferred = publisher_name_long
-        pe.set_attribute("chosen_candidate_id","-1")
-        pe.set_attribute("role","pbl")
-        print("pe in parse_istc - publisher")
+        node_type = "person)"
+        name_preferred = publisher_name_long
+        role = "publisher"
+        pe = (node_type, name_preferred, role)
         print(pe)
         publisher_list.append(pe)
     return publisher_list
@@ -292,41 +317,42 @@ def istc_get_bibliographic_id(istc_record_short):
     """
     bib_ids=[]
 
-    bib_id = classes.ExternalReference()
-    bib_id.external_id = istc_record_short["id"]
-    bib_id.name = "ISTC"
-    bib_id.uri = r"https://data.cerl.org/istc/"+bib_id.external_id
+    #bib_id = classes.ExternalReference()
+    external_id = istc_record_short["id"]
+    id_name = "ISTC"
+    uri = r"https://data.cerl.org/istc/" + external_id
+    bib_id = (external_id, id_name, uri)
     bib_ids.append(bib_id)
 
 
     for reference in istc_record_short['references']:
         #print("step1: " + step1)
         if reference["reference_name"] == "GW":
-            bib_id = classes.ExternalReference()
-            bib_id.external_id = str(reference["reference_location_in_source"])
-            bib_id.name = "GW"
+            #bib_id = classes.ExternalReference()
+            external_id = str(reference["reference_location_in_source"])
+            id_name = "GW"
             gw_type0 = r'\d{1,5}' # the standard type
             gw_type1 = r'M\d{5,7}' # a number from the still unpublished volumes
             gw_type2 = r'\d{7}N' # a later addition
             gw_type3 = x = r'([XVI]{1,4}) Sp\.(\d{1,3})([a-z])'
             # a reference to a book that is now not regarded as an incunable
             gw_type4 = x = r'([XVI]{1,4}) Sp\.(\d{1,3})([a-z]P)' # no clue what this is
-            if re.match(gw_type0, bib_id.external_id):
-                x = 5 - len(bib_id.external_id)
+            if re.match(gw_type0, external_id):
+                x = 5 - len(external_id)
                 y = "0" * x
-                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" \
-                    + y + bib_id.external_id + ".htm"
-            elif re.match(gw_type1, bib_id.external_id):
-                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/" + \
-                    bib_id.external_id + ".htm"
-            elif re.match(gw_type2, bib_id.external_id):
-                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
-                    bib_id.external_id + ".htm"
-            elif re.match(gw_type3, bib_id.external_id) or re.match(gw_type4, bib_id.external_id):
-                x = re.match(gw_type3, bib_id.external_id)
-                bib_id.uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
+                uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" \
+                    + y + external_id + ".htm"
+            elif re.match(gw_type1, external_id):
+                uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/" + \
+                    external_id + ".htm"
+            elif re.match(gw_type2, external_id):
+                uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
+                    external_id + ".htm"
+            elif re.match(gw_type3, external_id) or re.match(gw_type4, external_id):
+                x = re.match(gw_type3, external_id)
+                uri = "https://www.gesamtkatalogderwiegendrucke.de/docs/GW" + \
                     x[1] + x[2] + (x[3]).upper() + ".htm"
-
+            bib_id = (external_id, id_name, uri)
 #                classes.BibliographicInformation.model_validate(bid)
             bib_ids.append(bib_id)
     return bib_ids
@@ -404,10 +430,11 @@ def istc_analyse_date(printing_date_raw):
     date_string = string_prefix + string_day + string_month + string_year + \
          date_between_indicator + string_day_between + \
          string_month_between + string_year_between
-    date = classes.Date()
-    date.date_string = date_string.strip()
-    date.date_start = (start_year, start_month, start_day)
-    date.date_end = (end_year, end_month, end_day)
+
+    date_string = date_string.strip()
+    date_start = (start_year, start_month, start_day)
+    date_end = (end_year, end_month, end_day)
+    date = (date_string, date_start, date_end)
     return date
 
 
