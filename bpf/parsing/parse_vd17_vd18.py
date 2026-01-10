@@ -218,7 +218,7 @@ def vd17_get_author(record):
                 #person.external_id.append(pe_id)
             person = (node_type, name_preferred, role, external_id, id_name)
             author_list.append(person)
-        return author_list
+    return author_list
 
 @classes.func_logger
 def vd17_get_title(record):
